@@ -14,6 +14,7 @@ class PartieEditorChoice extends React.Component<PartieEditorChoiceProps, Partie
   constructor(props: PartieEditorChoiceProps) {
     super(props);
     this.handlePopupClose = this.handlePopupClose.bind(this);
+    this.openLoadPartieConfig = this.openLoadPartieConfig.bind(this);
   }
 
   handlePopupClose = () => {
@@ -22,6 +23,10 @@ class PartieEditorChoice extends React.Component<PartieEditorChoiceProps, Partie
 
   openNewConfigScreen = () => {
     this.props.App.setState({ openScreen: 'partieConfigNewScreen' });
+  };
+  openLoadPartieConfig = async () => {
+    const partieJSON = await window.electron.dialog.openPartieConfig();
+    console.log(partieJSON);
   };
 
   render() {
@@ -34,7 +39,8 @@ class PartieEditorChoice extends React.Component<PartieEditorChoiceProps, Partie
             <div className='relative flex gap-8 w-[80vw] xl:w-[70vw] 2xl:w-[60vw]  mx-auto'>
               <PartieEditorChoiceCard text={'Neue Partie Konfiguration'} bgImage={newBGImage}
                                       onClickAction={this.openNewConfigScreen} />
-              <PartieEditorChoiceCard text={'Laden'} bgImage={loadingBGImage} />
+              <PartieEditorChoiceCard text={'Laden'} bgImage={loadingBGImage}
+                                      onClickAction={this.openLoadPartieConfig} />
             </div>
           </div>
         </div>
@@ -70,7 +76,7 @@ class PartieEditorChoiceCard extends React.Component <PartieEditorChoiceCardProp
     const onclick = this.props.onClickAction?.bind(this);
     return (
       <div
-        className='relative w-[50%] h-[400px] xl:h-[500px] 2xl:h-[600px] border border-background shadow-2xl hover:cursor-pointer'
+        className='relative w-[50%] h-[400px] xl:h-[500px] 2xl:h-[600px] shadow-2xl hover:cursor-pointer'
         onMouseEnter={this.handleHover}
         onMouseLeave={this.handleHover}
         onClick={this.props.onClickAction && onclick}
@@ -88,7 +94,7 @@ class PartieEditorChoiceCard extends React.Component <PartieEditorChoiceCardProp
         </div>
         <div className='z-20 absolute top-0 left-0 h-full w-full'>
           <div
-            className={'transition-all absolute bottom-0 text-center w-full text-xl bg-background-800/50' + (hover ? ' p-8' : ' p-4')}>{text}</div>
+            className={'transition-all absolute bottom-0 text-center w-full text-xl' + (hover ? ' bg-accent-500 p-8' : ' bg-background-800/50 p-4')}>{text}</div>
         </div>
       </div>
     );

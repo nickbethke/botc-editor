@@ -64,7 +64,7 @@ class BoardEditorChoiceCard extends React.Component <BoardEditorChoiceCardProps,
     const { hover } = this.state || { hover: false };
     return (
       <div
-        className='relative w-[33.333%] h-[400px] xl:h-[500px] 2xl:h-[600px] border border-background shadow-2xl hover:cursor-pointer'
+        className='relative w-[33.333%] h-[400px] xl:h-[500px] 2xl:h-[600px] shadow-2xl hover:cursor-pointer'
         onMouseEnter={this.handleHover}
         onMouseLeave={this.handleHover}
       >
@@ -81,7 +81,7 @@ class BoardEditorChoiceCard extends React.Component <BoardEditorChoiceCardProps,
         </div>
         <div className='z-20 absolute top-0 left-0 h-full w-full'>
           <div
-            className={'transition-all absolute bottom-0 text-center w-full text-xl bg-background-800/50' + (hover ? ' p-8' : ' p-4')}>{text}</div>
+            className={'transition-all absolute bottom-0 text-center w-full text-xl' + (hover ? ' bg-accent-500 p-8' : ' bg-background-800/50 p-4')}>{text}</div>
         </div>
       </div>
     );

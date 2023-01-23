@@ -3,6 +3,10 @@ import { Channels } from 'main/preload';
 declare global {
   interface Window {
     electron: {
+      dialog: {
+        openPartieConfig(): object
+      };
+      app: { close(): void };
       ipcRenderer: {
         sendMessage(channel: Channels, args: unknown[]): void;
         on(

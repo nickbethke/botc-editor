@@ -9,11 +9,12 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 import path from 'path';
-import { app, BrowserWindow, shell, ipcMain } from 'electron';
+import { app, BrowserWindow, shell, ipcMain, dialog } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
+import fs from 'fs';
 
 class AppUpdater {
   constructor() {
@@ -30,6 +31,7 @@ ipcMain.on('ipc-example', async (event, arg) => {
   console.log(msgTemplate(arg));
   event.reply('ipc-example', msgTemplate('pong'));
 });
+
 
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
@@ -85,7 +87,7 @@ const createWindow = async () => {
     },
     icon: getAssetPath('icon.png'),
     webPreferences: {
-      devTools: false,
+      // devTools: false,
       preload: app.isPackaged
         ? path.join(__dirname, 'preload.js')
         : path.join(__dirname, '../../.erb/dll/preload.js')
@@ -141,6 +143,29 @@ app.on('window-all-closed', () => {
   }
 });
 
+function closeApp() {
+  console.log('INVOKE: CLOSING');
+  if (process.platform !== 'darwin') {
+    app.quit();
+  }
+}
+
+async function handleFileOpen() {
+  console.log('INVOKE: dialog:openPartieConfig');
+  const { canceled, filePaths } = await dialog.showOpenDialog({
+    title: 'Partie-Konfiguration auswählen',
+    properties: ['openFile'],
+    filters: [
+      { name: 'Partie-Konfig', extensions: ['json'] }
+    ]
+  });
+  if (canceled) {
+    return;
+  } else {
+    return JSON.parse(fs.readFileSync(filePaths[0], { encoding: 'utf8' }));
+  }
+}
+
 app
   .whenReady()
   .then(() => {
@@ -150,5 +175,7 @@ app
       // dock icon is clicked and there are no other windows open.
       if (mainWindow === null) createWindow();
     });
+    ipcMain.handle('dialog:openPartieConfig', handleFileOpen);
+    ipcMain.handle('app-close', closeApp);
   })
   .catch(console.log);

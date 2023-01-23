@@ -44,10 +44,10 @@ body {
   position: relative;
   width: fit-content;
   border-left: 1px solid #ffffff;
-  transition: padding-left 0.2s ease-in-out;
+  transition: border-left 0.2s ease-in-out;
 
   &:hover {
-    @apply pl-4;
+    @apply border-l-8 border-l-accent;
     cursor: pointer;
   }
 }
