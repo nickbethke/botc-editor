@@ -8,6 +8,7 @@ import { IoIosClose } from 'react-icons/io';
 type AppStates = {
   openScreen: string,
   openPopup: string | false,
+  toLoad: object | null
 };
 
 class App extends React.Component<unknown, AppStates> {
@@ -38,6 +39,9 @@ class App extends React.Component<unknown, AppStates> {
         return this.homeScreen();
         break;
       case 'partieConfigNewScreen':
+        return this.partieConfigScreen();
+        break;
+      case  'partieConfigLoadScreen':
         return this.partieConfigScreen();
         break;
     }
@@ -84,6 +88,11 @@ class App extends React.Component<unknown, AppStates> {
     const { openScreen } = this.state;
     if (openScreen === 'partieConfigNewScreen') {
       return <PartieKonfigurator App={this} />;
+    }
+    if (openScreen === 'partieConfigLoadScreen') {
+      const load = this.state.toLoad;
+      this.setState({ toLoad: null });
+      return <PartieKonfigurator App={this} values={load} />;
     }
   }
 }

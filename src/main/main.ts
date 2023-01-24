@@ -76,9 +76,9 @@ const createWindow = async () => {
     autoHideMenuBar: true,
     show: false,
     width: 1195,
-    height: 728,
+    height: 880,
     minWidth: 1195,
-    minHeight: 850,
+    minHeight: 880,
     titleBarStyle: 'hidden',
     titleBarOverlay: {
       color: 'hsl(204,14%,49%)',
@@ -87,7 +87,7 @@ const createWindow = async () => {
     },
     icon: getAssetPath('icon.png'),
     webPreferences: {
-      // devTools: false,
+      devTools: false,
       preload: app.isPackaged
         ? path.join(__dirname, 'preload.js')
         : path.join(__dirname, '../../.erb/dll/preload.js')
@@ -166,6 +166,19 @@ async function handleFileOpen() {
   }
 }
 
+async function handleSavePartieConfig(json: string) {
+  console.log('JSON:' + json);
+  const { canceled, filePath } = await dialog.showSaveDialog({
+    title: 'Partie-Konfiguration speichern',
+    filters: [
+      { name: 'Partie-Konfig', extensions: ['json'] }
+    ]
+  });
+  if (filePath) {
+    fs.writeFileSync(filePath, json);
+  }
+}
+
 app
   .whenReady()
   .then(() => {
@@ -176,6 +189,9 @@ app
       if (mainWindow === null) createWindow();
     });
     ipcMain.handle('dialog:openPartieConfig', handleFileOpen);
+    ipcMain.handle('dialog:savePartieConfig', async (event, ...args) => {
+      await handleSavePartieConfig(args[0]);
+    });
     ipcMain.handle('app-close', closeApp);
   })
   .catch(console.log);

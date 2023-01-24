@@ -26,7 +26,7 @@ class PartieEditorChoice extends React.Component<PartieEditorChoiceProps, Partie
   };
   openLoadPartieConfig = async () => {
     const partieJSON = await window.electron.dialog.openPartieConfig();
-    console.log(partieJSON);
+    this.props.App.setState({ openScreen: 'partieConfigLoadScreen', toLoad: partieJSON });
   };
 
   render() {
@@ -59,7 +59,7 @@ type PartieEditorChoiceCardState = {
   hover: boolean
 };
 
-class PartieEditorChoiceCard extends React.Component <PartieEditorChoiceCardProps, PartieEditorChoiceCardState> {
+class PartieEditorChoiceCard extends React.Component<PartieEditorChoiceCardProps, PartieEditorChoiceCardState> {
   constructor(props: PartieEditorChoiceCardProps) {
     super(props);
     this.state = { hover: false };

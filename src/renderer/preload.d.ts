@@ -4,7 +4,8 @@ declare global {
   interface Window {
     electron: {
       dialog: {
-        openPartieConfig(): object
+        openPartieConfig(): object,
+        savePartieConfig(json: string): boolean
       };
       app: { close(): void };
       ipcRenderer: {

@@ -23,7 +23,11 @@ contextBridge.exposeInMainWorld('electron', {
   dialog: {
     openPartieConfig: () => {
       console.log('INVOKE: dialog:openPartieConfig');
-      return ipcRenderer.invoke('dialog:openPartieConfig')
+      return ipcRenderer.invoke('dialog:openPartieConfig');
+    },
+    savePartieConfig: (json: string) => {
+      console.log('INVOKE: dialog:openPartieConfig');
+      return ipcRenderer.invoke('dialog:savePartieConfig', json);
     }
   },
   app: {
