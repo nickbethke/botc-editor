@@ -1,11 +1,13 @@
 import { Channels } from 'main/preload';
+import { PartieConfigSchema } from './components/PartieKonfigurator';
 
 declare global {
   interface Window {
     electron: {
       dialog: {
-        openPartieConfig(): object,
-        savePartieConfig(json: string): boolean
+        openBoardConfig(): object,
+        openPartieConfig(): PartieConfigSchema,
+        savePartieConfig(json: string): Promise<boolean>
       };
       app: { close(): void };
       ipcRenderer: {

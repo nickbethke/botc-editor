@@ -87,7 +87,7 @@ const createWindow = async () => {
     },
     icon: getAssetPath('icon.png'),
     webPreferences: {
-      devTools: false,
+      // devTools: false,
       preload: app.isPackaged
         ? path.join(__dirname, 'preload.js')
         : path.join(__dirname, '../../.erb/dll/preload.js')
@@ -150,33 +150,55 @@ function closeApp() {
   }
 }
 
-async function handleFileOpen() {
-  console.log('INVOKE: dialog:openPartieConfig');
-  const { canceled, filePaths } = await dialog.showOpenDialog({
-    title: 'Partie-Konfiguration auswählen',
-    properties: ['openFile'],
-    filters: [
-      { name: 'Partie-Konfig', extensions: ['json'] }
-    ]
-  });
-  if (canceled) {
-    return;
-  } else {
-    return JSON.parse(fs.readFileSync(filePaths[0], { encoding: 'utf8' }));
+async function handleFileOpen(type: string) {
+  if (type == 'board') {
+    const { canceled, filePaths } = await dialog.showOpenDialog({
+      title: 'Board-Konfiguration auswählen',
+      properties: ['openFile'],
+      filters: [
+        { name: 'Board-Konfig', extensions: ['json'] }
+      ]
+    });
+    if (canceled) {
+      return false;
+    } else {
+      return JSON.parse(fs.readFileSync(filePaths[0], { encoding: 'utf8' }));
+    }
   }
+  if (type == 'partie') {
+    const { canceled, filePaths } = await dialog.showOpenDialog({
+      title: 'Partie-Konfiguration auswählen',
+      properties: ['openFile'],
+      filters: [
+        { name: 'Partie-Konfig', extensions: ['json'] }
+      ]
+    });
+    if (canceled) {
+      return false;
+    } else {
+      return JSON.parse(fs.readFileSync(filePaths[0], { encoding: 'utf8' }));
+    }
+  }
+
 }
 
-async function handleSavePartieConfig(json: string) {
-  console.log('JSON:' + json);
+async function handleSavePartieConfig(json: string): Promise<boolean> {
   const { canceled, filePath } = await dialog.showSaveDialog({
     title: 'Partie-Konfiguration speichern',
     filters: [
       { name: 'Partie-Konfig', extensions: ['json'] }
     ]
   });
+  if (canceled) {
+    return false;
+  }
   if (filePath) {
     fs.writeFileSync(filePath, json);
+    return true;
+  } else {
+    return false;
   }
+
 }
 
 app
@@ -188,9 +210,14 @@ app
       // dock icon is clicked and there are no other windows open.
       if (mainWindow === null) createWindow();
     });
-    ipcMain.handle('dialog:openPartieConfig', handleFileOpen);
+    ipcMain.handle('dialog:openBoardConfig', async () => {
+      return await handleFileOpen('board');
+    });
+    ipcMain.handle('dialog:openPartieConfig', async () => {
+      return await handleFileOpen('partie');
+    });
     ipcMain.handle('dialog:savePartieConfig', async (event, ...args) => {
-      await handleSavePartieConfig(args[0]);
+      return await handleSavePartieConfig(args[0]);
     });
     ipcMain.handle('app-close', closeApp);
   })

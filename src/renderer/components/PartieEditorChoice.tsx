@@ -1,6 +1,5 @@
 import React from 'react';
 import newBGImage from './../../../assets/images/new-color.jpg';
-import randomBGImage from './../../../assets/images/random-color.jpg';
 import loadingBGImage from './../../../assets/images/bg-color-II.jpg';
 import App from './../App';
 
@@ -26,7 +25,9 @@ class PartieEditorChoice extends React.Component<PartieEditorChoiceProps, Partie
   };
   openLoadPartieConfig = async () => {
     const partieJSON = await window.electron.dialog.openPartieConfig();
-    this.props.App.setState({ openScreen: 'partieConfigLoadScreen', toLoad: partieJSON });
+    if (partieJSON) {
+      this.props.App.setState({ openScreen: 'partieConfigLoadScreen', toLoad: partieJSON });
+    }
   };
 
   render() {

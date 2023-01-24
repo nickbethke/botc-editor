@@ -2,8 +2,8 @@ import React from 'react';
 import './App.scss';
 import BoardEditorChoice from './components/BoardEditorChoice';
 import PartieEditorChoice from './components/PartieEditorChoice';
-import PartieKonfigurator from './components/PartieKonfigurator';
-import { IoIosClose } from 'react-icons/io';
+import PartieKonfigurator, { PartieConfigSchema } from './components/PartieKonfigurator';
+import BoardKonfigurator from './components/BoardKonfigurator';
 
 type AppStates = {
   openScreen: string,
@@ -14,7 +14,7 @@ type AppStates = {
 class App extends React.Component<unknown, AppStates> {
   constructor(props: unknown) {
     super(props);
-    this.state = { openScreen: 'home', openPopup: false };
+    this.state = { openScreen: 'home', openPopup: false, toLoad: null };
     this.handleOpenBoardEditorChoice =
       this.handleOpenBoardEditorChoice.bind(this);
     this.handleOpenPartieEditorChoice =
@@ -33,17 +33,16 @@ class App extends React.Component<unknown, AppStates> {
   };
 
   render() {
-    const { openScreen, openPopup } = this.state;
+    const { openScreen } = this.state;
     switch (openScreen) {
       case 'home':
         return this.homeScreen();
-        break;
       case 'partieConfigNewScreen':
-        return this.partieConfigScreen();
-        break;
       case  'partieConfigLoadScreen':
         return this.partieConfigScreen();
-        break;
+      case 'boardConfigNewScreen':
+      case 'boardConfigLoadScreen':
+        return this.boardConfigScreen();
     }
 
 
@@ -84,7 +83,7 @@ class App extends React.Component<unknown, AppStates> {
     );
   }
 
-  partieConfigScreen() {
+  partieConfigScreen = () => {
     const { openScreen } = this.state;
     if (openScreen === 'partieConfigNewScreen') {
       return <PartieKonfigurator App={this} />;
@@ -92,9 +91,18 @@ class App extends React.Component<unknown, AppStates> {
     if (openScreen === 'partieConfigLoadScreen') {
       const load = this.state.toLoad;
       this.setState({ toLoad: null });
-      return <PartieKonfigurator App={this} values={load} />;
+      return <PartieKonfigurator App={this} values={load as PartieConfigSchema} />;
     }
-  }
+  };
+  boardConfigScreen = () => {
+    const { openScreen } = this.state;
+    if (openScreen === 'boardConfigNewScreen') {
+      return <BoardKonfigurator App={this} />;
+    }
+    if (openScreen === 'boardConfigLoadScreen') {
+      return <BoardKonfigurator App={this} />;
+    }
+  };
 }
 
 export default App;

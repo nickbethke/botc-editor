@@ -14,10 +14,25 @@ class BoardEditorChoice extends React.Component<BoardEditorChoiceProps, BoardEdi
   constructor(props: BoardEditorChoiceProps) {
     super(props);
     this.handlePopupClose = this.handlePopupClose.bind(this);
+    this.openNewBoardConfig = this.openNewBoardConfig.bind(this);
+    this.openRandomBoardConfig = this.openRandomBoardConfig.bind(this);
+    this.openLoadBoardConfig = this.openLoadBoardConfig.bind(this);
   }
 
   handlePopupClose = () => {
     this.props.App.setState({ openPopup: false });
+  };
+  openLoadBoardConfig = async () => {
+    const boarsJSON = await window.electron.dialog.openBoardConfig();
+    if (boarsJSON) {
+      this.props.App.setState({ openScreen: 'boardConfigLoadScreen', toLoad: boarsJSON });
+    }
+  };
+  openNewBoardConfig = () => {
+    this.props.App.setState({ openScreen: 'boardConfigNewScreen' });
+  };
+  openRandomBoardConfig = () => {
+
   };
 
   render() {
@@ -28,9 +43,11 @@ class BoardEditorChoice extends React.Component<BoardEditorChoiceProps, BoardEdi
           <div className='absolute top-[50%] left-[50%] translate-y-[-50%] translate-x-[-50%]'>
             <div className='text-center text-3xl mb-8'>Board Konfiguration</div>
             <div className='relative flex gap-8 w-[80vw] xl:w-[70vw] 2xl:w-[60vw]  mx-auto'>
-              <BoardEditorChoiceCard text={'Leeres Board'} bgImage={newBGImage} />
-              <BoardEditorChoiceCard text={'Zufällig'} bgImage={randomBGImage} />
-              <BoardEditorChoiceCard text={'Laden'} bgImage={loadingBGImage} />
+              <BoardEditorChoiceCard text={'Leeres Board'} bgImage={newBGImage}
+                                     onClickAction={this.openNewBoardConfig} />
+              <BoardEditorChoiceCard text={'Zufällig'} bgImage={randomBGImage}
+                                     onClickAction={this.openRandomBoardConfig} />
+              <BoardEditorChoiceCard text={'Laden'} bgImage={loadingBGImage} onClickAction={this.openLoadBoardConfig} />
             </div>
           </div>
         </div>
@@ -42,6 +59,7 @@ class BoardEditorChoice extends React.Component<BoardEditorChoiceProps, BoardEdi
 type BoardEditorChoiceCardProps = {
   text: string;
   bgImage?: string;
+  onClickAction?: Function
 };
 
 type BoardEditorChoiceCardState = {
@@ -62,11 +80,13 @@ class BoardEditorChoiceCard extends React.Component <BoardEditorChoiceCardProps,
   render() {
     const { text, bgImage } = this.props;
     const { hover } = this.state || { hover: false };
+    const onclick = this.props.onClickAction?.bind(this);
     return (
       <div
         className='relative w-[33.333%] h-[400px] xl:h-[500px] 2xl:h-[600px] shadow-2xl hover:cursor-pointer'
         onMouseEnter={this.handleHover}
         onMouseLeave={this.handleHover}
+        onClick={this.props.onClickAction && onclick}
       >
         <div className='absolute top-0 left-0 h-full w-full z-0'>
           <div style={{

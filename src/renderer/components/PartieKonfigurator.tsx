@@ -4,13 +4,10 @@ import App from './../App';
 import { BiChevronLeft } from 'react-icons/bi';
 import InputLabel from './InputLabel';
 import { InputValidator } from '../helper/InputValidator';
-import { Notification } from './Notification';
+import { Error, Notification } from './Notification';
+import { ConfirmPopup } from './ConfirmPopup';
 
-type PartieKonfiguratorProps = {
-  App: App,
-  values?: PartieKonfiguratorState
-}
-type PartieKonfiguratorState = {
+export type PartieConfigSchema = {
   name: string,
   maxRounds: number,
   reviveRounds: number
@@ -22,8 +19,17 @@ type PartieKonfiguratorState = {
   startLembas: number
 }
 
-class PartieKonfigurator extends React.Component<PartieKonfiguratorProps, PartieKonfiguratorState> {
-  private default = {
+type PartieKonfiguratorProps = {
+  App: App,
+  values?: PartieConfigSchema
+}
+type PartieKonfiguratorState = {
+  values: PartieConfigSchema,
+  popupLeave: boolean
+}
+
+export class PartieKonfigurator extends React.Component<PartieKonfiguratorProps, PartieKonfiguratorState> {
+  private default: PartieConfigSchema = {
     name: '',
     maxRounds: 0,
     reviveRounds: 0,
@@ -34,50 +40,63 @@ class PartieKonfigurator extends React.Component<PartieKonfiguratorProps, Partie
     shotLembas: 0,
     startLembas: 0
   };
-  private notification: JSX.Element = null;
+  private notification: JSX.Element | undefined;
 
   constructor(props: PartieKonfiguratorProps) {
     super(props);
-    this.backToHomeScreen = this.backToHomeScreen.bind(this);
+    this.handleBackButton = this.handleBackButton.bind(this);
     this.handleSaveClick = this.handleSaveClick.bind(this);
     this.openLoadPartieConfig = this.openLoadPartieConfig.bind(this);
-    this.setState({
-      name: '',
-      maxRounds: 0,
-      reviveRounds: 0,
-      serverIngameDelay: 0,
-      riverMoveCount: 0,
-      cardSelectionTimeout: 0,
-      charSelectionTimeout: 0,
-      shotLembas: 0,
-      startLembas: 0
-    });
+    this.abortBackToHomeScreen = this.abortBackToHomeScreen.bind(this);
+    this.state = {
+      values: this.default,
+      popupLeave: false
+    };
   }
 
-  state: PartieKonfiguratorState = this.default;
+  handleBackButton = () => {
+    this.setState({ popupLeave: true });
+  };
 
   backToHomeScreen = () => {
     this.props.App.setState({ openScreen: 'home', openPopup: false });
   };
+  abortBackToHomeScreen = () => {
+    this.setState({ popupLeave: false });
+  };
 
   handleSaveClick = async () => {
-    const json = JSON.stringify({ ...this.default, ...this.state }, null, 4);
-    await window.electron.dialog.savePartieConfig(json);
-    this.setState({ ...this.default, ...this.state });
-    this.notification = (<Notification label={'Erfolgreich gespeichert'} />);
+    const json = JSON.stringify({ ...this.default, ...this.state.values }, null, 4);
+    const answer = await window.electron.dialog.savePartieConfig(json);
+    if (answer)
+      this.notification = <Notification label={'Erfolgreich gespeichert'} />;
+    this.setState({ values: { ...this.default, ...this.state.values } });
+
   };
 
   openLoadPartieConfig = async () => {
     const partieJSON = await window.electron.dialog.openPartieConfig();
-    this.setState(partieJSON);
-    this.notification = (<Notification label={'Erfolgreich geladen'}></Notification>);
+    if (partieJSON) {
+      this.setState({ values: partieJSON });
+      this.notification = (<Notification label={'Erfolgreich geladen'}></Notification>);
+    } else {
+      this.setState({ values: this.default });
+      this.notification = (<Error label={'Laden der Datei fehlgeschlagen!'}></Error>);
+    }
   };
 
   render = () => {
     if (this.props.values) {
-      this.setState(this.props.values);
+      this.setState({ values: this.props.values });
       this.notification = (<Notification label={'Erfolgreich geladen'} />);
     }
+    let popupLeave = null;
+    if (this.state.popupLeave) {
+      popupLeave = (
+        <ConfirmPopup label={'Partie-Konfigurator wirklich verlassen?'} onConfirm={this.backToHomeScreen}
+                      onAbort={this.abortBackToHomeScreen} />);
+    }
+    const { values } = this.state;
     return (
       <div>
         <div className='dragger absolute top-0 left-0 w-[100vw] h-8' />
@@ -85,8 +104,8 @@ class PartieKonfigurator extends React.Component<PartieKonfiguratorProps, Partie
           <div style={{ backgroundImage: 'url(' + backgroundImage + ')', backgroundSize: 'cover' }}></div>
           <div className={'col-span-2 2xl:col-span-1 m-8 flex flex-col gap-8'}>
             <div className={'flex flex-row justify-start gap-8'}>
-              <BiChevronLeft className={'text-4xl border border-white rounded cursor-pointer'}
-                             onClick={this.backToHomeScreen} />
+              <BiChevronLeft className={'text-4xl border border-white cursor-pointer hover:bg-accent-500'}
+                             onClick={this.handleBackButton} />
               <div className={'text-4xl'}>Partie Konfigurator</div>
             </div>
             <div>
@@ -98,9 +117,9 @@ class PartieKonfigurator extends React.Component<PartieKonfiguratorProps, Partie
                 label={'Partie Name'}
                 type={'text'}
                 placeholder={'Partie Name'}
-                value={this.state.name}
+                value={values.name}
                 onChange={(value) => {
-                  this.setState({ name: value.toString() });
+                  this.setState({ values: { ...values, name: value.toString() } });
                 }}
                 validator={new InputValidator(InputValidator.TYPE_STRING, {
                   text: {
@@ -122,7 +141,7 @@ class PartieKonfigurator extends React.Component<PartieKonfiguratorProps, Partie
                   label={'Maximale Rundenanzahl'}
                   type={'number'}
                   min={-1}
-                  value={this.state.maxRounds}
+                  value={values.maxRounds}
                   validator={new InputValidator(InputValidator.TYPE_NUMBER, {
                     number: {
                       ifSmallerThen: {
@@ -136,7 +155,7 @@ class PartieKonfigurator extends React.Component<PartieKonfiguratorProps, Partie
                     }
                   })}
                   onChange={(value) => {
-                    this.setState({ maxRounds: Number.parseFloat(value.toString()) });
+                    this.setState({ values: { ...values, maxRounds: Number.parseFloat(value.toString()) } });
                   }}
                 />
               </div>
@@ -145,7 +164,7 @@ class PartieKonfigurator extends React.Component<PartieKonfiguratorProps, Partie
                   editor={this}
                   label={'Start Lembas'}
                   type={'number'}
-                  value={this.state.startLembas}
+                  value={values.startLembas}
                   validator={new InputValidator(InputValidator.TYPE_NUMBER, {
                     number: {
                       ifSmallerThen: {
@@ -155,7 +174,12 @@ class PartieKonfigurator extends React.Component<PartieKonfiguratorProps, Partie
                     }
                   })}
                   onChange={(value) => {
-                    this.setState({ startLembas: Number.parseFloat(value.toString()) });
+                    this.setState({
+                      values: {
+                        ...values,
+                        startLembas: Number.parseFloat(value.toString())
+                      }
+                    });
                   }} />
               </div>
             </div>
@@ -166,9 +190,14 @@ class PartieKonfigurator extends React.Component<PartieKonfiguratorProps, Partie
                   label={'Schuss Lembase'}
                   type={'number'}
                   onChange={(value) => {
-                    this.setState({ shotLembas: Number.parseFloat(value.toString()) });
+                    this.setState({
+                      values: {
+                        ...values,
+                        shotLembas: Number.parseFloat(value.toString())
+                      }
+                    });
                   }}
-                  value={this.state.shotLembas}
+                  value={values.shotLembas}
                 />
               </div>
               <div>
@@ -177,9 +206,14 @@ class PartieKonfigurator extends React.Component<PartieKonfiguratorProps, Partie
                   label={'Flussbewegugsschritte'}
                   type={'number'}
                   onChange={(value) => {
-                    this.setState({ riverMoveCount: Number.parseFloat(value.toString()) });
+                    this.setState({
+                      values: {
+                        ...values,
+                        riverMoveCount: Number.parseFloat(value.toString())
+                      }
+                    });
                   }}
-                  value={this.state.riverMoveCount}
+                  value={values.riverMoveCount}
                 />
               </div>
             </div>
@@ -191,42 +225,84 @@ class PartieKonfigurator extends React.Component<PartieKonfiguratorProps, Partie
                   type={'number'}
                   helperText={'-1 für dauerhaften Tod'}
                   onChange={(value) => {
-                    this.setState({ reviveRounds: Number.parseFloat(value.toString()) });
+                    this.setState({
+                      values: {
+                        ...values,
+                        reviveRounds: Number.parseFloat(value.toString())
+                      }
+                    });
                   }}
-                  value={this.state.reviveRounds}
+                  value={values.reviveRounds}
                 />
               </div>
-              <div><InputLabel editor={this} label={'TimeOut für Charakterauswahl'} type={'number'}
-                               helperText={'in ms'} onChange={(value) => {
-                this.setState({ charSelectionTimeout: Number.parseFloat(value.toString()) });
-              }} value={this.state.charSelectionTimeout} /></div>
-            </div>
-            <div className={'grid grid-cols-2 gap-8'}>
-              <div><InputLabel editor={this} label={'TimeOut für Kartenauswahl'} type={'number'} helperText={'in ms'}
-                               onChange={(value) => {
-                                 this.setState({ cardSelectionTimeout: Number.parseFloat(value.toString()) });
-                               }} value={this.state.cardSelectionTimeout} />
-              </div>
-              <div><InputLabel editor={this} label={'Server-Ingame-Delay'} type={'number'} helperText={'in ms'}
-                               onChange={(value) => {
-                                 this.setState({ serverIngameDelay: Number.parseFloat(value.toString()) });
-                               }} value={this.state.serverIngameDelay} /></div>
+              <div>
+                <InputLabel
+                  editor={this}
+                  label={'TimeOut für Charakterauswahl'}
+                  type={'number'}
+                  helperText={'in ms'}
+                  onChange={(value) => {
+                    this.setState({
+                      values: {
+                        ...values,
+                        charSelectionTimeout: Number.parseFloat(value.toString())
+                      }
+                    });
+                  }}
+                  value={values.charSelectionTimeout} /></div>
             </div>
             <div className={'grid grid-cols-2 gap-8'}>
               <div>
-                <button className={'border rounded p-4 w-full text-xl'} onClick={this.handleSaveClick}>Speichern
+                <InputLabel
+                  editor={this}
+                  label={'TimeOut für Kartenauswahl'}
+                  type={'number'}
+                  helperText={'in ms'}
+                  onChange={(value) => {
+                    this.setState({
+                      values: {
+                        ...values,
+                        cardSelectionTimeout: Number.parseFloat(value.toString())
+                      }
+                    });
+                  }}
+                  value={values.cardSelectionTimeout} />
+              </div>
+              <div>
+                <InputLabel
+                  editor={this}
+                  label={'Server-Ingame-Delay'}
+                  type={'number'}
+                  helperText={'in ms'}
+                  onChange={(value) => {
+                    this.setState({
+                      values: {
+                        ...values,
+                        serverIngameDelay: Number.parseFloat(value.toString())
+                      }
+                    });
+                  }}
+                  value={values.serverIngameDelay} /></div>
+            </div>
+            <div className={'grid grid-cols-2 gap-8'}>
+              <div>
+                <button className={'w-full border border-white p-4 hover:bg-accent-500 text-lg'}
+                        onClick={this.handleSaveClick}>Speichern
                 </button>
               </div>
               <div>
-                <button className={'border rounded p-4 w-full text-xl'} onClick={this.openLoadPartieConfig}>Laden
+                <button className={'w-full border border-white p-4 hover:bg-accent-500 text-lg'}
+                        onClick={this.openLoadPartieConfig}>Laden
                 </button>
               </div>
             </div>
           </div>
         </div>
+        {popupLeave}
       </div>
     );
-  };
+  }
+  ;
 }
 
 export default PartieKonfigurator;

@@ -1,4 +1,4 @@
-import { app, contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
+import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 
 export type Channels = 'ipc-example';
 
@@ -21,6 +21,10 @@ contextBridge.exposeInMainWorld('electron', {
     }
   },
   dialog: {
+    openBoardConfig: () => {
+      console.log('INVOKE: dialog:openBoardConfig');
+      return ipcRenderer.invoke('dialog:openBoardConfig');
+    },
     openPartieConfig: () => {
       console.log('INVOKE: dialog:openPartieConfig');
       return ipcRenderer.invoke('dialog:openPartieConfig');
