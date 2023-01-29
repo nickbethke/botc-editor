@@ -8,7 +8,6 @@ import { Error, Notification } from './Notification';
 import { ConfirmPopup } from './ConfirmPopup';
 
 export type PartieConfigSchema = {
-  name: string,
   maxRounds: number,
   reviveRounds: number
   serverIngameDelay: number,
@@ -30,7 +29,6 @@ type PartieKonfiguratorState = {
 
 export class PartieKonfigurator extends React.Component<PartieKonfiguratorProps, PartieKonfiguratorState> {
   private default: PartieConfigSchema = {
-    name: '',
     maxRounds: 0,
     reviveRounds: 0,
     serverIngameDelay: 0,
@@ -110,29 +108,6 @@ export class PartieKonfigurator extends React.Component<PartieKonfiguratorProps,
             </div>
             <div>
               {this.notification}
-            </div>
-            <div>
-              <InputLabel
-                editor={this}
-                label={'Partie Name'}
-                type={'text'}
-                placeholder={'Partie Name'}
-                value={values.name}
-                onChange={(value) => {
-                  this.setState({ values: { ...values, name: value.toString() } });
-                }}
-                validator={new InputValidator(InputValidator.TYPE_STRING, {
-                  text: {
-                    longerThan: {
-                      number: 25,
-                      error: 'Partie Name zu lang. Bitte nicht mehr als 25 Zeichen.'
-                    },
-                    regex: {
-                      expression: new RegExp('^([a-z0-9A-Z_äöüÄÖÜß\\s-]*)$'),
-                      error: 'Nur Buchstaben, Zahlen, Leerzeilen und Unterstriche erlaube!'
-                    }
-                  }
-                })} />
             </div>
             <div className={'grid grid-cols-2 gap-8'}>
               <div>
