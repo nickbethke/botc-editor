@@ -4,6 +4,7 @@ import BoardEditorChoice from './components/BoardEditorChoice';
 import PartieEditorChoice from './components/PartieEditorChoice';
 import PartieKonfigurator, { PartieConfigSchema } from './components/PartieKonfigurator';
 import BoardKonfigurator from './components/BoardKonfigurator';
+import { JSONValidator } from './components/JSONValidator';
 
 type AppStates = {
   openScreen: string,
@@ -20,6 +21,7 @@ class App extends React.Component<unknown, AppStates> {
     this.handleOpenPartieEditorChoice =
       this.handleOpenPartieEditorChoice.bind(this);
     this.handleCloseApp = this.handleCloseApp.bind(this);
+    this.handleOpenValidator = this.handleOpenValidator.bind(this);
   }
 
   handleOpenBoardEditorChoice = () => {
@@ -30,6 +32,9 @@ class App extends React.Component<unknown, AppStates> {
   };
   handleCloseApp = () => {
     window.electron.app.close();
+  };
+  handleOpenValidator = () => {
+    this.setState({ openScreen: 'validator' });
   };
 
   render() {
@@ -43,6 +48,8 @@ class App extends React.Component<unknown, AppStates> {
       case 'boardConfigNewScreen':
       case 'boardConfigLoadScreen':
         return this.boardConfigScreen();
+      case  'validator':
+        return this.validatorScreen();
     }
 
 
@@ -70,6 +77,7 @@ class App extends React.Component<unknown, AppStates> {
             <div className='flex flex-col gap-4'>
               <div className='text-2xl clickable' onClick={this.handleOpenBoardEditorChoice}>Board-Konfigurator</div>
               <div className='text-2xl clickable' onClick={this.handleOpenPartieEditorChoice}>Partie-Konfigurator</div>
+              <div className='text-2xl clickable' onClick={this.handleOpenValidator}>Validator</div>
               <div className={'clickable mt-8 flex gap-4'} onClick={this.handleCloseApp}>
                 <span className={'text-2xl'}>Beenden</span>
               </div>
@@ -101,6 +109,12 @@ class App extends React.Component<unknown, AppStates> {
     }
     if (openScreen === 'boardConfigLoadScreen') {
       return <BoardKonfigurator App={this} />;
+    }
+  };
+  validatorScreen = () => {
+    const { openScreen } = this.state;
+    if (openScreen === 'validator') {
+      return <JSONValidator App={this} />;
     }
   };
 }

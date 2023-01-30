@@ -16,6 +16,19 @@
   url('/assets/fonts/salsa/salsa-v17-latin-regular.svg#Salsa') format('svg'); /* Legacy iOS */
 }
 
+@font-face {
+  font-display: swap;
+  font-family: 'Lato';
+  font-style: normal;
+  font-weight: 400;
+  src: url('/assets/fonts/lato/lato-v23-latin-regular.eot'); /* IE9 Compat Modes */
+  src: url('/assets/fonts/lato/lato-v23-latin-regular.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+  url('/assets/fonts/lato/lato-v23-latin-regular.woff2') format('woff2'), /* Super Modern Browsers */
+  url('/assets/fonts/lato/lato-v23-latin-regular.woff') format('woff'), /* Modern Browsers */
+  url('/assets/fonts/lato/lato-v23-latin-regular.ttf') format('truetype'), /* Safari, Android, iOS */
+  url('/assets/fonts/lato/lato-v23-latin-regular.svg#Lato') format('svg'); /* Legacy iOS */
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -25,9 +38,22 @@ body {
   font-family: "Salsa", sans-serif;
 
 }
-.dragger{
+
+.dragger {
   -webkit-app-region: drag;
   -webkit-user-select: none;
+}
+
+.font-lato {
+  font-family: "Lato", sans-serif;
+}
+
+.font-mono {
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 14px;
+  font-feature-settings: "liga" 0, "calt" 0;
+  line-height: 19px;
+  letter-spacing: 0;
 }
 
 #homeScreenBG {

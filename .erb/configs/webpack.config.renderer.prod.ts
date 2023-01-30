@@ -14,6 +14,7 @@ import baseConfig from './webpack.config.base';
 import webpackPaths from './webpack.paths';
 import checkNodeEnv from '../scripts/check-node-env';
 import deleteSourceMaps from '../scripts/delete-source-maps';
+import MonacoWebpackPlugin from 'monaco-editor-webpack-plugin';
 
 checkNodeEnv('production');
 deleteSourceMaps();
@@ -126,6 +127,9 @@ const configuration: webpack.Configuration = {
     new webpack.EnvironmentPlugin({
       NODE_ENV: 'production',
       DEBUG_PROD: false,
+    }),
+    new MonacoWebpackPlugin({
+      languages: ['json']
     }),
 
     new MiniCssExtractPlugin({

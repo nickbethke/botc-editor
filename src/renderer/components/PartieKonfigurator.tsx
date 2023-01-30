@@ -6,17 +6,7 @@ import InputLabel from './InputLabel';
 import { InputValidator } from '../helper/InputValidator';
 import { Error, Notification } from './Notification';
 import { ConfirmPopup } from './ConfirmPopup';
-
-export type PartieConfigSchema = {
-  maxRounds: number,
-  reviveRounds: number
-  serverIngameDelay: number,
-  riverMoveCount: number,
-  cardSelectionTimeout: number,
-  charSelectionTimeout: number,
-  shotLembas: number,
-  startLembas: number
-}
+import { PartieConfigSchema } from '../../schema/partieConfigSchema';
 
 type PartieKonfiguratorProps = {
   App: App,
@@ -34,7 +24,7 @@ export class PartieKonfigurator extends React.Component<PartieKonfiguratorProps,
     serverIngameDelay: 0,
     riverMoveCount: 0,
     cardSelectionTimeout: 0,
-    charSelectionTimeout: 0,
+    characterSelectionTimeout: 0,
     shotLembas: 0,
     startLembas: 0
   };
@@ -220,11 +210,11 @@ export class PartieKonfigurator extends React.Component<PartieKonfiguratorProps,
                     this.setState({
                       values: {
                         ...values,
-                        charSelectionTimeout: Number.parseFloat(value.toString())
+                        characterSelectionTimeout: Number.parseFloat(value.toString())
                       }
                     });
                   }}
-                  value={values.charSelectionTimeout} /></div>
+                  value={values.characterSelectionTimeout} /></div>
             </div>
             <div className={'grid grid-cols-2 gap-8'}>
               <div>

@@ -20,7 +20,15 @@ contextBridge.exposeInMainWorld('electron', {
       ipcRenderer.once(channel, (_event, ...args) => func(...args));
     }
   },
+  validate: (json: object) => {
+    console.log('INVOKE: validate:json');
+    return ipcRenderer.invoke('validate:json', json);
+  },
   dialog: {
+    openConfig: () => {
+      console.log('INVOKE: dialog:openConfig');
+      return ipcRenderer.invoke('dialog:openConfig');
+    },
     openBoardConfig: () => {
       console.log('INVOKE: dialog:openBoardConfig');
       return ipcRenderer.invoke('dialog:openBoardConfig');

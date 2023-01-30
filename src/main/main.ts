@@ -15,6 +15,8 @@ import log from 'electron-log';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 import fs from 'fs';
+import Ajv from 'ajv';
+import { schema } from '../schema/partieConfigSchema';
 
 class AppUpdater {
   constructor() {
@@ -87,7 +89,7 @@ const createWindow = async () => {
     },
     icon: getAssetPath('icon.png'),
     webPreferences: {
-      devTools: false,
+      // devTools: false,
       preload: app.isPackaged
         ? path.join(__dirname, 'preload.js')
         : path.join(__dirname, '../../.erb/dll/preload.js')
@@ -150,7 +152,7 @@ function closeApp() {
   }
 }
 
-async function handleFileOpen(type: string) {
+async function handleFileOpen(type: string = '') {
   if (type == 'board') {
     const { canceled, filePaths } = await dialog.showOpenDialog({
       title: 'Board-Konfiguration auswählen',
@@ -171,6 +173,21 @@ async function handleFileOpen(type: string) {
       properties: ['openFile'],
       filters: [
         { name: 'Partie-Konfig', extensions: ['json'] }
+      ]
+    });
+    if (canceled) {
+      return false;
+    } else {
+      return JSON.parse(fs.readFileSync(filePaths[0], { encoding: 'utf8' }));
+    }
+  }
+  if (type == '') {
+    const { canceled, filePaths } = await dialog.showOpenDialog({
+      title: 'Konfiguration auswählen',
+      properties: ['openFile'],
+      filters: [
+        { name: 'Partie-Konfig', extensions: ['json'] },
+        { name: 'Board-Konfig', extensions: ['json'] }
       ]
     });
     if (canceled) {
@@ -201,6 +218,21 @@ async function handleSavePartieConfig(json: string): Promise<boolean> {
 
 }
 
+function jsonValidate(json: string) {
+  const ajv = new Ajv({ allErrors: true });
+  const validate = ajv.compile(schema);
+  try {
+    if (validate(JSON.parse(json))) {
+      return true;
+    } else {
+      return JSON.stringify(validate.errors, null, 4);
+    }
+  } catch (e) {
+    return JSON.stringify({ 'error': 'unvalid JSON format' }, null, 4);
+  }
+
+}
+
 app
   .whenReady()
   .then(() => {
@@ -218,6 +250,12 @@ app
     });
     ipcMain.handle('dialog:savePartieConfig', async (event, ...args) => {
       return await handleSavePartieConfig(args[0]);
+    });
+    ipcMain.handle('dialog:openConfig', async () => {
+      return await handleFileOpen();
+    });
+    ipcMain.handle('validate:json', (event, ...args) => {
+      return jsonValidate(args[0]);
     });
     ipcMain.handle('app-close', closeApp);
   })
