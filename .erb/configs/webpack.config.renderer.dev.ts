@@ -10,8 +10,8 @@ import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin';
 import baseConfig from './webpack.config.base';
 import webpackPaths from './webpack.paths';
 import checkNodeEnv from '../scripts/check-node-env';
-
-import MonacoWebpackPlugin from 'monaco-editor-webpack-plugin';
+import CopyPlugin from 'copy-webpack-plugin';
+import MonacoEditorWebpackPlugin from 'monaco-editor-webpack-plugin';
 
 // When an ESLint server is running, we can't set the NODE_ENV so we'll check if it's
 // at the dev webpack config is not accidentally run in a production environment
@@ -50,7 +50,7 @@ const configuration: webpack.Configuration = {
   entry: [
     `webpack-dev-server/client?http://localhost:${port}/dist`,
     'webpack/hot/only-dev-server',
-    path.join(webpackPaths.srcRendererPath, 'index.tsx')
+    path.join(webpackPaths.srcRendererPath, 'index.tsx'),
   ],
 
   output: {
@@ -58,8 +58,8 @@ const configuration: webpack.Configuration = {
     publicPath: '/',
     filename: 'renderer.dev.js',
     library: {
-      type: 'umd'
-    }
+      type: 'umd',
+    },
   },
 
   module: {
@@ -73,34 +73,34 @@ const configuration: webpack.Configuration = {
             options: {
               modules: true,
               sourceMap: true,
-              importLoaders: 1
-            }
+              importLoaders: 1,
+            },
           },
           'sass-loader',
           {
             loader: 'postcss-loader',
             options: {
               ident: 'postcss',
-              plugins: [require('tailwindcss'), require('autoprefixer')]
-            }
-          }
+              plugins: [require('tailwindcss'), require('autoprefixer')],
+            },
+          },
         ],
-        include: /\.module\.s?(c|a)ss$/
+        include: /\.module\.s?(c|a)ss$/,
       },
       {
         test: /\.s?css$/,
         use: ['style-loader', 'css-loader', 'sass-loader', 'postcss-loader'],
-        exclude: /\.module\.s?(c|a)ss$/
+        exclude: /\.module\.s?(c|a)ss$/,
       },
       // Fonts
       {
         test: /\.(woff|woff2|eot|ttf|otf)$/i,
-        type: 'asset/resource'
+        type: 'asset/resource',
       },
       // Images
       {
         test: /\.(png|jpg|jpeg|gif)$/i,
-        type: 'asset/resource'
+        type: 'asset/resource',
       },
       // SVG
       {
@@ -112,32 +112,28 @@ const configuration: webpack.Configuration = {
               prettier: false,
               svgo: false,
               svgoConfig: {
-                plugins: [{ removeViewBox: false }]
+                plugins: [{ removeViewBox: false }],
               },
               titleProp: true,
-              ref: true
-            }
+              ref: true,
+            },
           },
-          'file-loader'
-        ]
-      }
-    ]
+          'file-loader',
+        ],
+      },
+    ],
   },
   plugins: [
     ...(skipDLLs
       ? []
       : [
-        new webpack.DllReferencePlugin({
-          context: webpackPaths.dllPath,
-          manifest: require(manifest),
-          sourceType: 'var'
-        })
-      ]),
-
+          new webpack.DllReferencePlugin({
+            context: webpackPaths.dllPath,
+            manifest: require(manifest),
+            sourceType: 'var',
+          }),
+        ]),
     new webpack.NoEmitOnErrorsPlugin(),
-    new MonacoWebpackPlugin({
-      languages: ['json']
-    }),
     /**
      * Create global constants which can be configured at compile time.
      *
@@ -151,13 +147,13 @@ const configuration: webpack.Configuration = {
      * 'staging', for example, by changing the ENV variables in the npm scripts
      */
     new webpack.EnvironmentPlugin({
-      NODE_ENV: 'development'
+      NODE_ENV: 'development',
     }),
 
     new webpack.LoaderOptionsPlugin({
-      debug: true
+      debug: true,
     }),
-
+    new MonacoEditorWebpackPlugin(),
     new ReactRefreshWebpackPlugin(),
 
     new HtmlWebpackPlugin({
@@ -166,18 +162,18 @@ const configuration: webpack.Configuration = {
       minify: {
         collapseWhitespace: true,
         removeAttributeQuotes: true,
-        removeComments: true
+        removeComments: true,
       },
       isBrowser: false,
       env: process.env.NODE_ENV,
       isDevelopment: process.env.NODE_ENV !== 'production',
-      nodeModules: webpackPaths.appNodeModulesPath
-    })
+      nodeModules: webpackPaths.appNodeModulesPath,
+    }),
   ],
 
   node: {
     __dirname: false,
-    __filename: false
+    __filename: false,
   },
 
   devServer: {
@@ -186,16 +182,16 @@ const configuration: webpack.Configuration = {
     hot: true,
     headers: { 'Access-Control-Allow-Origin': '*' },
     static: {
-      publicPath: '/'
+      publicPath: '/',
     },
     historyApiFallback: {
-      verbose: true
+      verbose: true,
     },
     setupMiddlewares(middlewares) {
       console.log('Starting preload.js builder...');
       const preloadProcess = spawn('npm', ['run', 'start:preload'], {
         shell: true,
-        stdio: 'inherit'
+        stdio: 'inherit',
       })
         .on('close', (code: number) => process.exit(code!))
         .on('error', (spawnError) => console.error(spawnError));
@@ -209,7 +205,7 @@ const configuration: webpack.Configuration = {
       }
       spawn('npm', args, {
         shell: true,
-        stdio: 'inherit'
+        stdio: 'inherit',
       })
         .on('close', (code: number) => {
           preloadProcess.kill();
@@ -217,8 +213,8 @@ const configuration: webpack.Configuration = {
         })
         .on('error', (spawnError) => console.error(spawnError));
       return middlewares;
-    }
-  }
+    },
+  },
 };
 
 export default merge(baseConfig, configuration);

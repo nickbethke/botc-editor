@@ -18,11 +18,11 @@ contextBridge.exposeInMainWorld('electron', {
     },
     once(channel: Channels, func: (...args: unknown[]) => void) {
       ipcRenderer.once(channel, (_event, ...args) => func(...args));
-    }
+    },
   },
-  validate: (json: object) => {
+  validate: (json: object, type: 'partie' | 'board') => {
     console.log('INVOKE: validate:json');
-    return ipcRenderer.invoke('validate:json', json);
+    return ipcRenderer.invoke('validate:json', json, type);
   },
   dialog: {
     openConfig: () => {
@@ -38,14 +38,18 @@ contextBridge.exposeInMainWorld('electron', {
       return ipcRenderer.invoke('dialog:openPartieConfig');
     },
     savePartieConfig: (json: string) => {
-      console.log('INVOKE: dialog:openPartieConfig');
+      console.log('INVOKE: dialog:savePartieConfig');
       return ipcRenderer.invoke('dialog:savePartieConfig', json);
-    }
+    },
+    saveBoardConfig: (json: string) => {
+      console.log('INVOKE: dialog:saveBoardConfig');
+      return ipcRenderer.invoke('dialog:saveBoardConfig', json);
+    },
   },
   app: {
     close() {
       console.log('INVOKE: CLOSING');
       ipcRenderer.invoke('app-close');
-    }
-  }
+    },
+  },
 });

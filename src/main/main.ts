@@ -9,14 +9,12 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 import path from 'path';
-import { app, BrowserWindow, shell, ipcMain, dialog } from 'electron';
+import { app, BrowserWindow, ipcMain, shell } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
-import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
-import fs from 'fs';
-import Ajv from 'ajv';
-import { schema } from '../schema/partieConfigSchema';
+import MenuBuilder from './menu';
+import IPCHelper from './helper/IPCHelper';
 
 class AppUpdater {
   constructor() {
@@ -33,7 +31,6 @@ ipcMain.on('ipc-example', async (event, arg) => {
   console.log(msgTemplate(arg));
   event.reply('ipc-example', msgTemplate('pong'));
 });
-
 
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
@@ -85,24 +82,24 @@ const createWindow = async () => {
     titleBarOverlay: {
       color: 'hsl(204,14%,49%)',
       symbolColor: '#ffffff',
-      height: 32
+      height: 32,
     },
     icon: getAssetPath('icon.png'),
     webPreferences: {
       // devTools: false,
       preload: app.isPackaged
         ? path.join(__dirname, 'preload.js')
-        : path.join(__dirname, '../../.erb/dll/preload.js')
-    }
+        : path.join(__dirname, '../../.erb/dll/preload.js'),
+    },
   });
 
-  mainWindow.on('resize', function() {
+  mainWindow.on('resize', () => {
     if (mainWindow) {
-      process.stdout.write('resize: ' + mainWindow.getSize() + '\r');
+      process.stdout.write(`resize: ${mainWindow.getSize()}\r`);
     }
   });
 
-  mainWindow.loadURL(resolveHtmlPath('index.html'));
+  await mainWindow.loadURL(resolveHtmlPath('index.html'));
 
   mainWindow.on('ready-to-show', () => {
     if (!mainWindow) {
@@ -145,94 +142,6 @@ app.on('window-all-closed', () => {
   }
 });
 
-function closeApp() {
-  console.log('INVOKE: CLOSING');
-  if (process.platform !== 'darwin') {
-    app.quit();
-  }
-}
-
-async function handleFileOpen(type: string = '') {
-  if (type == 'board') {
-    const { canceled, filePaths } = await dialog.showOpenDialog({
-      title: 'Board-Konfiguration auswählen',
-      properties: ['openFile'],
-      filters: [
-        { name: 'Board-Konfig', extensions: ['json'] }
-      ]
-    });
-    if (canceled) {
-      return false;
-    } else {
-      return JSON.parse(fs.readFileSync(filePaths[0], { encoding: 'utf8' }));
-    }
-  }
-  if (type == 'partie') {
-    const { canceled, filePaths } = await dialog.showOpenDialog({
-      title: 'Partie-Konfiguration auswählen',
-      properties: ['openFile'],
-      filters: [
-        { name: 'Partie-Konfig', extensions: ['json'] }
-      ]
-    });
-    if (canceled) {
-      return false;
-    } else {
-      return JSON.parse(fs.readFileSync(filePaths[0], { encoding: 'utf8' }));
-    }
-  }
-  if (type == '') {
-    const { canceled, filePaths } = await dialog.showOpenDialog({
-      title: 'Konfiguration auswählen',
-      properties: ['openFile'],
-      filters: [
-        { name: 'Partie-Konfig', extensions: ['json'] },
-        { name: 'Board-Konfig', extensions: ['json'] }
-      ]
-    });
-    if (canceled) {
-      return false;
-    } else {
-      return JSON.parse(fs.readFileSync(filePaths[0], { encoding: 'utf8' }));
-    }
-  }
-
-}
-
-async function handleSavePartieConfig(json: string): Promise<boolean> {
-  const { canceled, filePath } = await dialog.showSaveDialog({
-    title: 'Partie-Konfiguration speichern',
-    filters: [
-      { name: 'Partie-Konfig', extensions: ['json'] }
-    ]
-  });
-  if (canceled) {
-    return false;
-  }
-  if (filePath) {
-    fs.writeFileSync(filePath, json);
-    return true;
-  } else {
-    return false;
-  }
-
-}
-
-function jsonValidate(json: string) {
-  const ajv = new Ajv({ allErrors: true });
-  const validate = ajv.compile(schema);
-  try {
-    if (validate(JSON.parse(json))) {
-      return true;
-    } else {
-      return JSON.stringify(validate.errors, null, 4);
-    }
-  } catch (e) {
-    return JSON.stringify({ 'error': 'unvalid JSON format' }, null, 4);
-  }
-
-}
-
 app
   .whenReady()
   .then(() => {
@@ -242,21 +151,25 @@ app
       // dock icon is clicked and there are no other windows open.
       if (mainWindow === null) createWindow();
     });
+
     ipcMain.handle('dialog:openBoardConfig', async () => {
-      return await handleFileOpen('board');
+      return IPCHelper.handleFileOpen('board');
     });
     ipcMain.handle('dialog:openPartieConfig', async () => {
-      return await handleFileOpen('partie');
+      return IPCHelper.handleFileOpen('partie');
     });
     ipcMain.handle('dialog:savePartieConfig', async (event, ...args) => {
-      return await handleSavePartieConfig(args[0]);
+      return IPCHelper.handleSavePartieConfig(args[0]);
+    });
+    ipcMain.handle('dialog:saveBoardConfig', async (event, ...args) => {
+      return IPCHelper.handleSaveBoardConfig(args[0]);
     });
     ipcMain.handle('dialog:openConfig', async () => {
-      return await handleFileOpen();
+      return IPCHelper.handleFileOpen();
     });
     ipcMain.handle('validate:json', (event, ...args) => {
-      return jsonValidate(args[0]);
+      return IPCHelper.jsonValidate(args[0], args[1]);
     });
-    ipcMain.handle('app-close', closeApp);
+    ipcMain.handle('app-close', IPCHelper.closeApp);
   })
   .catch(console.log);

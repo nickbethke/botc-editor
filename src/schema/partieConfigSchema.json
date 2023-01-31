@@ -1,7 +1,5 @@
-import { JSONSchemaType } from 'ajv';
-
-// @ts-ignore
-export const schema: JSONSchemaType<PartieConfigSchema> = {
+{
+  "$schema": "http://json-schema.org/draft-06/schema#",
   "$ref": "#/definitions/Partie",
   "definitions": {
     "Partie": {
@@ -18,7 +16,7 @@ export const schema: JSONSchemaType<PartieConfigSchema> = {
           "minimum": -1,
           "maximum": 99
         },
-        "characterSelectionTimeout": {
+        "characterChoiceTimeout": {
           "type": "integer",
           "minimum": 1,
           "maximum": 36000000,
@@ -54,7 +52,7 @@ export const schema: JSONSchemaType<PartieConfigSchema> = {
       },
       "required": [
         "cardSelectionTimeout",
-        "characterSelectionTimeout",
+        "characterChoiceTimeout",
         "maxRounds",
         "reviveRounds",
         "riverMoveCount",
@@ -65,15 +63,4 @@ export const schema: JSONSchemaType<PartieConfigSchema> = {
       "title": "Partie"
     }
   }
-};
-
-export interface PartieConfigSchema {
-  cardSelectionTimeout: number;
-  characterSelectionTimeout: number;
-  maxRounds: number;
-  reviveRounds: number;
-  riverMoveCount: number;
-  serverIngameDelay: number;
-  shotLembas: number;
-  startLembas: number;
 }

@@ -1,17 +1,18 @@
 import { Channels } from 'main/preload';
-import { PartieConfigSchema } from './components/PartieKonfigurator';
-import { BoardConfigSchema } from './components/BoardKonfigurator';
+import PartieConfigInterface from '../schema/interfaces/partieConfigInterface';
+import BoardConfigInterface from '../schema/interfaces/boardConfigInterface';
 
 declare global {
   interface Window {
     electron: {
       dialog: {
-        openConfig(): PartieConfigSchema | BoardConfigSchema,
-        openBoardConfig(): BoardConfigSchema,
-        openPartieConfig(): PartieConfigSchema,
-        savePartieConfig(json: string): Promise<boolean>
+        openConfig(): PartieConfigInterface | BoardConfigInterface;
+        openBoardConfig(): BoardConfigInterface;
+        openPartieConfig(): PartieConfigInterface;
+        savePartieConfig(json: string): Promise<boolean>;
+        saveBoardConfig(json: string): Promise<boolean>;
       };
-      validate(json: object): boolean | string;
+      validate(json: object, type: 'partie' | 'board'): boolean | string;
       app: { close(): void };
       ipcRenderer: {
         sendMessage(channel: Channels, args: unknown[]): void;
