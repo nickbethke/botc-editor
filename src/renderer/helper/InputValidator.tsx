@@ -1,24 +1,30 @@
 import { toNumber } from 'lodash';
 
-type InputValidatorValidateAnswer = { valid: { is: boolean; text: string[] }; warning: { has: boolean; text: string[] } };
+type InputValidatorValidateAnswer = {
+  valid: { is: boolean; text: string[] };
+  warning: { has: boolean; text: string[] };
+};
 type InputValidatorErrors = {
   number?: {
     ifBiggerThen?: {
-      number: number, error: string
-    },
+      number: number;
+      error: string;
+    };
     ifSmallerThen?: {
-      number: number, error: string
-    }
-  },
+      number: number;
+      error: string;
+    };
+  };
   text?: {
     longerThan?: {
-      number: number, error: string
-    },
+      number: number;
+      error: string;
+    };
     regex?: {
-      expression: RegExp,
-      error: string
-    }
-  }
+      expression: RegExp;
+      error: string;
+    };
+  };
 };
 
 export class InputValidator {
@@ -40,17 +46,23 @@ export class InputValidator {
 
   validate(value: string): InputValidatorValidateAnswer {
     const answer = {
-      valid: { is: true, text: new Array },
-      warning: { has: false, text: new Array }
+      valid: { is: true, text: new Array() },
+      warning: { has: false, text: new Array() },
     };
     switch (this.type) {
       case InputValidator.TYPE_STRING:
         if (this.errors.text) {
-          if (this.errors.text.longerThan && value.length > (this.errors.text.longerThan.number || 0)) {
+          if (
+            this.errors.text.longerThan &&
+            value.length > (this.errors.text.longerThan.number || 0)
+          ) {
             answer.valid.is = false;
             answer.valid.text.push(this.errors.text.longerThan.error);
           }
-          if (this.errors.text.regex && this.errors.text.regex.expression.test(value) == false) {
+          if (
+            this.errors.text.regex &&
+            this.errors.text.regex.expression.test(value) == false
+          ) {
             answer.valid.is = false;
             answer.valid.text.push(this.errors.text.regex.error);
           }
@@ -59,11 +71,17 @@ export class InputValidator {
       case InputValidator.TYPE_NUMBER:
         const numberValue = toNumber(value);
         if (this.errors.number) {
-          if (this.errors.number.ifBiggerThen && numberValue > this.errors.number.ifBiggerThen.number) {
+          if (
+            this.errors.number.ifBiggerThen &&
+            numberValue > this.errors.number.ifBiggerThen.number
+          ) {
             answer.warning.has = true;
             answer.warning.text.push(this.errors.number.ifBiggerThen.error);
           }
-          if (this.errors.number.ifSmallerThen && numberValue < this.errors.number.ifSmallerThen.number) {
+          if (
+            this.errors.number.ifSmallerThen &&
+            numberValue < this.errors.number.ifSmallerThen.number
+          ) {
             answer.warning.has = true;
             answer.warning.text.push(this.errors.number.ifSmallerThen.error);
           }
