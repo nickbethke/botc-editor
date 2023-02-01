@@ -1,6 +1,6 @@
 import React, { ChangeEvent } from 'react';
 import _uniqueId from 'lodash/uniqueId';
-import { InputValidator } from '../helper/InputValidator';
+import InputValidator from '../helper/InputValidator';
 
 interface OnChangeFunctionInputLabel {
   (value: string | number): void;
