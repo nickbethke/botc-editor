@@ -91,7 +91,7 @@ class App extends React.Component<unknown, AppStates> {
   validatorScreen = () => {
     const { openScreen } = this.state;
     if (openScreen === 'validator') {
-      return <JSONValidierer App={this} />;
+      return <JSONValidierer parentApp={this} />;
     }
     return null;
   };
@@ -100,10 +100,10 @@ class App extends React.Component<unknown, AppStates> {
     const { openPopup } = this.state;
     let popup: JSX.Element | string = '';
     if (openPopup === 'boardEditorChoice') {
-      popup = <BoardEditorChoice App={this} />;
+      popup = <BoardEditorChoice parentApp={this} />;
     }
     if (openPopup === 'partieEditorChoice') {
-      popup = <PartieEditorChoice App={this} />;
+      popup = <PartieEditorChoice parentApp={this} />;
     }
     return (
       <div className="text-white">

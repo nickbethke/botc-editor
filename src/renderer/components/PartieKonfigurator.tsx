@@ -5,9 +5,9 @@ import App from '../App';
 import InputLabel from './InputLabel';
 import Notification from './Notification';
 import Error from './Error';
-import { InputValidator } from '../helper/InputValidator';
+import InputValidator from '../helper/InputValidator';
 
-import { ConfirmPopup } from './ConfirmPopup';
+import ConfirmPopup from './ConfirmPopup';
 import PartieConfigInterface from '../../schema/interfaces/partieConfigInterface';
 
 type PartieKonfiguratorProps = {
@@ -123,7 +123,6 @@ class PartieKonfigurator extends React.Component<
             <div className="grid grid-cols-2 gap-8">
               <div>
                 <InputLabel
-                  editor={this}
                   label="Maximale Rundenanzahl"
                   type="number"
                   min={-1}
@@ -157,7 +156,6 @@ class PartieKonfigurator extends React.Component<
               </div>
               <div>
                 <InputLabel
-                  editor={this}
                   label="Start Lembas"
                   type="number"
                   value={values.startLembas}
@@ -185,7 +183,6 @@ class PartieKonfigurator extends React.Component<
             <div className="grid grid-cols-2 gap-8">
               <div>
                 <InputLabel
-                  editor={this}
                   label="Schuss Lembas"
                   type="number"
                   onChange={(value) => {
@@ -201,7 +198,6 @@ class PartieKonfigurator extends React.Component<
               </div>
               <div>
                 <InputLabel
-                  editor={this}
                   label="Flussbewegungsschritte"
                   type="number"
                   onChange={(value) => {
@@ -219,7 +215,6 @@ class PartieKonfigurator extends React.Component<
             <div className="grid grid-cols-2 gap-8">
               <div>
                 <InputLabel
-                  editor={this}
                   label="Runden bis zur Wiederbelebung"
                   type="number"
                   helperText="-1 für dauerhaften Tod"
@@ -236,7 +231,6 @@ class PartieKonfigurator extends React.Component<
               </div>
               <div>
                 <InputLabel
-                  editor={this}
                   label="TimeOut für Charakterauswahl"
                   type="number"
                   helperText="in ms"
@@ -257,7 +251,6 @@ class PartieKonfigurator extends React.Component<
             <div className="grid grid-cols-2 gap-8">
               <div>
                 <InputLabel
-                  editor={this}
                   label="TimeOut für Kartenauswahl"
                   type="number"
                   helperText="in ms"
@@ -276,7 +269,6 @@ class PartieKonfigurator extends React.Component<
               </div>
               <div>
                 <InputLabel
-                  editor={this}
                   label="Server-Ingame-Delay"
                   type="number"
                   helperText="in ms"

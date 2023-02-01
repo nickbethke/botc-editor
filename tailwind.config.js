@@ -18,9 +18,9 @@ module.exports = {
           600: '#06115E',
           700: '#030A38',
           800: '#010311',
-          900: '#000000'
+          900: '#000000',
         },
-        'accent': {
+        accent: {
           DEFAULT: '#71C294',
           50: '#D5EDDF',
           100: '#C7E7D5',
@@ -31,12 +31,11 @@ module.exports = {
           600: '#3B885C',
           700: '#2A6142',
           800: '#193A27',
-          900: '#08130D'
-        }
+          900: '#08130D',
+        },
       },
-
-    }
+    },
   },
   variants: {},
-  plugins: [tailwindcssNesting, tailwindcss, autoprefixer]
+  plugins: [tailwindcssNesting, tailwindcss, autoprefixer],
 };

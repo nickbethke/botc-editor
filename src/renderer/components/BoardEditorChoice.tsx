@@ -1,17 +1,17 @@
 import React from 'react';
-import newBGImage from './../../../assets/images/new-color.jpg';
-import randomBGImage from './../../../assets/images/random-color.jpg';
-import loadingBGImage from './../../../assets/images/bg-color-II.jpg';
-import App from './../App';
+import newBGImage from '../../../assets/images/new-color.jpg';
+import randomBGImage from '../../../assets/images/random-color.jpg';
+import loadingBGImage from '../../../assets/images/bg-color-II.jpg';
+import App from '../App';
+import BoardEditorChoiceCard from './BoardEditorChoiceCard';
 
 type BoardEditorChoiceProps = {
-  App: App;
+  parentApp: App;
 };
-type BoardEditorChoiceState = {};
 
 class BoardEditorChoice extends React.Component<
   BoardEditorChoiceProps,
-  BoardEditorChoiceState
+  unknown
 > {
   constructor(props: BoardEditorChoiceProps) {
     super(props);
@@ -22,115 +22,56 @@ class BoardEditorChoice extends React.Component<
   }
 
   handlePopupClose = () => {
-    this.props.App.setState({ openPopup: false });
+    const { parentApp } = this.props;
+    parentApp.setState({ openPopup: false });
   };
+
   openLoadBoardConfig = async () => {
     const boarsJSON = await window.electron.dialog.openBoardConfig();
     if (boarsJSON) {
-      this.props.App.setState({
+      const { parentApp } = this.props;
+      parentApp.setState({
         openScreen: 'boardConfigLoadScreen',
         toLoad: boarsJSON,
       });
     }
   };
+
   openNewBoardConfig = () => {
-    this.props.App.setState({ openScreen: 'boardConfigNewScreen' });
+    const { parentApp } = this.props;
+    parentApp.setState({ openScreen: 'boardConfigNewScreen' });
   };
+
   openRandomBoardConfig = () => {};
 
   render() {
     return (
       <div className="absolute w-[100vw] h-[100vh] top-0 left-0">
         <div
+          role="presentation"
           className="w-[100vw] h-[100vh] bg-background-800/50"
           onClick={this.handlePopupClose}
-        ></div>
+        />
         <div>
           <div className="absolute top-[50%] left-[50%] translate-y-[-50%] translate-x-[-50%]">
             <div className="text-center text-3xl mb-8">Board Konfiguration</div>
             <div className="relative flex gap-8 w-[80vw] xl:w-[70vw] 2xl:w-[60vw]  mx-auto">
               <BoardEditorChoiceCard
-                text={'Leeres Board'}
+                text="Leeres Board"
                 bgImage={newBGImage}
                 onClickAction={this.openNewBoardConfig}
               />
               <BoardEditorChoiceCard
-                text={'Zufällig'}
+                text="Zufällig"
                 bgImage={randomBGImage}
                 onClickAction={this.openRandomBoardConfig}
               />
               <BoardEditorChoiceCard
-                text={'Laden'}
+                text="Laden"
                 bgImage={loadingBGImage}
                 onClickAction={this.openLoadBoardConfig}
               />
             </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-}
-
-type BoardEditorChoiceCardProps = {
-  text: string;
-  bgImage?: string;
-  onClickAction?: Function;
-};
-
-type BoardEditorChoiceCardState = {
-  hover: boolean;
-};
-
-class BoardEditorChoiceCard extends React.Component<
-  BoardEditorChoiceCardProps,
-  BoardEditorChoiceCardState
-> {
-  constructor(props: BoardEditorChoiceCardProps) {
-    super(props);
-    this.state = { hover: false };
-    this.handleHover = this.handleHover.bind(this);
-  }
-
-  handleHover = () => {
-    this.setState({ hover: !this.state.hover });
-  };
-
-  render() {
-    const { text, bgImage } = this.props;
-    const { hover } = this.state || { hover: false };
-    const onclick = this.props.onClickAction?.bind(this);
-    return (
-      <div
-        className="relative w-[33.333%] h-[400px] xl:h-[500px] 2xl:h-[600px] shadow-2xl hover:cursor-pointer"
-        onMouseEnter={this.handleHover}
-        onMouseLeave={this.handleHover}
-        onClick={this.props.onClickAction && onclick}
-      >
-        <div className="absolute top-0 left-0 h-full w-full z-0">
-          <div
-            style={{
-              backgroundImage: 'url("' + bgImage + '")',
-              backgroundPosition: 'center',
-              backgroundSize: 'cover',
-            }}
-            className="absolute top-0 left-0 w-full h-full"
-          ></div>
-          <div
-            className={
-              'transition-all absolute top-0 left-0 w-full h-full' +
-              (hover ? ' bg-background-800/0' : ' bg-background-800/50')
-            }
-          ></div>
-        </div>
-        <div className="z-20 absolute top-0 left-0 h-full w-full">
-          <div
-            className={
-              'transition-all absolute bottom-0 text-center w-full text-xl' +
-              (hover ? ' bg-accent-500 p-8' : ' bg-background-800/50 p-4')
-            }
-          >
-            {text}
           </div>
         </div>
       </div>

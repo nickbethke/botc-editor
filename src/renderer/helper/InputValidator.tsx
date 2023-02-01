@@ -27,11 +27,13 @@ type InputValidatorErrors = {
   };
 };
 
-export class InputValidator {
+class InputValidator {
   static readonly TYPE_STRING = 'string';
+
   static readonly TYPE_NUMBER = 'number';
 
   readonly type: string;
+
   readonly errors: InputValidatorErrors;
 
   /**
@@ -46,8 +48,8 @@ export class InputValidator {
 
   validate(value: string): InputValidatorValidateAnswer {
     const answer = {
-      valid: { is: true, text: new Array() },
-      warning: { has: false, text: new Array() },
+      valid: { is: true, text: new Array<string>() },
+      warning: { has: false, text: new Array<string>() },
     };
     switch (this.type) {
       case InputValidator.TYPE_STRING:
@@ -61,7 +63,7 @@ export class InputValidator {
           }
           if (
             this.errors.text.regex &&
-            this.errors.text.regex.expression.test(value) == false
+            this.errors.text.regex.expression.test(value) === false
           ) {
             answer.valid.is = false;
             answer.valid.text.push(this.errors.text.regex.error);
@@ -69,18 +71,17 @@ export class InputValidator {
         }
         break;
       case InputValidator.TYPE_NUMBER:
-        const numberValue = toNumber(value);
         if (this.errors.number) {
           if (
             this.errors.number.ifBiggerThen &&
-            numberValue > this.errors.number.ifBiggerThen.number
+            toNumber(value) > this.errors.number.ifBiggerThen.number
           ) {
             answer.warning.has = true;
             answer.warning.text.push(this.errors.number.ifBiggerThen.error);
           }
           if (
             this.errors.number.ifSmallerThen &&
-            numberValue < this.errors.number.ifSmallerThen.number
+            toNumber(value) < this.errors.number.ifSmallerThen.number
           ) {
             answer.warning.has = true;
             answer.warning.text.push(this.errors.number.ifSmallerThen.error);
@@ -92,3 +93,5 @@ export class InputValidator {
     return answer;
   }
 }
+
+export default InputValidator;

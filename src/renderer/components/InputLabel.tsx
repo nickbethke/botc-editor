@@ -1,14 +1,12 @@
 import React, { ChangeEvent } from 'react';
-import PartieKonfigurator from './PartieKonfigurator';
 import _uniqueId from 'lodash/uniqueId';
 import { InputValidator } from '../helper/InputValidator';
 
-interface onChangeFunctionInputLabel {
+interface OnChangeFunctionInputLabel {
   (value: string | number): void;
 }
 
 type InputLabelProps = {
-  editor: PartieKonfigurator;
   label: string;
   type: string;
   placeholder?: string;
@@ -16,17 +14,27 @@ type InputLabelProps = {
   helperText?: string;
   validator?: InputValidator;
   min?: number;
-  onChange: onChangeFunctionInputLabel;
+  onChange: OnChangeFunctionInputLabel;
 };
-type _InputLabelState = {
+type InputLabelState = {
   hasWarning: boolean;
   warningText: string[];
   errorMsg: string[];
   isValid: boolean;
 };
 
-class InputLabel extends React.Component<InputLabelProps, _InputLabelState> {
+class InputLabel extends React.Component<InputLabelProps, InputLabelState> {
   private readonly id: string;
+
+  static get defaultProps() {
+    return {
+      placeholder: '',
+      value: null,
+      helperText: '',
+      validator: undefined,
+      min: 0,
+    };
+  }
 
   constructor(props: InputLabelProps) {
     super(props);
@@ -41,9 +49,10 @@ class InputLabel extends React.Component<InputLabelProps, _InputLabelState> {
   }
 
   handleOnChange(e: ChangeEvent<HTMLInputElement>) {
-    const value = e.target.value;
-    if (this.props.validator) {
-      const { valid, warning } = this.props.validator.validate(value);
+    const { value } = e.target;
+    const { validator, onChange } = this.props;
+    if (validator) {
+      const { valid, warning } = validator.validate(value);
       this.setState({
         warningText: warning.text,
         isValid: valid.is,
@@ -51,54 +60,57 @@ class InputLabel extends React.Component<InputLabelProps, _InputLabelState> {
         hasWarning: warning.has,
       });
     }
-    this.props.onChange(value);
+    onChange(value);
   }
 
   render() {
     let helper: string | JSX.Element = '';
-    if (this.props.helperText) {
-      helper = <div>{this.props.helperText}</div>;
+
+    const { helperText, label, min, type, placeholder, value } = this.props;
+
+    if (helperText) {
+      helper = <div>{helperText}</div>;
     }
     const { isValid, hasWarning, warningText, errorMsg } = this.state;
     let warningHelper: string | JSX.Element = '';
     let invalidHelper: string | JSX.Element = '';
     if (hasWarning) {
       warningHelper = (
-        <div className={'text-sm text-orange-400 pl-4'}>
+        <div className="text-sm text-orange-400 pl-4">
           {warningText.join(' | ')}
         </div>
       );
     }
     if (!isValid && errorMsg) {
       invalidHelper = (
-        <div className={'text-sm text-red-400 pl-4'}>
-          {errorMsg.join(' | ')}
-        </div>
+        <div className="text-sm text-red-400 pl-4">{errorMsg.join(' | ')}</div>
       );
     }
+    let validClass = '';
+    if (isValid) {
+      if (hasWarning) {
+        validClass = ' border-b-orange-400';
+      }
+    } else {
+      validClass = ' border-b-red-400';
+    }
+
     return (
-      <div className={'flex flex-col'}>
+      <div className="flex flex-col">
         <div>
-          <label htmlFor={this.id} className={'text-2xl'}>
-            {this.props.label}
+          <label htmlFor={this.id} className="text-2xl">
+            {label}
           </label>
         </div>
         <div>
           <input
             id={this.id}
-            className={
-              'bg-transparent border-b-2 text-xl px-4 py-2 focus:outline-none w-full' +
-              (isValid
-                ? hasWarning
-                  ? ' border-b-orange-400'
-                  : ''
-                : ' border-b-red-400')
-            }
-            type={this.props.type}
-            placeholder={this.props.placeholder && this.props.placeholder}
+            className={`bg-transparent border-b-2 text-xl px-4 py-2 focus:outline-none w-full${validClass}`}
+            type={type}
+            placeholder={placeholder}
             onChange={this.handleOnChange}
-            min={this.props.min || -1}
-            value={this.props.value?.toString()}
+            min={min || -1}
+            value={value?.toString()}
           />
         </div>
         {helper}

@@ -4,14 +4,13 @@ import { AiFillFolderOpen } from 'react-icons/ai';
 import MonacoEditor, { monaco } from 'react-monaco-editor';
 import { HiSaveAs } from 'react-icons/hi';
 import Mousetrap from 'mousetrap';
-import { ConfirmPopup } from './ConfirmPopup';
 import KeyCode = monaco.KeyCode;
 import KeyMod = monaco.KeyMod;
+import ConfirmPopup from './ConfirmPopup';
+import App from '../App';
 
 type JSONValidatorProps = {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  App: App;
+  parentApp: App;
 };
 type JSONValidatorState = {
   popupLeave: boolean;
@@ -70,8 +69,8 @@ class JSONValidierer extends React.Component<
   };
 
   backToHomeScreen = () => {
-    const { App } = this.props;
-    App.setState({ openScreen: 'home', openPopup: false });
+    const { parentApp } = this.props;
+    parentApp.setState({ openScreen: 'home', openPopup: false });
   };
 
   abortBackToHomeScreen = () => {

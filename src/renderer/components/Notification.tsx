@@ -22,6 +22,7 @@ class Notification extends React.Component<
 
   render() {
     const { visible } = this.state;
+    const { label } = this.props;
     return (
       <div
         className={`bg-green-100/50 border border-green-400 px-4 py-3 rounded relative${
@@ -29,9 +30,9 @@ class Notification extends React.Component<
         }`}
         role="alert"
       >
-        <span className="block sm:inline">{this.props.label}</span>
+        <span className="block sm:inline">{label}</span>
         <button
-          typeof="button"
+          type="button"
           className="absolute top-0 bottom-0 right-0 px-4 py-3"
           onClick={() => {
             this.setState({ visible: false });
