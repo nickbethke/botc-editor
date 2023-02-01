@@ -20,7 +20,7 @@ type JSONValidatorState = {
   type: 'board' | 'partie';
 };
 
-class JSONValidator extends React.Component<
+class JSONValidierer extends React.Component<
   JSONValidatorProps,
   JSONValidatorState
 > {
@@ -40,6 +40,7 @@ class JSONValidator extends React.Component<
       type: 'partie',
     };
     Mousetrap.bind(['command+s', 'ctrl+s'], () => {
+      // eslint-disable-next-line no-console
       this.saveFile().catch(console.log);
     });
     monaco.editor.addEditorAction({
@@ -48,6 +49,7 @@ class JSONValidator extends React.Component<
       // eslint-disable-next-line no-bitwise
       keybindings: [KeyMod.CtrlCmd | KeyCode.KeyS],
       run: () => {
+        // eslint-disable-next-line no-console
         this.saveFile().then(console.log).catch(console.log);
       },
     });
@@ -57,14 +59,11 @@ class JSONValidator extends React.Component<
       // eslint-disable-next-line no-bitwise
       keybindings: [KeyMod.CtrlCmd | KeyCode.KeyO],
       run: () => {
+        // eslint-disable-next-line no-console
         this.openFile().then(console.log).catch(console.log);
       },
     });
   }
-
-  handleKeyPress = (event: KeyboardEvent) => {
-    console.log(`You pressed ${event.key}`);
-  };
 
   handleBackButton = () => {
     this.setState({ popupLeave: true });
@@ -79,10 +78,9 @@ class JSONValidator extends React.Component<
     this.setState({ popupLeave: false });
   };
 
-  onChange = async (newValue: string, e: any) => {
+  onChange = async (newValue: string) => {
     const { type } = this.state;
     try {
-      const json = JSON.parse(newValue);
       const valid = await window.electron.validate(JSON.parse(newValue), type);
       if (typeof valid === 'string') {
         this.setState({ codeError: valid });
@@ -90,9 +88,9 @@ class JSONValidator extends React.Component<
         this.setState({ codeError: '' });
       }
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.log(error);
     }
-    console.log(typeof newValue);
     this.setState({ code: newValue });
   };
 
@@ -100,15 +98,21 @@ class JSONValidator extends React.Component<
     const json = await window.electron.dialog.openConfig();
     if (json) {
       try {
-        this.setState({
-          codeError: '',
-          popupLeave: false,
-          code: JSON.stringify(json, null, 4),
-        });
+        this.setState(
+          {
+            codeError: '',
+            popupLeave: false,
+            code: JSON.stringify(json, null, 4),
+          },
+          async () => {
+            const { code } = this.state;
+            await this.onChange(code);
+          }
+        );
       } catch (e) {
+        // eslint-disable-next-line no-console
         console.log(e);
       }
-      await this.onChange(JSON.stringify(json), null);
     }
   };
 
@@ -125,14 +129,20 @@ class JSONValidator extends React.Component<
     }
   };
 
-  changeType = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  changeType = async (e: React.ChangeEvent<HTMLSelectElement>) => {
     switch (e.target.value) {
       case 'board':
-        this.setState({ type: 'board' });
+        this.setState({ type: 'board' }, async () => {
+          const { code } = this.state;
+          await this.onChange(code);
+        });
         break;
       case 'partie':
       default:
-        this.setState({ type: 'partie' });
+        this.setState({ type: 'partie' }, async () => {
+          const { code } = this.state;
+          await this.onChange(code);
+        });
     }
   };
 
@@ -156,30 +166,16 @@ class JSONValidator extends React.Component<
       try {
         let i = 0;
         JSON.parse(codeError).forEach(
-          (e: {
-            instancePath: any;
-            message:
-              | string
-              | number
-              | boolean
-              | React.ReactElement<
-                  any,
-                  string | React.JSXElementConstructor<any>
-                >
-              | React.ReactFragment
-              | React.ReactPortal
-              | null
-              | undefined;
-          }) => {
+          (e: { instancePath: string; message: string }) => {
             errorMsg[i] = (
-              <div className="flex fex-cols pt-2">
-                <p className="mr-4 pr-4 border-r">
+              <div className="flex fex-cols" key={i}>
+                <p className="mr-2 pr-4 border-r pt-2">
                   {i + 1 < 10 ? `0${i + 1}` : i + 1}
                 </p>
-                <p className="font-black text-red-500">
+                <p className="font-black text-red-500 pt-2">
                   {`${e.instancePath}`}&nbsp;
                 </p>
-                <p>{e.message}</p>
+                <p className="pt-2">{e.message}</p>
               </div>
             );
             i += 1;
@@ -200,7 +196,7 @@ class JSONValidator extends React.Component<
                   className="text-4xl border border-white cursor-pointer hover:bg-accent-500"
                   onClick={this.handleBackButton}
                 />
-                <div className="text-4xl">Validator</div>
+                <div className="text-4xl">Validierer</div>
               </div>
             </div>
           </div>
@@ -264,4 +260,4 @@ class JSONValidator extends React.Component<
   }
 }
 
-export default JSONValidator;
+export default JSONValidierer;

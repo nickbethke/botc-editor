@@ -86,12 +86,8 @@
         "checkPoints",
         "eye",
         "height",
-        "holes",
-        "lembas",
         "name",
-        "riverFields",
         "startFields",
-        "walls",
         "width"
       ],
       "title": "Board"

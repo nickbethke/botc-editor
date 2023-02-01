@@ -8,14 +8,14 @@ import Error from './Error';
 import { InputValidator } from '../helper/InputValidator';
 
 import { ConfirmPopup } from './ConfirmPopup';
-import { PartieConfigInterface } from '../../schema/interfaces/partieConfigInterface';
+import PartieConfigInterface from '../../schema/interfaces/partieConfigInterface';
 
 type PartieKonfiguratorProps = {
   App: App;
-  loadedValues: PartieConfigSchema | null;
+  loadedValues: PartieConfigInterface | null;
 };
 type PartieKonfiguratorState = {
-  values: PartieConfigSchema;
+  values: PartieConfigInterface;
   popupLeave: boolean;
 };
 
@@ -23,7 +23,7 @@ class PartieKonfigurator extends React.Component<
   PartieKonfiguratorProps,
   PartieKonfiguratorState
 > {
-  private default: PartieConfigSchema = {
+  private default: PartieConfigInterface = {
     maxRounds: 0,
     reviveRounds: 0,
     serverIngameDelay: 0,
@@ -53,6 +53,7 @@ class PartieKonfigurator extends React.Component<
   };
 
   backToHomeScreen = () => {
+    // eslint-disable-next-line @typescript-eslint/no-shadow
     const { App } = this.props;
     App.setState({ openScreen: 'home', openPopup: false });
   };
@@ -185,7 +186,7 @@ class PartieKonfigurator extends React.Component<
               <div>
                 <InputLabel
                   editor={this}
-                  label="Schuss Lembase"
+                  label="Schuss Lembas"
                   type="number"
                   onChange={(value) => {
                     this.setState({
@@ -201,7 +202,7 @@ class PartieKonfigurator extends React.Component<
               <div>
                 <InputLabel
                   editor={this}
-                  label="Flussbewegugsschritte"
+                  label="Flussbewegungsschritte"
                   type="number"
                   onChange={(value) => {
                     this.setState({

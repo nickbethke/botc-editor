@@ -5,17 +5,16 @@ import PartieEditorChoice from './components/PartieEditorChoice';
 import PartieKonfigurator from './components/PartieKonfigurator';
 import PartieConfigInterface from '../schema/interfaces/partieConfigInterface';
 import BoardKonfigurator from './components/BoardKonfigurator';
-import JSONValidator from './components/JSONValidator';
+import JSONValidierer from './components/JSONValidierer';
 
 type AppStates = {
   openScreen: string;
   openPopup: string | false;
   toLoad: object | null;
 };
-type AppProps = {};
 
-class App extends React.Component<AppProps, AppStates> {
-  constructor(props: AppProps) {
+class App extends React.Component<unknown, AppStates> {
+  constructor(props: unknown) {
     super(props);
     this.state = { openScreen: 'home', openPopup: false, toLoad: null };
     this.handleOpenBoardEditorChoice =
@@ -92,7 +91,7 @@ class App extends React.Component<AppProps, AppStates> {
   validatorScreen = () => {
     const { openScreen } = this.state;
     if (openScreen === 'validator') {
-      return <JSONValidator App={this} />;
+      return <JSONValidierer App={this} />;
     }
     return null;
   };
@@ -138,7 +137,7 @@ class App extends React.Component<AppProps, AppStates> {
                 className="text-2xl clickable"
                 onClick={this.handleOpenValidator}
               >
-                Validator
+                Validierer
               </button>
               <button
                 type="button"
