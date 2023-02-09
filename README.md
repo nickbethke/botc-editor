@@ -24,3 +24,7 @@ See the [docs and guides here](https://electron-react-boilerplate.js.org/docs/in
 
 ## Installation
 ....
+
+
+## Programmierung
+Der Editor ist mithilfe der IDE [WebStorm](https://www.jetbrains.com/de-de/webstorm/) geschrieben
