@@ -1,4 +1,4 @@
-![Battle of the Centerländ](assets/images/bg-color-2x.jpg)
+![Battle of the Centerländ](assets/images/editor-banner.png)
 
 # Battle of the Centerländ - Editor - Team 11
 
