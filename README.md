@@ -13,7 +13,7 @@ Da das Projekt in [NodeJS](https://nodejs.org/en/) geschrieben ist, muss NodeJS 
 [Download NodeJS](https://nodejs.org/en/download/)
 
 ```bash
-git clone -b %{current_branch} https://gitlab.uni-ulm.de/softwaregrundprojekt/2022-2023/gruppenprojekt/group-11/team-11-editor.git
+git clone -b develop https://gitlab.uni-ulm.de/softwaregrundprojekt/2022-2023/gruppenprojekt/group-11/team-11-editor.git
 cd team-11-editor
 npm install
 ```
