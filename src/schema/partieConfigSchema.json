@@ -1,0 +1,78 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Game Schema",
+  "type": "object",
+  "default": {},
+  "required": [
+    "startLembas",
+    "shotLembas",
+    "characterChoiceTimeout",
+    "cardSelectionTimeout",
+    "riverMoveCount",
+    "serverIngameDelay",
+    "reviveRounds",
+    "maxRounds"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "startLembas": {
+      "title": "The startLembas Schema",
+      "type": "integer",
+      "default": 0,
+      "minimum": 0,
+      "maximum": 99
+    },
+    "shotLembas": {
+      "title": "The shotLembas Schema",
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 99,
+      "default": 1
+    },
+    "characterChoiceTimeout": {
+      "title": "The characterChoiceTimeout Schema",
+      "type": "integer",
+      "minimum": 500,
+      "maximum": 36000000,
+      "multipleOf": 500,
+      "default": 500
+    },
+    "cardSelectionTimeout": {
+      "title": "The cardSelectionTimeout Schema",
+      "type": "integer",
+      "minimum": 500,
+      "maximum": 36000000,
+      "multipleOf": 500,
+      "default": 500
+    },
+    "riverMoveCount": {
+      "title": "The riverMoveCount Schema",
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 99,
+      "default": 1
+    },
+    "serverIngameDelay": {
+      "title": "The serverIngameDelay Schema",
+      "type": "integer",
+      "minimum": 100,
+      "maximum": 60000,
+      "multipleOf": 100,
+      "default": 100
+    },
+    "reviveRounds": {
+      "title": "The reviveRounds Schema",
+      "type": "integer",
+      "minimum": -1,
+      "maximum": 99,
+      "default": 0
+    },
+    "maxRounds": {
+      "title": "The maxRounds Schema",
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 99,
+      "default": 1
+    }
+  }
+}
