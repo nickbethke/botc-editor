@@ -6,12 +6,16 @@
 benutzt [Electron React Boilerplate](https://electron-react-boilerplate.js.org/docs/installation), [Electron](https://electron.atom.io/), [React](https://facebook.github.io/react/), [React Router](https://github.com/reactjs/react-router),[Webpack](https://webpack.js.org/), [React Fast Refresh](https://www.npmjs.com/package/react-refresh)
 und [NodeJS](https://nodejs.org/en/).
 
-## Abhängigkeiten installieren
+## Projekt installieren
+
+Da das Projekt in [NodeJS](https://nodejs.org/en/) geschrieben ist, muss NodeJS installiert sein:
+
+[Download NodeJS](https://nodejs.org/en/download/)
 
 ```bash
+git clone https://gitlab.uni-ulm.de/softwaregrundprojekt/2022-2023/gruppenprojekt/group-11/team-11-editor.git
+cd team-11-editor
 npm install
-# or with yarn
-yarn install
 ```
 
 ## Entwicklung starten
@@ -20,8 +24,6 @@ Starte die App in der `dev` Umgebung:
 
 ```bash
 npm start
-# or with yarn
-yarn run package
 ```
 
 ## App bauen
@@ -30,8 +32,6 @@ Um die App für die aktuelle Plattform bauen zu lassen:
 
 ```bash
 npm run package
-# or with yarn
-yarn run package
 ```
 
 ## Docs
