@@ -39,6 +39,38 @@
       url('/assets/fonts/lato/lato-v23-latin-regular.svg#Lato') format('svg'); /* Legacy iOS */
 }
 
+@font-face {
+  font-display: swap;
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 400;
+  src: url('/assets/fonts/jetbrains-mono/JetBrainsMono-Regular.woff2');
+}
+
+@font-face {
+  font-display: swap;
+  font-family: 'JetBrains Mono';
+  font-style: italic;
+  font-weight: 400;
+  src: url('/assets/fonts/jetbrains-mono/JetBrainsMono-Italic.woff2');
+}
+
+@font-face {
+  font-display: swap;
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: bold;
+  src: url('/assets/fonts/jetbrains-mono/JetBrainsMono-Bold.woff2');
+}
+
+@font-face {
+  font-display: swap;
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 900;
+  src: url('/assets/fonts/jetbrains-mono/JetBrainsMono-ExtraBold.woff2');
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
