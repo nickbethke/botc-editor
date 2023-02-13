@@ -6,6 +6,7 @@ type FieldDraggerProps = {
 	text: string;
 	type: FieldsEnum;
 	onDragStart: (type: FieldsEnum) => void;
+	onDragEnd: () => void;
 };
 
 class FieldDragger extends React.Component<FieldDraggerProps, any> {
@@ -30,8 +31,8 @@ class FieldDragger extends React.Component<FieldDraggerProps, any> {
 	};
 
 	handleDragEnd: React.DragEventHandler<HTMLDivElement> = (event) => {
-		const { onDragStart, type } = this.props;
-		onDragStart(type);
+		const { onDragEnd } = this.props;
+		onDragEnd();
 	};
 
 	render = () => {
