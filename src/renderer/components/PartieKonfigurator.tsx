@@ -108,6 +108,7 @@ class PartieKonfigurator extends React.Component<
 		return (
 			<div>
 				<div className="dragger absolute top-0 left-0 w-[100vw] h-8" />
+				{popupLeaveR}
 				<div className="text-white grid grid-cols-3 2xl:grid-cols-2 gap-0 h-[100vh] w-[100vw]">
 					<div
 						style={{
@@ -117,10 +118,13 @@ class PartieKonfigurator extends React.Component<
 					/>
 					<div className="col-span-2 2xl:col-span-1 m-8 flex flex-col gap-8">
 						<div className="flex flex-row justify-start gap-8">
-							<BiChevronLeft
-								className="text-4xl border border-white cursor-pointer hover:bg-accent-500"
+							<button
+								type="button"
+								className="border border-white cursor-pointer hover:bg-accent-500"
 								onClick={this.handleBackButton}
-							/>
+							>
+								<BiChevronLeft className="text-4xl" />
+							</button>
 							<div className="text-4xl">Partie Konfigurator</div>
 						</div>
 						<div>{this.notification}</div>
@@ -330,7 +334,6 @@ class PartieKonfigurator extends React.Component<
 						</div>
 					</div>
 				</div>
-				{popupLeaveR}
 			</div>
 		);
 	};

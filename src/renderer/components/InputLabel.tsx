@@ -144,7 +144,7 @@ class InputLabel extends React.Component<InputLabelProps, InputLabelState> {
 								this.setState({ value: v });
 							}}
 							min={min || 0}
-							max={256}
+							max={20}
 						/>
 					</label>
 				</div>
@@ -154,7 +154,7 @@ class InputLabel extends React.Component<InputLabelProps, InputLabelState> {
 						type="range"
 						value={Number.parseInt(value.toString(), 10)}
 						min={min || 0}
-						max={256}
+						max={20}
 						onChange={this.handleOnChange}
 						className={`w-full h-[2px] rounded-lg appearance-none cursor-pointer ${validClass}`}
 					/>

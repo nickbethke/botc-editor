@@ -13,7 +13,6 @@ import { app, BrowserWindow, ipcMain, shell } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import { resolveHtmlPath } from './util';
-import MenuBuilder from './menu';
 import IPCHelper from './helper/IPCHelper';
 
 class AppUpdater {
@@ -116,8 +115,7 @@ const createWindow = async () => {
 		mainWindow = null;
 	});
 
-	const menuBuilder = new MenuBuilder(mainWindow);
-	menuBuilder.buildMenu();
+	mainWindow.setMenu(null);
 
 	// Open urls in the user's browser
 	mainWindow.webContents.setWindowOpenHandler((details) => {

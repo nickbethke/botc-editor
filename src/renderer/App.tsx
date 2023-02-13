@@ -1,5 +1,6 @@
 import React from 'react';
 import './App.scss';
+import Mousetrap from 'mousetrap';
 import BoardEditorChoice from './components/BoardEditorChoice';
 import PartieEditorChoice from './components/PartieEditorChoice';
 import PartieKonfigurator from './components/PartieKonfigurator';
@@ -9,7 +10,7 @@ import JSONValidierer from './components/JSONValidierer';
 
 type AppStates = {
 	openScreen: string;
-	openPopup: string | false;
+	openPopup: 'boardEditorChoice' | 'partieEditorChoice' | false;
 	toLoad: object | null;
 };
 
@@ -23,6 +24,16 @@ class App extends React.Component<unknown, AppStates> {
 			this.handleOpenPartieEditorChoice.bind(this);
 		this.handleCloseApp = this.handleCloseApp.bind(this);
 		this.handleOpenValidator = this.handleOpenValidator.bind(this);
+
+		Mousetrap.bind(['command+b', 'ctrl+b'], () => {
+			this.setState({ openPopup: 'boardEditorChoice' });
+		});
+		Mousetrap.bind(['command+p', 'ctrl+p'], () => {
+			this.setState({ openPopup: 'partieEditorChoice' });
+		});
+		Mousetrap.bind(['esc'], () => {
+			this.setState({ openPopup: false });
+		});
 	}
 
 	handleOpenBoardEditorChoice = () => {
@@ -105,6 +116,7 @@ class App extends React.Component<unknown, AppStates> {
 		if (openPopup === 'partieEditorChoice') {
 			popup = <PartieEditorChoice parentApp={this} />;
 		}
+		const tabIndex = openPopup !== false ? -1 : 0;
 		return (
 			<div className="text-white">
 				<div id="home" className={popup ? 'blur' : ''}>
@@ -119,6 +131,7 @@ class App extends React.Component<unknown, AppStates> {
 						</div>
 						<div className="flex flex-col gap-4">
 							<button
+								tabIndex={tabIndex}
 								type="button"
 								className="text-2xl clickable"
 								onClick={this.handleOpenBoardEditorChoice}
@@ -126,6 +139,7 @@ class App extends React.Component<unknown, AppStates> {
 								Board-Konfigurator
 							</button>
 							<button
+								tabIndex={tabIndex}
 								type="button"
 								className="text-2xl clickable"
 								onClick={this.handleOpenPartieEditorChoice}
@@ -133,6 +147,7 @@ class App extends React.Component<unknown, AppStates> {
 								Partie-Konfigurator
 							</button>
 							<button
+								tabIndex={tabIndex}
 								type="button"
 								className="text-2xl clickable"
 								onClick={this.handleOpenValidator}
@@ -140,6 +155,7 @@ class App extends React.Component<unknown, AppStates> {
 								Validierer
 							</button>
 							<button
+								tabIndex={tabIndex}
 								type="button"
 								className="text-2xl clickable mt-8 flex gap-4"
 								onClick={this.handleCloseApp}

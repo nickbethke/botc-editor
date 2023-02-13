@@ -1,9 +1,10 @@
+/* eslint-disable jsx-a11y/no-autofocus */
 import React, { MouseEventHandler } from 'react';
 
 type PartieEditorChoiceCardProps = {
 	text: string;
 	bgImage: string;
-	onClickAction: MouseEventHandler<HTMLDivElement>;
+	onClickAction: MouseEventHandler<HTMLButtonElement>;
 };
 
 type PartieEditorChoiceCardState = {
@@ -31,8 +32,8 @@ class PartieEditorChoiceCard extends React.Component<
 		const { onClickAction } = this.props;
 		const onclick = onClickAction?.bind(this);
 		return (
-			<div
-				role="presentation"
+			<button
+				type="button"
 				className="relative w-[50%] h-[400px] xl:h-[500px] 2xl:h-[600px] shadow-2xl hover:cursor-pointer"
 				onMouseEnter={this.handleHover}
 				onMouseLeave={this.handleHover}
@@ -66,7 +67,7 @@ class PartieEditorChoiceCard extends React.Component<
 						{text}
 					</div>
 				</div>
-			</div>
+			</button>
 		);
 	}
 }

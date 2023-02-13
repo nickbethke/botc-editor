@@ -109,7 +109,7 @@ body {
 
 #homeScreenBG {
 	@apply fixed w-[50vw] h-[100vh] right-0;
-	background-color: hsl(204, 14%, 49%);
+	background-color: #6b808e;
 	background-image: url('/assets/images/bg-color-2x.jpg');
 	background-size: contain;
 	background-repeat: no-repeat;
@@ -134,4 +134,8 @@ input[type='range']::-webkit-slider-thumb {
 	background: #ffffff;
 	border: 2px solid white;
 	@apply bg-background-100 rounded-3xl;
+}
+
+select option {
+	@apply text-[#222222];
 }

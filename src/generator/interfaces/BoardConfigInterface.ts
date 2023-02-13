@@ -1,6 +1,6 @@
 interface BoardConfigInterface {
 	checkPoints: Array<Position>;
-	eye?: PositionDirection;
+	eye: PositionDirection;
 	height: number;
 	holes?: Array<Position>;
 	lembas?: Lembas[];
@@ -16,7 +16,9 @@ export interface PositionDirection {
 	position: Position;
 }
 
-export enum Direction {
+export type Direction = 'NORTH' | 'EAST' | 'SOUTH' | 'WEST';
+
+export enum DirectionEnum {
 	'NORTH',
 	'EAST',
 	'SOUTH',

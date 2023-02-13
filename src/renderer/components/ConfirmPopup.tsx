@@ -51,7 +51,10 @@ class ConfirmPopup extends React.Component<
 			return null;
 		}
 		return (
-			<div className="absolute w-[100vw] h-[100vh] top-0 left-0 bg-background-800/75">
+			<div
+				role="dialog"
+				className="absolute w-[100vw] h-[100vh] top-0 left-0 bg-background-800/75"
+			>
 				<div>
 					<div className="absolute top-[50%] left-[50%] translate-y-[-50%] translate-x-[-50%]">
 						<div className="p-8 bg-accent-700 text-white">
