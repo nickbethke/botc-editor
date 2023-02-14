@@ -7,18 +7,26 @@ import Field from './Field';
 import { FieldsEnum } from '../BoardKonfigurator';
 import FieldWithPositionInterface from '../../../generator/interfaces/fieldWithPositionInterface';
 import { BoardPosition } from '../../../generator/interfaces/boardPosition';
+import Checkpoint from '../../../generator/fields/checkpoint';
+import KeyCode from '../KeyCode';
+import Lembas from '../../../generator/fields/lembas';
+import StartField from '../../../generator/fields/startField';
+import SauronsEye from '../../../generator/fields/sauronsEye';
+import River from '../../../generator/fields/river';
 
 type BoardKonfiguratorBoardProps = {
 	config: BoardConfigInterface;
 	board: Array<Array<FieldWithPositionInterface>>;
 	onSelect: (position: BoardPosition | null) => boolean;
 	onDrop: (position: BoardPosition) => void;
+	selected: BoardPosition | null;
 };
 
 type BoardKonfiguratorBoardState = {
 	zoom: number;
 	selected: BoardPosition | null;
 	errorViewOpen: boolean;
+	tabOpen: 'critical' | 'warning' | 'hints' | 'hotkeys';
 };
 
 class BoardKonfiguratorBoard extends React.Component<
@@ -27,13 +35,70 @@ class BoardKonfiguratorBoard extends React.Component<
 > {
 	constructor(props: BoardKonfiguratorBoardProps) {
 		super(props);
-		this.state = { zoom: 100, selected: null, errorViewOpen: true };
+		const { selected } = this.props;
+		this.state = {
+			zoom: 100,
+			selected,
+			errorViewOpen: true,
+			tabOpen: 'critical',
+		};
 		this.handleZoom = this.handleZoom.bind(this);
 		this.handleKeyDown = this.handleKeyDown.bind(this);
 
 		Mousetrap.bind(['command+w', 'ctrl+w'], () => {
 			const { errorViewOpen } = this.state;
 			this.setState({ errorViewOpen: !errorViewOpen });
+		});
+		Mousetrap.bind(['command+enter', 'ctrl+enter'], () => {
+			this.setState({ zoom: 100 });
+		});
+		Mousetrap.bind(['command++', 'ctrl++'], () => {
+			const { zoom } = this.state;
+			if (zoom >= 1000) {
+				this.setState({ zoom: 1000 });
+				return;
+			}
+			this.setState({ zoom: zoom + 10 });
+		});
+		Mousetrap.bind(['command+-', 'ctrl+-'], () => {
+			const { zoom } = this.state;
+			if (zoom <= 10) {
+				this.setState({ zoom: 10 });
+				return;
+			}
+			this.setState({ zoom: zoom - 10 });
+		});
+		Mousetrap.bind(['command+h', 'ctrl+h'], () => {
+			const { errorViewOpen } = this.state;
+			if (!errorViewOpen) {
+				this.setState({ errorViewOpen: true, tabOpen: 'hotkeys' });
+			} else {
+				this.setState({ tabOpen: 'hotkeys' });
+			}
+		});
+		Mousetrap.bind(['ctrl+f1'], () => {
+			const { errorViewOpen } = this.state;
+			if (!errorViewOpen) {
+				this.setState({ errorViewOpen: true, tabOpen: 'critical' });
+			} else {
+				this.setState({ tabOpen: 'critical' });
+			}
+		});
+		Mousetrap.bind(['ctrl+f2'], () => {
+			const { errorViewOpen } = this.state;
+			if (!errorViewOpen) {
+				this.setState({ errorViewOpen: true, tabOpen: 'critical' });
+			} else {
+				this.setState({ tabOpen: 'warning' });
+			}
+		});
+		Mousetrap.bind(['ctrl+f3'], () => {
+			const { errorViewOpen } = this.state;
+			if (!errorViewOpen) {
+				this.setState({ errorViewOpen: true, tabOpen: 'critical' });
+			} else {
+				this.setState({ tabOpen: 'hints' });
+			}
 		});
 	}
 
@@ -57,26 +122,115 @@ class BoardKonfiguratorBoard extends React.Component<
 		}
 	};
 
-	handleKeyDown: React.KeyboardEventHandler<HTMLDivElement> = (event) => {
-		if (event.ctrlKey && event.key === 'Enter') {
-			this.setState({ zoom: 100 });
-		}
+	handleKeyDown: React.KeyboardEventHandler<HTMLDivElement> = (event) => {};
+
+	hotKeys = () => {
+		return (
+			<div className="bg-white/25">
+				<div className="grid 2xl:grid-cols-2 gap-2 p-2 max-w-[800px] mx-auto justify-center">
+					<div className="flex flex-col mb-2 items-center">
+						<p className="text-lg">Allgemein</p>
+						<KeyCode text="Hilfe öffnen" keyCodes={['Strg', 'H']} />
+						<KeyCode
+							text="Warnung Fenster"
+							keyCodes={['Strg', 'W']}
+						/>
+					</div>
+					<div className="flex flex-col mb-2 items-center">
+						<p className="text-lg">Tabs</p>
+						<KeyCode
+							text="Global Tab öffnen"
+							keyCodes={['Strg', '1']}
+						/>
+						<KeyCode
+							text="Felder Tab öffnen"
+							keyCodes={['Strg', '2']}
+						/>
+						<KeyCode
+							text="Presets Tab öffnen"
+							keyCodes={['Strg', '3']}
+						/>
+					</div>
+					<div className="flex flex-col mb-2 items-center">
+						<p className="text-lg">Tool</p>
+						<KeyCode text="Auswahl-Tool" keyCodes={['Strg', 'E']} />
+						<KeyCode
+							text="Entfernen-Tool"
+							keyCodes={['Strg', 'D']}
+						/>
+					</div>
+					<div className="flex flex-col mb-2 items-center">
+						<p className="text-lg">Fehlerfenster</p>
+						<KeyCode
+							text="Kritisch öffnen"
+							keyCodes={['Strg', 'F1']}
+						/>
+						<KeyCode
+							text="Warnung öffnen"
+							keyCodes={['Strg', 'F2']}
+						/>
+						<KeyCode
+							text="Hinweis öffnen"
+							keyCodes={['Strg', 'F3']}
+						/>
+					</div>
+					<div className="flex flex-col mb-2 items-center 2xl:col-span-2">
+						<p className="text-lg">Board</p>
+						<KeyCode
+							text="Auswahl bewegen"
+							keyCodes={['↑', '↓', '←', '→']}
+							delimiter=""
+						/>
+						<KeyCode
+							text="Zoom 100%"
+							keyCodes={['Strg', 'Enter']}
+						/>
+						<KeyCode text="Zoom + 10%" keyCodes={['Strg', '+']} />
+						<KeyCode text="Zoom - 10%" keyCodes={['Strg', '-']} />
+					</div>
+				</div>
+			</div>
+		);
 	};
 
 	render() {
 		const board: Array<Array<JSX.Element>> = [];
-		const { zoom, selected, errorViewOpen } = this.state;
-		const { config, onSelect, onDrop, board: cBoard } = this.props;
+		const { zoom, selected, errorViewOpen, tabOpen } = this.state;
+		const {
+			config,
+			onSelect,
+			onDrop,
+			board: cBoard,
+			selected: propsSelected,
+		} = this.props;
+		if (propsSelected && selected !== propsSelected) {
+			this.setState({ selected: propsSelected });
+		}
 		const { height, width } = config;
 		for (let y = 0; y < height; y += 1) {
 			const row: Array<JSX.Element> = [];
 			for (let x = 0; x < width; x += 1) {
+				const boardField = cBoard[y][x];
 				const id = _uniqueId('field-');
 				let type = FieldsEnum.GRASS;
+				let attribute = null;
 				if (cBoard.length > 0) {
 					type = cBoard[y][x].fieldEnum;
 				}
-				const field = (
+				if (boardField instanceof Checkpoint) {
+					attribute = boardField.order;
+				}
+				if (boardField instanceof Lembas) {
+					attribute = boardField.amount;
+				}
+				if (
+					boardField instanceof StartField ||
+					boardField instanceof SauronsEye ||
+					boardField instanceof River
+				) {
+					attribute = boardField.direction;
+				}
+				row[x] = (
 					<Field
 						key={id}
 						position={{ x, y }}
@@ -85,6 +239,7 @@ class BoardKonfiguratorBoard extends React.Component<
 						selected={
 							!!(selected && selected.x === x && selected.y === y)
 						}
+						attribute={attribute}
 						onSelect={(position) => {
 							if (onSelect(position)) {
 								this.setState({ selected: position });
@@ -97,7 +252,6 @@ class BoardKonfiguratorBoard extends React.Component<
 						}}
 					/>
 				);
-				row[x] = field;
 			}
 			board[y] = row;
 		}
@@ -106,6 +260,15 @@ class BoardKonfiguratorBoard extends React.Component<
 		) : (
 			<BsChevronUp />
 		);
+		let errorWindow = null;
+		switch (tabOpen) {
+			case 'hotkeys':
+				errorWindow = this.hotKeys();
+				break;
+			default:
+				break;
+		}
+
 		return (
 			<div className="h-full max-h-full flex flex-col">
 				<div
@@ -127,7 +290,7 @@ class BoardKonfiguratorBoard extends React.Component<
 				</div>
 				<div
 					id="errors"
-					className="text-white border bg-background-700 relative"
+					className="text-white border border-t-0 bg-background-700 relative"
 				>
 					<div
 						role="presentation"
@@ -138,31 +301,72 @@ class BoardKonfiguratorBoard extends React.Component<
 					>
 						{errorViewOpener}
 					</div>
-					<div className="w-fit flex flex-row justify-start">
+					<div className="w-full h-1 bg-white cursor-row-resize" />
+					<div className="w-full flex flex-row justify-start">
 						<button
 							type="button"
-							className="p-4 hover:bg-white/50 transition-colors transition"
+							className={`${
+								tabOpen === 'critical' ? 'bg-white/25' : ''
+							} p-4 hover:bg-white/50 transition-colors transition`}
+							onClick={() => {
+								this.setState({
+									tabOpen: 'critical',
+									errorViewOpen: true,
+								});
+							}}
 						>
 							Kritisch
 						</button>
 						<button
 							type="button"
-							className="p-4 hover:bg-white/50 transition-colors transition"
+							className={`${
+								tabOpen === 'warning' ? 'bg-white/25' : ''
+							} p-4 hover:bg-white/50 transition-colors transition`}
+							onClick={() => {
+								this.setState({
+									tabOpen: 'warning',
+									errorViewOpen: true,
+								});
+							}}
 						>
 							Warnung
 						</button>
 						<button
 							type="button"
-							className=" p-4 hover:bg-white/50 transition-colors transition"
+							className={`${
+								tabOpen === 'hints' ? 'bg-white/25' : ''
+							} border-r p-4 hover:bg-white/50 transition-colors transition`}
+							onClick={() => {
+								this.setState({
+									tabOpen: 'hints',
+									errorViewOpen: true,
+								});
+							}}
 						>
 							Hinweis
+						</button>
+						<button
+							type="button"
+							className={`${
+								tabOpen === 'hotkeys' ? 'bg-white/25' : ''
+							} border-l p-4 hover:bg-white/50 transition-colors transition ml-auto`}
+							onClick={() => {
+								this.setState({
+									tabOpen: 'hotkeys',
+									errorViewOpen: true,
+								});
+							}}
+						>
+							Hotkeys
 						</button>
 					</div>
 					<div
 						className={`${
-							errorViewOpen ? 'h-[200px] border-t ' : 'h-0'
-						} w-full bg-background transition-all duration-200 overflow-y-auto`}
-					/>
+							errorViewOpen ? 'h-[250px] border-t ' : 'h-0'
+						} w-full bg-background-700 transition-all duration-200 overflow-y-auto`}
+					>
+						{errorWindow}
+					</div>
 				</div>
 			</div>
 		);

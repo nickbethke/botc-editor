@@ -68,7 +68,7 @@ class InputValidator {
 					}
 					if (
 						this.errors.text.regex &&
-						this.errors.text.regex.expression.test(value) === false
+						!this.errors.text.regex.expression.test(value)
 					) {
 						answer.valid.is = false;
 						answer.valid.text.push(this.errors.text.regex.error);

@@ -172,5 +172,17 @@ app.whenReady()
 		ipcMain.handle('load:presets', () => {
 			return IPCHelper.loadPresets();
 		});
+		ipcMain.handle('get:isLinux', () => {
+			return IPCHelper.getOS() === 'linux';
+		});
+		ipcMain.handle('get:isMac', () => {
+			return IPCHelper.getOS() === 'darwin';
+		});
+		ipcMain.handle('get:isWin', () => {
+			return IPCHelper.getOS() === 'win32';
+		});
+		ipcMain.handle('get:os', () => {
+			return IPCHelper.getOS();
+		});
 	})
 	.catch(console.log);

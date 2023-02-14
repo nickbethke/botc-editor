@@ -42,10 +42,7 @@ class PresetsLoader {
 		const schema: JSONSchemaType<RiverPreset> = RiverPresetSchema;
 		const validate = ajv.compile(schema);
 		try {
-			if (validate(JSON.parse(content))) {
-				return true;
-			}
-			return false;
+			return !!validate(JSON.parse(content));
 		} catch (e) {
 			return false;
 		}

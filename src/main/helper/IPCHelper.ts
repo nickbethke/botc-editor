@@ -1,6 +1,7 @@
 import { app, dialog } from 'electron';
 import fs from 'fs';
 import Ajv, { JSONSchemaType } from 'ajv';
+import * as os from 'os';
 import PartieConfigInterface from '../../schema/interfaces/partieConfigInterface';
 import * as PartieConfigSchema from '../../schema/partieConfigSchema.json';
 import BoardConfigInterface from '../../schema/interfaces/boardConfigInterface';
@@ -123,6 +124,10 @@ class IPCHelper {
 	static loadPresets = (): Array<RiverPreset> => {
 		const loader = new PresetsLoader();
 		return loader.riverPresets;
+	};
+
+	static getOS = (): NodeJS.Platform => {
+		return os.platform();
 	};
 }
 

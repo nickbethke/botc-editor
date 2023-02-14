@@ -6,7 +6,7 @@ export type ConfirmPopupProps = {
 	confirmText?: string;
 	abortText?: string;
 	onConfirm: () => void;
-	onAbort?: () => void;
+	onAbort: () => void;
 };
 type ConfirmPopupStats = {
 	visible: boolean;
@@ -20,7 +20,6 @@ class ConfirmPopup extends React.Component<
 		return {
 			confirmText: 'OK',
 			abortText: 'Abbrechen',
-			onAbort: () => {},
 			text: '',
 		};
 	}
@@ -39,9 +38,9 @@ class ConfirmPopup extends React.Component<
 	};
 
 	handleAbort = () => {
-		this.setState({ visible: false });
 		const { onAbort } = this.props;
-		if (typeof onAbort !== 'undefined') onAbort();
+		this.setState({ visible: false });
+		onAbort();
 	};
 
 	render() {

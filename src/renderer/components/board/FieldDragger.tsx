@@ -9,7 +9,7 @@ type FieldDraggerProps = {
 	onDragEnd: () => void;
 };
 
-class FieldDragger extends React.Component<FieldDraggerProps, any> {
+class FieldDragger extends React.Component<FieldDraggerProps, never> {
 	private draggableItemClass: string =
 		'p-4 bg-white/10 flex text-center justify-center items-center cursor-grab border-2 border-transparent border-dashed hover:border-white';
 
@@ -25,12 +25,12 @@ class FieldDragger extends React.Component<FieldDraggerProps, any> {
 		this.handleDragEnd = this.handleDragEnd.bind(this);
 	}
 
-	handleDragStart: React.DragEventHandler<HTMLDivElement> = (event) => {
+	handleDragStart: React.DragEventHandler<HTMLDivElement> = () => {
 		const { onDragStart, type } = this.props;
 		onDragStart(type);
 	};
 
-	handleDragEnd: React.DragEventHandler<HTMLDivElement> = (event) => {
+	handleDragEnd: React.DragEventHandler<HTMLDivElement> = () => {
 		const { onDragEnd } = this.props;
 		onDragEnd();
 	};

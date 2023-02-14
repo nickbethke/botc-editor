@@ -22,9 +22,14 @@ declare global {
 				json: object,
 				type: 'partie' | 'board'
 			): Promise<boolean | string>;
-			app: { close(): void };
+			app: {
+				close(): void;
+				isWin(): Promise<boolean>;
+				isLinux(): Promise<boolean>;
+				isMac(): Promise<boolean>;
+				getOS(): Promise<NodeJS.Platform>;
+			};
 			ipcRenderer: {
-				sendMessage(channel: Channels, args: unknown[]): void;
 				on(
 					channel: Channels,
 					func: (...args: unknown[]) => void

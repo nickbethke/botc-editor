@@ -1,12 +1,11 @@
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
+import * as os from 'os';
+import IPCHelper from './helper/IPCHelper';
 
 export type Channels = 'ipc-example';
 
 contextBridge.exposeInMainWorld('electron', {
 	ipcRenderer: {
-		sendMessage(channel: Channels, args: unknown[]) {
-			ipcRenderer.send(channel, args);
-		},
 		on(channel: Channels, func: (...args: unknown[]) => void) {
 			const subscription = (
 				_event: IpcRendererEvent,
@@ -44,7 +43,19 @@ contextBridge.exposeInMainWorld('electron', {
 	},
 	app: {
 		close() {
-			ipcRenderer.invoke('app-close');
+			return ipcRenderer.invoke('app-close');
+		},
+		isWin() {
+			return ipcRenderer.invoke('get:isWin');
+		},
+		isMac() {
+			return ipcRenderer.invoke('get:isMac');
+		},
+		isLinux() {
+			return ipcRenderer.invoke('get:isLinux');
+		},
+		getOS() {
+			return ipcRenderer.invoke('get:os');
 		},
 	},
 	load: {

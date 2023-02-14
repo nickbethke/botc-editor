@@ -1,18 +1,10 @@
 import React from 'react';
-import {
-	BsChevronDown,
-	BsChevronUp,
-	BsFillCursorFill,
-	BsFillTrashFill,
-} from 'react-icons/bs';
+import { BsFillCursorFill, BsFillTrashFill } from 'react-icons/bs';
 import _uniqueId from 'lodash/uniqueId';
-import { symlink } from 'fs';
 import Mousetrap from 'mousetrap';
 import App from '../App';
-import BoardConfigInterface, {
-	Direction,
-} from '../../schema/interfaces/boardConfigInterface';
-import InputLabel from './InputLabel';
+import BoardConfigInterface from '../../schema/interfaces/boardConfigInterface';
+import InputLabel, { OnChangeFunctionInputLabel } from './InputLabel';
 import InputValidator from '../helper/InputValidator';
 import { RiverPreset } from '../../main/helper/PresetsLoader';
 import BoardKonfiguratorBoard from './board/BoardKonfiguratorBoard';
@@ -24,11 +16,14 @@ import { DirectionEnum } from '../../generator/interfaces/BoardConfigInterface';
 import Checkpoint from '../../generator/fields/checkpoint';
 import SauronsEye from '../../generator/fields/sauronsEye';
 import { BoardPosition } from '../../generator/interfaces/boardPosition';
-import FieldWithPositionAndAmountInterface from '../../generator/interfaces/FieldWithPositionAndAmountInterface';
 import Lembas from '../../generator/fields/lembas';
 import River from '../../generator/fields/river';
 import FieldWithPositionAndDirectionInterface from '../../generator/interfaces/fieldWithPositionAndDirectionInterface';
-import KeyCode from './KeyCode';
+
+import CheckpointSortable from './board/CheckpointSortable';
+import FieldWithPositionAndAmountInterface from '../../generator/interfaces/FieldWithPositionAndAmountInterface';
+import Hole from '../../generator/fields/hole';
+import ConfirmPopup from './ConfirmPopup';
 
 type BoardKonfiguratorProps = {
 	// eslint-disable-next-line react/no-unused-prop-types
@@ -54,7 +49,9 @@ type BoardKonfiguratorState = {
 	presets: Array<RiverPreset>;
 	isDragged: FieldsEnum | null;
 	selected: BoardPosition | null;
-	helpOpen: boolean;
+	checkpoints: Array<Checkpoint>;
+	leave: boolean;
+	os: NodeJS.Platform;
 };
 
 // TODO: Speichern Dialog: Als Preset oder als Board
@@ -90,15 +87,35 @@ class BoardKonfigurator extends React.Component<
 			isDragged: null,
 			board: [],
 			selected: null,
-			helpOpen: false,
+			checkpoints: [],
+			leave: false,
+			os: 'win32',
 		};
+
+		window.electron.app
+			.getOS()
+			.then((platform) => {
+				this.setState({ os: platform });
+				return true;
+			})
+			.catch((e) => {
+				if (!e) {
+					console.warn('OS not detected');
+				}
+			});
 
 		this.changeToPresets = this.changeToPresets.bind(this);
 		// this.changeToPresets();
 
-		this.handleDragStart = this.handleDragStart.bind(this);
 		this.draggerOnDragStart = this.draggerOnDragStart.bind(this);
 		this.handleBoardOnDrop = this.handleBoardOnDrop.bind(this);
+
+		this.onCheckpointSortUpdate = this.onCheckpointSortUpdate.bind(this);
+
+		this.onWidthChange = this.onWidthChange.bind(this);
+		this.onHeightChange = this.onHeightChange.bind(this);
+
+		this.abortBackToHomeScreen = this.abortBackToHomeScreen.bind(this);
 
 		Mousetrap.bind(['command+1', 'ctrl+1'], () => {
 			this.setState({ openTab: 'global' });
@@ -115,9 +132,37 @@ class BoardKonfigurator extends React.Component<
 		Mousetrap.bind(['command+d', 'ctrl+d'], () => {
 			this.setState({ currentTool: 'delete' });
 		});
-		Mousetrap.bind(['command+h', 'ctrl+h'], () => {
-			const { helpOpen } = this.state;
-			this.setState({ helpOpen: !helpOpen });
+		Mousetrap.bind(['up'], () => {
+			const { selected } = this.state;
+			if (selected && selected.y > 0) {
+				this.setState({
+					selected: { y: selected.y - 1, x: selected.x },
+				});
+			}
+		});
+		Mousetrap.bind(['down'], () => {
+			const { selected, config } = this.state;
+			if (selected && selected.y < config.height - 1) {
+				this.setState({
+					selected: { y: selected.y + 1, x: selected.x },
+				});
+			}
+		});
+		Mousetrap.bind(['left'], () => {
+			const { selected } = this.state;
+			if (selected && selected.x > 0) {
+				this.setState({
+					selected: { y: selected.y, x: selected.x - 1 },
+				});
+			}
+		});
+		Mousetrap.bind(['right'], () => {
+			const { selected, config } = this.state;
+			if (selected && selected.x < config.width - 1) {
+				this.setState({
+					selected: { y: selected.y, x: selected.x + 1 },
+				});
+			}
 		});
 	}
 
@@ -138,18 +183,25 @@ class BoardKonfigurator extends React.Component<
 			});
 	};
 
-	handleDragStart: React.DragEventHandler<HTMLDivElement> = (event) => {};
+	backToHomeScreen = () => {
+		// eslint-disable-next-line @typescript-eslint/no-shadow
+		const { App } = this.props;
+		App.setState({ openScreen: 'home', openPopup: false });
+	};
+
+	abortBackToHomeScreen = () => {
+		this.setState({ leave: false });
+	};
 
 	render = () => {
-		const { openTab, config, board } = this.state;
+		const { openTab, config, board, leave, os } = this.state;
 		if (board.length < 1) {
 			const newBoard: Array<Array<FieldWithPositionInterface>> = [];
 			const { height, width } = config;
 			for (let y = 0; y < height; y += 1) {
 				const row: Array<FieldWithPositionInterface> = [];
 				for (let x = 0; x < width; x += 1) {
-					const field = new Grass({ x, y });
-					row[x] = field;
+					row[x] = new Grass({ x, y });
 				}
 				newBoard[y] = row;
 			}
@@ -157,10 +209,22 @@ class BoardKonfigurator extends React.Component<
 			return null;
 		}
 
+		const popupLeave = (
+			<ConfirmPopup
+				label="Board-Konfigurator wirklich verlassen?"
+				text="Alle ungespeicherten Änderungen werden verworfen."
+				onConfirm={this.backToHomeScreen}
+				onAbort={this.abortBackToHomeScreen}
+			/>
+		);
+		// TODO: Dragger in Linux ausblenden
+
 		return (
-			<div className="flex flex-col h-[100vh]" role="presentation">
-				<div className="dragger w-[100vw] h-8 bg-[#6b808e]" />
-				<div className="grid grid-cols-4 xl:grid-cols-6 flex-grow bg-background">
+			<div className="flex flex-col h-[100vh]">
+				{os === 'win32' ? (
+					<div className="dragger w-[100vw] h-8 bg-[#6b808e]" />
+				) : null}
+				<div className="grid grid-cols-4 2xl:grid-cols-6 flex-grow bg-background">
 					<div
 						id="board-configurator-sidebar-left"
 						className="w-full h-full bg-background-700 text-white flex flex-col"
@@ -232,16 +296,20 @@ class BoardKonfigurator extends React.Component<
 							<button
 								type="button"
 								className="p-4 hover:bg-white/50 transition-colors transition"
+								onClick={() => {
+									this.setState({ leave: true });
+								}}
 							>
 								Beenden
 							</button>
 						</div>
 					</div>
-					<div className="col-span-2 xl:col-span-4">
+					<div className="col-span-2 2xl:col-span-4">
 						{this.board()}
 					</div>
 					{this.rightSidebar()}
 				</div>
+				{leave ? popupLeave : null}
 			</div>
 		);
 	};
@@ -270,6 +338,7 @@ class BoardKonfigurator extends React.Component<
 					</div>
 				</div>
 			);
+
 		return (
 			<div className="flex flex-col flex-grow">
 				<div className="border-b">
@@ -323,50 +392,60 @@ class BoardKonfigurator extends React.Component<
 
 	fields = () => {
 		return (
-			<div className="grid grid-cols-2 m-4 gap-4">
-				<FieldDragger
-					type={FieldsEnum.START}
-					text="Start"
-					onDragStart={this.draggerOnDragStart}
-					onDragEnd={this.draggerOnDragEnd}
-				/>
-				<FieldDragger
-					type={FieldsEnum.CHECKPOINT}
-					text="Checkpoint"
-					onDragStart={this.draggerOnDragStart}
-					onDragEnd={this.draggerOnDragEnd}
-				/>
-				<FieldDragger
-					type={FieldsEnum.EYE}
-					text="Saurons Auge"
-					onDragStart={this.draggerOnDragStart}
-					onDragEnd={this.draggerOnDragEnd}
-				/>
-				<FieldDragger
-					type={FieldsEnum.RIVER}
-					text="Fluss"
-					onDragStart={this.draggerOnDragStart}
-					onDragEnd={this.draggerOnDragEnd}
-				/>
-				<FieldDragger
-					type={FieldsEnum.LEMBAS}
-					text="Lembas"
-					onDragStart={this.draggerOnDragStart}
-					onDragEnd={this.draggerOnDragEnd}
-				/>
-				<FieldDragger
-					type={FieldsEnum.HOLE}
-					text="Loch"
-					onDragStart={this.draggerOnDragStart}
-					onDragEnd={this.draggerOnDragEnd}
-				/>
-				<FieldDragger
-					type={FieldsEnum.WALL}
-					text="Wand"
-					className="col-span-2"
-					onDragStart={this.draggerOnDragStart}
-					onDragEnd={this.draggerOnDragEnd}
-				/>
+			<div>
+				<div className="grid grid-cols-2 m-4 gap-4">
+					<FieldDragger
+						type={FieldsEnum.START}
+						text="Start"
+						onDragStart={this.draggerOnDragStart}
+						onDragEnd={this.draggerOnDragEnd}
+					/>
+					<FieldDragger
+						type={FieldsEnum.CHECKPOINT}
+						text="Checkpoint"
+						onDragStart={this.draggerOnDragStart}
+						onDragEnd={this.draggerOnDragEnd}
+					/>
+					<FieldDragger
+						type={FieldsEnum.EYE}
+						text="Saurons Auge"
+						className="col-span-2"
+						onDragStart={this.draggerOnDragStart}
+						onDragEnd={this.draggerOnDragEnd}
+					/>
+				</div>
+				<hr />
+				<div className="grid grid-cols-2 m-4 gap-4">
+					<FieldDragger
+						type={FieldsEnum.RIVER}
+						text="Fluss"
+						onDragStart={this.draggerOnDragStart}
+						onDragEnd={this.draggerOnDragEnd}
+					/>
+					<FieldDragger
+						type={FieldsEnum.LEMBAS}
+						text="Lembas"
+						onDragStart={this.draggerOnDragStart}
+						onDragEnd={this.draggerOnDragEnd}
+					/>
+					<FieldDragger
+						type={FieldsEnum.HOLE}
+						text="Loch"
+						className="col-span-2"
+						onDragStart={this.draggerOnDragStart}
+						onDragEnd={this.draggerOnDragEnd}
+					/>
+				</div>
+				<hr />
+				<div className="grid grid-cols-2 m-4 gap-4">
+					<FieldDragger
+						type={FieldsEnum.WALL}
+						text="Wand"
+						className="col-span-2"
+						onDragStart={this.draggerOnDragStart}
+						onDragEnd={this.draggerOnDragEnd}
+					/>
+				</div>
 			</div>
 		);
 	};
@@ -389,8 +468,101 @@ class BoardKonfigurator extends React.Component<
 		);
 	};
 
+	updateCheckpointArray = () => {
+		const { board, checkpoints } = this.state;
+		const helpArray: Checkpoint[] = [];
+		let i = 0;
+		board.map((row) => {
+			return row.map((f) => {
+				if (f instanceof Checkpoint) {
+					helpArray.push(new Checkpoint(f.position, i));
+					board[f.position.y][f.position.x] = new Checkpoint(
+						f.position,
+						i
+					);
+					i += 1;
+				}
+				return true;
+			});
+		});
+		this.setState({
+			checkpoints:
+				helpArray.length !== checkpoints.length
+					? helpArray
+					: checkpoints,
+		});
+	};
+
+	onCheckpointSortUpdate: (checkpoints: Checkpoint[]) => void = (check) => {
+		const { board } = this.state;
+		for (let i = 0; i < check.length; i += 1) {
+			const checkpoint = check[i];
+			board[checkpoint.position.y][checkpoint.position.x] =
+				new Checkpoint(checkpoint.position, checkpoint.order);
+		}
+		this.setState({ checkpoints: check, board });
+	};
+
+	onWidthChange: OnChangeFunctionInputLabel = (width) => {
+		const { board, config } = this.state;
+		for (let y = 0; y < board.length; y += 1) {
+			const row = board[y];
+			const newRow = [];
+			for (let x = 0; x < width; x += 1) {
+				if (x + 1 <= row.length) {
+					newRow[x] = row[x];
+				} else {
+					newRow[x] = new Grass({ x, y });
+				}
+			}
+			board[y] = newRow;
+		}
+		this.setState(
+			{
+				config: {
+					...config,
+					width: Number.parseInt(width.toString(), 10),
+				},
+				board,
+			},
+			() => {
+				this.updateCheckpointArray();
+			}
+		);
+	};
+
+	onHeightChange: OnChangeFunctionInputLabel = (height) => {
+		const { board, config } = this.state;
+		const newBoard = [];
+		for (let y = 0; y < height; y += 1) {
+			if (y + 1 <= board.length) {
+				newBoard[y] = board[y];
+			} else {
+				const row = [];
+				for (let x = 0; x < config.width; x += 1) {
+					row[x] = new Grass({ x, y });
+				}
+				newBoard[y] = row;
+			}
+		}
+
+		this.setState(
+			{
+				config: {
+					...config,
+					height: Number.parseInt(height.toString(), 10),
+				},
+				board: newBoard,
+			},
+			() => {
+				this.updateCheckpointArray();
+			}
+		);
+	};
+
 	globals = () => {
-		const { config, board } = this.state;
+		const { config, checkpoints } = this.state;
+
 		return (
 			<div className="flex flex-col flex-grow">
 				<div className="flex-shrink">
@@ -427,30 +599,7 @@ class BoardKonfigurator extends React.Component<
 							labelClass="text-xl"
 							value={config.width}
 							min={config.height === 1 ? 2 : 1}
-							onChange={(width) => {
-								for (let y = 0; y < board.length; y += 1) {
-									const row = board[y];
-									const newRow = [];
-									for (let x = 0; x < width; x += 1) {
-										if (x + 1 <= row.length) {
-											newRow[x] = row[x];
-										} else {
-											newRow[x] = new Grass({ x, y });
-										}
-									}
-									board[y] = newRow;
-								}
-								this.setState({
-									config: {
-										...config,
-										width: Number.parseInt(
-											width.toString(),
-											10
-										),
-									},
-									board,
-								});
-							}}
+							onChange={this.onWidthChange}
 						/>
 					</div>
 					<div className="p-4">
@@ -460,40 +609,19 @@ class BoardKonfigurator extends React.Component<
 							labelClass="text-xl"
 							value={config.height}
 							min={config.width === 1 ? 2 : 1}
-							onChange={(height) => {
-								const newboard = [];
-								for (let y = 0; y < height; y += 1) {
-									if (y + 1 <= board.length) {
-										newboard[y] = board[y];
-									} else {
-										const row = [];
-										for (
-											let x = 0;
-											x < config.width;
-											x += 1
-										) {
-											row[x] = new Grass({ x, y });
-										}
-										newboard[y] = row;
-									}
-								}
-
-								this.setState({
-									config: {
-										...config,
-										height: Number.parseInt(
-											height.toString(),
-											10
-										),
-									},
-									board: newboard,
-								});
-							}}
+							onChange={this.onHeightChange}
 						/>
 					</div>
 				</div>
 				<div className="flex-grow p-4 border-t">
-					<div className="text-xl">Checkpoint Reihenfolge</div>
+					<div className="text-xl mb-2">Checkpoint Reihenfolge</div>
+					<CheckpointSortable
+						checkpoints={checkpoints}
+						onUpdate={this.onCheckpointSortUpdate}
+						onSelect={(pos) => {
+							this.setState({ selected: pos });
+						}}
+					/>
 				</div>
 			</div>
 		);
@@ -502,47 +630,71 @@ class BoardKonfigurator extends React.Component<
 	handleBoardOnDrop: (position: { x: number; y: number }) => void = (
 		position
 	) => {
-		const { isDragged, config, board } = this.state;
+		const { isDragged, config, board, checkpoints } = this.state;
+		let newField: FieldWithPositionInterface;
 		switch (isDragged) {
 			case FieldsEnum.START:
-				board[position.y][position.x] = new StartField(
+				newField = new StartField(
 					{
 						x: position.x,
 						y: position.y,
 					},
 					DirectionEnum.NORTH
 				);
+				board[position.y][position.x] = newField;
 				this.setState({ board });
 				break;
 			case FieldsEnum.CHECKPOINT:
-				board[position.y][position.x] = new Checkpoint(
+				newField = new Checkpoint(
 					{
 						x: position.x,
 						y: position.y,
 					},
-					config.checkPoints.length
+					checkpoints.length
 				);
+				checkpoints.push(newField as Checkpoint);
+				board[position.y][position.x] = newField;
 				this.setState({ board });
 				break;
 			case FieldsEnum.EYE:
-				board[position.y][position.x] = new SauronsEye(
+				newField = new SauronsEye(
 					{
 						x: position.x,
 						y: position.y,
 					},
 					DirectionEnum.NORTH
 				);
+				board[position.y][position.x] = newField;
 				this.setState({ board });
 				break;
 			case FieldsEnum.RIVER:
-				if (!config.riverFields) config.riverFields = [];
-				board[position.y][position.x] = new River(
+				newField = new River(
 					{
 						x: position.x,
 						y: position.y,
 					},
 					DirectionEnum.NORTH
 				);
+				board[position.y][position.x] = newField;
+				this.setState({ board });
+				break;
+			case FieldsEnum.LEMBAS:
+				newField = new Lembas(
+					{
+						x: position.x,
+						y: position.y,
+					},
+					1
+				);
+				board[position.y][position.x] = newField;
+				this.setState({ board });
+				break;
+			case FieldsEnum.HOLE:
+				newField = new Hole({
+					x: position.x,
+					y: position.y,
+				});
+				board[position.y][position.x] = newField;
 				this.setState({ board });
 				break;
 			default:
@@ -551,17 +703,31 @@ class BoardKonfigurator extends React.Component<
 	};
 
 	board = () => {
-		const { config, board } = this.state;
+		const { config, board, selected } = this.state;
 		return (
 			<BoardKonfiguratorBoard
 				config={config}
 				board={board}
+				selected={selected}
 				onSelect={(position) => {
 					if (position) {
 						const { currentTool } = this.state;
-						if (currentTool === 'delete') {
+						const field = board[position.y][position.x];
+						if (
+							currentTool === 'delete' &&
+							!(field instanceof Grass)
+						) {
 							board[position.y][position.x] = new Grass(position);
-							this.setState({ board, selected: null });
+
+							this.setState(
+								{
+									board,
+									selected: null,
+								},
+								() => {
+									this.updateCheckpointArray();
+								}
+							);
 							return false;
 						}
 						this.setState({ selected: position });
@@ -576,7 +742,7 @@ class BoardKonfigurator extends React.Component<
 	};
 
 	rightSidebar = () => {
-		const { selected, board, helpOpen } = this.state;
+		const { selected, board } = this.state;
 		let field: FieldWithPositionInterface | null = null;
 		let option: JSX.Element | null = null;
 		if (selected) {
@@ -588,10 +754,12 @@ class BoardKonfigurator extends React.Component<
 						type="range"
 						value={field.amount}
 						onChange={(value) => {
-							(field as Lembas).amount = Number.parseInt(
-								value.toString(),
-								10
-							);
+							(
+								board[selected.y][
+									selected.x
+								] as FieldWithPositionAndAmountInterface
+							).amount = Number.parseInt(value.toString(), 10);
+							this.setState({ board });
 						}}
 					/>
 				);
@@ -600,7 +768,6 @@ class BoardKonfigurator extends React.Component<
 				field instanceof SauronsEye ||
 				field instanceof StartField
 			) {
-				const id = _uniqueId('select-');
 				option = (
 					<div className="flex flex-col">
 						<p className="text-xl">Blickrichtung</p>
@@ -629,12 +796,6 @@ class BoardKonfigurator extends React.Component<
 				);
 			}
 		}
-		const helpOpener = helpOpen ? (
-			<BsChevronDown className="text-xl" />
-		) : (
-			<BsChevronUp className="text-xl" />
-		);
-
 		return (
 			<div
 				id="board-configurator-sidebar-right"
@@ -643,61 +804,9 @@ class BoardKonfigurator extends React.Component<
 				<div className="flex flex-col h-full">
 					<div className="flex flex-col flex-grow text-white h-1/2">
 						<div className="text-2xl text-center p-4">
-							Feldeigenschaft
+							Feld-Eigenschaft
 						</div>
 						<div className="p-4">{option}</div>
-					</div>
-					<div>
-						<div className="relative border-y text-white flex flex-col">
-							<div
-								role="presentation"
-								className="p-4 cursor-pointer flex flex-row justify-between"
-								onClick={() => {
-									this.setState({ helpOpen: !helpOpen });
-								}}
-							>
-								<div>Hilfe</div>
-								<div>{helpOpener}</div>
-							</div>
-							<div
-								className={`${
-									helpOpen
-										? 'h-[500px] border-t p-4'
-										: 'h-0 overflow-y-hidden px-4'
-								} transition-all duration-200 bg-white/25 gap-4 flex flex-col gap-4 overflow-y-auto`}
-							>
-								<KeyCode
-									text="Hilfe öffnen"
-									keyCodes={['Strg', 'H']}
-								/>
-								<KeyCode
-									text="Warnung/Fehler Fenster"
-									keyCodes={['Strg', 'W']}
-								/>
-								<div className="">Tabs</div>
-								<KeyCode
-									text="Global Tab öffnen"
-									keyCodes={['Strg', '1']}
-								/>
-								<KeyCode
-									text="Felder Tab öffnen"
-									keyCodes={['Strg', '2']}
-								/>
-								<KeyCode
-									text="Presets Tab öffnen"
-									keyCodes={['Strg', '3']}
-								/>
-								<div className="">Editor</div>
-								<KeyCode
-									text="Auswahl-Tool"
-									keyCodes={['Strg', 'E']}
-								/>
-								<KeyCode
-									text="Entfernen-Tool"
-									keyCodes={['Strg', 'D']}
-								/>
-							</div>
-						</div>
 					</div>
 				</div>
 			</div>
