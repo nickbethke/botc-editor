@@ -1,5 +1,5 @@
 import { BoardPosition } from './boardPosition';
-import { FieldsEnum } from '../../renderer/components/BoardKonfigurator';
+import { FieldsEnum } from '../../../../renderer/components/BoardKonfigurator';
 
 interface FieldWithPositionInterface {
 	readonly position: BoardPosition;

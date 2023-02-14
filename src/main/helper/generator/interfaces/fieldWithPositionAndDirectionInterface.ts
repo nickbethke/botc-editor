@@ -1,4 +1,4 @@
-import { DirectionEnum } from '../../../../../../../Projekte/BotC-board-generator/src/interfaces/boardConfigInterface';
+import { DirectionEnum } from './BoardConfigInterface';
 import FieldWithPositionInterface from './fieldWithPositionInterface';
 
 interface FieldWithPositionAndDirectionInterface

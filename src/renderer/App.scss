@@ -132,9 +132,82 @@ input[type='range']::-webkit-slider-thumb {
 	width: 16px;
 	background: #ffffff;
 	border: 2px solid white;
-	@apply bg-background-100 rounded-3xl;
+	@apply bg-accent-500 rounded-3xl;
 }
 
 select option {
 	@apply text-[#222222];
+}
+
+/* Hide default HTML checkbox */
+/* The slider */
+/* Rounded sliders */
+.switch {
+	position: relative;
+	display: inline-block;
+	width: 40px;
+	@apply h-6;
+
+	input {
+		opacity: 0;
+		width: 0;
+		height: 0;
+	}
+}
+
+.slider {
+	position: absolute;
+	cursor: pointer;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: #ccc;
+	-webkit-transition: 0.4s;
+	transition: 0.4s;
+
+	&:before {
+		position: absolute;
+		content: '';
+		height: 16px;
+		width: 16px;
+		left: 4px;
+		bottom: 4px;
+		background-color: white;
+		-webkit-transition: 0.4s;
+		transition: 0.4s;
+	}
+}
+
+input {
+	&:checked {
+		+ {
+			.slider {
+				@apply bg-accent-500;
+
+				&:before {
+					transform: translateX(16px);
+				}
+			}
+		}
+	}
+
+	&:focus {
+		+ {
+			.slider {
+				box-shadow: 0 0 1px rgb(75 176 119);
+			}
+		}
+	}
+}
+.slider-both {
+	@apply bg-accent-500;
+}
+
+.slider.round {
+	border-radius: 34px;
+
+	&:before {
+		border-radius: 50%;
+	}
 }

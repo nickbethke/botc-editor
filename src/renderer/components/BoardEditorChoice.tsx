@@ -42,7 +42,10 @@ class BoardEditorChoice extends React.Component<
 		parentApp.setState({ openScreen: 'boardConfigNewScreen' });
 	};
 
-	openRandomBoardConfig = () => {};
+	openRandomBoardConfig = () => {
+		const { parentApp } = this.props;
+		parentApp.setState({ openPopup: 'randomBoardStartValues' });
+	};
 
 	render() {
 		return (

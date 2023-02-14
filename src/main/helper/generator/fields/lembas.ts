@@ -1,6 +1,6 @@
 import FieldWithPositionAndAmountInterface from '../interfaces/FieldWithPositionAndAmountInterface';
 import { BoardPosition } from '../interfaces/boardPosition';
-import { FieldsEnum } from '../../renderer/components/BoardKonfigurator';
+import { FieldsEnum } from '../../../../renderer/components/BoardKonfigurator';
 
 /**
  * Lembas Field Class

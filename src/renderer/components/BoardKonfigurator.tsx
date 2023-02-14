@@ -9,20 +9,20 @@ import InputValidator from '../helper/InputValidator';
 import { RiverPreset } from '../../main/helper/PresetsLoader';
 import BoardKonfiguratorBoard from './board/BoardKonfiguratorBoard';
 import FieldDragger from './board/FieldDragger';
-import FieldWithPositionInterface from '../../generator/interfaces/fieldWithPositionInterface';
-import Grass from '../../generator/fields/grass';
-import StartField from '../../generator/fields/startField';
-import { DirectionEnum } from '../../generator/interfaces/BoardConfigInterface';
-import Checkpoint from '../../generator/fields/checkpoint';
-import SauronsEye from '../../generator/fields/sauronsEye';
-import { BoardPosition } from '../../generator/interfaces/boardPosition';
-import Lembas from '../../generator/fields/lembas';
-import River from '../../generator/fields/river';
-import FieldWithPositionAndDirectionInterface from '../../generator/interfaces/fieldWithPositionAndDirectionInterface';
+import FieldWithPositionInterface from '../../main/helper/generator/interfaces/fieldWithPositionInterface';
+import Grass from '../../main/helper/generator/fields/grass';
+import StartField from '../../main/helper/generator/fields/startField';
+import { DirectionEnum } from '../../main/helper/generator/interfaces/BoardConfigInterface';
+import Checkpoint from '../../main/helper/generator/fields/checkpoint';
+import SauronsEye from '../../main/helper/generator/fields/sauronsEye';
+import { BoardPosition } from '../../main/helper/generator/interfaces/boardPosition';
+import Lembas from '../../main/helper/generator/fields/lembas';
+import River from '../../main/helper/generator/fields/river';
+import FieldWithPositionAndDirectionInterface from '../../main/helper/generator/interfaces/fieldWithPositionAndDirectionInterface';
 
 import CheckpointSortable from './board/CheckpointSortable';
-import FieldWithPositionAndAmountInterface from '../../generator/interfaces/FieldWithPositionAndAmountInterface';
-import Hole from '../../generator/fields/hole';
+import FieldWithPositionAndAmountInterface from '../../main/helper/generator/interfaces/FieldWithPositionAndAmountInterface';
+import Hole from '../../main/helper/generator/fields/hole';
 import ConfirmPopup from './ConfirmPopup';
 
 type BoardKonfiguratorProps = {
@@ -217,8 +217,9 @@ class BoardKonfigurator extends React.Component<
 				onAbort={this.abortBackToHomeScreen}
 			/>
 		);
-		// TODO: Dragger in Linux ausblenden
-
+		// TODO: Speichern
+		// TODO: Laden
+		// TODO: Random
 		return (
 			<div className="flex flex-col h-[100vh]">
 				{os === 'win32' ? (
@@ -630,7 +631,7 @@ class BoardKonfigurator extends React.Component<
 	handleBoardOnDrop: (position: { x: number; y: number }) => void = (
 		position
 	) => {
-		const { isDragged, config, board, checkpoints } = this.state;
+		const { isDragged, board, checkpoints } = this.state;
 		let newField: FieldWithPositionInterface;
 		switch (isDragged) {
 			case FieldsEnum.START:

@@ -1,12 +1,12 @@
 import FieldWithPositionAndDirectionInterface from '../interfaces/fieldWithPositionAndDirectionInterface';
 import { DirectionEnum } from '../interfaces/BoardConfigInterface';
 import { BoardPosition } from '../interfaces/boardPosition';
-import { FieldsEnum } from '../../renderer/components/BoardKonfigurator';
+import { FieldsEnum } from '../../../../renderer/components/BoardKonfigurator';
 
 /**
- * River Field Class
+ * Saurons Eye Field Class
  */
-class River implements FieldWithPositionAndDirectionInterface {
+class SauronsEye implements FieldWithPositionAndDirectionInterface {
 	readonly direction: DirectionEnum;
 
 	readonly position: BoardPosition;
@@ -16,7 +16,7 @@ class River implements FieldWithPositionAndDirectionInterface {
 		this.direction = direction;
 	}
 
-	readonly fieldEnum: FieldsEnum = FieldsEnum.RIVER;
+	readonly fieldEnum: FieldsEnum = FieldsEnum.EYE;
 }
 
-export default River;
+export default SauronsEye;

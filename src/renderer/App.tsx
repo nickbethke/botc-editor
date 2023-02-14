@@ -7,10 +7,15 @@ import PartieKonfigurator from './components/PartieKonfigurator';
 import PartieConfigInterface from '../schema/interfaces/partieConfigInterface';
 import BoardKonfigurator from './components/BoardKonfigurator';
 import JSONValidierer from './components/JSONValidierer';
+import RandomBoardStartValuesDialog from './components/RandomBoardStartValuesDialog';
 
 type AppStates = {
 	openScreen: string;
-	openPopup: 'boardEditorChoice' | 'partieEditorChoice' | false;
+	openPopup:
+		| 'boardEditorChoice'
+		| 'partieEditorChoice'
+		| 'randomBoardStartValues'
+		| false;
 	toLoad: object | null;
 };
 
@@ -32,7 +37,12 @@ class App extends React.Component<unknown, AppStates> {
 			this.setState({ openPopup: 'partieEditorChoice' });
 		});
 		Mousetrap.bind(['esc'], () => {
-			this.setState({ openPopup: false });
+			const { openPopup } = this.state;
+			if (openPopup === 'randomBoardStartValues') {
+				this.setState({ openPopup: 'boardEditorChoice' });
+			} else {
+				this.setState({ openPopup: false });
+			}
 		});
 	}
 
@@ -112,6 +122,15 @@ class App extends React.Component<unknown, AppStates> {
 		let popup: JSX.Element | string = '';
 		if (openPopup === 'boardEditorChoice') {
 			popup = <BoardEditorChoice parentApp={this} />;
+		}
+		if (openPopup === 'randomBoardStartValues') {
+			popup = (
+				<RandomBoardStartValuesDialog
+					onClose={() => {
+						this.setState({ openPopup: 'boardEditorChoice' });
+					}}
+				/>
+			);
 		}
 		if (openPopup === 'partieEditorChoice') {
 			popup = <PartieEditorChoice parentApp={this} />;

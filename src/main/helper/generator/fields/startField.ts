@@ -1,7 +1,7 @@
 import FieldWithPositionAndDirectionInterface from '../interfaces/fieldWithPositionAndDirectionInterface';
 import { DirectionEnum } from '../interfaces/BoardConfigInterface';
 import { BoardPosition } from '../interfaces/boardPosition';
-import { FieldsEnum } from '../../renderer/components/BoardKonfigurator';
+import { FieldsEnum } from '../../../../renderer/components/BoardKonfigurator';
 
 /**
  * Start Field Class

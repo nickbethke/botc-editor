@@ -8,22 +8,24 @@ export interface OnChangeFunctionInputLabel {
 }
 
 type InputLabelProps = {
-	label: string;
-	type: 'text' | 'number' | 'range';
+	label?: string | false;
+	type: 'text' | 'number' | 'range' | 'switch';
 	placeholder?: string;
-	value: number | string;
+	value: number | string | boolean;
 	helperText?: string;
 	validator?: InputValidator;
 	min?: number;
+	max?: number;
 	onChange: OnChangeFunctionInputLabel;
 	labelClass?: string;
+	bothSides?: boolean;
 };
 type InputLabelState = {
 	hasWarning: boolean;
 	warningText: string[];
 	errorMsg: string[];
 	isValid: boolean;
-	value: number | string;
+	value: number | string | boolean;
 };
 
 class InputLabel extends React.Component<InputLabelProps, InputLabelState> {
@@ -35,7 +37,10 @@ class InputLabel extends React.Component<InputLabelProps, InputLabelState> {
 			helperText: '',
 			validator: undefined,
 			min: 0,
-			labelClass: 'text-2xl',
+			labelClass: 'text-lg',
+			max: 20,
+			label: false,
+			bothSides: false,
 		};
 	}
 
@@ -53,29 +58,52 @@ class InputLabel extends React.Component<InputLabelProps, InputLabelState> {
 	}
 
 	handleOnChange(e: ChangeEvent<HTMLInputElement>) {
-		const { value } = e.target;
-		const { validator, onChange } = this.props;
-		if (validator) {
-			const { valid, warning } = validator.validate(value);
-			this.setState({
-				warningText: warning.text,
-				isValid: valid.is,
-				errorMsg: valid.text,
-				hasWarning: warning.has,
-				value,
-			});
+		const { type } = this.props;
+		if (type !== 'switch') {
+			const { value } = e.target;
+			const { validator, onChange } = this.props;
+			if (validator) {
+				const { valid, warning } = validator.validate(value);
+				this.setState({
+					warningText: warning.text,
+					isValid: valid.is,
+					errorMsg: valid.text,
+					hasWarning: warning.has,
+					value,
+				});
+			} else {
+				this.setState({ value });
+			}
+			onChange(value);
 		} else {
+			const { checked: value } = e.target;
+			const { onChange } = this.props;
+
 			this.setState({ value });
+			onChange(value ? 1 : 0);
 		}
-		onChange(value);
 	}
 
 	render() {
 		let helper: string | JSX.Element = '';
 
-		const { helperText, label, min, type, placeholder, labelClass } =
-			this.props;
+		const {
+			helperText,
+			label,
+			min,
+			type,
+			placeholder,
+			labelClass,
+			max,
+			bothSides,
+			value: propsValue,
+			onChange,
+		} = this.props;
 		const { value } = this.state;
+
+		if (propsValue !== value) {
+			this.setState({ value: propsValue });
+		}
 
 		if (helperText) {
 			helper = <div>{helperText}</div>;
@@ -107,9 +135,12 @@ class InputLabel extends React.Component<InputLabelProps, InputLabelState> {
 		}
 		if (type === 'text' || type === 'number') {
 			return (
-				<div className="flex flex-col">
+				<div className="flex flex-col font-lato">
 					<div>
-						<label htmlFor={this.id} className={labelClass}>
+						<label
+							htmlFor={this.id}
+							className={`${labelClass} font-lato`}
+						>
 							{label}
 						</label>
 					</div>
@@ -121,6 +152,7 @@ class InputLabel extends React.Component<InputLabelProps, InputLabelState> {
 							placeholder={placeholder}
 							onChange={this.handleOnChange}
 							min={min || -1}
+							max={max || 20}
 							value={value?.toString()}
 						/>
 					</div>
@@ -130,38 +162,67 @@ class InputLabel extends React.Component<InputLabelProps, InputLabelState> {
 				</div>
 			);
 		}
-		return (
-			<div className="flex flex-col">
-				<div>
-					<label
-						htmlFor={this.id}
-						className={`${labelClass} flex flex-row gap-2`}
-					>
-						<span>{label}:</span>
-						<DblClickInput
+		if (type === 'range') {
+			return (
+				<div className="flex flex-col">
+					<div>
+						<label
+							htmlFor={this.id}
+							className={`${labelClass} flex flex-row gap-2 font-lato`}
+						>
+							<span>{label}:</span>
+							<DblClickInput
+								value={Number.parseInt(
+									value.toString() ? value.toString() : '0',
+									10
+								)}
+								onChange={(v) => {
+									this.setState({ value: v });
+									onChange(v);
+								}}
+								min={min || 0}
+								max={max || 20}
+							/>
+						</label>
+					</div>
+					<div>
+						<input
+							id={this.id}
+							type="range"
 							value={Number.parseInt(value.toString(), 10)}
-							onChange={(v) => {
-								this.setState({ value: v });
-							}}
 							min={min || 0}
-							max={20}
+							max={max || 20}
+							onChange={this.handleOnChange}
+							className={`w-full h-[2px] rounded-lg appearance-none cursor-pointer ${validClass}`}
 						/>
-					</label>
+					</div>
+					{helper}
+					{warningHelper}
+					{invalidHelper}
 				</div>
-				<div>
-					<input
-						id={this.id}
-						type="range"
-						value={Number.parseInt(value.toString(), 10)}
-						min={min || 0}
-						max={20}
-						onChange={this.handleOnChange}
-						className={`w-full h-[2px] rounded-lg appearance-none cursor-pointer ${validClass}`}
-					/>
-				</div>
-				{helper}
-				{warningHelper}
-				{invalidHelper}
+			);
+		}
+		return (
+			<div>
+				<label
+					htmlFor={this.id}
+					className={`${labelClass} flex flex-row gap-2 justify-center items-center font-lato`}
+				>
+					{label ? <span className="min-h-8">{label}</span> : null}
+					<div className="switch">
+						<input
+							type="checkbox"
+							id={this.id}
+							checked={!!value}
+							onChange={this.handleOnChange}
+						/>
+						<span
+							className={`${
+								bothSides ? 'slider-both' : ''
+							} slider round`}
+						/>
+					</div>
+				</label>
 			</div>
 		);
 	}

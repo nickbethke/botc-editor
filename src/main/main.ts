@@ -14,6 +14,7 @@ import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import { resolveHtmlPath } from './util';
 import IPCHelper from './helper/IPCHelper';
+import { RandomBoardStartValues } from '../renderer/components/RandomBoardStartValuesDialog';
 
 class AppUpdater {
 	constructor() {
@@ -184,5 +185,11 @@ app.whenReady()
 		ipcMain.handle('get:os', () => {
 			return IPCHelper.getOS();
 		});
+		ipcMain.handle(
+			'generate:randomBoard',
+			(event, startValue: RandomBoardStartValues) => {
+				return IPCHelper.generateRandomBoard(startValue);
+			}
+		);
 	})
 	.catch(console.log);

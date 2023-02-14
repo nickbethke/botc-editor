@@ -8,8 +8,8 @@ import riverImage from '../../../../assets/images/river.png';
 import lembasImage from '../../../../assets/images/lembas.png';
 import holeImage from '../../../../assets/images/hole.png';
 
-import { BoardPosition } from '../../../generator/interfaces/boardPosition';
-import { DirectionEnum } from '../../../generator/interfaces/BoardConfigInterface';
+import { BoardPosition } from '../../../main/helper/generator/interfaces/boardPosition';
+import { DirectionEnum } from '../../../main/helper/generator/interfaces/BoardConfigInterface';
 
 type FieldProps = {
 	type: FieldsEnum;

@@ -1,6 +1,6 @@
 import FieldWithPositionInterface from '../interfaces/fieldWithPositionInterface';
 import { BoardPosition } from '../interfaces/boardPosition';
-import { FieldsEnum } from '../../renderer/components/BoardKonfigurator';
+import { FieldsEnum } from '../../../../renderer/components/BoardKonfigurator';
 
 /**
  * Grass Field - Default Field Type
