@@ -15,7 +15,7 @@ class Grass implements FieldWithPositionInterface {
 		this.position = position;
 	}
 
-	readonly fieldEnum: FieldsEnum = FieldsEnum.GRASS;
+	readonly fieldEnum: FieldsEnum = 0;
 }
 
 export default Grass;

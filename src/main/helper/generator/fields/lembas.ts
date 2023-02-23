@@ -15,7 +15,7 @@ class Lembas implements FieldWithPositionAndAmountInterface {
 		this.amount = amount;
 	}
 
-	readonly fieldEnum: FieldsEnum = FieldsEnum.LEMBAS;
+	readonly fieldEnum: FieldsEnum = 5;
 }
 
 export default Lembas;

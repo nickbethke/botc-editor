@@ -7,7 +7,7 @@ import BoardConfigInterface, {
 import BoardGenerator, {
 	BoardPosition,
 	RandomBoardStartValues,
-} from './boardGenerator';
+} from './BoardGenerator';
 import DirectionHelper from './helper/DirectionHelper';
 
 class Board implements BoardConfigInterface {
@@ -143,22 +143,13 @@ class Board implements BoardConfigInterface {
 	}
 
 	/**
-	 * get the walls count
-	 */
-	public getWallCount(): number {
-		return this.walls ? this.walls.length : 0;
-	}
-
-	/**
 	 * generate a random valid board via the BoardGeneration class
 	 * @param startValues?
-	 * @param _callback?
 	 */
 	static generateRandom(
-		startValues?: RandomBoardStartValues,
-		_callback?: () => void
+		startValues?: RandomBoardStartValues
 	): BoardGenerator {
-		return new BoardGenerator(startValues, _callback);
+		return new BoardGenerator(startValues);
 	}
 }
 

@@ -1,6 +1,6 @@
 import FieldWithPositionInterface from '../interfaces/fieldWithPositionInterface';
 import SauronsEye from '../fields/sauronsEye';
-import { BoardPosition } from '../boardGenerator';
+import { BoardPosition } from '../BoardGenerator';
 import Hole from '../fields/hole';
 import River from '../fields/river';
 
@@ -50,7 +50,7 @@ class AStar {
 		];
 
 		while (frontier.length > 0) {
-			frontier.sort(function (a, b) {
+			frontier.sort((a, b) => {
 				return a.estimate - b.estimate;
 			});
 

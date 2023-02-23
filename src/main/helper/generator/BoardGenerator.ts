@@ -1,8 +1,6 @@
+import FieldWithPositionInterface from './interfaces/fieldWithPositionInterface';
 import Grass from './fields/grass';
-import BoardConfigInterface, {
-	Direction,
-	DirectionEnum,
-} from './interfaces/BoardConfigInterface';
+import { Direction, DirectionEnum } from './interfaces/BoardConfigInterface';
 import SauronsEye from './fields/sauronsEye';
 import StartField from './fields/startField';
 import Checkpoint from './fields/checkpoint';
@@ -10,14 +8,8 @@ import Hole from './fields/hole';
 import Lembas from './fields/lembas';
 import River from './fields/river';
 import Board from './board';
-import FieldWithPositionInterface from './interfaces/fieldWithPositionInterface';
 import AStar from './helper/AStar';
 import DirectionHelper from './helper/DirectionHelper';
-
-/**
- * Direction Arrows for console output
- */
-const DirectionArrows: string[] = ['↑', '→', '↓', '←'];
 
 /**
  * random board start values type
@@ -82,7 +74,7 @@ class BoardGenerator {
 
 	readonly board: Array<Array<FieldWithPositionInterface>>;
 
-	private readonly startValues: RandomBoardStartValues;
+	readonly startValues: RandomBoardStartValues;
 
 	private readonly boardJSON: Board;
 
@@ -90,7 +82,7 @@ class BoardGenerator {
 
 	private wallMapArray: Array<[string, boolean]>;
 
-	private readonly checkpoints: BoardPosition[];
+	readonly checkpoints: BoardPosition[];
 
 	private readonly startFields: BoardPosition[];
 
@@ -107,14 +99,7 @@ class BoardGenerator {
 		amount: number;
 	}>;
 
-	/**
-	 * @throws {Error}
-	 * @param startValues?
-	 * @param _callback?
-	 */
-	constructor(startValues?: RandomBoardStartValues, _callback?: () => void) {
-		// TODO: start values validation...?!
-
+	constructor(startValues?: RandomBoardStartValues) {
 		this.holesSet = 0;
 
 		// merging custom start values with default values
@@ -177,13 +162,8 @@ class BoardGenerator {
 				this.genWallsRandom();
 			}
 		}
-		if (_callback) _callback();
 	}
 
-	/**
-	 * generation of the board array with all fields set to grass and the width and height
-	 * @private
-	 */
 	public static generateBoardArray(
 		height: number,
 		width: number
@@ -201,10 +181,6 @@ class BoardGenerator {
 		return board;
 	}
 
-	/**
-	 * generate saurons eye with a random position and random direction
-	 * @private
-	 */
 	private genSauronsEye() {
 		const position = this.getRandomPosition();
 		const direction = BoardGenerator.getRandomDirection();
@@ -215,10 +191,6 @@ class BoardGenerator {
 		this.boardJSON.setEye(position, direction);
 	}
 
-	/**
-	 * generate all start fields
-	 * @private
-	 */
 	private genStartFields() {
 		const todo = this.startValues.startFields;
 		for (let i = 0; i < todo; i += 1) {
@@ -226,10 +198,6 @@ class BoardGenerator {
 		}
 	}
 
-	/**
-	 * generate a start field with random position and direction
-	 * @private
-	 */
 	private genStartField() {
 		const position = this.getRandomPosition();
 		const direction = BoardGenerator.getRandomDirection();
@@ -241,21 +209,12 @@ class BoardGenerator {
 		this.startFields.push(position);
 	}
 
-	/**
-	 * generate all checkpoints
-	 * @private
-	 */
 	private genCheckpoints() {
 		for (let i = 0; i < this.startValues.checkpoints; i += 1) {
 			this.genCheckpoint(i);
 		}
 	}
 
-	/**
-	 * generate a checkpoint with a random position
-	 * @param order
-	 * @private
-	 */
 	private genCheckpoint(order: number) {
 		const position = this.getRandomPosition();
 		this.board[position.y][position.x] = new Checkpoint(position, order);
@@ -263,10 +222,6 @@ class BoardGenerator {
 		this.checkpoints.push(position);
 	}
 
-	/**
-	 * generate all hole fields
-	 * @private
-	 */
 	private genHoles() {
 		const maxTrys = this.getFieldCount() * 8;
 		let trys = 0;
@@ -278,10 +233,6 @@ class BoardGenerator {
 		}
 	}
 
-	/**
-	 * generate a hole field
-	 * @private
-	 */
 	private genHole() {
 		this.holesTrys = new Map<string, boolean>();
 		// generate random position
@@ -310,20 +261,12 @@ class BoardGenerator {
 		}
 	}
 
-	/**
-	 * generate all lembas fields
-	 * @private
-	 */
 	private genLembasFields() {
 		for (let i = 0; i < this.startValues.lembasFields; i += 1) {
 			this.genLembasField();
 		}
 	}
 
-	/**
-	 * generate lembas field
-	 * @private
-	 */
 	private genLembasField() {
 		const position = this.getRandomPosition();
 		// set amount: either random or exact the start value
@@ -336,11 +279,6 @@ class BoardGenerator {
 		this.boardJSON.addLembasField(position, amount);
 	}
 
-	/**
-	 * generate river fields
-	 * amount: a fifth of all free fields
-	 * @private
-	 */
 	private genRivers() {
 		const freeSpacesCount = this.getFreeFieldsCount();
 		let riverFieldCount = Math.floor(freeSpacesCount / 5);
@@ -358,11 +296,6 @@ class BoardGenerator {
 		}
 	}
 
-	/**
-	 * Placing totally random river fields on the board.
-	 * @param riverCount
-	 * @private
-	 */
 	private genRiversDefault(riverCount: number) {
 		for (let i = 0; i < riverCount; i += 1) {
 			const position = this.getRandomPosition();
@@ -372,11 +305,6 @@ class BoardGenerator {
 		}
 	}
 
-	/**
-	 * Placing river fields more natural on the board by placing them in groups.
-	 * @param riverCount
-	 * @private
-	 */
 	private genRiversComplex(riverCount: number) {
 		let made = 0;
 		while (made < riverCount) {
@@ -461,10 +389,6 @@ class BoardGenerator {
 		}
 	}
 
-	/**
-	 * generate neighbors array for complex river algorithm without already placed river fields
-	 * @param position
-	 */
 	public getRiverNeighbors(
 		position: BoardPosition
 	): Array<{ position: BoardPosition; direction: Direction }> {
@@ -626,13 +550,11 @@ class BoardGenerator {
 	}
 
 	private genWallsIterative(): void {
-		let runs = 0;
 		for (let y = 0; y < this.board.length; y += 1) {
 			const row = this.board[y];
 			for (let x = 0; x < row.length; x += 1) {
 				const field = row[x];
 				this.genWallIterative(field.position);
-				runs += 1;
 			}
 		}
 	}
@@ -800,60 +722,6 @@ class BoardGenerator {
 		return postion.x.toString() + postion.y.toString();
 	}
 
-	public wallCount(): number {
-		return this.walls;
-	}
-
-	static printRandomGeneratorBoard(
-		board: Array<Array<FieldWithPositionInterface>>
-	): string {
-		const outputArray: string[] = [];
-		const repeat = 14;
-		outputArray.push(
-			`${`|${'-'.repeat(repeat + 2)}`.repeat(board[0].length)}|\n`
-		);
-		for (let y = 0; y < board.length; y += 1) {
-			const row: FieldWithPositionInterface[] = board[y];
-			outputArray.push('| ');
-			for (let x = 0; x < row.length; x += 1) {
-				const item = row[x];
-				if (
-					item instanceof SauronsEye ||
-					item instanceof StartField ||
-					item instanceof River
-				) {
-					outputArray.push(
-						`${`${item.constructor.name} ${
-							DirectionArrows[item.direction]
-						}`.padEnd(repeat, ' ')} | `
-					);
-				} else if (item instanceof Lembas) {
-					outputArray.push(
-						`${`${item.constructor.name}:${item.amount}`.padEnd(
-							repeat,
-							' '
-						)} | `
-					);
-				} else if (item instanceof Checkpoint) {
-					outputArray.push(
-						`${`${item.constructor.name}:${item.order}`.padEnd(
-							repeat,
-							' '
-						)} | `
-					);
-				} else {
-					outputArray.push(
-						`${item.constructor.name.padEnd(repeat, ' ')} | `
-					);
-				}
-			}
-			outputArray.push(
-				`\n${`|${'-'.repeat(repeat + 2)}`.repeat(row.length)}|\n`
-			);
-		}
-		return outputArray.join('');
-	}
-
 	static firstLetter(string: string): string {
 		return string.substring(0, 1);
 	}
@@ -862,6 +730,17 @@ class BoardGenerator {
 		return new Promise((resolve) => {
 			setTimeout(resolve, ms);
 		});
+	}
+
+	static checkpointsPositionArrayToCheckpointArray(
+		checkpointPositionArray: BoardPosition[]
+	): Checkpoint[] {
+		const checkpoints = [];
+		for (let i = 0; i < checkpointPositionArray.length; i += 1) {
+			const c = checkpointPositionArray[i];
+			checkpoints.push(new Checkpoint(c, i));
+		}
+		return checkpoints;
 	}
 }
 

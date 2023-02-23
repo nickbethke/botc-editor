@@ -1,10 +1,4 @@
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
-import * as os from 'os';
-import IPCHelper from './helper/IPCHelper';
-import RandomBoardStartValuesDialog, {
-	RandomBoardStartValues,
-} from '../renderer/components/RandomBoardStartValuesDialog';
-import BoardConfigInterface from '../schema/interfaces/boardConfigInterface';
 
 export type Channels = 'ipc-example';
 
@@ -66,10 +60,5 @@ contextBridge.exposeInMainWorld('electron', {
 		presets() {
 			return ipcRenderer.invoke('load:presets');
 		},
-	},
-	generateRandomBoard(
-		startValue: RandomBoardStartValues
-	): Promise<{ board: BoardConfigInterface; preview: string }> {
-		return ipcRenderer.invoke('generate:randomBoard', startValue);
 	},
 });

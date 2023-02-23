@@ -20,7 +20,7 @@ class Checkpoint implements FieldWithPositionInterface {
 		this.order = order;
 	}
 
-	readonly fieldEnum: FieldsEnum = FieldsEnum.CHECKPOINT;
+	readonly fieldEnum: FieldsEnum = 2;
 }
 
 export default Checkpoint;

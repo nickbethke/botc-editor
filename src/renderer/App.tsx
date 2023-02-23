@@ -8,6 +8,7 @@ import PartieConfigInterface from '../schema/interfaces/partieConfigInterface';
 import BoardKonfigurator from './components/BoardKonfigurator';
 import JSONValidierer from './components/JSONValidierer';
 import RandomBoardStartValuesDialog from './components/RandomBoardStartValuesDialog';
+import BoardGenerator from '../main/helper/generator/BoardGenerator';
 
 type AppStates = {
 	openScreen: string;
@@ -17,12 +18,18 @@ type AppStates = {
 		| 'randomBoardStartValues'
 		| false;
 	toLoad: object | null;
+	generator: BoardGenerator | null;
 };
 
 class App extends React.Component<unknown, AppStates> {
 	constructor(props: unknown) {
 		super(props);
-		this.state = { openScreen: 'home', openPopup: false, toLoad: null };
+		this.state = {
+			openScreen: 'home',
+			openPopup: false,
+			toLoad: null,
+			generator: null,
+		};
 		this.handleOpenBoardEditorChoice =
 			this.handleOpenBoardEditorChoice.bind(this);
 		this.handleOpenPartieEditorChoice =
@@ -63,7 +70,7 @@ class App extends React.Component<unknown, AppStates> {
 	};
 
 	render = () => {
-		const { openScreen } = this.state;
+		const { openScreen, generator } = this.state;
 		switch (openScreen) {
 			case 'home':
 				return this.homeScreen();
@@ -73,6 +80,8 @@ class App extends React.Component<unknown, AppStates> {
 			case 'boardConfigNewScreen':
 			case 'boardConfigLoadScreen':
 				return this.boardConfigScreen();
+			case 'boardConfigFromRandomScreen':
+				return this.boardConfigScreen(generator);
 			case 'validator':
 				return this.validatorScreen();
 			default:
@@ -98,13 +107,38 @@ class App extends React.Component<unknown, AppStates> {
 		return null;
 	};
 
-	boardConfigScreen = () => {
+	boardConfigScreen = (generator: BoardGenerator | null = null) => {
 		const { openScreen } = this.state;
 		if (openScreen === 'boardConfigNewScreen') {
-			return <BoardKonfigurator App={this} />;
+			return (
+				<BoardKonfigurator
+					onClose={() => {
+						this.setState({ openScreen: 'home', openPopup: false });
+					}}
+				/>
+			);
 		}
 		if (openScreen === 'boardConfigLoadScreen') {
-			return <BoardKonfigurator App={this} />;
+			return (
+				<BoardKonfigurator
+					onClose={() => {
+						this.setState({ openScreen: 'home', openPopup: false });
+					}}
+				/>
+			);
+		}
+		if (
+			openScreen === 'boardConfigFromRandomScreen' &&
+			generator instanceof BoardGenerator
+		) {
+			return (
+				<BoardKonfigurator
+					onClose={() => {
+						this.setState({ openScreen: 'home', openPopup: false });
+					}}
+					generator={generator}
+				/>
+			);
 		}
 		return null;
 	};
@@ -128,6 +162,13 @@ class App extends React.Component<unknown, AppStates> {
 				<RandomBoardStartValuesDialog
 					onClose={() => {
 						this.setState({ openPopup: 'boardEditorChoice' });
+					}}
+					onGenerate={(generator) => {
+						this.setState({
+							generator,
+							openScreen: 'boardConfigFromRandomScreen',
+							openPopup: false,
+						});
 					}}
 				/>
 			);

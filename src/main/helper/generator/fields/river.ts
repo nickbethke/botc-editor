@@ -16,7 +16,7 @@ class River implements FieldWithPositionAndDirectionInterface {
 		this.direction = direction;
 	}
 
-	readonly fieldEnum: FieldsEnum = FieldsEnum.RIVER;
+	readonly fieldEnum: FieldsEnum = 6;
 }
 
 export default River;

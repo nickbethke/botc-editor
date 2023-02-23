@@ -2,7 +2,6 @@ import React from 'react';
 import { BsFillCursorFill, BsFillTrashFill } from 'react-icons/bs';
 import _uniqueId from 'lodash/uniqueId';
 import Mousetrap from 'mousetrap';
-import App from '../App';
 import BoardConfigInterface from '../../schema/interfaces/boardConfigInterface';
 import InputLabel, { OnChangeFunctionInputLabel } from './InputLabel';
 import InputValidator from '../helper/InputValidator';
@@ -24,10 +23,15 @@ import CheckpointSortable from './board/CheckpointSortable';
 import FieldWithPositionAndAmountInterface from '../../main/helper/generator/interfaces/FieldWithPositionAndAmountInterface';
 import Hole from '../../main/helper/generator/fields/hole';
 import ConfirmPopup from './ConfirmPopup';
+import BoardGenerator, {
+	defaultStartValues,
+} from '../../main/helper/generator/BoardGenerator';
+import { RandomBoardStartValues } from './RandomBoardStartValuesDialog';
 
 type BoardKonfiguratorProps = {
 	// eslint-disable-next-line react/no-unused-prop-types
-	App: App;
+	generator?: BoardGenerator | null;
+	onClose: () => void;
 };
 
 export enum FieldsEnum {
@@ -76,21 +80,51 @@ class BoardKonfigurator extends React.Component<
 	private tabClosedClass =
 		'p-4 text-center hover:bg-white/50 transition-colors transition';
 
+	static get defaultProps() {
+		return {
+			generator: null,
+		};
+	}
+
 	constructor(props: BoardKonfiguratorProps) {
 		super(props);
+		const { generator } = this.props;
 
-		this.state = {
-			config: BoardKonfigurator.default,
-			currentTool: 'select',
-			openTab: 'fields',
-			presets: [],
-			isDragged: null,
-			board: [],
-			selected: null,
-			checkpoints: [],
-			leave: false,
-			os: 'win32',
-		};
+		if (generator) {
+			this.state = {
+				config: {
+					...BoardKonfigurator.default,
+					width: generator.startValues.width,
+					height: generator.startValues.height,
+					name: generator.startValues.name,
+				},
+				currentTool: 'select',
+				openTab: 'fields',
+				presets: [],
+				isDragged: null,
+				board: generator.board,
+				selected: null,
+				checkpoints:
+					BoardGenerator.checkpointsPositionArrayToCheckpointArray(
+						generator.checkpoints
+					),
+				leave: false,
+				os: 'win32',
+			};
+		} else {
+			this.state = {
+				config: BoardKonfigurator.default,
+				currentTool: 'select',
+				openTab: 'fields',
+				presets: [],
+				isDragged: null,
+				board: [],
+				selected: null,
+				checkpoints: [],
+				leave: false,
+				os: 'win32',
+			};
+		}
 
 		window.electron.app
 			.getOS()
@@ -116,6 +150,32 @@ class BoardKonfigurator extends React.Component<
 		this.onHeightChange = this.onHeightChange.bind(this);
 
 		this.abortBackToHomeScreen = this.abortBackToHomeScreen.bind(this);
+
+		Mousetrap.bind(['command+g', 'ctrl+g'], () => {
+			const startValues: RandomBoardStartValues = {
+				...defaultStartValues,
+				width: 20,
+				height: 20,
+				checkpoints: 6,
+				rivers: true,
+				riverAlgorithm: 'complex',
+				holes: 16 * 4,
+			};
+			const nGenerator = new BoardGenerator(startValues);
+			const { config } = this.state;
+			this.setState({
+				board: nGenerator.board,
+				checkpoints:
+					BoardGenerator.checkpointsPositionArrayToCheckpointArray(
+						nGenerator.checkpoints
+					),
+				config: {
+					...config,
+					width: startValues.width,
+					height: startValues.height,
+				},
+			});
+		});
 
 		Mousetrap.bind(['command+1', 'ctrl+1'], () => {
 			this.setState({ openTab: 'global' });
@@ -184,9 +244,8 @@ class BoardKonfigurator extends React.Component<
 	};
 
 	backToHomeScreen = () => {
-		// eslint-disable-next-line @typescript-eslint/no-shadow
-		const { App } = this.props;
-		App.setState({ openScreen: 'home', openPopup: false });
+		const { onClose } = this.props;
+		onClose();
 	};
 
 	abortBackToHomeScreen = () => {

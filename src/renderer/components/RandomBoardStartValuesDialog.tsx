@@ -1,6 +1,6 @@
 import React, { MouseEventHandler } from 'react';
-import { Grid } from 'react-loader-spinner';
 import InputLabel from './InputLabel';
+import BoardGenerator from '../../main/helper/generator/BoardGenerator';
 
 export type RandomBoardStartValuesDialogStats = {
 	name: string;
@@ -16,7 +16,6 @@ export type RandomBoardStartValuesDialogStats = {
 	walls: boolean;
 	riverAlgorithm: RiverAlgorithm;
 	wallsAlgorithm: WallAlgorithm;
-	preview: null | JSX.Element;
 };
 
 export type RandomBoardStartValues = {
@@ -37,6 +36,7 @@ export type RandomBoardStartValues = {
 
 type RandomBoardStartValuesDialogProps = {
 	onClose: () => void;
+	onGenerate: (generator: BoardGenerator) => void;
 };
 
 /**
@@ -71,7 +71,6 @@ class RandomBoardStartValuesDialog extends React.Component<
 			walls: false,
 			riverAlgorithm: 'default',
 			wallsAlgorithm: 'iterative',
-			preview: null,
 		};
 		this.generate = this.generate.bind(this);
 		this.close = this.close.bind(this);
@@ -139,11 +138,6 @@ class RandomBoardStartValuesDialog extends React.Component<
 	};
 
 	generate: MouseEventHandler<HTMLButtonElement> = async () => {
-		this.setState({
-			preview: (
-				<Grid color="#71C294" width={150} height={150} radius={10} />
-			),
-		});
 		const {
 			height,
 			startFields,
@@ -174,13 +168,9 @@ class RandomBoardStartValuesDialog extends React.Component<
 			name,
 			width,
 		};
-		window.electron
-			.generateRandomBoard(generationValues)
-			.then((answer) => {
-				console.log(answer);
-				return true;
-			})
-			.catch(console.log);
+		const { onGenerate } = this.props;
+		const generator = new BoardGenerator(generationValues);
+		onGenerate(generator);
 	};
 
 	close: MouseEventHandler<HTMLButtonElement> = () => {
@@ -203,7 +193,6 @@ class RandomBoardStartValuesDialog extends React.Component<
 			wallsAlgorithm,
 			walls,
 			holes,
-			preview,
 		} = this.state;
 		return (
 			<div className="absolute w-[100vw] h-[100vh] top-0 left-0">
@@ -216,9 +205,9 @@ class RandomBoardStartValuesDialog extends React.Component<
 						<div className="text-center text-3xl mb-4">
 							Zufälliges Board - Startwerte
 						</div>
-						<div className="grid grid-cols-2 gap-8 2xl:w-[50vw] w-[75vw]">
+						<div className="2xl:w-[50vw] w-[75vw]">
 							<div className="h-fit">
-								<div className="relative grid grid-cols-2 gap-4">
+								<div className="relative grid grid-cols-2 gap-8">
 									<div className="col-span-2">
 										<InputLabel
 											label="Board Name"
@@ -232,7 +221,7 @@ class RandomBoardStartValuesDialog extends React.Component<
 											placeholder="Board Name"
 										/>
 									</div>
-									<div className="flex flex-col gap-4">
+									<div className="flex flex-col gap-8">
 										<InputLabel
 											label="Breite"
 											value={width}
@@ -265,7 +254,7 @@ class RandomBoardStartValuesDialog extends React.Component<
 											max={6}
 										/>
 									</div>
-									<div className="flex flex-col gap-4">
+									<div className="flex flex-col gap-8">
 										<InputLabel
 											label="Höhe"
 											value={height}
@@ -299,7 +288,7 @@ class RandomBoardStartValuesDialog extends React.Component<
 									</div>
 								</div>
 								<hr className="my-4" />
-								<div className="relative grid grid-cols-2 gap-4 h-fit">
+								<div className="relative grid grid-cols-2 gap-8 h-fit">
 									<InputLabel
 										label="Lembas-Felder"
 										value={lembasFields}
@@ -346,7 +335,7 @@ class RandomBoardStartValuesDialog extends React.Component<
 									</div>
 								</div>
 								<hr className="my-4" />
-								<div className="relative grid gap-4 h-fit">
+								<div className="relative grid gap-8 h-fit">
 									<InputLabel
 										label="Löcher"
 										type="range"
@@ -373,7 +362,7 @@ class RandomBoardStartValuesDialog extends React.Component<
 									</span>
 								</div>
 								<hr className="my-4" />
-								<div className="relative grid grid-cols-2 gap-4 h-fit">
+								<div className="relative grid grid-cols-2 gap-8 h-fit">
 									<InputLabel
 										label="Flüsse"
 										type="switch"
@@ -408,7 +397,7 @@ class RandomBoardStartValuesDialog extends React.Component<
 									) : null}
 								</div>
 								<hr className="my-4" />
-								<div className="relative grid grid-cols-2 gap-4 h-fit">
+								<div className="relative grid grid-cols-2 gap-8 h-fit">
 									<InputLabel
 										label="Wände"
 										type="switch"
@@ -458,9 +447,6 @@ class RandomBoardStartValuesDialog extends React.Component<
 										Abbrechen
 									</button>
 								</div>
-							</div>
-							<div className="h-full w-full min-h-[25vh] bg-background flex justify-center items-center">
-								{preview}
 							</div>
 						</div>
 					</div>

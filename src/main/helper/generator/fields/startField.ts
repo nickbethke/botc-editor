@@ -16,7 +16,7 @@ class StartField implements FieldWithPositionAndDirectionInterface {
 		this.direction = direction;
 	}
 
-	readonly fieldEnum: FieldsEnum = FieldsEnum.START;
+	readonly fieldEnum: FieldsEnum = 1;
 }
 
 export default StartField;

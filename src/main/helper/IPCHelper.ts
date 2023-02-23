@@ -7,7 +7,6 @@ import * as PartieConfigSchema from '../../schema/partieConfigSchema.json';
 import BoardConfigInterface from '../../schema/interfaces/boardConfigInterface';
 import * as BoardConfigSchema from '../../schema/boardConfigSchema.json';
 import PresetsLoader, { RiverPreset } from './PresetsLoader';
-import { RandomBoardStartValues } from '../../renderer/components/RandomBoardStartValuesDialog';
 
 class IPCHelper {
 	static handleSavePartieConfig = async (json: string): Promise<boolean> => {
@@ -129,21 +128,6 @@ class IPCHelper {
 
 	static getOS = (): NodeJS.Platform => {
 		return os.platform();
-	};
-
-	static generateRandomBoard = (
-		startValue: RandomBoardStartValues
-	): { board: BoardConfigInterface; preview: string } => {
-		return {
-			board: {
-				name: startValue.name,
-				width: startValue.width,
-				height: startValue.height,
-				startFields: [],
-				checkPoints: [],
-			},
-			preview: '',
-		};
 	};
 }
 

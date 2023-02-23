@@ -16,7 +16,7 @@ class SauronsEye implements FieldWithPositionAndDirectionInterface {
 		this.direction = direction;
 	}
 
-	readonly fieldEnum: FieldsEnum = FieldsEnum.EYE;
+	readonly fieldEnum: FieldsEnum = 3;
 }
 
 export default SauronsEye;

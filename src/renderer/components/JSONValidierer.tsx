@@ -5,10 +5,10 @@ import MonacoEditor, { monaco } from 'react-monaco-editor';
 import { HiSaveAs } from 'react-icons/hi';
 import Mousetrap from 'mousetrap';
 import { DefinedError } from 'ajv';
-import KeyCode = monaco.KeyCode;
-import KeyMod = monaco.KeyMod;
 import ConfirmPopup from './ConfirmPopup';
 import App from '../App';
+import KeyCode = monaco.KeyCode;
+import KeyMod = monaco.KeyMod;
 
 type JSONValidatorProps = {
 	parentApp: App;

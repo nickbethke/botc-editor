@@ -12,7 +12,7 @@ class Hole implements FieldWithPositionInterface {
 		this.position = position;
 	}
 
-	readonly fieldEnum: FieldsEnum = FieldsEnum.HOLE;
+	readonly fieldEnum: FieldsEnum = 4;
 }
 
 export default Hole;
