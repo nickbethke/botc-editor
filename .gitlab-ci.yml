@@ -7,4 +7,4 @@ run_tests:
     before_script:
         - npm install
     script:
-        - npm run jest
+        - npm run test
