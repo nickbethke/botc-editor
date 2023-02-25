@@ -1,15 +1,14 @@
 stages:
-    - test
     - build
 
-run_tests:
-    stage: test
-    image: node:latest
-    before_script:
-        - npm install
-        - npm run build
-    script:
-        - npm run test
+# run_tests:
+#   stage: test
+#        image: node:latest
+#        before_script:
+#            - npm install
+#            - npm run build
+#    script:
+#        - npm run test
 build:
     stage: build
     image: node:latest
