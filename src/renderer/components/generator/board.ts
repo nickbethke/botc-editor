@@ -1,13 +1,13 @@
-import BoardConfigInterface, {
-	DirectionEnum,
-	Lembas,
-	Position,
-	PositionDirection,
-} from './interfaces/BoardConfigInterface';
 import BoardGenerator, {
 	BoardPosition,
 	RandomBoardStartValues,
 } from './BoardGenerator';
+import BoardConfigInterface, {
+	DirectionEnum,
+	LembasField,
+	Position,
+	PositionDirection,
+} from '../interfaces/BoardConfigInterface';
 import DirectionHelper from './helper/DirectionHelper';
 
 class Board implements BoardConfigInterface {
@@ -23,7 +23,7 @@ class Board implements BoardConfigInterface {
 
 	holes?: Position[];
 
-	lembas?: Lembas[];
+	lembas?: LembasField[];
 
 	name: string;
 

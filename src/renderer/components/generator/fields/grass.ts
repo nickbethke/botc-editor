@@ -1,18 +1,21 @@
 import FieldWithPositionInterface from '../interfaces/fieldWithPositionInterface';
 import { BoardPosition } from '../interfaces/boardPosition';
-import { FieldsEnum } from '../../../../renderer/components/BoardKonfigurator';
+import { FieldsEnum } from '../../BoardKonfigurator';
 
 /**
- * Hole Field Class
+ * Grass Field - Default Field Type
  */
-class Hole implements FieldWithPositionInterface {
+class Grass implements FieldWithPositionInterface {
 	readonly position: BoardPosition;
 
+	/**
+	 * @param position
+	 */
 	constructor(position: BoardPosition) {
 		this.position = position;
 	}
 
-	readonly fieldEnum: FieldsEnum = 4;
+	readonly fieldEnum: FieldsEnum = 0;
 }
 
-export default Hole;
+export default Grass;

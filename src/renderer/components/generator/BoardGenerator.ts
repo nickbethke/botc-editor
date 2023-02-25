@@ -1,6 +1,10 @@
 import FieldWithPositionInterface from './interfaces/fieldWithPositionInterface';
 import Grass from './fields/grass';
-import { Direction, DirectionEnum } from './interfaces/BoardConfigInterface';
+import BoardConfigInterface, {
+	Direction,
+	DirectionEnum,
+	Position,
+} from '../interfaces/BoardConfigInterface';
 import SauronsEye from './fields/sauronsEye';
 import StartField from './fields/startField';
 import Checkpoint from './fields/checkpoint';
@@ -162,6 +166,19 @@ class BoardGenerator {
 				this.genWallsRandom();
 			}
 		}
+	}
+
+	public static positionArrayToBoardPositionArray(
+		position: Position[]
+	): BoardPosition[] {
+		const boardPositions: BoardPosition[] = [];
+		for (let i = 0; i < position.length; i += 1) {
+			const positionItem = position[i];
+			boardPositions.push(
+				BoardGenerator.positionToBoardPosition(positionItem)
+			);
+		}
+		return boardPositions;
 	}
 
 	public static generateBoardArray(
@@ -741,6 +758,89 @@ class BoardGenerator {
 			checkpoints.push(new Checkpoint(c, i));
 		}
 		return checkpoints;
+	}
+
+	static positionToBoardPosition(position: Position): BoardPosition {
+		return { x: position[0], y: position[1] };
+	}
+
+	static directionToDirectionEnum(direction: Direction): DirectionEnum {
+		if (direction === 'NORTH') {
+			return DirectionEnum.NORTH;
+		}
+		if (direction === 'EAST') {
+			return DirectionEnum.EAST;
+		}
+		if (direction === 'SOUTH') {
+			return DirectionEnum.SOUTH;
+		}
+		if (direction === 'WEST') {
+			return DirectionEnum.WEST;
+		}
+		return DirectionEnum.NORTH;
+	}
+
+	static jsonToBoard(
+		json: BoardConfigInterface
+	): Array<Array<FieldWithPositionInterface>> {
+		const board: Array<Array<FieldWithPositionInterface>> =
+			BoardGenerator.generateBoardArray(json.height, json.width);
+
+		board[json.eye.position[1]][json.eye.position[0]] = new SauronsEye(
+			BoardGenerator.positionToBoardPosition(json.eye.position),
+			BoardGenerator.directionToDirectionEnum(json.eye.direction)
+		);
+
+		for (let i = 0; i < json.startFields.length; i += 1) {
+			const startField = json.startFields[i];
+			const position = BoardGenerator.positionToBoardPosition(
+				startField.position
+			);
+			const d = BoardGenerator.directionToDirectionEnum(
+				startField.direction
+			);
+			board[position.y][position.x] = new StartField(position, d);
+		}
+
+		for (let i = 0; i < json.checkPoints.length; i += 1) {
+			const checkPoint = json.checkPoints[i];
+			const position = BoardGenerator.positionToBoardPosition(checkPoint);
+			board[position.y][position.x] = new Checkpoint(position, i);
+		}
+		if (json.holes) {
+			for (let i = 0; i < json.holes.length; i += 1) {
+				const hole = json.holes[i];
+				const position = BoardGenerator.positionToBoardPosition(hole);
+				board[position.y][position.x] = new Hole(position);
+			}
+		}
+		if (json.lembasFields) {
+			for (let i = 0; i < json.lembasFields.length; i += 1) {
+				const lembasField = json.lembasFields[i];
+				const position = BoardGenerator.positionToBoardPosition(
+					lembasField.position
+				);
+				board[position.y][position.x] = new Lembas(
+					position,
+					lembasField.amount
+				);
+			}
+		}
+
+		if (json.riverFields) {
+			for (let i = 0; i < json.riverFields.length; i += 1) {
+				const riverField = json.riverFields[i];
+				const position = BoardGenerator.positionToBoardPosition(
+					riverField.position
+				);
+				const d = BoardGenerator.directionToDirectionEnum(
+					riverField.direction
+				);
+				board[position.y][position.x] = new River(position, d);
+			}
+		}
+
+		return board;
 	}
 }
 

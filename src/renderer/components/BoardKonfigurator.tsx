@@ -1,36 +1,35 @@
-import React from 'react';
+import React, { MouseEventHandler } from 'react';
 import { BsFillCursorFill, BsFillTrashFill } from 'react-icons/bs';
 import _uniqueId from 'lodash/uniqueId';
 import Mousetrap from 'mousetrap';
-import BoardConfigInterface from '../../schema/interfaces/boardConfigInterface';
+import { ProgressBar } from 'react-loader-spinner';
 import InputLabel, { OnChangeFunctionInputLabel } from './InputLabel';
 import InputValidator from '../helper/InputValidator';
 import { RiverPreset } from '../../main/helper/PresetsLoader';
 import BoardKonfiguratorBoard from './board/BoardKonfiguratorBoard';
 import FieldDragger from './board/FieldDragger';
-import FieldWithPositionInterface from '../../main/helper/generator/interfaces/fieldWithPositionInterface';
-import Grass from '../../main/helper/generator/fields/grass';
-import StartField from '../../main/helper/generator/fields/startField';
-import { DirectionEnum } from '../../main/helper/generator/interfaces/BoardConfigInterface';
-import Checkpoint from '../../main/helper/generator/fields/checkpoint';
-import SauronsEye from '../../main/helper/generator/fields/sauronsEye';
-import { BoardPosition } from '../../main/helper/generator/interfaces/boardPosition';
-import Lembas from '../../main/helper/generator/fields/lembas';
-import River from '../../main/helper/generator/fields/river';
-import FieldWithPositionAndDirectionInterface from '../../main/helper/generator/interfaces/fieldWithPositionAndDirectionInterface';
-
+import FieldWithPositionInterface from './generator/interfaces/fieldWithPositionInterface';
+import Grass from './generator/fields/grass';
+import StartField from './generator/fields/startField';
+import BoardConfigInterface, {
+	DirectionEnum,
+} from './interfaces/BoardConfigInterface';
+import Checkpoint from './generator/fields/checkpoint';
+import SauronsEye from './generator/fields/sauronsEye';
+import { BoardPosition } from './generator/interfaces/boardPosition';
+import River from './generator/fields/river';
+import FieldWithPositionAndDirectionInterface from './generator/interfaces/fieldWithPositionAndDirectionInterface';
 import CheckpointSortable from './board/CheckpointSortable';
-import FieldWithPositionAndAmountInterface from '../../main/helper/generator/interfaces/FieldWithPositionAndAmountInterface';
-import Hole from '../../main/helper/generator/fields/hole';
+import FieldWithPositionAndAmountInterface from './generator/interfaces/FieldWithPositionAndAmountInterface';
+import Hole from './generator/fields/hole';
 import ConfirmPopup from './ConfirmPopup';
-import BoardGenerator, {
-	defaultStartValues,
-} from '../../main/helper/generator/BoardGenerator';
-import { RandomBoardStartValues } from './RandomBoardStartValuesDialog';
+import BoardGenerator from './generator/BoardGenerator';
+import Lembas from './generator/fields/lembas';
+import Popup from './Popup';
 
 type BoardKonfiguratorProps = {
-	// eslint-disable-next-line react/no-unused-prop-types
 	generator?: BoardGenerator | null;
+	json?: BoardConfigInterface | null;
 	onClose: () => void;
 };
 
@@ -56,9 +55,12 @@ type BoardKonfiguratorState = {
 	checkpoints: Array<Checkpoint>;
 	leave: boolean;
 	os: NodeJS.Platform;
+	loading: boolean;
+	error: string | null;
 };
 
 // TODO: Speichern Dialog: Als Preset oder als Board
+// TODO: Walls!!!
 class BoardKonfigurator extends React.Component<
 	BoardKonfiguratorProps,
 	BoardKonfiguratorState
@@ -69,6 +71,28 @@ class BoardKonfigurator extends React.Component<
 		name: 'Default Board',
 		checkPoints: [],
 		startFields: [],
+		eye: { position: [0, 0], direction: 'NORTH' },
+	};
+
+	static defaultState: BoardKonfiguratorState = {
+		config: BoardKonfigurator.default,
+		currentTool: 'select',
+		openTab: 'fields',
+		presets: [],
+		isDragged: null,
+		board: BoardGenerator.jsonToBoard(BoardKonfigurator.default),
+		selected: BoardGenerator.positionToBoardPosition(
+			BoardKonfigurator.default.eye.position
+		),
+		checkpoints: BoardGenerator.checkpointsPositionArrayToCheckpointArray(
+			BoardGenerator.positionArrayToBoardPositionArray(
+				BoardKonfigurator.default.checkPoints
+			)
+		),
+		leave: false,
+		os: 'win32',
+		loading: false,
+		error: null,
 	};
 
 	private draggableItemClass: string =
@@ -83,14 +107,53 @@ class BoardKonfigurator extends React.Component<
 	static get defaultProps() {
 		return {
 			generator: null,
+			json: null,
 		};
 	}
 
 	constructor(props: BoardKonfiguratorProps) {
 		super(props);
-		const { generator } = this.props;
+		const { generator, json } = this.props;
 
-		if (generator) {
+		if (json) {
+			try {
+				this.state = {
+					config: {
+						...BoardKonfigurator.default,
+						width: json.width,
+						height: json.height,
+						name: json.name,
+					},
+					currentTool: 'select',
+					openTab: 'fields',
+					presets: [],
+					isDragged: null,
+					board: BoardGenerator.jsonToBoard(
+						json as BoardConfigInterface
+					),
+					selected: null,
+					checkpoints:
+						BoardGenerator.checkpointsPositionArrayToCheckpointArray(
+							BoardGenerator.positionArrayToBoardPositionArray(
+								json.checkPoints
+							)
+						),
+					leave: false,
+					os: 'win32',
+					loading: false,
+					error: null,
+				};
+			} catch (e) {
+				if (e instanceof Error)
+					this.state = {
+						...BoardKonfigurator.defaultState,
+						loading: false,
+						error:
+							`Invalides JSON für eine Board-Konfiguration\n` +
+							`${e.message}`,
+					};
+			}
+		} else if (generator) {
 			this.state = {
 				config: {
 					...BoardKonfigurator.default,
@@ -110,20 +173,11 @@ class BoardKonfigurator extends React.Component<
 					),
 				leave: false,
 				os: 'win32',
+				loading: false,
+				error: null,
 			};
 		} else {
-			this.state = {
-				config: BoardKonfigurator.default,
-				currentTool: 'select',
-				openTab: 'fields',
-				presets: [],
-				isDragged: null,
-				board: [],
-				selected: null,
-				checkpoints: [],
-				leave: false,
-				os: 'win32',
-			};
+			this.state = BoardKonfigurator.defaultState;
 		}
 
 		window.electron.app
@@ -134,7 +188,7 @@ class BoardKonfigurator extends React.Component<
 			})
 			.catch((e) => {
 				if (!e) {
-					console.warn('OS not detected');
+					this.setState({ error: 'OS not detected' });
 				}
 			});
 
@@ -150,6 +204,7 @@ class BoardKonfigurator extends React.Component<
 		this.onHeightChange = this.onHeightChange.bind(this);
 
 		this.abortBackToHomeScreen = this.abortBackToHomeScreen.bind(this);
+		this.openBoardConfig = this.openBoardConfig.bind(this);
 
 		Mousetrap.bind(['command+1', 'ctrl+1'], () => {
 			this.setState({ openTab: 'global' });
@@ -226,8 +281,45 @@ class BoardKonfigurator extends React.Component<
 		this.setState({ leave: false });
 	};
 
+	openBoardConfig: MouseEventHandler<HTMLButtonElement> = async () => {
+		this.setState({ loading: true });
+		const boarsJSON = await window.electron.dialog.openBoardConfig();
+		if (boarsJSON) {
+			try {
+				this.setState({
+					config: {
+						...BoardKonfigurator.default,
+						width: boarsJSON.width,
+						height: boarsJSON.height,
+						name: boarsJSON.name,
+					},
+					selected: null,
+					board: BoardGenerator.jsonToBoard(boarsJSON),
+					checkpoints:
+						BoardGenerator.checkpointsPositionArrayToCheckpointArray(
+							BoardGenerator.positionArrayToBoardPositionArray(
+								boarsJSON.checkPoints
+							)
+						),
+					loading: false,
+				});
+			} catch (e) {
+				if (e instanceof Error)
+					this.setState({
+						loading: false,
+						error:
+							`Invalides JSON für eine Board-Konfiguration\n` +
+							`${e.message}`,
+					});
+			}
+		} else {
+			this.setState({ loading: false });
+		}
+	};
+
 	render = () => {
-		const { openTab, config, board, leave, os } = this.state;
+		const { openTab, config, board, leave, os, loading, error } =
+			this.state;
 		if (board.length < 1) {
 			const newBoard: Array<Array<FieldWithPositionInterface>> = [];
 			const { height, width } = config;
@@ -241,18 +333,47 @@ class BoardKonfigurator extends React.Component<
 			this.setState({ board: newBoard });
 			return null;
 		}
-
-		const popupLeave = (
-			<ConfirmPopup
-				label="Board-Konfigurator wirklich verlassen?"
-				text="Alle ungespeicherten Änderungen werden verworfen."
-				onConfirm={this.backToHomeScreen}
-				onAbort={this.abortBackToHomeScreen}
-			/>
-		);
+		let popup: JSX.Element | null = null;
+		if (leave) {
+			popup = (
+				<ConfirmPopup
+					label="Board-Konfigurator wirklich verlassen?"
+					text="Alle ungespeicherten Änderungen werden verworfen."
+					onConfirm={this.backToHomeScreen}
+					onAbort={this.abortBackToHomeScreen}
+				/>
+			);
+		}
+		if (loading) {
+			popup = (
+				<Popup
+					label="Lädt Board-Konfiguration"
+					content={
+						<ProgressBar
+							wrapperClass="text-center mx-auto justify-center"
+							borderColor="#ffffff"
+							barColor="#71C294"
+							width="80"
+						/>
+					}
+					onClose={() => {}}
+				/>
+			);
+		}
+		if (error) {
+			popup = (
+				<Popup
+					label="Fehler"
+					content={<pre>{error}</pre>}
+					onClose={() => {
+						this.setState({ error: null });
+					}}
+				/>
+			);
+		}
 		// TODO: Speichern
-		// TODO: Laden
-		// TODO: Random
+		// TODO: Laden (Wände)
+		// TODO: Random (Wände)
 		return (
 			<div className="flex flex-col h-[100vh]">
 				{os === 'win32' ? (
@@ -318,6 +439,7 @@ class BoardKonfigurator extends React.Component<
 							<button
 								type="button"
 								className="p-4 hover:bg-white/50 transition-colors transition"
+								onClick={this.openBoardConfig}
 							>
 								Laden
 							</button>
@@ -343,7 +465,7 @@ class BoardKonfigurator extends React.Component<
 					</div>
 					{this.rightSidebar()}
 				</div>
-				{leave ? popupLeave : null}
+				{popup}
 			</div>
 		);
 	};
@@ -458,7 +580,7 @@ class BoardKonfigurator extends React.Component<
 					/>
 					<FieldDragger
 						type={FieldsEnum.LEMBAS}
-						text="Lembas"
+						text="LembasField"
 						onDragStart={this.draggerOnDragStart}
 						onDragEnd={this.draggerOnDragEnd}
 					/>
@@ -784,7 +906,7 @@ class BoardKonfigurator extends React.Component<
 			if (field instanceof Lembas) {
 				option = (
 					<InputLabel
-						label="Lembas-Anzahl"
+						label="LembasField-Anzahl"
 						type="range"
 						value={field.amount}
 						onChange={(value) => {

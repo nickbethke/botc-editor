@@ -1,9 +1,9 @@
 import FieldWithPositionAndAmountInterface from '../interfaces/FieldWithPositionAndAmountInterface';
 import { BoardPosition } from '../interfaces/boardPosition';
-import { FieldsEnum } from '../../../../renderer/components/BoardKonfigurator';
+import { FieldsEnum } from '../../BoardKonfigurator';
 
 /**
- * Lembas Field Class
+ * LembasField Field Class
  */
 class Lembas implements FieldWithPositionAndAmountInterface {
 	amount: number;

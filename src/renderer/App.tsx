@@ -4,11 +4,13 @@ import Mousetrap from 'mousetrap';
 import BoardEditorChoice from './components/BoardEditorChoice';
 import PartieEditorChoice from './components/PartieEditorChoice';
 import PartieKonfigurator from './components/PartieKonfigurator';
-import PartieConfigInterface from '../schema/interfaces/partieConfigInterface';
+
 import BoardKonfigurator from './components/BoardKonfigurator';
 import JSONValidierer from './components/JSONValidierer';
 import RandomBoardStartValuesDialog from './components/RandomBoardStartValuesDialog';
-import BoardGenerator from '../main/helper/generator/BoardGenerator';
+import BoardGenerator from './components/generator/BoardGenerator';
+import PartieConfigInterface from './components/interfaces/PartieConfigInterface';
+import BoardConfigInterface from './components/interfaces/BoardConfigInterface';
 
 type AppStates = {
 	openScreen: string;
@@ -108,7 +110,7 @@ class App extends React.Component<unknown, AppStates> {
 	};
 
 	boardConfigScreen = (generator: BoardGenerator | null = null) => {
-		const { openScreen } = this.state;
+		const { openScreen, toLoad } = this.state;
 		if (openScreen === 'boardConfigNewScreen') {
 			return (
 				<BoardKonfigurator
@@ -124,6 +126,7 @@ class App extends React.Component<unknown, AppStates> {
 					onClose={() => {
 						this.setState({ openScreen: 'home', openPopup: false });
 					}}
+					json={toLoad as BoardConfigInterface}
 				/>
 			);
 		}

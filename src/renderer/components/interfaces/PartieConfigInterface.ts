@@ -1,12 +1,14 @@
 interface PartieConfigInterface {
+	startLembas: number;
+	shotLembas: number;
 	cardSelectionTimeout: number;
 	characterChoiceTimeout: number;
-	maxRounds: number;
-	reviveRounds: number;
 	riverMoveCount: number;
 	serverIngameDelay: number;
-	shotLembas: number;
-	startLembas: number;
+	reviveRounds: number;
+	maxRounds: number;
+
+	[k: string]: unknown;
 }
 
 export default PartieConfigInterface;

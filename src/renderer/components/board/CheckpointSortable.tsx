@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { arrayMoveImmutable } from 'array-move';
 import SortableList, { SortableItem, SortableKnob } from 'react-easy-sort';
 import { BsChevronBarExpand } from 'react-icons/bs';
-import Checkpoint from '../../../main/helper/generator/fields/checkpoint';
-import { BoardPosition } from '../../../main/helper/generator/interfaces/boardPosition';
+import Checkpoint from '../generator/fields/checkpoint';
+import { BoardPosition } from '../generator/interfaces/boardPosition';
 
 const CheckpointSortable = (props: {
 	checkpoints: Array<Checkpoint>;

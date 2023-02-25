@@ -5,11 +5,9 @@ import MonacoEditor, { monaco } from 'react-monaco-editor';
 import { HiSaveAs } from 'react-icons/hi';
 import Mousetrap from 'mousetrap';
 import { DefinedError } from 'ajv';
-import { useRouteError } from 'react-router-dom';
 import ConfirmPopup from './ConfirmPopup';
 import KeyCode = monaco.KeyCode;
 import KeyMod = monaco.KeyMod;
-import Popup from './Popup';
 
 type JSONValidatorProps = {
 	onClose: () => void;
@@ -69,7 +67,7 @@ class JSONValidierer extends React.Component<
 			},
 		});
 
-		window.addEventListener('resize', (e) => {
+		window.addEventListener('resize', () => {
 			this.setState({
 				window: {
 					width: window.innerWidth,
@@ -231,11 +229,11 @@ class JSONValidierer extends React.Component<
 					<div className="grow relative h-full">
 						<div className="bg-[#30344F]">
 							<MonacoEditor
+								value={code}
 								language="json"
 								height={window.height - (149 + 280)}
 								width={window.width}
 								theme="vs-dark"
-								value={code}
 								onChange={this.onChange}
 							/>
 						</div>

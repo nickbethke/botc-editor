@@ -1,6 +1,6 @@
 import React, { MouseEventHandler } from 'react';
 import InputLabel from './InputLabel';
-import BoardGenerator from '../../main/helper/generator/BoardGenerator';
+import BoardGenerator from './generator/BoardGenerator';
 
 export type RandomBoardStartValuesDialogStats = {
 	name: string;
@@ -290,7 +290,7 @@ class RandomBoardStartValuesDialog extends React.Component<
 								<hr className="my-4" />
 								<div className="relative grid grid-cols-2 gap-8 h-fit">
 									<InputLabel
-										label="Lembas-Felder"
+										label="LembasField-Felder"
 										value={lembasFields}
 										onChange={(value) => {
 											this.setState({
@@ -305,7 +305,7 @@ class RandomBoardStartValuesDialog extends React.Component<
 										max={32}
 									/>
 									<InputLabel
-										label="Lembas-Anzahl"
+										label="LembasField-Anzahl"
 										value={maxLembasAmountOnField}
 										onChange={(value) => {
 											this.setState({
@@ -322,7 +322,7 @@ class RandomBoardStartValuesDialog extends React.Component<
 									/>
 									<div className="col-span-2">
 										<InputLabel
-											label="Exakte Lembas Anzahl"
+											label="Exakte LembasField Anzahl"
 											value={lembasAmountExactMaximum}
 											onChange={(value) => {
 												this.setState({

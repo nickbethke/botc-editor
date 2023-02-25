@@ -2,17 +2,17 @@ import React from 'react';
 import _uniqueId from 'lodash/uniqueId';
 import { BsChevronDown, BsChevronUp } from 'react-icons/bs';
 import Mousetrap from 'mousetrap';
-import BoardConfigInterface from '../../../schema/interfaces/boardConfigInterface';
 import Field from './Field';
 import { FieldsEnum } from '../BoardKonfigurator';
-import FieldWithPositionInterface from '../../../main/helper/generator/interfaces/fieldWithPositionInterface';
-import { BoardPosition } from '../../../main/helper/generator/interfaces/boardPosition';
-import Checkpoint from '../../../main/helper/generator/fields/checkpoint';
+import FieldWithPositionInterface from '../generator/interfaces/fieldWithPositionInterface';
+import { BoardPosition } from '../generator/interfaces/boardPosition';
+import Checkpoint from '../generator/fields/checkpoint';
 import KeyCode from '../KeyCode';
-import Lembas from '../../../main/helper/generator/fields/lembas';
-import StartField from '../../../main/helper/generator/fields/startField';
-import SauronsEye from '../../../main/helper/generator/fields/sauronsEye';
-import River from '../../../main/helper/generator/fields/river';
+import Lembas from '../generator/fields/lembas';
+import StartField from '../generator/fields/startField';
+import SauronsEye from '../generator/fields/sauronsEye';
+import River from '../generator/fields/river';
+import BoardConfigInterface from '../interfaces/BoardConfigInterface';
 
 type BoardKonfiguratorBoardProps = {
 	config: BoardConfigInterface;
@@ -195,7 +195,7 @@ class BoardKonfiguratorBoard extends React.Component<
 
 	private buildBoard() {
 		const board: Array<Array<JSX.Element>> = [];
-		const { zoom, selected, errorViewOpen, tabOpen } = this.state;
+		const { selected } = this.state;
 		const {
 			config,
 			onSelect,

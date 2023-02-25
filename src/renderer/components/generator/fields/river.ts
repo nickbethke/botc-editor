@@ -1,12 +1,12 @@
 import FieldWithPositionAndDirectionInterface from '../interfaces/fieldWithPositionAndDirectionInterface';
-import { DirectionEnum } from '../interfaces/BoardConfigInterface';
+import { DirectionEnum } from '../../interfaces/BoardConfigInterface';
 import { BoardPosition } from '../interfaces/boardPosition';
-import { FieldsEnum } from '../../../../renderer/components/BoardKonfigurator';
+import { FieldsEnum } from '../../BoardKonfigurator';
 
 /**
- * Start Field Class
+ * River Field Class
  */
-class StartField implements FieldWithPositionAndDirectionInterface {
+class River implements FieldWithPositionAndDirectionInterface {
 	readonly direction: DirectionEnum;
 
 	readonly position: BoardPosition;
@@ -16,7 +16,7 @@ class StartField implements FieldWithPositionAndDirectionInterface {
 		this.direction = direction;
 	}
 
-	readonly fieldEnum: FieldsEnum = 1;
+	readonly fieldEnum: FieldsEnum = 6;
 }
 
-export default StartField;
+export default River;

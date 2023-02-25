@@ -8,7 +8,7 @@ import Error from './Error';
 import InputValidator from '../helper/InputValidator';
 
 import ConfirmPopup from './ConfirmPopup';
-import PartieConfigInterface from '../../schema/interfaces/partieConfigInterface';
+import PartieConfigInterface from './interfaces/PartieConfigInterface';
 
 type PartieKonfiguratorProps = {
 	App: App;
@@ -167,7 +167,7 @@ class PartieKonfigurator extends React.Component<
 							</div>
 							<div>
 								<InputLabel
-									label="Start Lembas"
+									label="Start LembasField"
 									type="number"
 									value={values.startLembas}
 									validator={
@@ -177,7 +177,7 @@ class PartieKonfigurator extends React.Component<
 												number: {
 													ifSmallerThen: {
 														number: 5,
-														error: 'Unpassende Start Lembas-Anzahl!',
+														error: 'Unpassende Start LembasField-Anzahl!',
 													},
 												},
 											}
@@ -199,7 +199,7 @@ class PartieKonfigurator extends React.Component<
 						<div className="grid grid-cols-2 gap-8">
 							<div>
 								<InputLabel
-									label="Schuss Lembas"
+									label="Schuss LembasField"
 									type="number"
 									onChange={(value) => {
 										this.setState({

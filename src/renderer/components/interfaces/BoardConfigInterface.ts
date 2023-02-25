@@ -3,7 +3,7 @@ interface BoardConfigInterface {
 	eye: PositionDirection;
 	height: number;
 	holes?: Array<Position>;
-	lembas?: Lembas[];
+	lembasFields?: LembasField[];
 	name: string;
 	riverFields?: PositionDirection[];
 	startFields: PositionDirection[];
@@ -25,7 +25,7 @@ export enum DirectionEnum {
 	'WEST',
 }
 
-export interface Lembas {
+export interface LembasField {
 	amount: number;
 	position: Position;
 }

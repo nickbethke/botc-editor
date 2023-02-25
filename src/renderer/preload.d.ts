@@ -1,7 +1,7 @@
 import { Channels } from 'main/preload';
-import PartieConfigInterface from '../schema/interfaces/partieConfigInterface';
-import BoardConfigInterface from '../schema/interfaces/boardConfigInterface';
 import { RiverPreset } from '../main/helper/PresetsLoader';
+import PartieConfigInterface from './components/interfaces/PartieConfigInterface';
+import BoardConfigInterface from './components/interfaces/BoardConfigInterface';
 
 declare global {
 	interface Window {
