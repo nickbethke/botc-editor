@@ -2,11 +2,13 @@ import React from 'react';
 import newBGImage from '../../../assets/images/new-color.jpg';
 import randomBGImage from '../../../assets/images/random-color.jpg';
 import loadingBGImage from '../../../assets/images/bg-color-II.jpg';
-import App from '../App';
 import BoardEditorChoiceCard from './BoardEditorChoiceCard';
 
 type BoardEditorChoiceProps = {
-	parentApp: App;
+	onClose: () => void;
+	onLoadConfig: () => void;
+	onNewConfig: () => void;
+	onRandomConfig: () => void;
 };
 
 class BoardEditorChoice extends React.Component<
@@ -22,29 +24,23 @@ class BoardEditorChoice extends React.Component<
 	}
 
 	handlePopupClose = () => {
-		const { parentApp } = this.props;
-		parentApp.setState({ openPopup: false });
+		const { onClose } = this.props;
+		onClose();
 	};
 
 	openLoadBoardConfig = async () => {
-		const boarsJSON = await window.electron.dialog.openBoardConfig();
-		if (boarsJSON) {
-			const { parentApp } = this.props;
-			parentApp.setState({
-				openScreen: 'boardConfigLoadScreen',
-				toLoad: boarsJSON,
-			});
-		}
+		const { onLoadConfig } = this.props;
+		onLoadConfig();
 	};
 
 	openNewBoardConfig = () => {
-		const { parentApp } = this.props;
-		parentApp.setState({ openScreen: 'boardConfigNewScreen' });
+		const { onNewConfig } = this.props;
+		onNewConfig();
 	};
 
 	openRandomBoardConfig = () => {
-		const { parentApp } = this.props;
-		parentApp.setState({ openPopup: 'randomBoardStartValues' });
+		const { onRandomConfig } = this.props;
+		onRandomConfig();
 	};
 
 	render() {

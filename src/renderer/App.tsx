@@ -164,7 +164,29 @@ class App extends React.Component<unknown, AppStates> {
 		const { openPopup } = this.state;
 		let popup: JSX.Element | string = '';
 		if (openPopup === 'boardEditorChoice') {
-			popup = <BoardEditorChoice parentApp={this} />;
+			popup = (
+				<BoardEditorChoice
+					onClose={() => {
+						this.setState({ openPopup: false });
+					}}
+					onLoadConfig={async () => {
+						const boarsJSON =
+							await window.electron.dialog.openBoardConfig();
+						if (boarsJSON) {
+							this.setState({
+								openScreen: 'boardConfigLoadScreen',
+								toLoad: boarsJSON,
+							});
+						}
+					}}
+					onNewConfig={() => {
+						this.setState({ openScreen: 'boardConfigNewScreen' });
+					}}
+					onRandomConfig={() => {
+						this.setState({ openPopup: 'randomBoardStartValues' });
+					}}
+				/>
+			);
 		}
 		if (openPopup === 'randomBoardStartValues') {
 			popup = (
@@ -183,7 +205,26 @@ class App extends React.Component<unknown, AppStates> {
 			);
 		}
 		if (openPopup === 'partieEditorChoice') {
-			popup = <PartieEditorChoice parentApp={this} />;
+			popup = (
+				<PartieEditorChoice
+					onClose={() => {
+						this.setState({ openPopup: false });
+					}}
+					onNewConfig={() => {
+						this.setState({ openScreen: 'partieConfigNewScreen' });
+					}}
+					onLoadConfig={async () => {
+						const partieJSON =
+							await window.electron.dialog.openPartieConfig();
+						if (partieJSON) {
+							this.setState({
+								openScreen: 'partieConfigLoadScreen',
+								toLoad: partieJSON,
+							});
+						}
+					}}
+				/>
+			);
 		}
 		const tabIndex = openPopup !== false ? -1 : 0;
 		return (

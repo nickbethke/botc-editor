@@ -842,6 +842,10 @@ class BoardGenerator {
 
 		return board;
 	}
+
+	public wallCount(): number {
+		return this.walls;
+	}
 }
 
 export default BoardGenerator;

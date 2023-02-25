@@ -2,11 +2,11 @@ import { app, dialog } from 'electron';
 import fs from 'fs';
 import Ajv, { JSONSchemaType } from 'ajv';
 import * as os from 'os';
-import PartieConfigInterface from '../../schema/interfaces/partieConfigInterface';
 import * as PartieConfigSchema from '../../schema/partieConfigSchema.json';
-import BoardConfigInterface from '../../schema/interfaces/boardConfigInterface';
 import * as BoardConfigSchema from '../../schema/boardConfigSchema.json';
 import PresetsLoader, { RiverPreset } from './PresetsLoader';
+import PartieConfigInterface from '../../renderer/components/interfaces/PartieConfigInterface';
+import BoardConfigInterface from '../../renderer/components/interfaces/BoardConfigInterface';
 
 class IPCHelper {
 	static handleSavePartieConfig = async (json: string): Promise<boolean> => {

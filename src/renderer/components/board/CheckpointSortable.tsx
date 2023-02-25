@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { arrayMoveImmutable } from 'array-move';
 import SortableList, { SortableItem, SortableKnob } from 'react-easy-sort';
 import { BsChevronBarExpand } from 'react-icons/bs';
 import Checkpoint from '../generator/fields/checkpoint';
@@ -13,6 +12,32 @@ const CheckpointSortable = (props: {
 	const { checkpoints, onUpdate, onSelect } = props;
 	const [items, setItems] = useState(checkpoints);
 	const ref = React.createRef<HTMLDivElement>();
+
+	const arrayMoveMutable = (
+		array: any[],
+		fromIndex: number,
+		toIndex: number
+	) => {
+		const startIndex = fromIndex < 0 ? array.length + fromIndex : fromIndex;
+
+		if (startIndex >= 0 && startIndex < array.length) {
+			const endIndex = toIndex < 0 ? array.length + toIndex : toIndex;
+
+			const [item] = array.splice(fromIndex, 1);
+			array.splice(endIndex, 0, item);
+		}
+	};
+
+	const arrayMoveImmutable = (
+		array: any[],
+		fromIndex: number,
+		toIndex: number
+	) => {
+		const nArray = [...array];
+		arrayMoveMutable(nArray, fromIndex, toIndex);
+		return nArray;
+	};
+
 	const onSortEnd = (oldIndex: number, newIndex: number) => {
 		const newCheckpointOrder = arrayMoveImmutable(
 			items,

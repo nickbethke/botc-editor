@@ -1,11 +1,12 @@
 import React from 'react';
 import newBGImage from '../../../assets/images/new-color.jpg';
 import loadingBGImage from '../../../assets/images/bg-color-II.jpg';
-import App from '../App';
 import PartieEditorChoiceCard from './PartieEditorChoiceCard';
 
 type PartieEditorChoiceProps = {
-	parentApp: App;
+	onClose: () => void;
+	onNewConfig: () => void;
+	onLoadConfig: () => void;
 };
 
 class PartieEditorChoice extends React.Component<
@@ -19,24 +20,18 @@ class PartieEditorChoice extends React.Component<
 	}
 
 	handlePopupClose = () => {
-		const { parentApp } = this.props;
-		parentApp.setState({ openPopup: false });
+		const { onClose } = this.props;
+		onClose();
 	};
 
 	openNewConfigScreen = () => {
-		const { parentApp } = this.props;
-		parentApp.setState({ openScreen: 'partieConfigNewScreen' });
+		const { onNewConfig } = this.props;
+		onNewConfig();
 	};
 
 	openLoadPartieConfig = async () => {
-		const partieJSON = await window.electron.dialog.openPartieConfig();
-		if (partieJSON) {
-			const { parentApp } = this.props;
-			parentApp.setState({
-				openScreen: 'partieConfigLoadScreen',
-				toLoad: partieJSON,
-			});
-		}
+		const { onLoadConfig } = this.props;
+		onLoadConfig();
 	};
 
 	render() {
