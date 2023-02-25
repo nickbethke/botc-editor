@@ -1,5 +1,6 @@
 stages:
     - test
+    - build
 
 run_tests:
     stage: test
@@ -9,3 +10,8 @@ run_tests:
         - npm run build
     script:
         - npm run test
+build:
+    stage: build
+    image: node:latest
+    script:
+        - echo "//${CI_SERVER_HOST}/api/v4/projects/${CI_PROJECT_ID}/packages/npm/:_authToken=${CI_JOB_TOKEN}"
