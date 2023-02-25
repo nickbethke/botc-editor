@@ -151,32 +151,6 @@ class BoardKonfigurator extends React.Component<
 
 		this.abortBackToHomeScreen = this.abortBackToHomeScreen.bind(this);
 
-		Mousetrap.bind(['command+g', 'ctrl+g'], () => {
-			const startValues: RandomBoardStartValues = {
-				...defaultStartValues,
-				width: 20,
-				height: 20,
-				checkpoints: 6,
-				rivers: true,
-				riverAlgorithm: 'complex',
-				holes: 16 * 4,
-			};
-			const nGenerator = new BoardGenerator(startValues);
-			const { config } = this.state;
-			this.setState({
-				board: nGenerator.board,
-				checkpoints:
-					BoardGenerator.checkpointsPositionArrayToCheckpointArray(
-						nGenerator.checkpoints
-					),
-				config: {
-					...config,
-					width: startValues.width,
-					height: startValues.height,
-				},
-			});
-		});
-
 		Mousetrap.bind(['command+1', 'ctrl+1'], () => {
 			this.setState({ openTab: 'global' });
 		});

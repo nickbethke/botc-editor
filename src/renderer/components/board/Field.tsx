@@ -84,42 +84,44 @@ class Field extends React.Component<FieldProps, FieldStats> {
 		) : null;
 
 		return (
-			<button
-				type="button"
-				key={id}
-				className={`${selected ? 'rounded border-red-400' : ''} ${
-					dragOver ? 'border-dashed' : ''
-				} relative border-2 hover:bg-white/25 text-transparent`}
-				style={{
-					height: `${fieldSize / 4}em`,
-					width: `${fieldSize / 4}em`,
-					backgroundImage: `url(${image})`,
-					backgroundPosition: 'center',
-					backgroundSize: 'contain',
-					backgroundRepeat: 'no-repeat',
-					backgroundColor: '#5fa01e',
-				}}
-				tabIndex={-1}
-				onClick={this.handleClick}
-				onDrop={() => {
-					if (dragOver) this.setState({ dragOver: false });
-					onDrop(position);
-				}}
-				onDragOver={(event) => {
-					event.preventDefault();
-				}}
-				onDragLeave={() => {
-					if (dragOver) this.setState({ dragOver: false });
-				}}
-				onDragEnter={() => {
-					if (!dragOver) this.setState({ dragOver: true });
-				}}
-				onDragExit={() => {
-					if (dragOver) this.setState({ dragOver: false });
-				}}
-			>
-				{textElement}
-			</button>
+			<div>
+				<button
+					type="button"
+					key={id}
+					className={`${selected ? 'rounded border-red-400' : ''} ${
+						dragOver ? 'border-dashed' : ''
+					} relative border-2 hover:bg-white/25 text-transparent`}
+					style={{
+						height: `${fieldSize / 4}em`,
+						width: `${fieldSize / 4}em`,
+						backgroundImage: `url(${image})`,
+						backgroundPosition: 'center',
+						backgroundSize: 'contain',
+						backgroundRepeat: 'no-repeat',
+						backgroundColor: '#5fa01e',
+					}}
+					tabIndex={-1}
+					onClick={this.handleClick}
+					onDrop={() => {
+						if (dragOver) this.setState({ dragOver: false });
+						onDrop(position);
+					}}
+					onDragOver={(event) => {
+						event.preventDefault();
+					}}
+					onDragLeave={() => {
+						if (dragOver) this.setState({ dragOver: false });
+					}}
+					onDragEnter={() => {
+						if (!dragOver) this.setState({ dragOver: true });
+					}}
+					onDragExit={() => {
+						if (dragOver) this.setState({ dragOver: false });
+					}}
+				>
+					{textElement}
+				</button>
+			</div>
 		);
 	}
 }

@@ -193,7 +193,7 @@ class BoardKonfiguratorBoard extends React.Component<
 		);
 	};
 
-	render() {
+	private buildBoard() {
 		const board: Array<Array<JSX.Element>> = [];
 		const { zoom, selected, errorViewOpen, tabOpen } = this.state;
 		const {
@@ -255,6 +255,12 @@ class BoardKonfiguratorBoard extends React.Component<
 			}
 			board[y] = row;
 		}
+		return { board };
+	}
+
+	render() {
+		const { zoom, errorViewOpen, tabOpen } = this.state;
+		const { board } = this.buildBoard();
 		const errorViewOpener = errorViewOpen ? (
 			<BsChevronDown />
 		) : (

@@ -67,7 +67,7 @@ class AStar {
 				}
 				// Generate the possible next steps from this node's state
 				const next = this.generateNextSteps(node.state);
-				// console.log("GOTO", node.state, "NEIGHBORS", next);
+				// consoleOutput.log("GOTO", node.state, "NEIGHBORS", next);
 
 				// For each possible next step
 				for (let i = 0; i < next.length; i += 1) {
@@ -126,7 +126,7 @@ class AStar {
 		if (state.x > 0) {
 			// If the current state has a neighbor to the left, add it to the array of next steps
 			const neighbor = { x: state.x - 1, y: state.y };
-			// console.log("NEIGHBOR?", state, neighbor);
+			// consoleOutput.log("NEIGHBOR?", state, neighbor);
 			if (
 				!this.isObstacle(state.x - 1, state.y) &&
 				!this.isWallBetween(state, neighbor)
@@ -140,7 +140,7 @@ class AStar {
 		if (state.x < width - 1) {
 			// If the current state has a neighbor to the right, add it to the array of next steps
 			const neighbor = { x: state.x + 1, y: state.y };
-			// console.log("NEIGHBOR?", state, neighbor);
+			// consoleOutput.log("NEIGHBOR?", state, neighbor);
 			if (
 				!this.isObstacle(state.x + 1, state.y) &&
 				!this.isWallBetween(state, neighbor)
@@ -154,7 +154,7 @@ class AStar {
 		if (state.y > 0) {
 			// If the current state has a neighbor above it, add it to the array of next steps
 			const neighbor = { x: state.x, y: state.y - 1 };
-			// console.log("NEIGHBOR?", state, neighbor);
+			// consoleOutput.log("NEIGHBOR?", state, neighbor);
 			if (
 				!this.isObstacle(state.x, state.y - 1) &&
 				!this.isWallBetween(state, neighbor)
@@ -168,7 +168,7 @@ class AStar {
 		if (state.y < height - 1) {
 			// If the current state has a neighbor below it, add it to the array of next steps
 			const neighbor = { x: state.x, y: state.y + 1 };
-			// console.log("NEIGHBOR?", state, neighbor);
+			// consoleOutput.log("NEIGHBOR?", state, neighbor);
 			if (
 				!this.isObstacle(state.x, state.y + 1) &&
 				!this.isWallBetween(state, neighbor)

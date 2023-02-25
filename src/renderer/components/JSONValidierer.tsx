@@ -5,19 +5,22 @@ import MonacoEditor, { monaco } from 'react-monaco-editor';
 import { HiSaveAs } from 'react-icons/hi';
 import Mousetrap from 'mousetrap';
 import { DefinedError } from 'ajv';
+import { useRouteError } from 'react-router-dom';
 import ConfirmPopup from './ConfirmPopup';
-import App from '../App';
 import KeyCode = monaco.KeyCode;
 import KeyMod = monaco.KeyMod;
+import Popup from './Popup';
 
 type JSONValidatorProps = {
-	parentApp: App;
+	onClose: () => void;
 };
 type JSONValidatorState = {
-	popupLeave: boolean;
+	popup: JSX.Element | null;
 	code: string;
 	codeError: string;
 	type: 'board' | 'partie';
+	window: { width: number; height: number };
+	consoleOutput: string;
 };
 
 class JSONValidierer extends React.Component<
@@ -36,12 +39,13 @@ class JSONValidierer extends React.Component<
 		this.state = {
 			code: JSON.stringify({}, null, 4),
 			codeError: '',
-			popupLeave: false,
+			popup: null,
 			type: 'partie',
+			window: { width: window.innerWidth, height: window.innerHeight },
+			consoleOutput: '',
 		};
 
 		Mousetrap.bind(['command+s', 'ctrl+s'], () => {
-			// eslint-disable-next-line no-console
 			this.saveFile().catch(console.log);
 		});
 
@@ -51,7 +55,6 @@ class JSONValidierer extends React.Component<
 			// eslint-disable-next-line no-bitwise
 			keybindings: [KeyMod.CtrlCmd | KeyCode.KeyS],
 			run: () => {
-				// eslint-disable-next-line no-console
 				this.saveFile().then(console.log).catch(console.log);
 			},
 		});
@@ -62,23 +65,32 @@ class JSONValidierer extends React.Component<
 			// eslint-disable-next-line no-bitwise
 			keybindings: [KeyMod.CtrlCmd | KeyCode.KeyO],
 			run: () => {
-				// eslint-disable-next-line no-console
 				this.openFile().then(console.log).catch(console.log);
 			},
 		});
+
+		window.addEventListener('resize', (e) => {
+			this.setState({
+				window: {
+					width: window.innerWidth,
+					height: window.innerHeight,
+				},
+			});
+		});
+		this.onChange('{}');
 	}
 
 	handleBackButton = () => {
-		this.setState({ popupLeave: true });
+		this.setState({ popup: this.leavePopup() });
 	};
 
 	backToHomeScreen = () => {
-		const { parentApp } = this.props;
-		parentApp.setState({ openScreen: 'home', openPopup: false });
+		const { onClose } = this.props;
+		onClose();
 	};
 
 	abortBackToHomeScreen = () => {
-		this.setState({ popupLeave: false });
+		this.setState({ popup: this.leavePopup() });
 	};
 
 	onChange = async (newValue: string) => {
@@ -89,15 +101,25 @@ class JSONValidierer extends React.Component<
 				type
 			);
 			if (typeof valid === 'string') {
-				this.setState({ codeError: valid });
+				this.setState({ codeError: valid, consoleOutput: '' });
 			} else {
-				this.setState({ codeError: '' });
+				this.setState({ codeError: '', consoleOutput: '' });
 			}
 		} catch (error) {
-			// eslint-disable-next-line no-console
-			console.log(error);
+			if (error instanceof Error)
+				this.setState({ consoleOutput: `${error.message}` });
 		}
 		this.setState({ code: newValue });
+	};
+
+	leavePopup = (): JSX.Element => {
+		return (
+			<ConfirmPopup
+				label="Validator wirklich verlassen?"
+				onConfirm={this.backToHomeScreen}
+				onAbort={this.abortBackToHomeScreen}
+			/>
+		);
 	};
 
 	openFile = async () => {
@@ -107,17 +129,18 @@ class JSONValidierer extends React.Component<
 				this.setState(
 					{
 						codeError: '',
-						popupLeave: false,
+						popup: null,
 						code: JSON.stringify(json, null, 4),
+						consoleOutput: '',
 					},
 					async () => {
 						const { code } = this.state;
 						await this.onChange(code);
 					}
 				);
-			} catch (e) {
-				// eslint-disable-next-line no-console
-				console.log(e);
+			} catch (error) {
+				if (error instanceof Error)
+					this.setState({ consoleOutput: error.message });
 			}
 		}
 	};
@@ -152,63 +175,10 @@ class JSONValidierer extends React.Component<
 		}
 	};
 
-	render() {
-		let popupLeaveR = null;
-		const { popupLeave, type } = this.state;
-		if (popupLeave) {
-			popupLeaveR = (
-				<ConfirmPopup
-					label="Validator wirklich verlassen?"
-					onConfirm={this.backToHomeScreen}
-					onAbort={this.abortBackToHomeScreen}
-				/>
-			);
-		}
-		const { code, codeError } = this.state;
-		const errorMsg: ReactElement[] = [];
-		if (codeError === '') {
-			errorMsg[0] = (
-				<div className="flex fex-cols gap-2 pt-2">
-					VALID JSON Format
-				</div>
-			);
-		} else {
-			try {
-				let i = 0;
-				JSON.parse(codeError).forEach((e: DefinedError) => {
-					if (e.instancePath !== '') {
-						errorMsg[i] = (
-							<div className="flex fex-cols" key={i}>
-								<p className="mr-2 pr-4 border-r pt-2">
-									{i + 1 < 10 ? `0${i + 1}` : i + 1}
-								</p>
-								<p className="font-black pt-2">
-									{`${e.keyword.toUpperCase()}:`}&nbsp;
-								</p>
-								<p className="font-black text-red-500 pt-2">
-									{`${e.instancePath}`}&nbsp;
-								</p>
-								<p className="pt-2">{e.message}</p>
-							</div>
-						);
-					} else {
-						errorMsg[i] = (
-							<div className="flex fex-cols" key={i}>
-								<p className="mr-2 pr-4 border-r pt-2">
-									{i + 1 < 10 ? `0${i + 1}` : i + 1}
-								</p>
-								<p className="font-black pt-2">
-									{`${e.keyword.toUpperCase()}:`}&nbsp;
-								</p>
-								<p className="pt-2">{e.message}</p>
-							</div>
-						);
-					}
-					i += 1;
-				});
-				// eslint-disable-next-line no-empty
-			} catch (e) {}
-		}
+	render = () => {
+		const { popup, type, code, codeError, window, consoleOutput } =
+			this.state;
+		const errorMsg = this.genErrorMsg(codeError);
 
 		return (
 			<div>
@@ -259,29 +229,86 @@ class JSONValidierer extends React.Component<
 						</div>
 					</div>
 					<div className="grow relative h-full">
-						<div className="bg-[#30344F] h-[75%]">
+						<div className="bg-[#30344F]">
 							<MonacoEditor
 								language="json"
-								height="100%"
-								width="100%"
+								height={window.height - (149 + 280)}
+								width={window.width}
 								theme="vs-dark"
 								value={code}
 								onChange={this.onChange}
 							/>
 						</div>
-						<div className="h-[5%] text-white flex flex-col justify-center border-b">
-							<div className="text-xl pl-4">Errors</div>
-						</div>
-						<div className="w-full bg-[#30344F] h-[20%] text-white">
-							<div className="h-full max-h-full font-mono overflow-auto pl-8">
-								{errorMsg}
+						<div className="grid xl:grid-cols-4 grid-cols-2">
+							<div className="w-full h-[280px] max-h-[280px] flex flex-col font-jetbrains border-r xl:col-span-3">
+								<div className="text-white flex flex-col justify-center border-b p-2">
+									<div className="text-xl pl-4">Errors</div>
+								</div>
+								<div className="w-full bg-white/25 text-white overflow-auto grow">
+									<div className="h-full max-h-full pl-6">
+										{errorMsg}
+									</div>
+								</div>
+							</div>
+							<div className="w-full h-[280px] max-h-[280px] flex flex-col font-jetbrains border-r">
+								<div className="text-white flex flex-col justify-center border-b p-2">
+									<div className="text-xl pl-4">Konsole</div>
+								</div>
+								<div className="w-full text-white overflow-auto grow">
+									<div className="h-full max-h-full pl-6 pt-2">
+										<pre>{consoleOutput}</pre>
+									</div>
+								</div>
 							</div>
 						</div>
 					</div>
 				</div>
-				{popupLeaveR}
+				{popup}
 			</div>
 		);
+	};
+
+	private genErrorMsg(codeError: string) {
+		const errorMsg: ReactElement[] | null[] = [];
+		if (codeError === '') {
+			errorMsg[0] = null;
+		} else if (codeError === 'validate') {
+			errorMsg[0] = (
+				<div className="pt-2">
+					<span className="text-red-500">ERROR: </span>Code konnte
+					nicht validiert werden - kein valides JSON
+				</div>
+			);
+		} else {
+			try {
+				let i = 0;
+				JSON.parse(codeError).forEach((e: DefinedError) => {
+					const instancePath =
+						e.instancePath !== '' ? (
+							<p className="font-black text-red-500 pt-2">
+								{`${e.instancePath}`}&nbsp;
+							</p>
+						) : null;
+					errorMsg[i] = (
+						<div className="flex fex-cols" key={i}>
+							<p className="mr-2 pr-4 border-r pt-2">
+								{i + 1 < 10 ? `0${i + 1}` : i + 1}
+							</p>
+							<p className="font-black pt-2">
+								{`${e.keyword.toUpperCase()}:`}&nbsp;
+							</p>
+							{instancePath}
+							<p className="pt-2">{e.message}</p>
+						</div>
+					);
+					i += 1;
+				});
+			} catch (error) {
+				if (error instanceof Error)
+					this.setState({ consoleOutput: error.message });
+			}
+		}
+		return errorMsg;
 	}
 }
 
