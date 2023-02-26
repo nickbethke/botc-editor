@@ -80,7 +80,7 @@ class BoardGenerator {
 
 	readonly startValues: RandomBoardStartValues;
 
-	private readonly boardJSON: Board;
+	readonly boardJSON: Board;
 
 	private walls = 0;
 
@@ -142,7 +142,7 @@ class BoardGenerator {
 		// generate checkpoints
 		this.genCheckpoints();
 
-		// generate lembas fields if required
+		// generate lembasFields fields if required
 		if (this.startValues.lembasFields) {
 			this.genLembasFields();
 		}
@@ -290,7 +290,7 @@ class BoardGenerator {
 		const amount = this.startValues.lembasAmountExactMaximum
 			? this.startValues.maxLembasAmountOnField
 			: this.getRandomLembasAmount();
-		// add lembas field
+		// add lembasFields field
 		this.board[position.y][position.x] = new Lembas(position, amount);
 		this.lembasFields.push({ position, amount });
 		this.boardJSON.addLembasField(position, amount);

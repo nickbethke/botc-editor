@@ -12,7 +12,17 @@ import Lembas from '../generator/fields/lembas';
 import StartField from '../generator/fields/startField';
 import SauronsEye from '../generator/fields/sauronsEye';
 import River from '../generator/fields/river';
-import BoardConfigInterface from '../interfaces/BoardConfigInterface';
+import BoardConfigInterface, {
+	Position,
+} from '../interfaces/BoardConfigInterface';
+import BoardGenerator from '../generator/BoardGenerator';
+
+export type BoardKonfiguratorErrorProps = {
+	critical: string[];
+	warning: string[];
+	hints: string[];
+	validation: string[];
+};
 
 type BoardKonfiguratorBoardProps = {
 	config: BoardConfigInterface;
@@ -20,13 +30,15 @@ type BoardKonfiguratorBoardProps = {
 	onSelect: (position: BoardPosition | null) => boolean;
 	onDrop: (position: BoardPosition) => void;
 	selected: BoardPosition | null;
+
+	errors: BoardKonfiguratorErrorProps;
 };
 
 type BoardKonfiguratorBoardState = {
 	zoom: number;
 	selected: BoardPosition | null;
 	errorViewOpen: boolean;
-	tabOpen: 'critical' | 'warning' | 'hints' | 'hotkeys';
+	tabOpen: 'critical' | 'warning' | 'hints' | 'validation' | 'hotkeys';
 };
 
 class BoardKonfiguratorBoard extends React.Component<
@@ -47,7 +59,9 @@ class BoardKonfiguratorBoard extends React.Component<
 
 		Mousetrap.bind(['command+w', 'ctrl+w'], () => {
 			const { errorViewOpen } = this.state;
-			this.setState({ errorViewOpen: !errorViewOpen });
+			this.setState({
+				errorViewOpen: !errorViewOpen,
+			});
 		});
 		Mousetrap.bind(['command+enter', 'ctrl+enter'], () => {
 			this.setState({ zoom: 100 });
@@ -87,7 +101,7 @@ class BoardKonfiguratorBoard extends React.Component<
 		Mousetrap.bind(['ctrl+f2'], () => {
 			const { errorViewOpen } = this.state;
 			if (!errorViewOpen) {
-				this.setState({ errorViewOpen: true, tabOpen: 'critical' });
+				this.setState({ errorViewOpen: true, tabOpen: 'warning' });
 			} else {
 				this.setState({ tabOpen: 'warning' });
 			}
@@ -95,9 +109,17 @@ class BoardKonfiguratorBoard extends React.Component<
 		Mousetrap.bind(['ctrl+f3'], () => {
 			const { errorViewOpen } = this.state;
 			if (!errorViewOpen) {
-				this.setState({ errorViewOpen: true, tabOpen: 'critical' });
+				this.setState({ errorViewOpen: true, tabOpen: 'hints' });
 			} else {
 				this.setState({ tabOpen: 'hints' });
+			}
+		});
+		Mousetrap.bind(['ctrl+f4'], () => {
+			const { errorViewOpen } = this.state;
+			if (!errorViewOpen) {
+				this.setState({ errorViewOpen: true, tabOpen: 'validation' });
+			} else {
+				this.setState({ tabOpen: 'validation' });
 			}
 		});
 	}
@@ -124,10 +146,54 @@ class BoardKonfiguratorBoard extends React.Component<
 
 	handleKeyDown: React.KeyboardEventHandler<HTMLDivElement> = () => {};
 
+	errorWindow = (
+		errors: { critical: string[]; warning: string[]; hints: string[] },
+		type: 'critical' | 'hints' | 'warning' | 'validation'
+	) => {
+		let errorMessages: string[] | null = [];
+		let symbol: string | null = null;
+		let className = '';
+		switch (type) {
+			case 'critical':
+				errorMessages = errors.critical;
+				symbol = '!';
+				className = 'text-red-400';
+				break;
+			case 'warning':
+				errorMessages = errors.warning;
+				className = 'text-orange-400';
+				symbol = '!';
+				break;
+			case 'hints':
+				errorMessages = errors.hints;
+				symbol = '!';
+				break;
+			case 'validation':
+				errorMessages = null;
+				symbol = '!';
+				break;
+			default:
+				break;
+		}
+		if (errorMessages && errorMessages.length) {
+			return (
+				<div className="px-4 py-2 bg-background font-jetbrains">
+					{errorMessages.map((error) => (
+						<div className={className}>
+							<span className="mr-2">{symbol}</span>
+							{error}
+						</div>
+					))}
+				</div>
+			);
+		}
+		return null;
+	};
+
 	hotKeys = () => {
 		return (
 			<div className="bg-white/25">
-				<div className="grid 2xl:grid-cols-2 gap-2 p-2 max-w-[800px] mx-auto justify-center">
+				<div className="grid 2xl:grid-cols-3 gap-2 p-2 max-w-[800px] mx-auto justify-center">
 					<div className="flex flex-col mb-2 items-center">
 						<p className="text-lg">Allgemein</p>
 						<KeyCode text="Hilfe öffnen" keyCodes={['Strg', 'H']} />
@@ -173,6 +239,10 @@ class BoardKonfiguratorBoard extends React.Component<
 							text="Hinweis öffnen"
 							keyCodes={['Strg', 'F3']}
 						/>
+						<KeyCode
+							text="Validierungshilfe öffnen"
+							keyCodes={['Strg', 'F3']}
+						/>
 					</div>
 					<div className="flex flex-col mb-2 items-center 2xl:col-span-2">
 						<p className="text-lg">Board</p>
@@ -206,6 +276,7 @@ class BoardKonfiguratorBoard extends React.Component<
 		if (propsSelected && selected !== propsSelected) {
 			this.setState({ selected: propsSelected });
 		}
+
 		const { height, width } = config;
 		for (let y = 0; y < height; y += 1) {
 			const row: Array<JSX.Element> = [];
@@ -230,11 +301,37 @@ class BoardKonfiguratorBoard extends React.Component<
 				) {
 					attribute = boardField.direction;
 				}
+				const wallsToBuild = [];
+				if (config.walls) {
+					for (let i = 0; i < config.walls.length; i += 1) {
+						const item: Position[] = config.walls[i];
+						const currentPositionString =
+							BoardGenerator.position2String(
+								BoardGenerator.positionToBoardPosition([x, y])
+							);
+						const s1 = BoardGenerator.position2String(
+							BoardGenerator.positionToBoardPosition(item[0])
+						);
+						const s2 = BoardGenerator.position2String(
+							BoardGenerator.positionToBoardPosition(item[1])
+						);
+						if (
+							currentPositionString === s1 ||
+							currentPositionString === s2
+						) {
+							wallsToBuild.push(item);
+						}
+					}
+				}
+
 				row[x] = (
 					<Field
 						key={id}
+						boardSize={{ width, height }}
 						position={{ x, y }}
 						fieldSize={16}
+						wallThickness={2}
+						wallsToBuild={wallsToBuild}
 						type={type}
 						selected={
 							!!(selected && selected.x === x && selected.y === y)
@@ -260,16 +357,24 @@ class BoardKonfiguratorBoard extends React.Component<
 
 	render() {
 		const { zoom, errorViewOpen, tabOpen } = this.state;
+		const { errors } = this.props;
 		const { board } = this.buildBoard();
 		const errorViewOpener = errorViewOpen ? (
 			<BsChevronDown />
 		) : (
 			<BsChevronUp />
 		);
+
 		let errorWindow = null;
 		switch (tabOpen) {
 			case 'hotkeys':
 				errorWindow = this.hotKeys();
+				break;
+			case 'critical':
+			case 'warning':
+			case 'hints':
+			case 'validation':
+				errorWindow = this.errorWindow(errors, tabOpen);
 				break;
 			default:
 				break;
@@ -286,9 +391,9 @@ class BoardKonfiguratorBoard extends React.Component<
 					onKeyDown={this.handleKeyDown}
 					style={{ zoom: `${zoom}%` }}
 				>
-					<div className="absolute flex flex-col gap-4 items-center top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+					<div className="absolute flex flex-col items-center top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[#5c9621] rounded p-6">
 						{board.map((row) => (
-							<div className="flex flex-row gap-4">
+							<div key={_uniqueId()} className="flex flex-row">
 								{row.map((field) => field)}
 							</div>
 						))}
@@ -321,7 +426,12 @@ class BoardKonfiguratorBoard extends React.Component<
 								});
 							}}
 						>
-							Kritisch
+							Kritisch{' '}
+							{errors.critical.length > 0 ? (
+								<span className="font-jetbrains">
+									({errors.critical.length})
+								</span>
+							) : null}
 						</button>
 						<button
 							type="button"
@@ -335,13 +445,18 @@ class BoardKonfiguratorBoard extends React.Component<
 								});
 							}}
 						>
-							Warnung
+							Warnung{' '}
+							{errors.warning.length > 0 ? (
+								<span className="font-jetbrains">
+									({errors.warning.length})
+								</span>
+							) : null}
 						</button>
 						<button
 							type="button"
 							className={`${
 								tabOpen === 'hints' ? 'bg-white/25' : ''
-							} border-r p-4 hover:bg-white/50 transition-colors transition`}
+							} p-4 hover:bg-white/50 transition-colors transition`}
 							onClick={() => {
 								this.setState({
 									tabOpen: 'hints',
@@ -349,7 +464,31 @@ class BoardKonfiguratorBoard extends React.Component<
 								});
 							}}
 						>
-							Hinweis
+							Hinweis{' '}
+							{errors.hints.length > 0 ? (
+								<span className="font-jetbrains">
+									({errors.hints.length})
+								</span>
+							) : null}
+						</button>
+						<button
+							type="button"
+							className={`${
+								tabOpen === 'validation' ? 'bg-white/25' : ''
+							} border-x p-4 hover:bg-white/50 transition-colors transition`}
+							onClick={() => {
+								this.setState({
+									tabOpen: 'validation',
+									errorViewOpen: true,
+								});
+							}}
+						>
+							Validierung{' '}
+							{errors.validation.length > 0 ? (
+								<span className="font-jetbrains">
+									({errors.validation.length})
+								</span>
+							) : null}
 						</button>
 						<button
 							type="button"

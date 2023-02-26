@@ -316,7 +316,7 @@ class PartieKonfigurator extends React.Component<
 							<div>
 								<button
 									type="button"
-									className="w-full border border-white p-4 hover:bg-accent-500 text-lg"
+									className="w-full border border-white p-4 hover:bg-accent-500 text-lg bg-white/25"
 									onClick={this.handleSaveClick}
 								>
 									Speichern
@@ -325,7 +325,7 @@ class PartieKonfigurator extends React.Component<
 							<div>
 								<button
 									type="button"
-									className="w-full border border-white p-4 hover:bg-accent-500 text-lg"
+									className="w-full border border-white p-4 hover:bg-accent-500 text-lg bg-white/25"
 									onClick={this.openLoadPartieConfig}
 								>
 									Laden

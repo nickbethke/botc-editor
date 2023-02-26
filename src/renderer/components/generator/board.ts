@@ -23,7 +23,7 @@ class Board implements BoardConfigInterface {
 
 	holes?: Position[];
 
-	lembas?: LembasField[];
+	lembasFields?: LembasField[];
 
 	name: string;
 
@@ -103,16 +103,16 @@ class Board implements BoardConfigInterface {
 	}
 
 	/**
-	 * Add a position and amount to the lembas array
+	 * Add a position and amount to the lembasFields array
 	 * @param position
 	 * @param amount
 	 */
 	public addLembasField(position: BoardPosition, amount: number) {
 		const { x, y } = position;
-		if (this.lembas === undefined) {
-			this.lembas = [];
+		if (this.lembasFields === undefined) {
+			this.lembasFields = [];
 		}
-		this.lembas.push({ position: [x, y], amount });
+		this.lembasFields.push({ position: [x, y], amount });
 	}
 
 	/**

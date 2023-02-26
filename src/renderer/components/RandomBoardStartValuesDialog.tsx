@@ -36,7 +36,7 @@ export type RandomBoardStartValues = {
 
 type RandomBoardStartValuesDialogProps = {
 	onClose: () => void;
-	onGenerate: (generator: BoardGenerator) => void;
+	onGenerated: (generator: BoardGenerator) => void;
 };
 
 /**
@@ -168,9 +168,9 @@ class RandomBoardStartValuesDialog extends React.Component<
 			name,
 			width,
 		};
-		const { onGenerate } = this.props;
+		const { onGenerated } = this.props;
 		const generator = new BoardGenerator(generationValues);
-		onGenerate(generator);
+		onGenerated(generator);
 	};
 
 	close: MouseEventHandler<HTMLButtonElement> = () => {
@@ -201,7 +201,7 @@ class RandomBoardStartValuesDialog extends React.Component<
 					className="w-[100vw] h-[100vh] bg-background-800/50"
 				/>
 				<div>
-					<div className="absolute top-[50%] left-[50%] translate-y-[-50%] translate-x-[-50%] bg-background-700/75 p-8">
+					<div className="absolute top-[50%] left-[50%] translate-y-[-50%] translate-x-[-50%] bg-background-700 p-8">
 						<div className="text-center text-3xl mb-4">
 							Zufälliges Board - Startwerte
 						</div>
@@ -434,14 +434,14 @@ class RandomBoardStartValuesDialog extends React.Component<
 								<div className="relative flex gap-8 h-fit mt-4 justify-around">
 									<button
 										type="button"
-										className="w-full border border-white p-2 hover:bg-accent-500 text-lg"
+										className="w-full border border-white p-2 bg-white/25 hover:bg-accent-500 text-lg"
 										onClick={this.generate}
 									>
 										Generieren
 									</button>
 									<button
 										type="button"
-										className="w-full border border-white p-2 hover:bg-accent-500 text-lg"
+										className="w-full border border-white p-2 bg-white/25 hover:bg-accent-500 text-lg"
 										onClick={this.close}
 									>
 										Abbrechen

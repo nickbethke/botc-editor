@@ -7,18 +7,23 @@ import eyeImage from '../../../../assets/images/eye.png';
 import riverImage from '../../../../assets/images/river.png';
 import lembasImage from '../../../../assets/images/lembas.png';
 import holeImage from '../../../../assets/images/hole.png';
+import wallImage from '../../../../assets/images/wall.png';
 
 import { BoardPosition } from '../generator/interfaces/boardPosition';
-import { DirectionEnum } from '../interfaces/BoardConfigInterface';
+import { DirectionEnum, Position } from '../interfaces/BoardConfigInterface';
+import BoardGenerator from '../generator/BoardGenerator';
 
 type FieldProps = {
 	type: FieldsEnum;
 	onSelect: (position: BoardPosition | null) => boolean;
 	onDrop: (position: BoardPosition) => void;
 	fieldSize: number;
+	wallThickness: number;
 	position: BoardPosition;
 	selected: boolean;
 	attribute: DirectionEnum | number | null;
+	boardSize: { width: number; height: number };
+	wallsToBuild: Array<Position[]>;
 };
 type FieldStats = {
 	dragOver: boolean;
@@ -43,8 +48,17 @@ class Field extends React.Component<FieldProps, FieldStats> {
 	};
 
 	render() {
-		const { fieldSize, position, onDrop, type, selected, attribute } =
-			this.props;
+		const {
+			fieldSize,
+			wallThickness,
+			position,
+			onDrop,
+			type,
+			selected,
+			attribute,
+			boardSize,
+			wallsToBuild,
+		} = this.props;
 		const { dragOver } = this.state;
 		const id = _uniqueId('field-');
 		let image = null;
@@ -83,44 +97,124 @@ class Field extends React.Component<FieldProps, FieldStats> {
 			</div>
 		) : null;
 
-		return (
-			<div>
-				<button
-					type="button"
-					key={id}
-					className={`${selected ? 'rounded border-red-400' : ''} ${
-						dragOver ? 'border-dashed' : ''
-					} relative border-2 hover:bg-white/25 text-transparent`}
+		const currentPositionString = BoardGenerator.position2String(position);
+		const walls = { east: false, south: false };
+		for (let i = 0; i < wallsToBuild.length; i += 1) {
+			const item: Position[] = wallsToBuild[i];
+
+			const s2 = BoardGenerator.position2String(
+				BoardGenerator.positionToBoardPosition(item[1])
+			);
+			const toWallPosition =
+				currentPositionString === s2 ? item[0] : item[1];
+			if (toWallPosition[0] === position.x + 1) {
+				walls.east = true;
+			}
+			if (toWallPosition[1] === position.y + 1) {
+				walls.south = true;
+			}
+		}
+
+		let eastWall = null;
+		if (boardSize.width !== position.x + 1) {
+			eastWall = walls.east ? (
+				<div
 					style={{
 						height: `${fieldSize / 4}em`,
+						width: `${wallThickness / 4}em`,
+						backgroundImage: `url(${wallImage})`,
+						backgroundSize: 'cover',
+					}}
+				/>
+			) : (
+				<div
+					className={`${dragOver ? 'bg-red-400' : ''}`}
+					style={{
+						height: `${fieldSize / 4}em`,
+						width: `${wallThickness / 4}em`,
+					}}
+				/>
+			);
+		}
+		let southWall = null;
+		if (boardSize.height !== position.y + 1) {
+			southWall = walls.south ? (
+				<div
+					style={{
 						width: `${fieldSize / 4}em`,
-						backgroundImage: `url(${image})`,
-						backgroundPosition: 'center',
-						backgroundSize: 'contain',
-						backgroundRepeat: 'no-repeat',
-						backgroundColor: '#5fa01e',
+						height: `${wallThickness / 4}em`,
+						backgroundImage: `url(${wallImage})`,
+						backgroundSize: 'cover',
 					}}
-					tabIndex={-1}
-					onClick={this.handleClick}
-					onDrop={() => {
-						if (dragOver) this.setState({ dragOver: false });
-						onDrop(position);
+				/>
+			) : (
+				<div
+					className={`${dragOver ? 'bg-red-400' : ''}`}
+					style={{
+						width: `${fieldSize / 4}em`,
+						height: `${wallThickness / 4}em`,
 					}}
-					onDragOver={(event) => {
-						event.preventDefault();
-					}}
-					onDragLeave={() => {
-						if (dragOver) this.setState({ dragOver: false });
-					}}
-					onDragEnter={() => {
-						if (!dragOver) this.setState({ dragOver: true });
-					}}
-					onDragExit={() => {
-						if (dragOver) this.setState({ dragOver: false });
-					}}
+				/>
+			);
+		}
+		return (
+			<div
+				className="flex flex-col"
+				onDragOver={(event) => {
+					event.preventDefault();
+				}}
+				onDragLeave={() => {
+					if (dragOver) this.setState({ dragOver: false });
+				}}
+				onDragEnter={() => {
+					if (!dragOver) this.setState({ dragOver: true });
+				}}
+				onDragExit={() => {
+					if (dragOver) this.setState({ dragOver: false });
+				}}
+				onDrop={() => {
+					if (dragOver) this.setState({ dragOver: false });
+					onDrop(position);
+				}}
+			>
+				<div className="flex flex-row">
+					<button
+						type="button"
+						key={id}
+						className={`${
+							selected ? 'rounded border-red-400' : ''
+						} ${
+							dragOver ? 'border-dashed' : ''
+						} relative border hover:bg-white/25 text-transparent`}
+						style={{
+							height: `${fieldSize / 4}em`,
+							width: `${fieldSize / 4}em`,
+							backgroundImage: `url(${image})`,
+							backgroundPosition: 'center',
+							backgroundSize: 'contain',
+							backgroundRepeat: 'no-repeat',
+							backgroundColor: '#5fa01e',
+						}}
+						tabIndex={-1}
+						onClick={this.handleClick}
+					>
+						{textElement}
+					</button>
+					<div
+						className={
+							boardSize.width !== position.x + 1 ? 'px-2' : ''
+						}
+					>
+						{eastWall}
+					</div>
+				</div>
+				<div
+					className={
+						boardSize.height !== position.y + 1 ? 'py-2' : ''
+					}
 				>
-					{textElement}
-				</button>
+					{southWall}
+				</div>
 			</div>
 		);
 	}

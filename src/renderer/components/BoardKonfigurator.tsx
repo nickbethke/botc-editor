@@ -6,7 +6,9 @@ import { ProgressBar } from 'react-loader-spinner';
 import InputLabel, { OnChangeFunctionInputLabel } from './InputLabel';
 import InputValidator from '../helper/InputValidator';
 import { RiverPreset } from '../../main/helper/PresetsLoader';
-import BoardKonfiguratorBoard from './board/BoardKonfiguratorBoard';
+import BoardKonfiguratorBoard, {
+	BoardKonfiguratorErrorProps,
+} from './board/BoardKonfiguratorBoard';
 import FieldDragger from './board/FieldDragger';
 import FieldWithPositionInterface from './generator/interfaces/fieldWithPositionInterface';
 import Grass from './generator/fields/grass';
@@ -26,6 +28,7 @@ import ConfirmPopup from './ConfirmPopup';
 import BoardGenerator from './generator/BoardGenerator';
 import Lembas from './generator/fields/lembas';
 import Popup from './Popup';
+import RandomBoardStartValuesDialog from './RandomBoardStartValuesDialog';
 
 type BoardKonfiguratorProps = {
 	generator?: BoardGenerator | null;
@@ -57,6 +60,7 @@ type BoardKonfiguratorState = {
 	os: NodeJS.Platform;
 	loading: boolean;
 	error: string | null;
+	random: boolean;
 };
 
 // TODO: Speichern Dialog: Als Preset oder als Board
@@ -93,6 +97,7 @@ class BoardKonfigurator extends React.Component<
 		os: 'win32',
 		loading: false,
 		error: null,
+		random: false,
 	};
 
 	private draggableItemClass: string =
@@ -118,12 +123,7 @@ class BoardKonfigurator extends React.Component<
 		if (json) {
 			try {
 				this.state = {
-					config: {
-						...BoardKonfigurator.default,
-						width: json.width,
-						height: json.height,
-						name: json.name,
-					},
+					config: { ...BoardKonfigurator.default, ...json },
 					currentTool: 'select',
 					openTab: 'fields',
 					presets: [],
@@ -142,6 +142,7 @@ class BoardKonfigurator extends React.Component<
 					os: 'win32',
 					loading: false,
 					error: null,
+					random: false,
 				};
 			} catch (e) {
 				if (e instanceof Error)
@@ -157,9 +158,7 @@ class BoardKonfigurator extends React.Component<
 			this.state = {
 				config: {
 					...BoardKonfigurator.default,
-					width: generator.startValues.width,
-					height: generator.startValues.height,
-					name: generator.startValues.name,
+					...generator.boardJSON,
 				},
 				currentTool: 'select',
 				openTab: 'fields',
@@ -175,6 +174,7 @@ class BoardKonfigurator extends React.Component<
 				os: 'win32',
 				loading: false,
 				error: null,
+				random: false,
 			};
 		} else {
 			this.state = BoardKonfigurator.defaultState;
@@ -221,6 +221,7 @@ class BoardKonfigurator extends React.Component<
 		Mousetrap.bind(['command+d', 'ctrl+d'], () => {
 			this.setState({ currentTool: 'delete' });
 		});
+
 		Mousetrap.bind(['up'], () => {
 			const { selected } = this.state;
 			if (selected && selected.y > 0) {
@@ -283,22 +284,17 @@ class BoardKonfigurator extends React.Component<
 
 	openBoardConfig: MouseEventHandler<HTMLButtonElement> = async () => {
 		this.setState({ loading: true });
-		const boarsJSON = await window.electron.dialog.openBoardConfig();
-		if (boarsJSON) {
+		const boardJSON = await window.electron.dialog.openBoardConfig();
+		if (boardJSON) {
 			try {
 				this.setState({
-					config: {
-						...BoardKonfigurator.default,
-						width: boarsJSON.width,
-						height: boarsJSON.height,
-						name: boarsJSON.name,
-					},
+					config: { ...BoardKonfigurator.default, ...boardJSON },
 					selected: null,
-					board: BoardGenerator.jsonToBoard(boarsJSON),
+					board: BoardGenerator.jsonToBoard(boardJSON),
 					checkpoints:
 						BoardGenerator.checkpointsPositionArrayToCheckpointArray(
 							BoardGenerator.positionArrayToBoardPositionArray(
-								boarsJSON.checkPoints
+								boardJSON.checkPoints
 							)
 						),
 					loading: false,
@@ -318,7 +314,7 @@ class BoardKonfigurator extends React.Component<
 	};
 
 	render = () => {
-		const { openTab, config, board, leave, os, loading, error } =
+		const { openTab, config, board, leave, os, loading, error, random } =
 			this.state;
 		if (board.length < 1) {
 			const newBoard: Array<Array<FieldWithPositionInterface>> = [];
@@ -371,11 +367,34 @@ class BoardKonfigurator extends React.Component<
 				/>
 			);
 		}
+		if (random) {
+			popup = (
+				<RandomBoardStartValuesDialog
+					onClose={() => {
+						this.setState({ random: false });
+					}}
+					onGenerated={(generator) =>
+						this.setState({
+							config: {
+								...BoardKonfigurator.default,
+								...generator.boardJSON,
+							},
+							board: generator.board,
+							checkpoints:
+								BoardGenerator.checkpointsPositionArrayToCheckpointArray(
+									generator.checkpoints
+								),
+							random: false,
+						})
+					}
+				/>
+			);
+		}
 		// TODO: Speichern
-		// TODO: Laden (Wände)
-		// TODO: Random (Wände)
+		// TODO: Update config, wenn was am Board geändert wird (Array<Array<FieldWithPositionInterface>> 2 BoardConfigInterface)
+		// TODO: Error Tab -> Validation
 		return (
-			<div className="flex flex-col h-[100vh]">
+			<div className="flex flex-col h-[100vh] text-white">
 				{os === 'win32' ? (
 					<div className="dragger w-[100vw] h-8 bg-[#6b808e]" />
 				) : null}
@@ -434,6 +453,17 @@ class BoardKonfigurator extends React.Component<
 								</div>
 							</div>
 							{this.tools()}
+						</div>
+						<div className="border-t border-b">
+							<button
+								type="button"
+								className="p-4 hover:bg-white/50 transition-colors transition w-full"
+								onClick={() => {
+									this.setState({ random: true });
+								}}
+							>
+								Zufälliges Board
+							</button>
 						</div>
 						<div className="grid grid-cols-3 border-t border-b">
 							<button
@@ -860,8 +890,29 @@ class BoardKonfigurator extends React.Component<
 
 	board = () => {
 		const { config, board, selected } = this.state;
+
+		const errors: BoardKonfiguratorErrorProps = {
+			critical: [],
+			hints: [],
+			warning: [],
+			validation: [],
+		};
+
+		// TODO: Warnungen
+		if (config.checkPoints.length < 1) {
+			errors.critical.push(
+				'Es muss mindestens ein Checkpoint auf dem Board vorhanden sein!'
+			);
+		}
+		if (config.startFields.length < 2) {
+			errors.critical.push(
+				'Es müssen mindestens zwei Startfelder auf dem Board vorhanden sein!'
+			);
+		}
+
 		return (
 			<BoardKonfiguratorBoard
+				errors={errors}
 				config={config}
 				board={board}
 				selected={selected}

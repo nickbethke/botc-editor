@@ -170,12 +170,12 @@ class App extends React.Component<unknown, AppStates> {
 						this.setState({ openPopup: false });
 					}}
 					onLoadConfig={async () => {
-						const boarsJSON =
+						const boardJSON =
 							await window.electron.dialog.openBoardConfig();
-						if (boarsJSON) {
+						if (boardJSON) {
 							this.setState({
 								openScreen: 'boardConfigLoadScreen',
-								toLoad: boarsJSON,
+								toLoad: boardJSON,
 							});
 						}
 					}}
@@ -194,7 +194,7 @@ class App extends React.Component<unknown, AppStates> {
 					onClose={() => {
 						this.setState({ openPopup: 'boardEditorChoice' });
 					}}
-					onGenerate={(generator) => {
+					onGenerated={(generator) => {
 						this.setState({
 							generator,
 							openScreen: 'boardConfigFromRandomScreen',
