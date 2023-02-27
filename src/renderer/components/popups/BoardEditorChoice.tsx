@@ -1,8 +1,8 @@
 import React from 'react';
-import newBGImage from '../../../assets/images/new-color.jpg';
-import randomBGImage from '../../../assets/images/random-color.jpg';
-import loadingBGImage from '../../../assets/images/bg-color-II.jpg';
-import BoardEditorChoiceCard from './BoardEditorChoiceCard';
+import newBGImage from '../../../../assets/images/new-color.jpg';
+import randomBGImage from '../../../../assets/images/random-color.jpg';
+import loadingBGImage from '../../../../assets/images/bg-color-II.jpg';
+import BoardEditorChoiceCard from './components/BoardEditorChoiceCard';
 
 type BoardEditorChoiceProps = {
 	onClose: () => void;

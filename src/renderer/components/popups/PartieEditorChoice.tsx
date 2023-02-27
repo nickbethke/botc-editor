@@ -1,7 +1,7 @@
 import React from 'react';
-import newBGImage from '../../../assets/images/new-color.jpg';
-import loadingBGImage from '../../../assets/images/bg-color-II.jpg';
-import PartieEditorChoiceCard from './PartieEditorChoiceCard';
+import newBGImage from '../../../../assets/images/new-color.jpg';
+import loadingBGImage from '../../../../assets/images/bg-color-II.jpg';
+import PartieEditorChoiceCard from './components/PartieEditorChoiceCard';
 
 type PartieEditorChoiceProps = {
 	onClose: () => void;

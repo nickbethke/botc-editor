@@ -1,5 +1,5 @@
 import React from 'react';
-import { FieldsEnum } from '../BoardKonfigurator';
+import { FieldsEnum } from '../generator/BoardGenerator';
 
 type FieldDraggerProps = {
 	className?: string;

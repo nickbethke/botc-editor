@@ -11,7 +11,7 @@ import River from '../renderer/components/generator/fields/river';
 import Checkpoint from '../renderer/components/generator/fields/checkpoint';
 import AStar from '../renderer/components/generator/helper/AStar';
 import Hole from '../renderer/components/generator/fields/hole';
-import { RandomBoardStartValues } from '../renderer/components/RandomBoardStartValuesDialog';
+import { RandomBoardStartValues } from '../renderer/components/popups/RandomBoardStartValuesDialog';
 
 describe('start values unchanged', () => {
 	test('no start values equal to default after generation', () => {
@@ -125,22 +125,7 @@ describe('a-star', () => {
 			{ x: 0, y: 1 },
 			{ x: 2, y: 0 },
 		];
-		const map: Map<string, boolean> = new Map();
-		for (let i = 0; i < walls.length; i += 1) {
-			const wall = walls[i];
-			const s1 =
-				wall[0][0].toString() +
-				wall[0][1].toString() +
-				wall[1][0].toString() +
-				wall[1][1].toString();
-			const s2 =
-				wall[1][0].toString() +
-				wall[1][1].toString() +
-				wall[0][0].toString() +
-				wall[0][1].toString();
-			map.set(s1, true);
-			map.set(s2, true);
-		}
+		const map = BoardGenerator.genWallMap(walls);
 		const { result } = AStar.pathPossible(
 			checkpoints,
 			startFields,
@@ -185,6 +170,34 @@ describe('a-star', () => {
 			new Map([])
 		);
 		expect(result).toBe(true);
+	});
+	test('a-star algorithm impossible', () => {
+		const board: Array<Array<FieldWithPositionInterface>> = [
+			[
+				new SauronsEye({ x: 0, y: 0 }, DirectionEnum.NORTH),
+				new Hole({ x: 1, y: 0 }),
+				new StartField({ x: 2, y: 0 }, DirectionEnum.NORTH),
+			],
+			[
+				new Checkpoint({ x: 0, y: 1 }, DirectionEnum.NORTH),
+				new Hole({ x: 1, y: 1 }),
+				new StartField({ x: 2, y: 1 }, DirectionEnum.NORTH),
+			],
+		];
+
+		const checkpoints = [{ x: 0, y: 1 }];
+		const startFields = [
+			{ x: 2, y: 0 },
+			{ x: 2, y: 1 },
+		];
+		const { result } = AStar.pathPossible(
+			checkpoints,
+			startFields,
+			[],
+			board,
+			new Map([])
+		);
+		expect(result).toBe(false);
 	});
 });
 describe('wall generation', () => {

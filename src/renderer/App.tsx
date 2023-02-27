@@ -1,13 +1,13 @@
 import React from 'react';
 import './App.scss';
 import Mousetrap from 'mousetrap';
-import BoardEditorChoice from './components/BoardEditorChoice';
-import PartieEditorChoice from './components/PartieEditorChoice';
-import PartieKonfigurator from './components/PartieKonfigurator';
+import BoardEditorChoice from './components/popups/BoardEditorChoice';
+import PartieEditorChoice from './components/popups/PartieEditorChoice';
+import PartieKonfigurator from './screens/PartieKonfigurator';
 
-import BoardKonfigurator from './components/BoardKonfigurator';
-import JSONValidierer from './components/JSONValidierer';
-import RandomBoardStartValuesDialog from './components/RandomBoardStartValuesDialog';
+import BoardKonfigurator from './screens/BoardKonfigurator';
+import JSONValidierer from './screens/JSONValidierer';
+import RandomBoardStartValuesDialog from './components/popups/RandomBoardStartValuesDialog';
 import BoardGenerator from './components/generator/BoardGenerator';
 import PartieConfigInterface from './components/interfaces/PartieConfigInterface';
 import BoardConfigInterface from './components/interfaces/BoardConfigInterface';

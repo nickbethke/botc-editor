@@ -293,7 +293,11 @@ class AStar {
 		lembasFields: Array<{ position: BoardPosition; amount: number }>,
 		board: Array<Array<FieldWithPositionInterface>>,
 		walls: Map<string, boolean>
-	): { result: boolean; pathFindings: number } {
+	): {
+		result: boolean;
+		pathFindings: number;
+		error: { start: BoardPosition | null; end: BoardPosition | null };
+	} {
 		let pathFindings = 0;
 		const startFieldLength = startFields.length;
 
@@ -311,7 +315,11 @@ class AStar {
 
 			pathFindings += 1;
 			if (path.length < 1) {
-				return { result: false, pathFindings };
+				return {
+					result: false,
+					pathFindings,
+					error: { start: commonStartField, end: currStartField },
+				};
 			}
 		}
 
@@ -326,7 +334,14 @@ class AStar {
 			const path = aStar.AStar();
 			pathFindings += 1;
 			if (path.length < 1) {
-				return { result: false, pathFindings };
+				return {
+					result: false,
+					pathFindings,
+					error: {
+						start: lembasField.position,
+						end: commonStartField,
+					},
+				};
 			}
 		}
 
@@ -336,10 +351,18 @@ class AStar {
 			const path = aStar.AStar();
 			pathFindings += 1;
 			if (path.length < 1) {
-				return { result: false, pathFindings };
+				return {
+					result: false,
+					pathFindings,
+					error: { start: checkpoint, end: commonStartField },
+				};
 			}
 		}
-		return { result: true, pathFindings };
+		return {
+			result: true,
+			pathFindings,
+			error: { start: null, end: null },
+		};
 	}
 }
 

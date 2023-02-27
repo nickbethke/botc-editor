@@ -2,13 +2,13 @@ import React from 'react';
 import { BiChevronLeft } from 'react-icons/bi';
 import backgroundImage from '../../../assets/images/bg-color-III.jpg';
 import App from '../App';
-import InputLabel from './InputLabel';
-import Notification from './Notification';
-import Error from './Error';
+import InputLabel from '../components/InputLabel';
+import Notification from '../components/Notification';
+import Error from '../components/Error';
 import InputValidator from '../helper/InputValidator';
 
-import ConfirmPopup from './ConfirmPopup';
-import PartieConfigInterface from './interfaces/PartieConfigInterface';
+import ConfirmPopup from '../components/popups/ConfirmPopup';
+import PartieConfigInterface from '../components/interfaces/PartieConfigInterface';
 
 type PartieKonfiguratorProps = {
 	App: App;

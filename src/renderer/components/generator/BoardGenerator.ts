@@ -3,7 +3,9 @@ import Grass from './fields/grass';
 import BoardConfigInterface, {
 	Direction,
 	DirectionEnum,
+	LembasField,
 	Position,
+	PositionDirection,
 } from '../interfaces/BoardConfigInterface';
 import SauronsEye from './fields/sauronsEye';
 import StartField from './fields/startField';
@@ -181,6 +183,52 @@ class BoardGenerator {
 		return boardPositions;
 	}
 
+	public static startFieldsArrayToBoardPositionArray(
+		position: PositionDirection[]
+	): BoardPosition[] {
+		const boardPositions: BoardPosition[] = [];
+		for (let i = 0; i < position.length; i += 1) {
+			const positionItem = position[i];
+			boardPositions.push(
+				BoardGenerator.positionToBoardPosition(positionItem.position)
+			);
+		}
+		return boardPositions;
+	}
+
+	public static lembasFieldsArrayToBoardPositionArray(
+		position: LembasField[]
+	): { position: BoardPosition; amount: number }[] {
+		const boardPositions: { position: BoardPosition; amount: number }[] =
+			[];
+		for (let i = 0; i < position.length; i += 1) {
+			const positionItem = position[i];
+			boardPositions.push({
+				position: BoardGenerator.positionToBoardPosition(
+					positionItem.position
+				),
+				amount: positionItem.amount,
+			});
+		}
+		return boardPositions;
+	}
+
+	public static genWallMap(walls: Position[][]): Map<string, boolean> {
+		const map: Map<string, boolean> = new Map();
+		for (let i = 0; i < walls.length; i += 1) {
+			const wall = walls[i];
+			const s1 =
+				BoardGenerator.position2String(wall[0]) +
+				BoardGenerator.position2String(wall[1]);
+			const s2 =
+				BoardGenerator.position2String(wall[1]) +
+				BoardGenerator.position2String(wall[0]);
+			map.set(s1, true);
+			map.set(s2, true);
+		}
+		return map;
+	}
+
 	public static generateBoardArray(
 		height: number,
 		width: number
@@ -256,8 +304,9 @@ class BoardGenerator {
 		const position = this.getRandomPosition();
 		// check if position has already been tried
 		if (
-			this.holesTrys.get(BoardGenerator.position2String(position)) ===
-			undefined
+			this.holesTrys.get(
+				BoardGenerator.boardPosition2String(position)
+			) === undefined
 		) {
 			// check pathfinding, so all checkpoints are reachable from all start fields
 			const { result } = AStar.pathPossible(
@@ -274,7 +323,10 @@ class BoardGenerator {
 				this.holesSet += 1;
 			}
 			// set tried hole position
-			this.holesTrys.set(BoardGenerator.position2String(position), true);
+			this.holesTrys.set(
+				BoardGenerator.boardPosition2String(position),
+				true
+			);
 		}
 	}
 
@@ -501,11 +553,11 @@ class BoardGenerator {
 					)
 				) {
 					const s1 =
-						BoardGenerator.position2String(firstPosition) +
-						BoardGenerator.position2String(secondPosition);
+						BoardGenerator.boardPosition2String(firstPosition) +
+						BoardGenerator.boardPosition2String(secondPosition);
 					const s2 =
-						BoardGenerator.position2String(secondPosition) +
-						BoardGenerator.position2String(firstPosition);
+						BoardGenerator.boardPosition2String(secondPosition) +
+						BoardGenerator.boardPosition2String(firstPosition);
 					const wallsArrayCopy = [...this.wallMapArray];
 					this.wallMapArray.push([s1, true], [s2, true]);
 					const { result } = AStar.pathPossible(
@@ -588,11 +640,11 @@ class BoardGenerator {
 			) {
 				if (BoardGenerator.probably(this.percentage * 100)) {
 					const s1 =
-						BoardGenerator.position2String(position) +
-						BoardGenerator.position2String(neighbor);
+						BoardGenerator.boardPosition2String(position) +
+						BoardGenerator.boardPosition2String(neighbor);
 					const s2 =
-						BoardGenerator.position2String(neighbor) +
-						BoardGenerator.position2String(position);
+						BoardGenerator.boardPosition2String(neighbor) +
+						BoardGenerator.boardPosition2String(position);
 					const wallsArrayCopy = [...this.wallMapArray];
 					this.wallMapArray.push([s1, true], [s2, true]);
 					const { result: pathPossible } = AStar.pathPossible(
@@ -735,8 +787,12 @@ class BoardGenerator {
 		);
 	}
 
-	static position2String(postion: BoardPosition): string {
+	static boardPosition2String(postion: BoardPosition): string {
 		return postion.x.toString() + postion.y.toString();
+	}
+
+	static position2String(postion: Position): string {
+		return postion[0].toString() + postion[1].toString();
 	}
 
 	static firstLetter(string: string): string {
@@ -764,6 +820,10 @@ class BoardGenerator {
 		return { x: position[0], y: position[1] };
 	}
 
+	static boardPositionToPosition(position: BoardPosition): Position {
+		return [position.x, position.y];
+	}
+
 	static directionToDirectionEnum(direction: Direction): DirectionEnum {
 		if (direction === 'NORTH') {
 			return DirectionEnum.NORTH;
@@ -780,9 +840,25 @@ class BoardGenerator {
 		return DirectionEnum.NORTH;
 	}
 
-	static jsonToBoard(
+	static directionEnumToDirection(direction: DirectionEnum): Direction {
+		if (direction === DirectionEnum.NORTH) {
+			return 'NORTH';
+		}
+		if (direction === DirectionEnum.EAST) {
+			return 'EAST';
+		}
+		if (direction === DirectionEnum.SOUTH) {
+			return 'SOUTH';
+		}
+		if (direction === DirectionEnum.WEST) {
+			return 'WEST';
+		}
+		return 'NORTH';
+	}
+
+	static jsonToBoard = (
 		json: BoardConfigInterface
-	): Array<Array<FieldWithPositionInterface>> {
+	): Array<Array<FieldWithPositionInterface>> => {
 		const board: Array<Array<FieldWithPositionInterface>> =
 			BoardGenerator.generateBoardArray(json.height, json.width);
 
@@ -841,11 +917,98 @@ class BoardGenerator {
 		}
 
 		return board;
+	};
+
+	static checkPointArrayToPositionArray(array: Checkpoint[]): Position[] {
+		const r: Position[] = [];
+		for (let i = 0; i < array.length; i += 1) {
+			const checkpoint: Checkpoint = array[i];
+			r[checkpoint.order] = BoardGenerator.boardPositionToPosition(
+				checkpoint.position
+			);
+		}
+		return r;
 	}
 
 	public wallCount(): number {
 		return this.walls;
 	}
+
+	static updateBoardConfigFromBoardArray(
+		config: BoardConfigInterface,
+		board: Array<Array<FieldWithPositionInterface>>
+	): BoardConfigInterface {
+		console.warn('UPDATE config from board');
+		const newConfig: BoardConfigInterface = {
+			...config,
+			startFields: [],
+			checkPoints: [],
+			riverFields: [],
+			lembasFields: [],
+			holes: [],
+		};
+		for (let y = 0; y < board.length; y += 1) {
+			const row = board[y];
+			for (let x = 0; x < row.length; x += 1) {
+				const field = row[x];
+				if (field instanceof SauronsEye) {
+					newConfig.eye = {
+						position: BoardGenerator.boardPositionToPosition(
+							field.position
+						),
+						direction: BoardGenerator.directionEnumToDirection(
+							field.direction
+						),
+					};
+				}
+				if (field instanceof Checkpoint) {
+					newConfig.checkPoints[field.order] =
+						BoardGenerator.boardPositionToPosition(field.position);
+				}
+				if (field instanceof StartField) {
+					newConfig.startFields.push({
+						position: BoardGenerator.boardPositionToPosition(
+							field.position
+						),
+						direction: BoardGenerator.directionEnumToDirection(
+							field.direction
+						),
+					});
+				}
+				if (field instanceof Hole) {
+					if (!newConfig.holes) {
+						newConfig.holes = [];
+					}
+					newConfig.holes.push(
+						BoardGenerator.boardPositionToPosition(field.position)
+					);
+				}
+				if (field instanceof Lembas) {
+					if (!newConfig.lembasFields) {
+						newConfig.lembasFields = [];
+					}
+					newConfig.lembasFields.push({
+						position: BoardGenerator.boardPositionToPosition(
+							field.position
+						),
+						amount: field.amount,
+					});
+				}
+			}
+		}
+		return newConfig;
+	}
 }
 
 export default BoardGenerator;
+
+export enum FieldsEnum {
+	GRASS,
+	START,
+	CHECKPOINT,
+	EYE,
+	HOLE,
+	LEMBAS,
+	RIVER,
+	WALL,
+}

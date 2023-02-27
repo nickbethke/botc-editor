@@ -5,7 +5,7 @@ import MonacoEditor, { monaco } from 'react-monaco-editor';
 import { HiSaveAs } from 'react-icons/hi';
 import Mousetrap from 'mousetrap';
 import { DefinedError } from 'ajv';
-import ConfirmPopup from './ConfirmPopup';
+import ConfirmPopup from '../components/popups/ConfirmPopup';
 import KeyCode = monaco.KeyCode;
 import KeyMod = monaco.KeyMod;
 

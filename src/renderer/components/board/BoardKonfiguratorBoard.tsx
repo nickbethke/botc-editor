@@ -3,19 +3,16 @@ import _uniqueId from 'lodash/uniqueId';
 import { BsChevronDown, BsChevronUp } from 'react-icons/bs';
 import Mousetrap from 'mousetrap';
 import Field from './Field';
-import { FieldsEnum } from '../BoardKonfigurator';
 import FieldWithPositionInterface from '../generator/interfaces/fieldWithPositionInterface';
 import { BoardPosition } from '../generator/interfaces/boardPosition';
-import Checkpoint from '../generator/fields/checkpoint';
 import KeyCode from '../KeyCode';
 import Lembas from '../generator/fields/lembas';
-import StartField from '../generator/fields/startField';
-import SauronsEye from '../generator/fields/sauronsEye';
 import River from '../generator/fields/river';
 import BoardConfigInterface, {
 	Position,
 } from '../interfaces/BoardConfigInterface';
-import BoardGenerator from '../generator/BoardGenerator';
+import BoardGenerator, { FieldsEnum } from '../generator/BoardGenerator';
+import Checkpoint from '../generator/fields/checkpoint';
 
 export type BoardKonfiguratorErrorProps = {
 	critical: string[];
@@ -147,9 +144,15 @@ class BoardKonfiguratorBoard extends React.Component<
 	handleKeyDown: React.KeyboardEventHandler<HTMLDivElement> = () => {};
 
 	errorWindow = (
-		errors: { critical: string[]; warning: string[]; hints: string[] },
+		errors: {
+			critical: string[];
+			warning: string[];
+			hints: string[];
+			validation: string[];
+		},
 		type: 'critical' | 'hints' | 'warning' | 'validation'
 	) => {
+		console.log(errors.validation);
 		let errorMessages: string[] | null = [];
 		let symbol: string | null = null;
 		let className = '';
@@ -169,7 +172,7 @@ class BoardKonfiguratorBoard extends React.Component<
 				symbol = '!';
 				break;
 			case 'validation':
-				errorMessages = null;
+				errorMessages = errors.validation;
 				symbol = '!';
 				break;
 			default:
@@ -288,31 +291,33 @@ class BoardKonfiguratorBoard extends React.Component<
 				if (cBoard.length > 0) {
 					type = cBoard[y][x].fieldEnum;
 				}
-				if (boardField instanceof Checkpoint) {
-					attribute = boardField.order;
+				if (boardField.fieldEnum === FieldsEnum.CHECKPOINT) {
+					attribute = (boardField as Checkpoint).order;
 				}
-				if (boardField instanceof Lembas) {
-					attribute = boardField.amount;
+
+				if (boardField.fieldEnum === FieldsEnum.LEMBAS) {
+					attribute = (boardField as Lembas).amount;
 				}
+
 				if (
-					boardField instanceof StartField ||
-					boardField instanceof SauronsEye ||
-					boardField instanceof River
+					boardField.fieldEnum === FieldsEnum.START ||
+					boardField.fieldEnum === FieldsEnum.EYE ||
+					boardField.fieldEnum === FieldsEnum.RIVER
 				) {
-					attribute = boardField.direction;
+					attribute = (boardField as River).direction;
 				}
 				const wallsToBuild = [];
 				if (config.walls) {
 					for (let i = 0; i < config.walls.length; i += 1) {
 						const item: Position[] = config.walls[i];
 						const currentPositionString =
-							BoardGenerator.position2String(
+							BoardGenerator.boardPosition2String(
 								BoardGenerator.positionToBoardPosition([x, y])
 							);
-						const s1 = BoardGenerator.position2String(
+						const s1 = BoardGenerator.boardPosition2String(
 							BoardGenerator.positionToBoardPosition(item[0])
 						);
-						const s2 = BoardGenerator.position2String(
+						const s2 = BoardGenerator.boardPosition2String(
 							BoardGenerator.positionToBoardPosition(item[1])
 						);
 						if (

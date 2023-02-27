@@ -70,7 +70,7 @@ const CheckpointSortable = (props: {
 		>
 			{items.map((item) => {
 				const checkpoint = item;
-				const text = `Checkpoint [${checkpoint.position.y}, ${checkpoint.position.x}]`;
+				const text = `Checkpoint {y:${checkpoint.position.y}, x:${checkpoint.position.x}}`;
 				return (
 					<SortableItem key={item.order}>
 						<div

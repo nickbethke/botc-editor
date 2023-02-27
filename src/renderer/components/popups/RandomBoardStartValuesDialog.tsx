@@ -1,6 +1,6 @@
 import React, { MouseEventHandler } from 'react';
-import InputLabel from './InputLabel';
-import BoardGenerator from './generator/BoardGenerator';
+import InputLabel from '../InputLabel';
+import BoardGenerator from '../generator/BoardGenerator';
 
 export type RandomBoardStartValuesDialogStats = {
 	name: string;

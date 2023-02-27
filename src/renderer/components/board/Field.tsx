@@ -1,6 +1,5 @@
 import React from 'react';
 import _uniqueId from 'lodash/uniqueId';
-import { FieldsEnum } from '../BoardKonfigurator';
 import startFieldImage from '../../../../assets/images/start.png';
 import checkpointImage from '../../../../assets/images/checkpoint.png';
 import eyeImage from '../../../../assets/images/eye.png';
@@ -11,7 +10,7 @@ import wallImage from '../../../../assets/images/wall.png';
 
 import { BoardPosition } from '../generator/interfaces/boardPosition';
 import { DirectionEnum, Position } from '../interfaces/BoardConfigInterface';
-import BoardGenerator from '../generator/BoardGenerator';
+import BoardGenerator, { FieldsEnum } from '../generator/BoardGenerator';
 
 type FieldProps = {
 	type: FieldsEnum;
@@ -97,12 +96,13 @@ class Field extends React.Component<FieldProps, FieldStats> {
 			</div>
 		) : null;
 
-		const currentPositionString = BoardGenerator.position2String(position);
+		const currentPositionString =
+			BoardGenerator.boardPosition2String(position);
 		const walls = { east: false, south: false };
 		for (let i = 0; i < wallsToBuild.length; i += 1) {
 			const item: Position[] = wallsToBuild[i];
 
-			const s2 = BoardGenerator.position2String(
+			const s2 = BoardGenerator.boardPosition2String(
 				BoardGenerator.positionToBoardPosition(item[1])
 			);
 			const toWallPosition =

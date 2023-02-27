@@ -1,51 +1,45 @@
-import React, { MouseEventHandler } from 'react';
+import React from 'react';
 import { BsFillCursorFill, BsFillTrashFill } from 'react-icons/bs';
 import _uniqueId from 'lodash/uniqueId';
 import Mousetrap from 'mousetrap';
 import { ProgressBar } from 'react-loader-spinner';
-import InputLabel, { OnChangeFunctionInputLabel } from './InputLabel';
+import InputLabel, {
+	OnChangeFunctionInputLabel,
+} from '../components/InputLabel';
 import InputValidator from '../helper/InputValidator';
 import { RiverPreset } from '../../main/helper/PresetsLoader';
 import BoardKonfiguratorBoard, {
 	BoardKonfiguratorErrorProps,
-} from './board/BoardKonfiguratorBoard';
-import FieldDragger from './board/FieldDragger';
-import FieldWithPositionInterface from './generator/interfaces/fieldWithPositionInterface';
-import Grass from './generator/fields/grass';
-import StartField from './generator/fields/startField';
+} from '../components/board/BoardKonfiguratorBoard';
+import FieldDragger from '../components/board/FieldDragger';
+import FieldWithPositionInterface from '../components/generator/interfaces/fieldWithPositionInterface';
+import Grass from '../components/generator/fields/grass';
+import StartField from '../components/generator/fields/startField';
 import BoardConfigInterface, {
 	DirectionEnum,
-} from './interfaces/BoardConfigInterface';
-import Checkpoint from './generator/fields/checkpoint';
-import SauronsEye from './generator/fields/sauronsEye';
-import { BoardPosition } from './generator/interfaces/boardPosition';
-import River from './generator/fields/river';
-import FieldWithPositionAndDirectionInterface from './generator/interfaces/fieldWithPositionAndDirectionInterface';
-import CheckpointSortable from './board/CheckpointSortable';
-import FieldWithPositionAndAmountInterface from './generator/interfaces/FieldWithPositionAndAmountInterface';
-import Hole from './generator/fields/hole';
-import ConfirmPopup from './ConfirmPopup';
-import BoardGenerator from './generator/BoardGenerator';
-import Lembas from './generator/fields/lembas';
-import Popup from './Popup';
-import RandomBoardStartValuesDialog from './RandomBoardStartValuesDialog';
+} from '../components/interfaces/BoardConfigInterface';
+import Checkpoint from '../components/generator/fields/checkpoint';
+import SauronsEye from '../components/generator/fields/sauronsEye';
+import { BoardPosition } from '../components/generator/interfaces/boardPosition';
+import River from '../components/generator/fields/river';
+import FieldWithPositionAndDirectionInterface from '../components/generator/interfaces/fieldWithPositionAndDirectionInterface';
+import CheckpointSortable from '../components/board/CheckpointSortable';
+import FieldWithPositionAndAmountInterface from '../components/generator/interfaces/FieldWithPositionAndAmountInterface';
+import Hole from '../components/generator/fields/hole';
+import ConfirmPopup from '../components/popups/ConfirmPopup';
+import BoardGenerator, {
+	FieldsEnum,
+} from '../components/generator/BoardGenerator';
+import Lembas from '../components/generator/fields/lembas';
+import Popup from '../components/popups/Popup';
+import RandomBoardStartValuesDialog from '../components/popups/RandomBoardStartValuesDialog';
+import AStar from '../components/generator/helper/AStar';
 
 type BoardKonfiguratorProps = {
 	generator?: BoardGenerator | null;
 	json?: BoardConfigInterface | null;
 	onClose: () => void;
 };
-
-export enum FieldsEnum {
-	GRASS,
-	START,
-	CHECKPOINT,
-	EYE,
-	HOLE,
-	LEMBAS,
-	RIVER,
-	WALL,
-}
 
 type BoardKonfiguratorState = {
 	config: BoardConfigInterface;
@@ -205,6 +199,7 @@ class BoardKonfigurator extends React.Component<
 
 		this.abortBackToHomeScreen = this.abortBackToHomeScreen.bind(this);
 		this.openBoardConfig = this.openBoardConfig.bind(this);
+		this.saveBoardConfig = this.saveBoardConfig.bind(this);
 
 		Mousetrap.bind(['command+1', 'ctrl+1'], () => {
 			this.setState({ openTab: 'global' });
@@ -220,6 +215,12 @@ class BoardKonfigurator extends React.Component<
 		});
 		Mousetrap.bind(['command+d', 'ctrl+d'], () => {
 			this.setState({ currentTool: 'delete' });
+		});
+		Mousetrap.bind(['command+o', 'ctrl+o'], () => {
+			this.openBoardConfig().catch(console.log);
+		});
+		Mousetrap.bind(['command+s', 'ctrl+s'], () => {
+			this.saveBoardConfig().catch(console.log);
 		});
 
 		Mousetrap.bind(['up'], () => {
@@ -282,7 +283,7 @@ class BoardKonfigurator extends React.Component<
 		this.setState({ leave: false });
 	};
 
-	openBoardConfig: MouseEventHandler<HTMLButtonElement> = async () => {
+	openBoardConfig = async () => {
 		this.setState({ loading: true });
 		const boardJSON = await window.electron.dialog.openBoardConfig();
 		if (boardJSON) {
@@ -311,6 +312,23 @@ class BoardKonfigurator extends React.Component<
 		} else {
 			this.setState({ loading: false });
 		}
+	};
+
+	saveBoardConfig = async () => {
+		const { config } = this.state;
+		await window.electron.dialog.saveBoardConfig(
+			JSON.stringify(config, null, 4)
+		);
+	};
+
+	updateConfig = () => {
+		const { board, config } = this.state;
+		this.setState({
+			config: BoardGenerator.updateBoardConfigFromBoardArray(
+				config,
+				board
+			),
+		});
 	};
 
 	render = () => {
@@ -390,6 +408,9 @@ class BoardKonfigurator extends React.Component<
 				/>
 			);
 		}
+
+		console.log('config', JSON.stringify(config, null, 4));
+		// TODO: Saurons Auge kann man nur umplatzieren, nicht löschen!
 		// TODO: Speichern
 		// TODO: Update config, wenn was am Board geändert wird (Array<Array<FieldWithPositionInterface>> 2 BoardConfigInterface)
 		// TODO: Error Tab -> Validation
@@ -476,6 +497,7 @@ class BoardKonfigurator extends React.Component<
 							<button
 								type="button"
 								className="p-4 hover:bg-white/50 transition-colors transition"
+								onClick={this.saveBoardConfig}
 							>
 								Speichern
 							</button>
@@ -671,22 +693,32 @@ class BoardKonfigurator extends React.Component<
 				return true;
 			});
 		});
-		this.setState({
-			checkpoints:
-				helpArray.length !== checkpoints.length
-					? helpArray
-					: checkpoints,
-		});
+
+		const updatedArray =
+			helpArray.length !== checkpoints.length ? helpArray : checkpoints;
+		this.setState(
+			{
+				checkpoints: updatedArray,
+				board,
+			},
+			this.updateConfig
+		);
 	};
 
 	onCheckpointSortUpdate: (checkpoints: Checkpoint[]) => void = (check) => {
-		const { board } = this.state;
+		const { board, config } = this.state;
 		for (let i = 0; i < check.length; i += 1) {
 			const checkpoint = check[i];
 			board[checkpoint.position.y][checkpoint.position.x] =
 				new Checkpoint(checkpoint.position, checkpoint.order);
 		}
-		this.setState({ checkpoints: check, board });
+		this.setState(
+			{
+				checkpoints: check,
+				board,
+			},
+			this.updateConfig
+		);
 	};
 
 	onWidthChange: OnChangeFunctionInputLabel = (width) => {
@@ -816,7 +848,7 @@ class BoardKonfigurator extends React.Component<
 	handleBoardOnDrop: (position: { x: number; y: number }) => void = (
 		position
 	) => {
-		const { isDragged, board, checkpoints } = this.state;
+		const { isDragged, board, checkpoints, config } = this.state;
 		let newField: FieldWithPositionInterface;
 		switch (isDragged) {
 			case FieldsEnum.START:
@@ -828,7 +860,7 @@ class BoardKonfigurator extends React.Component<
 					DirectionEnum.NORTH
 				);
 				board[position.y][position.x] = newField;
-				this.setState({ board });
+				this.setState({ board }, this.updateConfig);
 				break;
 			case FieldsEnum.CHECKPOINT:
 				newField = new Checkpoint(
@@ -840,7 +872,13 @@ class BoardKonfigurator extends React.Component<
 				);
 				checkpoints.push(newField as Checkpoint);
 				board[position.y][position.x] = newField;
-				this.setState({ board });
+				this.setState(
+					{
+						board,
+						checkpoints,
+					},
+					this.updateConfig
+				);
 				break;
 			case FieldsEnum.EYE:
 				newField = new SauronsEye(
@@ -848,10 +886,19 @@ class BoardKonfigurator extends React.Component<
 						x: position.x,
 						y: position.y,
 					},
-					DirectionEnum.NORTH
+					BoardGenerator.directionToDirectionEnum(
+						config.eye.direction
+					)
 				);
+
+				board[config.eye.position[1]][config.eye.position[0]] =
+					new Grass(
+						BoardGenerator.positionToBoardPosition(
+							config.eye.position
+						)
+					);
 				board[position.y][position.x] = newField;
-				this.setState({ board });
+				this.setState({ board }, this.updateConfig);
 				break;
 			case FieldsEnum.RIVER:
 				newField = new River(
@@ -862,7 +909,7 @@ class BoardKonfigurator extends React.Component<
 					DirectionEnum.NORTH
 				);
 				board[position.y][position.x] = newField;
-				this.setState({ board });
+				this.setState({ board }, this.updateConfig);
 				break;
 			case FieldsEnum.LEMBAS:
 				newField = new Lembas(
@@ -873,7 +920,7 @@ class BoardKonfigurator extends React.Component<
 					1
 				);
 				board[position.y][position.x] = newField;
-				this.setState({ board });
+				this.setState({ board }, this.updateConfig);
 				break;
 			case FieldsEnum.HOLE:
 				newField = new Hole({
@@ -881,7 +928,7 @@ class BoardKonfigurator extends React.Component<
 					y: position.y,
 				});
 				board[position.y][position.x] = newField;
-				this.setState({ board });
+				this.setState({ board }, this.updateConfig);
 				break;
 			default:
 				break;
@@ -890,6 +937,10 @@ class BoardKonfigurator extends React.Component<
 
 	board = () => {
 		const { config, board, selected } = this.state;
+		const nConfig = BoardGenerator.updateBoardConfigFromBoardArray(
+			config,
+			board
+		);
 
 		const errors: BoardKonfiguratorErrorProps = {
 			critical: [],
@@ -897,23 +948,52 @@ class BoardKonfigurator extends React.Component<
 			warning: [],
 			validation: [],
 		};
-
 		// TODO: Warnungen
-		if (config.checkPoints.length < 1) {
+		if (nConfig.checkPoints.length < 1) {
 			errors.critical.push(
 				'Es muss mindestens ein Checkpoint auf dem Board vorhanden sein!'
 			);
 		}
-		if (config.startFields.length < 2) {
+		if (nConfig.startFields.length < 2) {
 			errors.critical.push(
 				'Es müssen mindestens zwei Startfelder auf dem Board vorhanden sein!'
 			);
+		}
+		if (
+			nConfig.startFields.length >= 2 &&
+			nConfig.checkPoints.length >= 1
+		) {
+			// TODO: Hier klappt noch was nicht...
+			const { result, error } = AStar.pathPossible(
+				BoardGenerator.positionArrayToBoardPositionArray(
+					nConfig.checkPoints
+				),
+				BoardGenerator.startFieldsArrayToBoardPositionArray(
+					nConfig.startFields
+				),
+				nConfig.lembasFields
+					? BoardGenerator.lembasFieldsArrayToBoardPositionArray(
+							nConfig.lembasFields
+					  )
+					: [],
+				board,
+				nConfig.walls
+					? BoardGenerator.genWallMap(nConfig.walls)
+					: new Map<string, boolean>()
+			);
+			if (result) {
+				errors.validation.push('AStar: Path possible!');
+			} else {
+				const msg = `AStar: Path impossible! [Start: {y:${error.start?.y}, x:${error.start?.x}}, End: {y:${error.end?.y}, x:${error.end?.x}}]`;
+				errors.critical.push(msg);
+				errors.validation.push(msg);
+			}
 		}
 
 		return (
 			<BoardKonfiguratorBoard
 				errors={errors}
-				config={config}
+				config={nConfig}
 				board={board}
 				selected={selected}
 				onSelect={(position) => {
@@ -933,6 +1013,7 @@ class BoardKonfigurator extends React.Component<
 								},
 								() => {
 									this.updateCheckpointArray();
+									this.updateConfig();
 								}
 							);
 							return false;
@@ -966,7 +1047,7 @@ class BoardKonfigurator extends React.Component<
 									selected.x
 								] as FieldWithPositionAndAmountInterface
 							).amount = Number.parseInt(value.toString(), 10);
-							this.setState({ board });
+							this.setState({ board }, this.updateConfig);
 						}}
 					/>
 				);
@@ -991,7 +1072,7 @@ class BoardKonfigurator extends React.Component<
 									event.target.value,
 									10
 								);
-								this.setState({ board });
+								this.setState({ board }, this.updateConfig);
 							}}
 						>
 							<option value={DirectionEnum.NORTH}>Norden</option>
