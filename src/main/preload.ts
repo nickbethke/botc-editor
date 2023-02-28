@@ -55,10 +55,21 @@ contextBridge.exposeInMainWorld('electron', {
 		getOS() {
 			return ipcRenderer.invoke('get:os');
 		},
+		getVersion() {
+			return ipcRenderer.invoke('get:version');
+		},
 	},
 	load: {
 		presets() {
 			return ipcRenderer.invoke('load:presets');
+		},
+	},
+	file: {
+		open(file: string) {
+			return ipcRenderer.invoke('file:open', file);
+		},
+		openDir(file: string) {
+			return ipcRenderer.invoke('file:openDir', file);
 		},
 	},
 });

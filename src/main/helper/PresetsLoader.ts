@@ -6,6 +6,7 @@ import * as RiverPresetSchema from '../../schema/river.schema.json';
 
 export type RiverPreset = {
 	name: string;
+	file: string;
 	data: {
 		position: [number, number];
 		direction: 'NORTH' | 'SOUTH' | 'EAST' | 'WEST';
@@ -26,7 +27,10 @@ class PresetsLoader {
 			});
 			const valid = PresetsLoader.validateFile('river', content);
 			if (valid) {
-				this.p_riverPresets.push(JSON.parse(content) as RiverPreset);
+				this.p_riverPresets.push({
+					...(JSON.parse(content) as RiverPreset),
+					file: this.riverPresetFolder + file,
+				});
 			}
 		});
 	}

@@ -3,6 +3,7 @@ import { BsFillCursorFill, BsFillTrashFill } from 'react-icons/bs';
 import _uniqueId from 'lodash/uniqueId';
 import Mousetrap from 'mousetrap';
 import { ProgressBar } from 'react-loader-spinner';
+import CRiverPreset from 'renderer/components/board/RiverPreset';
 import InputLabel, {
 	OnChangeFunctionInputLabel,
 } from '../components/InputLabel';
@@ -55,6 +56,7 @@ type BoardKonfiguratorState = {
 	loading: boolean;
 	error: string | null;
 	random: boolean;
+	contextMenu: JSX.Element | null;
 };
 
 // TODO: Speichern Dialog: Als Preset oder als Board
@@ -92,6 +94,7 @@ class BoardKonfigurator extends React.Component<
 		loading: false,
 		error: null,
 		random: false,
+		contextMenu: null,
 	};
 
 	private draggableItemClass: string =
@@ -137,6 +140,7 @@ class BoardKonfigurator extends React.Component<
 					loading: false,
 					error: null,
 					random: false,
+					contextMenu: null,
 				};
 			} catch (e) {
 				if (e instanceof Error)
@@ -169,6 +173,7 @@ class BoardKonfigurator extends React.Component<
 				loading: false,
 				error: null,
 				random: false,
+				contextMenu: null,
 			};
 		} else {
 			this.state = BoardKonfigurator.defaultState;
@@ -200,6 +205,8 @@ class BoardKonfigurator extends React.Component<
 		this.abortBackToHomeScreen = this.abortBackToHomeScreen.bind(this);
 		this.openBoardConfig = this.openBoardConfig.bind(this);
 		this.saveBoardConfig = this.saveBoardConfig.bind(this);
+
+		this.handleBoardOnSelect = this.handleBoardOnSelect.bind(this);
 
 		Mousetrap.bind(['command+1', 'ctrl+1'], () => {
 			this.setState({ openTab: 'global' });
@@ -261,6 +268,10 @@ class BoardKonfigurator extends React.Component<
 		this.setState({
 			openTab: 'presets',
 		});
+		this.reloadPresets();
+	};
+
+	reloadPresets = () => {
 		window.electron.load
 			.presets()
 			.then((presets) => {
@@ -332,8 +343,17 @@ class BoardKonfigurator extends React.Component<
 	};
 
 	render = () => {
-		const { openTab, config, board, leave, os, loading, error, random } =
-			this.state;
+		const {
+			openTab,
+			config,
+			board,
+			leave,
+			os,
+			loading,
+			error,
+			random,
+			contextMenu,
+		} = this.state;
 		if (board.length < 1) {
 			const newBoard: Array<Array<FieldWithPositionInterface>> = [];
 			const { height, width } = config;
@@ -518,6 +538,7 @@ class BoardKonfigurator extends React.Component<
 					{this.rightSidebar()}
 				</div>
 				{popup}
+				{contextMenu}
 			</div>
 		);
 	};
@@ -662,11 +683,20 @@ class BoardKonfigurator extends React.Component<
 		const presetsElements: Array<JSX.Element> = [];
 		const { presets } = this.state;
 		presets.forEach((preset) => {
-			const id = _uniqueId('preset-element-');
 			presetsElements.push(
-				<div key={id} className={this.draggableItemClass}>
-					{preset.name}
-				</div>
+				<CRiverPreset
+					preset={preset}
+					className={this.draggableItemClass}
+					onContextMenu={(contextMenu) => {
+						this.setState({ contextMenu });
+						document.addEventListener('click', () => {
+							this.setState({ contextMenu: null });
+						});
+					}}
+					onUpdate={() => {
+						this.reloadPresets();
+					}}
+				/>
 			);
 		});
 		return (
@@ -706,7 +736,7 @@ class BoardKonfigurator extends React.Component<
 	};
 
 	onCheckpointSortUpdate: (checkpoints: Checkpoint[]) => void = (check) => {
-		const { board, config } = this.state;
+		const { board } = this.state;
 		for (let i = 0; i < check.length; i += 1) {
 			const checkpoint = check[i];
 			board[checkpoint.position.y][checkpoint.position.x] =
@@ -935,6 +965,33 @@ class BoardKonfigurator extends React.Component<
 		}
 	};
 
+	handleBoardOnSelect = (position: BoardPosition | null): boolean => {
+		const { board } = this.state;
+		if (position) {
+			const { currentTool } = this.state;
+			const field = board[position.y][position.x];
+			if (currentTool === 'delete' && !(field instanceof Grass)) {
+				board[position.y][position.x] = new Grass(position);
+
+				this.setState(
+					{
+						board,
+						selected: null,
+					},
+					() => {
+						this.updateCheckpointArray();
+						this.updateConfig();
+					}
+				);
+				return false;
+			}
+			this.setState({ selected: position });
+		} else {
+			this.setState({ selected: null });
+		}
+		return true;
+	};
+
 	board = () => {
 		const { config, board, selected } = this.state;
 		const nConfig = BoardGenerator.updateBoardConfigFromBoardArray(
@@ -996,34 +1053,7 @@ class BoardKonfigurator extends React.Component<
 				config={nConfig}
 				board={board}
 				selected={selected}
-				onSelect={(position) => {
-					if (position) {
-						const { currentTool } = this.state;
-						const field = board[position.y][position.x];
-						if (
-							currentTool === 'delete' &&
-							!(field instanceof Grass)
-						) {
-							board[position.y][position.x] = new Grass(position);
-
-							this.setState(
-								{
-									board,
-									selected: null,
-								},
-								() => {
-									this.updateCheckpointArray();
-									this.updateConfig();
-								}
-							);
-							return false;
-						}
-						this.setState({ selected: position });
-					} else {
-						this.setState({ selected: null });
-					}
-					return true;
-				}}
+				onSelect={this.handleBoardOnSelect}
 				onDrop={this.handleBoardOnDrop}
 			/>
 		);

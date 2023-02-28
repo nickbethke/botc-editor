@@ -21,6 +21,7 @@ type AppStates = {
 		| false;
 	toLoad: object | null;
 	generator: BoardGenerator | null;
+	version: string;
 };
 
 class App extends React.Component<unknown, AppStates> {
@@ -31,6 +32,7 @@ class App extends React.Component<unknown, AppStates> {
 			openPopup: false,
 			toLoad: null,
 			generator: null,
+			version: '',
 		};
 		this.handleOpenBoardEditorChoice =
 			this.handleOpenBoardEditorChoice.bind(this);
@@ -38,6 +40,7 @@ class App extends React.Component<unknown, AppStates> {
 			this.handleOpenPartieEditorChoice.bind(this);
 		this.handleCloseApp = this.handleCloseApp.bind(this);
 		this.handleOpenValidator = this.handleOpenValidator.bind(this);
+		this.handleCloseChildScreen = this.handleCloseChildScreen.bind(this);
 
 		Mousetrap.bind(['command+b', 'ctrl+b'], () => {
 			this.setState({ openPopup: 'boardEditorChoice' });
@@ -53,6 +56,15 @@ class App extends React.Component<unknown, AppStates> {
 				this.setState({ openPopup: false });
 			}
 		});
+		window.electron.app
+			.getVersion()
+			.then((version) => {
+				this.setState({ version });
+				return null;
+			})
+			.catch(() => {
+				this.setState({ version: '0.0.1' });
+			});
 	}
 
 	handleOpenBoardEditorChoice = () => {
@@ -69,6 +81,10 @@ class App extends React.Component<unknown, AppStates> {
 
 	handleOpenValidator = () => {
 		this.setState({ openScreen: 'validator' });
+	};
+
+	handleCloseChildScreen = () => {
+		this.setState({ openScreen: 'home', openPopup: false });
 	};
 
 	render = () => {
@@ -94,14 +110,19 @@ class App extends React.Component<unknown, AppStates> {
 	partieConfigScreen = () => {
 		const { openScreen } = this.state;
 		if (openScreen === 'partieConfigNewScreen') {
-			return <PartieKonfigurator App={this} loadedValues={null} />;
+			return (
+				<PartieKonfigurator
+					onClose={this.handleCloseChildScreen}
+					loadedValues={null}
+				/>
+			);
 		}
 		if (openScreen === 'partieConfigLoadScreen') {
 			const { toLoad } = this.state;
 			this.setState({ toLoad: null });
 			return (
 				<PartieKonfigurator
-					App={this}
+					onClose={this.handleCloseChildScreen}
 					loadedValues={toLoad as PartieConfigInterface}
 				/>
 			);
@@ -112,20 +133,12 @@ class App extends React.Component<unknown, AppStates> {
 	boardConfigScreen = (generator: BoardGenerator | null = null) => {
 		const { openScreen, toLoad } = this.state;
 		if (openScreen === 'boardConfigNewScreen') {
-			return (
-				<BoardKonfigurator
-					onClose={() => {
-						this.setState({ openScreen: 'home', openPopup: false });
-					}}
-				/>
-			);
+			return <BoardKonfigurator onClose={this.handleCloseChildScreen} />;
 		}
 		if (openScreen === 'boardConfigLoadScreen') {
 			return (
 				<BoardKonfigurator
-					onClose={() => {
-						this.setState({ openScreen: 'home', openPopup: false });
-					}}
+					onClose={this.handleCloseChildScreen}
 					json={toLoad as BoardConfigInterface}
 				/>
 			);
@@ -136,9 +149,7 @@ class App extends React.Component<unknown, AppStates> {
 		) {
 			return (
 				<BoardKonfigurator
-					onClose={() => {
-						this.setState({ openScreen: 'home', openPopup: false });
-					}}
+					onClose={this.handleCloseChildScreen}
 					generator={generator}
 				/>
 			);
@@ -149,19 +160,13 @@ class App extends React.Component<unknown, AppStates> {
 	validatorScreen = () => {
 		const { openScreen } = this.state;
 		if (openScreen === 'validator') {
-			return (
-				<JSONValidierer
-					onClose={() => {
-						this.setState({ openScreen: 'home', openPopup: false });
-					}}
-				/>
-			);
+			return <JSONValidierer onClose={this.handleCloseChildScreen} />;
 		}
 		return null;
 	};
 
 	homeScreen() {
-		const { openPopup } = this.state;
+		const { openPopup, version } = this.state;
 		let popup: JSX.Element | string = '';
 		if (openPopup === 'boardEditorChoice') {
 			popup = (
@@ -232,46 +237,55 @@ class App extends React.Component<unknown, AppStates> {
 				<div id="home" className={popup ? 'blur' : ''}>
 					<div id="homeScreenBG" />
 					<div className="dragger absolute top-0 left-0 w-[100vw] h-8" />
-					<div className="flex flex-col py-8 px-12 justify-between h-[100vh] w-[50vw]">
-						<div>
-							<div className="text-4xl 2xl:text-6xl">
-								Battle of the Centerländ
+					<div className="h-[100vh] w-[50vw] flex flex-col">
+						<div className="flex flex-col py-8 px-12 justify-between grow">
+							<div>
+								<div className="text-4xl 2xl:text-6xl">
+									Battle of the Centerländ
+								</div>
+								<div className="text-2xl 2xl:text-4xl">
+									Editor
+								</div>
 							</div>
-							<div className="text-2xl 2xl:text-4xl">Editor</div>
+							<div className="flex flex-col gap-4">
+								<button
+									tabIndex={tabIndex}
+									type="button"
+									className="text-2xl clickable"
+									onClick={this.handleOpenBoardEditorChoice}
+								>
+									Board-Konfigurator
+								</button>
+								<button
+									tabIndex={tabIndex}
+									type="button"
+									className="text-2xl clickable"
+									onClick={this.handleOpenPartieEditorChoice}
+								>
+									Partie-Konfigurator
+								</button>
+								<button
+									tabIndex={tabIndex}
+									type="button"
+									className="text-2xl clickable"
+									onClick={this.handleOpenValidator}
+								>
+									Validierer
+								</button>
+								<button
+									tabIndex={tabIndex}
+									type="button"
+									className="text-2xl clickable mt-8 flex gap-4"
+									onClick={this.handleCloseApp}
+								>
+									Beenden
+								</button>
+							</div>
 						</div>
-						<div className="flex flex-col gap-4">
-							<button
-								tabIndex={tabIndex}
-								type="button"
-								className="text-2xl clickable"
-								onClick={this.handleOpenBoardEditorChoice}
-							>
-								Board-Konfigurator
-							</button>
-							<button
-								tabIndex={tabIndex}
-								type="button"
-								className="text-2xl clickable"
-								onClick={this.handleOpenPartieEditorChoice}
-							>
-								Partie-Konfigurator
-							</button>
-							<button
-								tabIndex={tabIndex}
-								type="button"
-								className="text-2xl clickable"
-								onClick={this.handleOpenValidator}
-							>
-								Validierer
-							</button>
-							<button
-								tabIndex={tabIndex}
-								type="button"
-								className="text-2xl clickable mt-8 flex gap-4"
-								onClick={this.handleCloseApp}
-							>
-								Beenden
-							</button>
+						<div className="bg-white/10 py-0.5 px-2  w-full font-jetbrains text-right">
+							<span className="text-[10px]">
+								Editor Version: {version}
+							</span>
 						</div>
 					</div>
 				</div>

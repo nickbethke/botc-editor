@@ -1,7 +1,6 @@
 import React from 'react';
 import { BiChevronLeft } from 'react-icons/bi';
 import backgroundImage from '../../../assets/images/bg-color-III.jpg';
-import App from '../App';
 import InputLabel from '../components/InputLabel';
 import Notification from '../components/Notification';
 import Error from '../components/Error';
@@ -11,7 +10,7 @@ import ConfirmPopup from '../components/popups/ConfirmPopup';
 import PartieConfigInterface from '../components/interfaces/PartieConfigInterface';
 
 type PartieKonfiguratorProps = {
-	App: App;
+	onClose: () => void;
 	loadedValues: PartieConfigInterface | null;
 };
 type PartieKonfiguratorState = {
@@ -53,9 +52,8 @@ class PartieKonfigurator extends React.Component<
 	};
 
 	backToHomeScreen = () => {
-		// eslint-disable-next-line @typescript-eslint/no-shadow
-		const { App } = this.props;
-		App.setState({ openScreen: 'home', openPopup: false });
+		const { onClose } = this.props;
+		onClose();
 	};
 
 	abortBackToHomeScreen = () => {

@@ -1,7 +1,8 @@
-import { app, dialog } from 'electron';
+import { app, dialog, shell } from 'electron';
 import fs from 'fs';
 import Ajv, { JSONSchemaType } from 'ajv';
 import * as os from 'os';
+import path from 'path';
 import * as PartieConfigSchema from '../../schema/partieConfigSchema.json';
 import * as BoardConfigSchema from '../../schema/boardConfigSchema.json';
 import PresetsLoader, { RiverPreset } from './PresetsLoader';
@@ -129,6 +130,15 @@ class IPCHelper {
 	static getOS = (): NodeJS.Platform => {
 		return os.platform();
 	};
+
+	static openFile(file: string) {
+		shell.openPath(file).catch(console.log);
+	}
+
+	static openDirectory(file: string) {
+		const { dir } = path.parse(file);
+		shell.openPath(dir).catch(console.log);
+	}
 }
 
 export default IPCHelper;

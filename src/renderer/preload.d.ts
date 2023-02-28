@@ -18,6 +18,10 @@ declare global {
 			load: {
 				presets(): Promise<Array<RiverPreset>>;
 			};
+			file: {
+				open(file: string): void;
+				openDir(file: string): void;
+			};
 			validate(
 				json: object,
 				type: 'partie' | 'board'
@@ -28,6 +32,7 @@ declare global {
 				isLinux(): Promise<boolean>;
 				isMac(): Promise<boolean>;
 				getOS(): Promise<NodeJS.Platform>;
+				getVersion(): Promise<string>;
 			};
 			ipcRenderer: {
 				on(

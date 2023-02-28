@@ -27,7 +27,6 @@ let mainWindow: BrowserWindow | null = null;
 
 ipcMain.on('ipc-example', async (event, arg) => {
 	const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
-	console.log(msgTemplate(arg));
 	event.reply('ipc-example', msgTemplate('pong'));
 });
 
@@ -183,6 +182,15 @@ app.whenReady()
 		});
 		ipcMain.handle('get:os', () => {
 			return IPCHelper.getOS();
+		});
+		ipcMain.handle('get:version', () => {
+			return app.getVersion();
+		});
+		ipcMain.handle('file:open', (event, ...args) => {
+			return IPCHelper.openFile(args[0]);
+		});
+		ipcMain.handle('file:openDir', (event, ...args) => {
+			return IPCHelper.openDirectory(args[0]);
 		});
 	})
 	.catch(console.log);
