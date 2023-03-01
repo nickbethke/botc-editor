@@ -144,7 +144,7 @@ app.whenReady()
 		createWindow();
 		app.on('activate', () => {
 			// On macOS, it's common to re-create a window in the app when the
-			// dock icon is clicked and there are no other windows open.
+			// dock icon is clicked and there are no other windows openExternal.
 			if (mainWindow === null) createWindow();
 		});
 
@@ -186,11 +186,14 @@ app.whenReady()
 		ipcMain.handle('get:version', () => {
 			return app.getVersion();
 		});
-		ipcMain.handle('file:open', (event, ...args) => {
+		ipcMain.handle('file:openExternal', (event, ...args) => {
 			return IPCHelper.openFile(args[0]);
 		});
 		ipcMain.handle('file:openDir', (event, ...args) => {
 			return IPCHelper.openDirectory(args[0]);
+		});
+		ipcMain.handle('file:save', (event, ...args) => {
+			return IPCHelper.saveFile(args[0], args[1]);
 		});
 	})
 	.catch(console.log);

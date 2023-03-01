@@ -1,4 +1,5 @@
 import { Channels } from 'main/preload';
+import { ParsedPath } from 'path';
 import { RiverPreset } from '../main/helper/PresetsLoader';
 import PartieConfigInterface from './components/interfaces/PartieConfigInterface';
 import BoardConfigInterface from './components/interfaces/BoardConfigInterface';
@@ -8,19 +9,37 @@ declare global {
 		electron: {
 			dialog: {
 				openConfig(): Promise<
-					PartieConfigInterface | BoardConfigInterface
+					| {
+							parsedPath: ParsedPath;
+							path: string;
+							config: BoardConfigInterface;
+					  }
+					| false
 				>;
 				openBoardConfig(): Promise<BoardConfigInterface>;
 				openPartieConfig(): Promise<PartieConfigInterface>;
-				savePartieConfig(json: string): Promise<boolean>;
-				saveBoardConfig(json: string): Promise<boolean>;
+				savePartieConfig(json: string): Promise<
+					| {
+							parsedPath: ParsedPath;
+							path: string;
+					  }
+					| false
+				>;
+				saveBoardConfig(json: string): Promise<
+					| {
+							parsedPath: ParsedPath;
+							path: string;
+					  }
+					| false
+				>;
 			};
 			load: {
 				presets(): Promise<Array<RiverPreset>>;
 			};
 			file: {
-				open(file: string): void;
+				openExternal(file: string): void;
 				openDir(file: string): void;
+				save(file: string, content: string): Promise<true | string>;
 			};
 			validate(
 				json: object,

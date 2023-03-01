@@ -35,7 +35,7 @@ class CRiverPreset extends React.Component<RiverPresetProps, RiverPresetState> {
 				<ContextMenuItem
 					text="Datei öffnen"
 					onClick={() => {
-						window.electron.file.open(preset.file);
+						window.electron.file.openExternal(preset.file);
 					}}
 				/>
 				<ContextMenuItem

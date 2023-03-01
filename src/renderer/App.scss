@@ -232,3 +232,12 @@ input {
 ::-webkit-scrollbar-thumb {
 	@apply bg-white/40;
 }
+
+.user-select,
+.user-select * {
+	user-select: text;
+}
+
+.no-user-select {
+	user-select: none;
+}

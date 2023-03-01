@@ -244,7 +244,7 @@ class BoardKonfiguratorBoard extends React.Component<
 						/>
 						<KeyCode
 							text="Validierungshilfe öffnen"
-							keyCodes={['Strg', 'F3']}
+							keyCodes={['Strg', 'F4']}
 						/>
 					</div>
 					<div className="flex flex-col mb-2 items-center 2xl:col-span-2">

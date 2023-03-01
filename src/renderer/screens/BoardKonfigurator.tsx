@@ -1,6 +1,5 @@
 import React from 'react';
 import { BsFillCursorFill, BsFillTrashFill } from 'react-icons/bs';
-import _uniqueId from 'lodash/uniqueId';
 import Mousetrap from 'mousetrap';
 import { ProgressBar } from 'react-loader-spinner';
 import CRiverPreset from 'renderer/components/board/RiverPreset';

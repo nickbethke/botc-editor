@@ -2,7 +2,7 @@ import { app, dialog, shell } from 'electron';
 import fs from 'fs';
 import Ajv, { JSONSchemaType } from 'ajv';
 import * as os from 'os';
-import path from 'path';
+import path, { ParsedPath } from 'path';
 import * as PartieConfigSchema from '../../schema/partieConfigSchema.json';
 import * as BoardConfigSchema from '../../schema/boardConfigSchema.json';
 import PresetsLoader, { RiverPreset } from './PresetsLoader';
@@ -10,7 +10,15 @@ import PartieConfigInterface from '../../renderer/components/interfaces/PartieCo
 import BoardConfigInterface from '../../renderer/components/interfaces/BoardConfigInterface';
 
 class IPCHelper {
-	static handleSavePartieConfig = async (json: string): Promise<boolean> => {
+	static handleSavePartieConfig = async (
+		json: string
+	): Promise<
+		| {
+				parsedPath: ParsedPath;
+				path: string;
+		  }
+		| false
+	> => {
 		const { canceled, filePath } = await dialog.showSaveDialog({
 			title: 'Partie-Konfiguration speichern',
 			filters: [{ name: 'Partie-Konfig', extensions: ['json'] }],
@@ -20,12 +28,20 @@ class IPCHelper {
 		}
 		if (filePath) {
 			fs.writeFileSync(filePath, json, { encoding: 'utf8', flag: 'w' });
-			return true;
+			return {
+				parsedPath: path.parse(filePath),
+				path: filePath,
+			};
 		}
 		return false;
 	};
 
-	static handleFileOpen = async (type = ''): Promise<boolean | object> => {
+	static handleFileOpen = async (
+		type = ''
+	): Promise<
+		| { parsedPath: ParsedPath; path: string; config: BoardConfigInterface }
+		| false
+	> => {
 		if (type === 'board') {
 			const { canceled, filePaths } = await dialog.showOpenDialog({
 				title: 'Board-Konfiguration auswählen',
@@ -35,9 +51,14 @@ class IPCHelper {
 			if (canceled) {
 				return false;
 			}
-			return JSON.parse(
+			const config = JSON.parse(
 				fs.readFileSync(filePaths[0], { encoding: 'utf8' })
-			);
+			) as BoardConfigInterface;
+			return {
+				config,
+				parsedPath: path.parse(filePaths[0]),
+				path: filePaths[0],
+			};
 		}
 		if (type === 'partie') {
 			const { canceled, filePaths } = await dialog.showOpenDialog({
@@ -48,9 +69,14 @@ class IPCHelper {
 			if (canceled) {
 				return false;
 			}
-			return JSON.parse(
+			const config = JSON.parse(
 				fs.readFileSync(filePaths[0], { encoding: 'utf8' })
-			);
+			) as BoardConfigInterface;
+			return {
+				config,
+				parsedPath: path.parse(filePaths[0]),
+				path: filePaths[0],
+			};
 		}
 		if (type === '') {
 			const { canceled, filePaths } = await dialog.showOpenDialog({
@@ -64,9 +90,15 @@ class IPCHelper {
 			if (canceled) {
 				return false;
 			}
-			return JSON.parse(
+			const config = JSON.parse(
 				fs.readFileSync(filePaths[0], { encoding: 'utf8' })
-			);
+			) as BoardConfigInterface;
+
+			return {
+				config,
+				parsedPath: path.parse(filePaths[0]),
+				path: filePaths[0],
+			};
 		}
 		return false;
 	};
@@ -107,7 +139,15 @@ class IPCHelper {
 		}
 	};
 
-	static handleSaveBoardConfig = async (json: string): Promise<boolean> => {
+	static handleSaveBoardConfig = async (
+		json: string
+	): Promise<
+		| {
+				parsedPath: ParsedPath;
+				path: string;
+		  }
+		| false
+	> => {
 		const { canceled, filePath } = await dialog.showSaveDialog({
 			title: 'Board-Konfiguration speichern',
 			filters: [{ name: 'Board-Konfig', extensions: ['json'] }],
@@ -117,7 +157,10 @@ class IPCHelper {
 		}
 		if (filePath) {
 			fs.writeFileSync(filePath, json, { encoding: 'utf8', flag: 'w' });
-			return true;
+			return {
+				parsedPath: path.parse(filePath),
+				path: filePath,
+			};
 		}
 		return false;
 	};
@@ -138,6 +181,14 @@ class IPCHelper {
 	static openDirectory(file: string) {
 		const { dir } = path.parse(file);
 		shell.openPath(dir).catch(console.log);
+	}
+
+	static saveFile(file: string, content: string) {
+		if (fs.existsSync(file)) {
+			fs.writeFileSync(file, content, { encoding: 'utf8', flag: 'w' });
+			return true;
+		}
+		return 'File does not exits';
 	}
 }
 

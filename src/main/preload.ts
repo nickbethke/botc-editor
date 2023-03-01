@@ -1,4 +1,6 @@
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
+import { ParsedPath } from 'path';
+import BoardConfigInterface from '../renderer/components/interfaces/BoardConfigInterface';
 
 export type Channels = 'ipc-example';
 
@@ -23,7 +25,14 @@ contextBridge.exposeInMainWorld('electron', {
 		return ipcRenderer.invoke('validate:json', json, type);
 	},
 	dialog: {
-		openConfig: () => {
+		openConfig: (): Promise<
+			| {
+					parsedPath: ParsedPath;
+					path: string;
+					config: BoardConfigInterface;
+			  }
+			| false
+		> => {
 			return ipcRenderer.invoke('dialog:openConfig');
 		},
 		openBoardConfig: () => {
@@ -32,10 +41,26 @@ contextBridge.exposeInMainWorld('electron', {
 		openPartieConfig: () => {
 			return ipcRenderer.invoke('dialog:openPartieConfig');
 		},
-		savePartieConfig: (json: string) => {
+		savePartieConfig: (
+			json: string
+		): Promise<
+			| {
+					parsedPath: ParsedPath;
+					path: string;
+			  }
+			| false
+		> => {
 			return ipcRenderer.invoke('dialog:savePartieConfig', json);
 		},
-		saveBoardConfig: (json: string) => {
+		saveBoardConfig: (
+			json: string
+		): Promise<
+			| {
+					parsedPath: ParsedPath;
+					path: string;
+			  }
+			| false
+		> => {
 			return ipcRenderer.invoke('dialog:saveBoardConfig', json);
 		},
 	},
@@ -65,11 +90,14 @@ contextBridge.exposeInMainWorld('electron', {
 		},
 	},
 	file: {
-		open(file: string) {
-			return ipcRenderer.invoke('file:open', file);
+		openExternal(file: string) {
+			return ipcRenderer.invoke('file:openExternal', file);
 		},
 		openDir(file: string) {
 			return ipcRenderer.invoke('file:openDir', file);
+		},
+		save(file: string, content: string): Promise<true | string> {
+			return ipcRenderer.invoke('file:save', file, content);
 		},
 	},
 });

@@ -1,11 +1,17 @@
 import React, { ReactElement } from 'react';
 import { BiChevronLeft } from 'react-icons/bi';
-import { AiFillFolderOpen } from 'react-icons/ai';
 import MonacoEditor, { monaco } from 'react-monaco-editor';
-import { HiSaveAs } from 'react-icons/hi';
 import Mousetrap from 'mousetrap';
 import { DefinedError } from 'ajv';
+import { ParsedPath } from 'path';
+import { VscFile, VscNewFile, VscSave } from 'react-icons/vsc';
+import { ProgressBar } from 'react-loader-spinner';
 import ConfirmPopup from '../components/popups/ConfirmPopup';
+import BoardConfigValidator from '../helper/BoardConfigValidator';
+import BoardConfigInterface from '../components/interfaces/BoardConfigInterface';
+import Popup from '../components/popups/Popup';
+import PartieConfigValidator from '../helper/PartieConfigValidator';
+import PartieConfigInterface from '../components/interfaces/PartieConfigInterface';
 import KeyCode = monaco.KeyCode;
 import KeyMod = monaco.KeyMod;
 
@@ -18,7 +24,9 @@ type JSONValidatorState = {
 	codeError: string;
 	type: 'board' | 'partie';
 	window: { width: number; height: number };
-	consoleOutput: string;
+	consoleOutput: string[];
+	currentFile: { parsed: ParsedPath; path: string } | null;
+	fileHasBeenEdited: boolean;
 };
 
 class JSONValidierer extends React.Component<
@@ -33,6 +41,7 @@ class JSONValidierer extends React.Component<
 		this.openFile = this.openFile.bind(this);
 		this.saveFile = this.saveFile.bind(this);
 		this.changeType = this.changeType.bind(this);
+		this.openNewFile = this.openNewFile.bind(this);
 
 		this.state = {
 			code: JSON.stringify({}, null, 4),
@@ -40,7 +49,9 @@ class JSONValidierer extends React.Component<
 			popup: null,
 			type: 'partie',
 			window: { width: window.innerWidth, height: window.innerHeight },
-			consoleOutput: '',
+			consoleOutput: [],
+			currentFile: null,
+			fileHasBeenEdited: false,
 		};
 
 		Mousetrap.bind(['command+s', 'ctrl+s'], () => {
@@ -88,7 +99,7 @@ class JSONValidierer extends React.Component<
 	};
 
 	abortBackToHomeScreen = () => {
-		this.setState({ popup: this.leavePopup() });
+		this.setState({ popup: null });
 	};
 
 	onChange = async (newValue: string) => {
@@ -98,14 +109,30 @@ class JSONValidierer extends React.Component<
 				JSON.parse(newValue),
 				type
 			);
-			if (typeof valid === 'string') {
-				this.setState({ codeError: valid, consoleOutput: '' });
+			let validator;
+			if (type === 'board') {
+				validator = new BoardConfigValidator(
+					JSON.parse(newValue) as BoardConfigInterface
+				);
 			} else {
-				this.setState({ codeError: '', consoleOutput: '' });
+				validator = new PartieConfigValidator(
+					JSON.parse(newValue) as PartieConfigInterface
+				);
+			}
+			if (typeof valid === 'string') {
+				this.setState({
+					codeError: valid,
+					consoleOutput: [...validator.errors],
+				});
+			} else {
+				this.setState({
+					codeError: '',
+					consoleOutput: [...validator.errors],
+				});
 			}
 		} catch (error) {
 			if (error instanceof Error)
-				this.setState({ consoleOutput: `${error.message}` });
+				this.setState({ consoleOutput: [...[`${error.message}`]] });
 		}
 		this.setState({ code: newValue });
 	};
@@ -120,16 +147,54 @@ class JSONValidierer extends React.Component<
 		);
 	};
 
+	loadingPopup = (): JSX.Element => {
+		return (
+			<Popup
+				label="Konfiguration öffnen"
+				content={
+					<ProgressBar
+						wrapperClass="text-center mx-auto justify-center"
+						borderColor="#ffffff"
+						barColor="#71C294"
+						width="80"
+					/>
+				}
+				onClose={() => {}}
+			/>
+		);
+	};
+
+	// Todo: Ungespeicherte Änderungen verwerfen?
+	openNewFile = () => {
+		this.setState(
+			{
+				currentFile: null,
+				fileHasBeenEdited: false,
+				code: '{}',
+			},
+			async () => {
+				const { code } = this.state;
+				await this.onChange(code);
+			}
+		);
+	};
+
 	openFile = async () => {
-		const json = await window.electron.dialog.openConfig();
-		if (json) {
+		this.setState({ popup: this.loadingPopup() });
+		const file = await window.electron.dialog.openConfig();
+		if (file) {
 			try {
 				this.setState(
 					{
 						codeError: '',
 						popup: null,
-						code: JSON.stringify(json, null, 4),
-						consoleOutput: '',
+						code: JSON.stringify(file.config, null, 4),
+						consoleOutput: [],
+						currentFile: {
+							parsed: file.parsedPath,
+							path: file.path,
+						},
+						fileHasBeenEdited: false,
 					},
 					async () => {
 						const { code } = this.state;
@@ -138,35 +203,60 @@ class JSONValidierer extends React.Component<
 				);
 			} catch (error) {
 				if (error instanceof Error)
-					this.setState({ consoleOutput: error.message });
+					this.setState({ consoleOutput: [...[error.message]] });
 			}
 		}
+		this.setState({ popup: null });
 	};
 
 	saveFile = async () => {
-		const { type, code } = this.state;
-		switch (type) {
-			case 'board':
-				await window.electron.dialog.saveBoardConfig(code);
-				break;
-			case 'partie':
-			default:
-				await window.electron.dialog.savePartieConfig(code);
-				break;
+		const { type, code, currentFile } = this.state;
+		if (currentFile) {
+			await window.electron.file.save(currentFile.path, code);
+		} else {
+			let save;
+			switch (type) {
+				case 'board':
+					save = await window.electron.dialog.saveBoardConfig(code);
+					if (save) {
+						this.setState({
+							currentFile: {
+								parsed: save.parsedPath,
+								path: save.path,
+							},
+							fileHasBeenEdited: false,
+						});
+					}
+					break;
+				case 'partie':
+				default:
+					save = await window.electron.dialog.savePartieConfig(code);
+					if (save) {
+						this.setState({
+							currentFile: {
+								parsed: save.parsedPath,
+								path: save.path,
+							},
+							fileHasBeenEdited: false,
+						});
+					}
+					break;
+			}
 		}
+		this.setState({ fileHasBeenEdited: false });
 	};
 
 	changeType = async (e: React.ChangeEvent<HTMLSelectElement>) => {
 		switch (e.target.value) {
 			case 'board':
-				this.setState({ type: 'board', code: '{}' }, async () => {
+				this.setState({ type: 'board' }, async () => {
 					const { code } = this.state;
 					await this.onChange(code);
 				});
 				break;
 			case 'partie':
 			default:
-				this.setState({ type: 'partie', code: '{}' }, async () => {
+				this.setState({ type: 'partie' }, async () => {
 					const { code } = this.state;
 					await this.onChange(code);
 				});
@@ -174,8 +264,16 @@ class JSONValidierer extends React.Component<
 	};
 
 	render = () => {
-		const { popup, type, code, codeError, window, consoleOutput } =
-			this.state;
+		const {
+			popup,
+			type,
+			code,
+			codeError,
+			window,
+			consoleOutput,
+			currentFile,
+			fileHasBeenEdited,
+		} = this.state;
 		const errorMsg = this.genErrorMsg(codeError);
 
 		return (
@@ -193,20 +291,40 @@ class JSONValidierer extends React.Component<
 							</div>
 						</div>
 					</div>
-					<div className="flex text-white bg-background-900 border-b font-lato">
+					<div className="flex text-white bg-background-900 border-y font-lato overflow-hidden">
+						<button
+							type="button"
+							className="bg-accent-500/25 hover:bg-accent-500 text-lg p-2 flex flex-row justify-center items-center gap-2 border-r"
+							onClick={this.openNewFile}
+						>
+							<VscNewFile /> Neu
+						</button>
+						{currentFile ? (
+							<div
+								className={currentFile ? 'border-r h-full' : ''}
+							>
+								<span
+									className="text-lg p-2 h-full font-jetbrains flex flex-row justify-center items-center"
+									title={currentFile?.path}
+								>
+									{currentFile?.parsed.base}
+									{fileHasBeenEdited ? ' *' : ''}
+								</span>
+							</div>
+						) : null}
 						<button
 							type="button"
 							className="bg-accent-500/25 hover:bg-accent-500 text-lg p-2 flex flex-row justify-center items-center gap-2 border-r"
 							onClick={this.openFile}
 						>
-							<AiFillFolderOpen /> Öffnen
+							<VscFile /> Öffnen
 						</button>
 						<button
 							type="button"
 							className="bg-accent-500/25 hover:bg-accent-500 text-lg p-2 flex flex-row justify-center items-center gap-2 border-r"
 							onClick={this.saveFile}
 						>
-							<HiSaveAs /> Speichern
+							<VscSave /> Speichern
 						</button>
 						<p className="bg-accent-500/10 text-lg p-2 flex flex-row justify-center items-center gap-2">
 							Type:
@@ -234,27 +352,38 @@ class JSONValidierer extends React.Component<
 								height={window.height - (149 + 280)}
 								width={window.width}
 								theme="vs-dark"
-								onChange={this.onChange}
+								onChange={async (value) => {
+									await this.onChange(value);
+									this.setState({ fileHasBeenEdited: true });
+								}}
 							/>
 						</div>
 						<div className="grid xl:grid-cols-4 grid-cols-2">
 							<div className="w-full h-[280px] max-h-[280px] flex flex-col font-jetbrains border-r xl:col-span-3">
 								<div className="text-white flex flex-col justify-center border-b p-2">
-									<div className="text-xl pl-4">Errors</div>
+									<div className="text-xl pl-4">
+										JSON-Validation
+									</div>
 								</div>
-								<div className="w-full bg-white/25 text-white overflow-auto grow">
-									<div className="h-full max-h-full pl-6">
+								<div className="w-full bg-white/10 text-white overflow-auto grow">
+									<div className="h-full max-h-full pl-2 user-select">
 										{errorMsg}
 									</div>
 								</div>
 							</div>
 							<div className="w-full h-[280px] max-h-[280px] flex flex-col font-jetbrains border-r">
 								<div className="text-white flex flex-col justify-center border-b p-2">
-									<div className="text-xl pl-4">Konsole</div>
+									<div className="text-xl pl-4">Errors</div>
 								</div>
-								<div className="w-full text-white overflow-auto grow">
+								<div className="w-full text-white overflow-auto grow bg-white/10">
 									<div className="h-full max-h-full pl-6 pt-2">
-										<pre>{consoleOutput}</pre>
+										<pre className="user-select">
+											{consoleOutput.map((error) => (
+												<p className="text-red-500">
+													{error}
+												</p>
+											))}
+										</pre>
 									</div>
 								</div>
 							</div>
@@ -272,7 +401,7 @@ class JSONValidierer extends React.Component<
 			errorMsg[0] = null;
 		} else if (codeError === 'validate') {
 			errorMsg[0] = (
-				<div className="pt-2">
+				<div className="pt-1">
 					<span className="text-red-500">ERROR: </span>Code konnte
 					nicht validiert werden - kein valides JSON
 				</div>
@@ -283,27 +412,27 @@ class JSONValidierer extends React.Component<
 				JSON.parse(codeError).forEach((e: DefinedError) => {
 					const instancePath =
 						e.instancePath !== '' ? (
-							<p className="font-black text-red-500 pt-2">
+							<p className="font-black text-red-500 pt-1">
 								{`${e.instancePath}`}&nbsp;
 							</p>
 						) : null;
 					errorMsg[i] = (
 						<div className="flex fex-cols" key={i}>
-							<p className="mr-2 pr-4 border-r pt-2">
+							<p className="mr-2 pr-2 border-r pt-1 no-user-select">
 								{i + 1 < 10 ? `0${i + 1}` : i + 1}
 							</p>
-							<p className="font-black pt-2">
+							<p className="font-black pt-1">
 								{`${e.keyword.toUpperCase()}:`}&nbsp;
 							</p>
 							{instancePath}
-							<p className="pt-2">{e.message}</p>
+							<p className="pt-1">{e.message}</p>
 						</div>
 					);
 					i += 1;
 				});
 			} catch (error) {
 				if (error instanceof Error)
-					this.setState({ consoleOutput: error.message });
+					this.setState({ consoleOutput: [...[error.message]] });
 			}
 		}
 		return errorMsg;
