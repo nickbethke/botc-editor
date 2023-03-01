@@ -74,7 +74,9 @@ class PartieKonfigurator extends React.Component<
 	openLoadPartieConfig = async () => {
 		const partieJSON = await window.electron.dialog.openPartieConfig();
 		if (partieJSON) {
-			this.setState({ values: partieJSON });
+			this.setState({
+				values: { ...partieJSON.config },
+			});
 			this.notification = <Notification label="Erfolgreich geladen" />;
 		} else {
 			this.notification = (
@@ -89,7 +91,7 @@ class PartieKonfigurator extends React.Component<
 		const { loadedValues } = this.props;
 
 		if (loadedValues) {
-			values = loadedValues;
+			values = { ...this.default, ...loadedValues };
 			this.setState({ values });
 			this.notification = <Notification label="Erfolgreich geladen" />;
 		}
@@ -132,6 +134,7 @@ class PartieKonfigurator extends React.Component<
 									label="Maximale Rundenanzahl"
 									type="number"
 									min={-1}
+									max={200}
 									value={values.maxRounds}
 									validator={
 										new InputValidator(
@@ -140,11 +143,12 @@ class PartieKonfigurator extends React.Component<
 												number: {
 													ifSmallerThen: {
 														number: 3,
-														error: 'Unpassende Rundenanzahl. Das Spiel wäre sehr schnell vorbei!',
+														error: 'Ungünstige Rundenanzahl. Das Spiel wäre sehr schnell vorbei!',
+														except: -1,
 													},
 													ifBiggerThen: {
-														number: 1000,
-														error: 'Unpassende Rundenanzahl. Das Spiel würde sehr lange dauern!',
+														number: 50,
+														error: 'Ungünstige Rundenanzahl. Das Spiel würde sehr lange dauern!',
 													},
 												},
 											}
@@ -165,7 +169,7 @@ class PartieKonfigurator extends React.Component<
 							</div>
 							<div>
 								<InputLabel
-									label="Start LembasField"
+									label="Start Lembas"
 									type="number"
 									value={values.startLembas}
 									validator={
@@ -175,7 +179,8 @@ class PartieKonfigurator extends React.Component<
 												number: {
 													ifSmallerThen: {
 														number: 5,
-														error: 'Unpassende Start LembasField-Anzahl!',
+														error: 'Ungünstige Start LembasField-Anzahl!',
+														except: -1,
 													},
 												},
 											}
@@ -197,7 +202,7 @@ class PartieKonfigurator extends React.Component<
 						<div className="grid grid-cols-2 gap-8">
 							<div>
 								<InputLabel
-									label="Schuss LembasField"
+									label="Schuss Lembas"
 									type="number"
 									onChange={(value) => {
 										this.setState({
@@ -255,6 +260,8 @@ class PartieKonfigurator extends React.Component<
 									label="TimeOut für Charakterauswahl"
 									type="number"
 									helperText="in ms"
+									min={0}
+									max={10 ** 6}
 									onChange={(value) => {
 										this.setState({
 											values: {
@@ -276,6 +283,8 @@ class PartieKonfigurator extends React.Component<
 									label="TimeOut für Kartenauswahl"
 									type="number"
 									helperText="in ms"
+									min={0}
+									max={10 ** 6}
 									onChange={(value) => {
 										this.setState({
 											values: {
@@ -295,6 +304,8 @@ class PartieKonfigurator extends React.Component<
 									label="Server-Ingame-Delay"
 									type="number"
 									helperText="in ms"
+									min={0}
+									max={10 ** 6}
 									onChange={(value) => {
 										this.setState({
 											values: {

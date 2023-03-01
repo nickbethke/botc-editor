@@ -16,8 +16,22 @@ declare global {
 					  }
 					| false
 				>;
-				openBoardConfig(): Promise<BoardConfigInterface>;
-				openPartieConfig(): Promise<PartieConfigInterface>;
+				openBoardConfig(): Promise<
+					| {
+							parsedPath: ParsedPath;
+							path: string;
+							config: BoardConfigInterface;
+					  }
+					| false
+				>;
+				openPartieConfig(): Promise<
+					| {
+							parsedPath: ParsedPath;
+							path: string;
+							config: PartieConfigInterface;
+					  }
+					| false
+				>;
 				savePartieConfig(json: string): Promise<
 					| {
 							parsedPath: ParsedPath;

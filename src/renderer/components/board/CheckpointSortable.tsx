@@ -13,11 +13,11 @@ const CheckpointSortable = (props: {
 	const [items, setItems] = useState(checkpoints);
 	const ref = React.createRef<HTMLDivElement>();
 
-	const arrayMoveMutable = (
-		array: any[],
+	function arrayMoveMutable<T>(
+		array: T[],
 		fromIndex: number,
 		toIndex: number
-	) => {
+	) {
 		const startIndex = fromIndex < 0 ? array.length + fromIndex : fromIndex;
 
 		if (startIndex >= 0 && startIndex < array.length) {
@@ -26,17 +26,17 @@ const CheckpointSortable = (props: {
 			const [item] = array.splice(fromIndex, 1);
 			array.splice(endIndex, 0, item);
 		}
-	};
+	}
 
-	const arrayMoveImmutable = (
-		array: any[],
+	function arrayMoveImmutable<T>(
+		array: T[],
 		fromIndex: number,
 		toIndex: number
-	) => {
+	): T[] {
 		const nArray = [...array];
 		arrayMoveMutable(nArray, fromIndex, toIndex);
 		return nArray;
-	};
+	}
 
 	const onSortEnd = (oldIndex: number, newIndex: number) => {
 		const newCheckpointOrder = arrayMoveImmutable(
@@ -75,7 +75,7 @@ const CheckpointSortable = (props: {
 					<SortableItem key={item.order}>
 						<div
 							role="presentation"
-							className="relative item border p-2 font-mono flex items-center gap-2 cursor-pointer bg-white/25"
+							className="relative item border p-1 font-mono flex items-center gap-2 cursor-pointer bg-white/25"
 							onDoubleClick={() => {
 								onSelect(item.position);
 							}}

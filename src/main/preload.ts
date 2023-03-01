@@ -1,6 +1,7 @@
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 import { ParsedPath } from 'path';
 import BoardConfigInterface from '../renderer/components/interfaces/BoardConfigInterface';
+import PartieConfigInterface from '../renderer/components/interfaces/PartieConfigInterface';
 
 export type Channels = 'ipc-example';
 
@@ -35,10 +36,24 @@ contextBridge.exposeInMainWorld('electron', {
 		> => {
 			return ipcRenderer.invoke('dialog:openConfig');
 		},
-		openBoardConfig: () => {
+		openBoardConfig: (): Promise<
+			| {
+					parsedPath: ParsedPath;
+					path: string;
+					config: BoardConfigInterface;
+			  }
+			| false
+		> => {
 			return ipcRenderer.invoke('dialog:openBoardConfig');
 		},
-		openPartieConfig: () => {
+		openPartieConfig: (): Promise<
+			| {
+					parsedPath: ParsedPath;
+					path: string;
+					config: PartieConfigInterface;
+			  }
+			| false
+		> => {
 			return ipcRenderer.invoke('dialog:openPartieConfig');
 		},
 		savePartieConfig: (

@@ -109,30 +109,49 @@ class JSONValidierer extends React.Component<
 				JSON.parse(newValue),
 				type
 			);
-			let validator;
-			if (type === 'board') {
-				validator = new BoardConfigValidator(
-					JSON.parse(newValue) as BoardConfigInterface
-				);
-			} else {
-				validator = new PartieConfigValidator(
-					JSON.parse(newValue) as PartieConfigInterface
-				);
-			}
 			if (typeof valid === 'string') {
 				this.setState({
 					codeError: valid,
-					consoleOutput: [...validator.errors],
 				});
 			} else {
 				this.setState({
 					codeError: '',
-					consoleOutput: [...validator.errors],
 				});
 			}
 		} catch (error) {
 			if (error instanceof Error)
 				this.setState({ consoleOutput: [...[`${error.message}`]] });
+		}
+		let validator;
+		if (type === 'board') {
+			try {
+				validator = new BoardConfigValidator(
+					JSON.parse(newValue) as BoardConfigInterface
+				);
+				this.setState({
+					consoleOutput: [...validator.errors],
+				});
+			} catch (error) {
+				if (error instanceof Error)
+					this.setState({
+						consoleOutput: [...[`${error.message}`]],
+					});
+			}
+		} else {
+			try {
+				validator = new PartieConfigValidator(
+					JSON.parse(newValue) as PartieConfigInterface
+				);
+				this.setState({
+					consoleOutput: [...validator.errors],
+				});
+			} catch (error) {
+				if (error instanceof Error) {
+					this.setState({
+						consoleOutput: [...[`${error.message}`]],
+					});
+				}
+			}
 		}
 		this.setState({ code: newValue });
 	};
@@ -147,10 +166,44 @@ class JSONValidierer extends React.Component<
 		);
 	};
 
-	loadingPopup = (): JSX.Element => {
+	newFileSavePreviousPopup = (): JSX.Element => {
+		const { currentFile } = this.state;
+		return (
+			<ConfirmPopup
+				label={`${currentFile?.parsed.base} speichern?`}
+				onConfirm={() => {
+					this.saveFile()
+						.then(() => {
+							this.setState({
+								popup: null,
+								currentFile: null,
+								fileHasBeenEdited: false,
+								code: '{}',
+							});
+							return false;
+						})
+						.catch((e) => {
+							if (e) console.log(e);
+						});
+				}}
+				onAbort={() => {
+					this.setState({
+						popup: null,
+						currentFile: null,
+						fileHasBeenEdited: false,
+						code: '{}',
+					});
+				}}
+				confirmText="Speichern"
+				abortText="Verwerfen"
+			/>
+		);
+	};
+
+	loadingPopup = (label?: string): JSX.Element => {
 		return (
 			<Popup
-				label="Konfiguration öffnen"
+				label={label || 'Konfiguration öffnen'}
 				content={
 					<ProgressBar
 						wrapperClass="text-center mx-auto justify-center"
@@ -159,24 +212,28 @@ class JSONValidierer extends React.Component<
 						width="80"
 					/>
 				}
-				onClose={() => {}}
+				closeButton={false}
 			/>
 		);
 	};
 
-	// Todo: Ungespeicherte Änderungen verwerfen?
 	openNewFile = () => {
-		this.setState(
-			{
-				currentFile: null,
-				fileHasBeenEdited: false,
-				code: '{}',
-			},
-			async () => {
-				const { code } = this.state;
-				await this.onChange(code);
-			}
-		);
+		const { currentFile, fileHasBeenEdited } = this.state;
+		if (currentFile && fileHasBeenEdited) {
+			this.setState({ popup: this.newFileSavePreviousPopup() });
+		} else {
+			this.setState(
+				{
+					currentFile: null,
+					fileHasBeenEdited: false,
+					code: '{}',
+				},
+				async () => {
+					const { code } = this.state;
+					await this.onChange(code);
+				}
+			);
+		}
 	};
 
 	openFile = async () => {
@@ -211,9 +268,13 @@ class JSONValidierer extends React.Component<
 
 	saveFile = async () => {
 		const { type, code, currentFile } = this.state;
+
 		if (currentFile) {
 			await window.electron.file.save(currentFile.path, code);
 		} else {
+			this.setState({
+				popup: this.loadingPopup('Konfiguration speichern'),
+			});
 			let save;
 			switch (type) {
 				case 'board':
@@ -243,7 +304,7 @@ class JSONValidierer extends React.Component<
 					break;
 			}
 		}
-		this.setState({ fileHasBeenEdited: false });
+		this.setState({ fileHasBeenEdited: false, popup: null });
 	};
 
 	changeType = async (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -326,8 +387,8 @@ class JSONValidierer extends React.Component<
 						>
 							<VscSave /> Speichern
 						</button>
-						<p className="bg-accent-500/10 text-lg p-2 flex flex-row justify-center items-center gap-2">
-							Type:
+						<p className="bg-accent-500/10 h-full text-lg p-2 flex flex-row justify-center items-center gap-2">
+							Type
 						</p>
 						<div className="border-r">
 							<select
@@ -342,6 +403,9 @@ class JSONValidierer extends React.Component<
 									Board Konfiguration
 								</option>
 							</select>
+						</div>
+						<div className="border-l ml-auto h-full text-sm p-2 flex flex-row justify-center items-center gap-2">
+							Version: 1.2.1
 						</div>
 					</div>
 					<div className="grow relative h-full">

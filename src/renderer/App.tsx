@@ -180,7 +180,7 @@ class App extends React.Component<unknown, AppStates> {
 						if (boardJSON) {
 							this.setState({
 								openScreen: 'boardConfigLoadScreen',
-								toLoad: boardJSON,
+								toLoad: boardJSON.config,
 							});
 						}
 					}}
@@ -224,7 +224,7 @@ class App extends React.Component<unknown, AppStates> {
 						if (partieJSON) {
 							this.setState({
 								openScreen: 'partieConfigLoadScreen',
-								toLoad: partieJSON,
+								toLoad: partieJSON.config,
 							});
 						}
 					}}

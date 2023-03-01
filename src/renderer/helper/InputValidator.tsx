@@ -13,6 +13,7 @@ type InputValidatorErrors = {
 		ifSmallerThen?: {
 			number: number;
 			error: string;
+			except?: number;
 		};
 	};
 	text?: {
@@ -90,15 +91,24 @@ class InputValidator {
 							this.errors.number.ifBiggerThen.error
 						);
 					}
-					if (
-						this.errors.number.ifSmallerThen &&
-						toNumber(value) <
+					if (this.errors.number.ifSmallerThen) {
+						if (this.errors.number.ifSmallerThen.except) {
+							if (
+								toNumber(value) ===
+								this.errors.number.ifSmallerThen.except
+							) {
+								break;
+							}
+						}
+						if (
+							toNumber(value) <
 							this.errors.number.ifSmallerThen.number
-					) {
-						answer.warning.has = true;
-						answer.warning.text.push(
-							this.errors.number.ifSmallerThen.error
-						);
+						) {
+							answer.warning.has = true;
+							answer.warning.text.push(
+								this.errors.number.ifSmallerThen.error
+							);
+						}
 					}
 				}
 				break;

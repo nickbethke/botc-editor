@@ -112,6 +112,7 @@ class BoardKonfigurator extends React.Component<
 		};
 	}
 
+	// TODO: Overflows überprüfen
 	constructor(props: BoardKonfiguratorProps) {
 		super(props);
 		const { generator, json } = this.props;
@@ -301,11 +302,11 @@ class BoardKonfigurator extends React.Component<
 				this.setState({
 					config: { ...BoardKonfigurator.default, ...boardJSON },
 					selected: null,
-					board: BoardGenerator.jsonToBoard(boardJSON),
+					board: BoardGenerator.jsonToBoard(boardJSON.config),
 					checkpoints:
 						BoardGenerator.checkpointsPositionArrayToCheckpointArray(
 							BoardGenerator.positionArrayToBoardPositionArray(
-								boardJSON.checkPoints
+								boardJSON.config.checkPoints
 							)
 						),
 					loading: false,
@@ -807,6 +808,7 @@ class BoardKonfigurator extends React.Component<
 		);
 	};
 
+	// TODO: Bei vielen Checkpoints kommt es zum overflow
 	globals = () => {
 		const { config, checkpoints } = this.state;
 
@@ -1020,7 +1022,7 @@ class BoardKonfigurator extends React.Component<
 			nConfig.checkPoints.length >= 1
 		) {
 			// TODO: Hier klappt noch was nicht...
-			const { result, error } = AStar.pathPossible(
+			/* const { result, error } = AStar.pathPossible(
 				BoardGenerator.positionArrayToBoardPositionArray(
 					nConfig.checkPoints
 				),
@@ -1043,7 +1045,7 @@ class BoardKonfigurator extends React.Component<
 				const msg = `AStar: Path impossible! [Start: {y:${error.start?.y}, x:${error.start?.x}}, End: {y:${error.end?.y}, x:${error.end?.x}}]`;
 				errors.critical.push(msg);
 				errors.validation.push(msg);
-			}
+			} */
 		}
 
 		return (

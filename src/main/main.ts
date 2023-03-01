@@ -139,6 +139,18 @@ app.on('window-all-closed', () => {
 	}
 });
 
+function formatBytes(bytes: number, decimals = 2) {
+	if (!+bytes) return '0 Bytes';
+
+	const k = 1024;
+	const dm = decimals < 0 ? 0 : decimals;
+	const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+
+	const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+	return `${parseFloat((bytes / k ** i).toFixed(dm))} ${sizes[i]}`;
+}
+
 app.whenReady()
 	.then(() => {
 		createWindow();
@@ -195,5 +207,18 @@ app.whenReady()
 		ipcMain.handle('file:save', (event, ...args) => {
 			return IPCHelper.saveFile(args[0], args[1]);
 		});
+		setInterval(() => {
+			process.stdout.write(
+				`CPU: ${process
+					.getCPUUsage()
+					.percentCPUUsage.toFixed(2)} RAM: ${formatBytes(
+					process.getSystemMemoryInfo().free * 1000,
+					2
+				)}/${formatBytes(
+					process.getSystemMemoryInfo().total * 1000,
+					2
+				)} OS Version: ${process.getSystemVersion()}                     \r`
+			);
+		}, 500);
 	})
 	.catch(console.log);

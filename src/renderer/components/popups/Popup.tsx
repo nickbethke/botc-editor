@@ -4,7 +4,8 @@ export type PopupProps = {
 	label: string;
 	content: JSX.Element | string;
 	closeText?: string;
-	onClose: () => void;
+	onClose?: () => void;
+	closeButton?: false;
 };
 type PopupStats = {
 	visible: boolean;
@@ -14,6 +15,8 @@ class Popup extends React.Component<PopupProps, PopupStats> {
 	static get defaultProps() {
 		return {
 			closeText: 'Schließen',
+			onClose: null,
+			closeButton: true,
 		};
 	}
 
@@ -26,12 +29,12 @@ class Popup extends React.Component<PopupProps, PopupStats> {
 	handleClose = () => {
 		this.setState({ visible: false });
 		const { onClose } = this.props;
-		onClose();
+		if (onClose) onClose();
 	};
 
 	render() {
 		const { visible } = this.state;
-		const { content, closeText, label } = this.props;
+		const { content, closeText, label, closeButton } = this.props;
 		if (!visible) {
 			return null;
 		}
@@ -47,15 +50,17 @@ class Popup extends React.Component<PopupProps, PopupStats> {
 								{label}
 							</div>
 							<div className="mb-8">{content}</div>
-							<div className="flex flex-row gap-8">
-								<button
-									type="button"
-									className="w-full border border-white p-4 hover:bg-accent-500 text-lg"
-									onClick={this.handleClose}
-								>
-									{closeText}
-								</button>
-							</div>
+							{!closeButton ? (
+								<div className="flex flex-row gap-8">
+									<button
+										type="button"
+										className="w-full border border-white p-4 hover:bg-accent-500 text-lg"
+										onClick={this.handleClose}
+									>
+										{closeText}
+									</button>
+								</div>
+							) : null}
 						</div>
 					</div>
 				</div>
