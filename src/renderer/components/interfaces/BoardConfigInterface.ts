@@ -2,12 +2,12 @@ interface BoardConfigInterface {
 	checkPoints: Array<Position>;
 	eye: PositionDirection;
 	height: number;
-	holes?: Array<Position>;
-	lembasFields?: LembasField[];
+	holes: Array<Position>;
+	lembasFields: LembasField[];
 	name: string;
-	riverFields?: PositionDirection[];
+	riverFields: PositionDirection[];
 	startFields: PositionDirection[];
-	walls?: Array<Array<Position>>;
+	walls: Array<Array<Position>>;
 	width: number;
 }
 

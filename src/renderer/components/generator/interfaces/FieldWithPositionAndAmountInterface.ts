@@ -1,4 +1,4 @@
-import FieldWithPositionInterface from './fieldWithPositionInterface';
+import FieldWithPositionInterface from './FieldWithPositionInterface';
 
 interface FieldWithPositionAndAmountInterface
 	extends FieldWithPositionInterface {

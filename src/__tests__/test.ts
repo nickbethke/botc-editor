@@ -1,16 +1,16 @@
 import BoardGenerator, {
 	defaultStartValues,
 } from '../renderer/components/generator/BoardGenerator';
-import Board from '../renderer/components/generator/board';
-import FieldWithPositionInterface from '../renderer/components/generator/interfaces/fieldWithPositionInterface';
-import Grass from '../renderer/components/generator/fields/grass';
-import SauronsEye from '../renderer/components/generator/fields/sauronsEye';
-import StartField from '../renderer/components/generator/fields/startField';
+import Board from '../renderer/components/generator/Board';
+import FieldWithPositionInterface from '../renderer/components/generator/interfaces/FieldWithPositionInterface';
+import Grass from '../renderer/components/generator/fields/Grass';
+import SauronsEye from '../renderer/components/generator/fields/SauronsEye';
+import StartField from '../renderer/components/generator/fields/StartField';
 import { DirectionEnum } from '../renderer/components/interfaces/BoardConfigInterface';
-import River from '../renderer/components/generator/fields/river';
-import Checkpoint from '../renderer/components/generator/fields/checkpoint';
+import River from '../renderer/components/generator/fields/River';
+import Checkpoint from '../renderer/components/generator/fields/Checkpoint';
 import AStar from '../renderer/components/generator/helper/AStar';
-import Hole from '../renderer/components/generator/fields/hole';
+import Hole from '../renderer/components/generator/fields/Hole';
 import { RandomBoardStartValues } from '../renderer/components/popups/RandomBoardStartValuesDialog';
 
 describe('start values unchanged', () => {
@@ -29,13 +29,13 @@ describe('calculations', () => {
 		expect(generator.getFreeFieldsCount()).toBe(0);
 	});
 
-	test('board dimensions', () => {
+	test('boardConfigurator dimensions', () => {
 		const { board } = Board.generateRandom();
 		expect(board.length).toBe(defaultStartValues.height);
 		expect(board[0].length).toBe(defaultStartValues.width);
 	});
 
-	test('board maximal wall count', () => {
+	test('boardConfigurator maximal wall count', () => {
 		let x = 3;
 		let y = 3;
 		let sides = (x - 1) * y + (y - 1) * x;
@@ -225,8 +225,8 @@ describe('wall generation', () => {
 	});
 });
 
-describe('board generation', () => {
-	test('default board', () => {
+describe('boardConfigurator generation', () => {
+	test('default boardConfigurator', () => {
 		const generator = Board.generateRandom();
 		const { startValues } = generator;
 		expect(startValues).toStrictEqual(defaultStartValues);
@@ -234,7 +234,7 @@ describe('board generation', () => {
 	});
 });
 describe('errors', () => {
-	test('too small board', () => {
+	test('too small boardConfigurator', () => {
 		expect(() => {
 			Board.generateRandom({ ...defaultStartValues, checkpoints: 3 });
 		}).toThrowError();

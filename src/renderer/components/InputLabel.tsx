@@ -135,12 +135,9 @@ class InputLabel extends React.Component<InputLabelProps, InputLabelState> {
 		}
 		if (type === 'text' || type === 'number') {
 			return (
-				<div className="flex flex-col font-lato">
+				<div className="flex flex-col">
 					<div>
-						<label
-							htmlFor={this.id}
-							className={`${labelClass} font-lato`}
-						>
+						<label htmlFor={this.id} className={`${labelClass}`}>
 							{label}
 						</label>
 					</div>
@@ -168,7 +165,7 @@ class InputLabel extends React.Component<InputLabelProps, InputLabelState> {
 					<div>
 						<label
 							htmlFor={this.id}
-							className={`${labelClass} flex flex-row gap-2 font-lato`}
+							className={`${labelClass} flex flex-row gap-2`}
 						>
 							<span>{label}:</span>
 							<DblClickInput
@@ -206,7 +203,7 @@ class InputLabel extends React.Component<InputLabelProps, InputLabelState> {
 			<div>
 				<label
 					htmlFor={this.id}
-					className={`${labelClass} flex flex-row gap-2 justify-center items-center font-lato`}
+					className={`${labelClass} flex flex-row gap-2 justify-center items-center`}
 				>
 					{label ? <span className="min-h-8">{label}</span> : null}
 					<div className="switch">

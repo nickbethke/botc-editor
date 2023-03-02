@@ -5,7 +5,7 @@ export type PopupProps = {
 	content: JSX.Element | string;
 	closeText?: string;
 	onClose?: () => void;
-	closeButton?: false;
+	closeButton?: boolean;
 };
 type PopupStats = {
 	visible: boolean;
@@ -50,7 +50,7 @@ class Popup extends React.Component<PopupProps, PopupStats> {
 								{label}
 							</div>
 							<div className="mb-8">{content}</div>
-							{!closeButton ? (
+							{closeButton ? (
 								<div className="flex flex-row gap-8">
 									<button
 										type="button"

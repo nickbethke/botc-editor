@@ -2,6 +2,7 @@ import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 import { ParsedPath } from 'path';
 import BoardConfigInterface from '../renderer/components/interfaces/BoardConfigInterface';
 import PartieConfigInterface from '../renderer/components/interfaces/PartieConfigInterface';
+import { BoardPreset, RiverPreset } from './helper/PresetsLoader';
 
 export type Channels = 'ipc-example';
 
@@ -100,7 +101,10 @@ contextBridge.exposeInMainWorld('electron', {
 		},
 	},
 	load: {
-		presets() {
+		presets(): Promise<{
+			rivers: Array<RiverPreset>;
+			boards: Array<BoardPreset>;
+		}> {
 			return ipcRenderer.invoke('load:presets');
 		},
 	},
@@ -113,6 +117,9 @@ contextBridge.exposeInMainWorld('electron', {
 		},
 		save(file: string, content: string): Promise<true | string> {
 			return ipcRenderer.invoke('file:save', file, content);
+		},
+		remove(file: string): Promise<true | string> {
+			return ipcRenderer.invoke('file:remove', file);
 		},
 	},
 });

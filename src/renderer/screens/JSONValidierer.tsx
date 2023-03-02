@@ -35,6 +35,7 @@ class JSONValidierer extends React.Component<
 > {
 	constructor(props: JSONValidatorProps) {
 		super(props);
+
 		this.handleBackButton = this.handleBackButton.bind(this);
 		this.backToHomeScreen = this.backToHomeScreen.bind(this);
 		this.abortBackToHomeScreen = this.abortBackToHomeScreen.bind(this);
@@ -86,7 +87,6 @@ class JSONValidierer extends React.Component<
 				},
 			});
 		});
-		this.onChange('{}');
 	}
 
 	handleBackButton = () => {
@@ -345,24 +345,28 @@ class JSONValidierer extends React.Component<
 						<div className="m-8 flex flex-col gap-8 justify-start">
 							<div className="flex flex-row justify-start gap-8">
 								<BiChevronLeft
-									className="text-4xl border border-white cursor-pointer hover:bg-accent-500"
+									className="text-4xl border border-gray-600 cursor-pointer hover:bg-accent-500"
 									onClick={this.handleBackButton}
 								/>
 								<div className="text-4xl">Validierer</div>
 							</div>
 						</div>
 					</div>
-					<div className="flex text-white bg-background-900 border-y font-lato overflow-hidden">
+					<div className="flex text-white bg-background-900 border-y border-gray-600 font-lato overflow-hidden">
 						<button
 							type="button"
-							className="bg-accent-500/25 hover:bg-accent-500 text-lg p-2 flex flex-row justify-center items-center gap-2 border-r"
+							className="bg-accent-500/25 hover:bg-accent-500 text-lg p-2 flex flex-row justify-center items-center gap-2 border-r border-gray-600"
 							onClick={this.openNewFile}
 						>
 							<VscNewFile /> Neu
 						</button>
 						{currentFile ? (
 							<div
-								className={currentFile ? 'border-r h-full' : ''}
+								className={
+									currentFile
+										? 'border-r border-gray-600 h-full'
+										: ''
+								}
 							>
 								<span
 									className="text-lg p-2 h-full font-jetbrains flex flex-row justify-center items-center"
@@ -375,14 +379,14 @@ class JSONValidierer extends React.Component<
 						) : null}
 						<button
 							type="button"
-							className="bg-accent-500/25 hover:bg-accent-500 text-lg p-2 flex flex-row justify-center items-center gap-2 border-r"
+							className="bg-accent-500/25 hover:bg-accent-500 text-lg p-2 flex flex-row justify-center items-center gap-2 border-r border-gray-600"
 							onClick={this.openFile}
 						>
 							<VscFile /> Öffnen
 						</button>
 						<button
 							type="button"
-							className="bg-accent-500/25 hover:bg-accent-500 text-lg p-2 flex flex-row justify-center items-center gap-2 border-r"
+							className="bg-accent-500/25 hover:bg-accent-500 text-lg p-2 flex flex-row justify-center items-center gap-2 border-r border-gray-600"
 							onClick={this.saveFile}
 						>
 							<VscSave /> Speichern
@@ -390,7 +394,7 @@ class JSONValidierer extends React.Component<
 						<p className="bg-accent-500/10 h-full text-lg p-2 flex flex-row justify-center items-center gap-2">
 							Type
 						</p>
-						<div className="border-r">
+						<div className="border-r border-gray-600">
 							<select
 								className="bg-accent-500/25 hover:bg-accent-500 text-lg p-2 flex flex-row justify-center items-center gap-2 border-r-4 border-transparent"
 								onChange={this.changeType}
@@ -404,7 +408,7 @@ class JSONValidierer extends React.Component<
 								</option>
 							</select>
 						</div>
-						<div className="border-l ml-auto h-full text-sm p-2 flex flex-row justify-center items-center gap-2">
+						<div className="border-l border-gray-600 ml-auto h-full text-sm p-2 flex flex-row justify-center items-center gap-2">
 							Version: 1.2.1
 						</div>
 					</div>
@@ -423,8 +427,8 @@ class JSONValidierer extends React.Component<
 							/>
 						</div>
 						<div className="grid xl:grid-cols-4 grid-cols-2">
-							<div className="w-full h-[280px] max-h-[280px] flex flex-col font-jetbrains border-r xl:col-span-3">
-								<div className="text-white flex flex-col justify-center border-b p-2">
+							<div className="w-full h-[280px] max-h-[280px] flex flex-col font-jetbrains border-r border-gray-600 xl:col-span-3">
+								<div className="text-white flex flex-col justify-center border-b border-gray-600 p-2">
 									<div className="text-xl pl-4">
 										JSON-Validation
 									</div>
@@ -435,8 +439,8 @@ class JSONValidierer extends React.Component<
 									</div>
 								</div>
 							</div>
-							<div className="w-full h-[280px] max-h-[280px] flex flex-col font-jetbrains border-r">
-								<div className="text-white flex flex-col justify-center border-b p-2">
+							<div className="w-full h-[280px] max-h-[280px] flex flex-col font-jetbrains">
+								<div className="text-white flex flex-col justify-center border-b border-gray-600 p-2">
 									<div className="text-xl pl-4">Errors</div>
 								</div>
 								<div className="w-full text-white overflow-auto grow bg-white/10">

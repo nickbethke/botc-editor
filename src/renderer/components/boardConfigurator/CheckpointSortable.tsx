@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import SortableList, { SortableItem, SortableKnob } from 'react-easy-sort';
 import { BsChevronBarExpand } from 'react-icons/bs';
-import Checkpoint from '../generator/fields/checkpoint';
+import Checkpoint from '../generator/fields/Checkpoint';
 import { BoardPosition } from '../generator/interfaces/boardPosition';
 
 const CheckpointSortable = (props: {

@@ -11,6 +11,7 @@ import RandomBoardStartValuesDialog from './components/popups/RandomBoardStartVa
 import BoardGenerator from './components/generator/BoardGenerator';
 import PartieConfigInterface from './components/interfaces/PartieConfigInterface';
 import BoardConfigInterface from './components/interfaces/BoardConfigInterface';
+import sunImage from '../../assets/images/sun.gif';
 
 type AppStates = {
 	openScreen: string;
@@ -22,6 +23,7 @@ type AppStates = {
 	toLoad: object | null;
 	generator: BoardGenerator | null;
 	version: string;
+	surprise: boolean;
 };
 
 class App extends React.Component<unknown, AppStates> {
@@ -33,6 +35,7 @@ class App extends React.Component<unknown, AppStates> {
 			toLoad: null,
 			generator: null,
 			version: '',
+			surprise: false,
 		};
 		this.handleOpenBoardEditorChoice =
 			this.handleOpenBoardEditorChoice.bind(this);
@@ -56,15 +59,14 @@ class App extends React.Component<unknown, AppStates> {
 				this.setState({ openPopup: false });
 			}
 		});
-		window.electron.app
-			.getVersion()
-			.then((version) => {
-				this.setState({ version });
-				return null;
-			})
-			.catch(() => {
-				this.setState({ version: '0.0.1' });
-			});
+
+		Mousetrap.bind(
+			'up up down down left right left right b a enter',
+			() => {
+				const { surprise } = this.state;
+				this.setState({ surprise: !surprise });
+			}
+		);
 	}
 
 	handleOpenBoardEditorChoice = () => {
@@ -88,6 +90,19 @@ class App extends React.Component<unknown, AppStates> {
 	};
 
 	render = () => {
+		const { version } = this.state;
+		if (version === '') {
+			window.electron.app
+				.getVersion()
+				.then((v) => {
+					this.setState({ version: v });
+					return null;
+				})
+				.catch(() => {
+					this.setState({ version: '0.0.1' });
+				});
+		}
+
 		const { openScreen, generator } = this.state;
 		switch (openScreen) {
 			case 'home':
@@ -166,7 +181,7 @@ class App extends React.Component<unknown, AppStates> {
 	};
 
 	homeScreen() {
-		const { openPopup, version } = this.state;
+		const { openPopup, version, surprise } = this.state;
 		let popup: JSX.Element | string = '';
 		if (openPopup === 'boardEditorChoice') {
 			popup = (
@@ -235,7 +250,17 @@ class App extends React.Component<unknown, AppStates> {
 		return (
 			<div className="text-white">
 				<div id="home" className={popup ? 'blur' : ''}>
-					<div id="homeScreenBG" />
+					<div id="homeScreenBG" className="relative">
+						<img
+							alt="surprise sun"
+							src={sunImage}
+							className={`${
+								surprise
+									? 'opacity-1 top-1/4'
+									: 'opacity-0 top-1/3'
+							} absolute left-1/2 transition transition-all duration-1000 w-16 2xl:w-32`}
+						/>
+					</div>
 					<div className="dragger absolute top-0 left-0 w-[100vw] h-8" />
 					<div className="h-[100vh] w-[50vw] flex flex-col">
 						<div className="flex flex-col py-8 px-12 justify-between grow">

@@ -1,8 +1,9 @@
-import FieldWithPositionInterface from '../interfaces/fieldWithPositionInterface';
-import SauronsEye from '../fields/sauronsEye';
+import FieldWithPositionInterface from '../interfaces/FieldWithPositionInterface';
+import SauronsEye from '../fields/SauronsEye';
 import { BoardPosition } from '../BoardGenerator';
-import Hole from '../fields/hole';
-import River from '../fields/river';
+import Hole from '../fields/Hole';
+import River from '../fields/River';
+import BoardConfigInterface from '../../interfaces/BoardConfigInterface';
 
 export type AStarElement = {
 	state: BoardPosition;
@@ -295,10 +296,8 @@ class AStar {
 		walls: Map<string, boolean>
 	): {
 		result: boolean;
-		pathFindings: number;
 		error: { start: BoardPosition | null; end: BoardPosition | null };
 	} {
-		let pathFindings = 0;
 		const startFieldLength = startFields.length;
 
 		const commonStartField: BoardPosition = startFields[0];
@@ -313,11 +312,9 @@ class AStar {
 			);
 			const path = aStar.AStar();
 
-			pathFindings += 1;
 			if (path.length < 1) {
 				return {
 					result: false,
-					pathFindings,
 					error: { start: commonStartField, end: currStartField },
 				};
 			}
@@ -332,11 +329,9 @@ class AStar {
 				walls
 			);
 			const path = aStar.AStar();
-			pathFindings += 1;
 			if (path.length < 1) {
 				return {
 					result: false,
-					pathFindings,
 					error: {
 						start: lembasField.position,
 						end: commonStartField,
@@ -349,18 +344,26 @@ class AStar {
 			const checkpoint = checkpoints[i];
 			const aStar = new AStar(checkpoint, commonStartField, board, walls);
 			const path = aStar.AStar();
-			pathFindings += 1;
 			if (path.length < 1) {
 				return {
 					result: false,
-					pathFindings,
 					error: { start: checkpoint, end: commonStartField },
 				};
 			}
 		}
 		return {
 			result: true,
-			pathFindings,
+			error: { start: null, end: null },
+		};
+	}
+
+	// TODO: Methode to check from BoardConfig Type
+	public static checkBoardConfig(config: BoardConfigInterface): {
+		result: boolean;
+		error: { start: BoardPosition | null; end: BoardPosition | null };
+	} {
+		return {
+			result: true,
 			error: { start: null, end: null },
 		};
 	}

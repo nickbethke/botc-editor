@@ -1,4 +1,4 @@
-import FieldWithPositionInterface from '../interfaces/fieldWithPositionInterface';
+import FieldWithPositionInterface from '../interfaces/FieldWithPositionInterface';
 import { BoardPosition } from '../interfaces/boardPosition';
 import { FieldsEnum } from '../BoardGenerator';
 

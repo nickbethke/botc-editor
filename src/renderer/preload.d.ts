@@ -1,6 +1,6 @@
 import { Channels } from 'main/preload';
 import { ParsedPath } from 'path';
-import { RiverPreset } from '../main/helper/PresetsLoader';
+import { BoardPreset, RiverPreset } from '../main/helper/PresetsLoader';
 import PartieConfigInterface from './components/interfaces/PartieConfigInterface';
 import BoardConfigInterface from './components/interfaces/BoardConfigInterface';
 
@@ -48,12 +48,16 @@ declare global {
 				>;
 			};
 			load: {
-				presets(): Promise<Array<RiverPreset>>;
+				presets(): Promise<{
+					rivers: Array<RiverPreset>;
+					boards: Array<BoardPreset>;
+				}>;
 			};
 			file: {
 				openExternal(file: string): void;
 				openDir(file: string): void;
 				save(file: string, content: string): Promise<true | string>;
+				remove(file: string): Promise<true | string>;
 			};
 			validate(
 				json: object,

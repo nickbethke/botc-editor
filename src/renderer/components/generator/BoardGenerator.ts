@@ -1,5 +1,5 @@
-import FieldWithPositionInterface from './interfaces/fieldWithPositionInterface';
-import Grass from './fields/grass';
+import FieldWithPositionInterface from './interfaces/FieldWithPositionInterface';
+import Grass from './fields/Grass';
 import BoardConfigInterface, {
 	Direction,
 	DirectionEnum,
@@ -7,18 +7,18 @@ import BoardConfigInterface, {
 	Position,
 	PositionDirection,
 } from '../interfaces/BoardConfigInterface';
-import SauronsEye from './fields/sauronsEye';
-import StartField from './fields/startField';
-import Checkpoint from './fields/checkpoint';
-import Hole from './fields/hole';
-import Lembas from './fields/lembas';
-import River from './fields/river';
-import Board from './board';
+import SauronsEye from './fields/SauronsEye';
+import StartField from './fields/StartField';
+import Checkpoint from './fields/Checkpoint';
+import Hole from './fields/Hole';
+import Lembas from './fields/Lembas';
+import River from './fields/River';
+import Board from './Board';
 import AStar from './helper/AStar';
 import DirectionHelper from './helper/DirectionHelper';
 
 /**
- * random board start values type
+ * random boardConfigurator start values type
  */
 export type RandomBoardStartValues = {
 	name: string;
@@ -47,7 +47,7 @@ export type RiverAlgorithm = 'default' | 'complex';
 export type WallAlgorithm = 'iterative' | 'random';
 
 /**
- * default random board start values
+ * default random boardConfigurator start values
  */
 export const defaultStartValues: RandomBoardStartValues = {
 	name: 'THE CENTERLÄND',
@@ -66,7 +66,7 @@ export const defaultStartValues: RandomBoardStartValues = {
 };
 
 /**
- * board position type <br>
+ * boardConfigurator position type <br>
  * consisting of an x and y number value
  */
 export type BoardPosition = {
@@ -117,18 +117,18 @@ class BoardGenerator {
 		this.lembasFields = [];
 		this.wallMapArray = [];
 
-		// check ig generation of board is possible, otherwise throws an error
+		// check ig generation of boardConfigurator is possible, otherwise throws an error
 		if (this.getFieldCount() < this.getOccupiedFieldsCount()) {
 			throw new Error('Board to small for all fields');
 		}
 
-		// initializing the board array
+		// initializing the boardConfigurator array
 		this.board = BoardGenerator.generateBoardArray(
 			this.startValues.height,
 			this.startValues.width
 		);
 
-		// initializing the new board
+		// initializing the new boardConfigurator
 		this.boardJSON = new Board(
 			this.startValues.name,
 			this.startValues.width,
@@ -938,7 +938,7 @@ class BoardGenerator {
 		config: BoardConfigInterface,
 		board: Array<Array<FieldWithPositionInterface>>
 	): BoardConfigInterface {
-		console.warn('UPDATE config from board');
+		console.warn('UPDATE config from boardConfigurator');
 		const newConfig: BoardConfigInterface = {
 			...config,
 			startFields: [],
@@ -992,6 +992,19 @@ class BoardGenerator {
 							field.position
 						),
 						amount: field.amount,
+					});
+				}
+				if (field instanceof River) {
+					if (!newConfig.riverFields) {
+						newConfig.riverFields = [];
+					}
+					newConfig.riverFields.push({
+						position: BoardGenerator.boardPositionToPosition(
+							field.position
+						),
+						direction: BoardGenerator.directionEnumToDirection(
+							field.direction
+						),
 					});
 				}
 			}

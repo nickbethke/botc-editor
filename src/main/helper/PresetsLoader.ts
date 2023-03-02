@@ -2,7 +2,8 @@ import fs from 'fs';
 import Ajv, { JSONSchemaType } from 'ajv';
 import { app } from 'electron';
 import path from 'path';
-import * as RiverPresetSchema from '../../schema/river.schema.json';
+import * as RiverPresetSchema from '../../schema/riverPreset.schema.json';
+import * as BoardPresetSchema from '../../schema/boardPreset.schema.json';
 
 export type RiverPreset = {
 	name: string;
@@ -12,44 +13,86 @@ export type RiverPreset = {
 		direction: 'NORTH' | 'SOUTH' | 'EAST' | 'WEST';
 	}[];
 };
+export type BoardPreset = {
+	name: string;
+	file: string;
+	data: object;
+};
 
 class PresetsLoader {
-	private riverPresetFolder: string =
+	private static riverPresetFolder: string =
 		PresetsLoader.getAssetPath('presets/rivers/');
 
-	private p_riverPresets: Array<RiverPreset> = [];
+	private static boardPresetFolder: string =
+		PresetsLoader.getAssetPath('presets/boards/');
 
-	constructor() {
-		const files = fs.readdirSync(this.riverPresetFolder);
+	public static getRiverPresets() {
+		const riverPresets: Array<RiverPreset> = [];
+		const files = fs.readdirSync(PresetsLoader.riverPresetFolder);
 		files.forEach((file) => {
-			const content = fs.readFileSync(this.riverPresetFolder + file, {
-				encoding: 'utf8',
-			});
+			const content = fs.readFileSync(
+				PresetsLoader.riverPresetFolder + file,
+				{
+					encoding: 'utf8',
+				}
+			);
 			const valid = PresetsLoader.validateFile('river', content);
 			if (valid) {
-				this.p_riverPresets.push({
+				riverPresets.push({
 					...(JSON.parse(content) as RiverPreset),
-					file: this.riverPresetFolder + file,
+					file: PresetsLoader.riverPresetFolder + file,
 				});
 			}
 		});
+		return riverPresets;
 	}
 
-	get riverPresets(): Array<RiverPreset> {
-		return this.p_riverPresets;
+	public static getBoardPresets() {
+		const boardPresets: Array<BoardPreset> = [];
+		const files = fs.readdirSync(PresetsLoader.boardPresetFolder);
+		files.forEach((file) => {
+			const content = fs.readFileSync(
+				PresetsLoader.boardPresetFolder + file,
+				{
+					encoding: 'utf8',
+				}
+			);
+			const valid = PresetsLoader.validateFile('board', content);
+			if (valid) {
+				boardPresets.push({
+					...(JSON.parse(content) as BoardPreset),
+					file: PresetsLoader.boardPresetFolder + file,
+				});
+			}
+		});
+		return boardPresets;
 	}
 
 	static validateFile(type: 'river' | 'board', content: string) {
 		const ajv = new Ajv({ allErrors: true });
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-ignore
-		const schema: JSONSchemaType<RiverPreset> = RiverPresetSchema;
-		const validate = ajv.compile(schema);
-		try {
-			return !!validate(JSON.parse(content));
-		} catch (e) {
-			return false;
+		if (type === 'river') {
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
+			const schema: JSONSchemaType<RiverPreset> = RiverPresetSchema;
+			const validate = ajv.compile(schema);
+			try {
+				return !!validate(JSON.parse(content));
+			} catch (e) {
+				return false;
+			}
 		}
+		if (type === 'board') {
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
+			const schema: JSONSchemaType<BoardPreset> = BoardPresetSchema;
+			const validate = ajv.compile(schema);
+			try {
+				return !!validate(JSON.parse(content));
+			} catch (e) {
+				return false;
+			}
+		}
+		return false;
 	}
 
 	static getAssetPath(...paths: string[]): string {

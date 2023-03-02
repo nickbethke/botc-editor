@@ -5,7 +5,7 @@ import * as os from 'os';
 import path, { ParsedPath } from 'path';
 import * as PartieConfigSchema from '../../schema/partieConfigSchema.json';
 import * as BoardConfigSchema from '../../schema/boardConfigSchema.json';
-import PresetsLoader, { RiverPreset } from './PresetsLoader';
+import PresetsLoader, { BoardPreset, RiverPreset } from './PresetsLoader';
 import PartieConfigInterface from '../../renderer/components/interfaces/PartieConfigInterface';
 import BoardConfigInterface from '../../renderer/components/interfaces/BoardConfigInterface';
 
@@ -165,9 +165,14 @@ class IPCHelper {
 		return false;
 	};
 
-	static loadPresets = (): Array<RiverPreset> => {
-		const loader = new PresetsLoader();
-		return loader.riverPresets;
+	static loadPresets = (): {
+		rivers: Array<RiverPreset>;
+		boards: Array<BoardPreset>;
+	} => {
+		return {
+			rivers: PresetsLoader.getRiverPresets(),
+			boards: PresetsLoader.getBoardPresets(),
+		};
 	};
 
 	static getOS = (): NodeJS.Platform => {
@@ -186,6 +191,14 @@ class IPCHelper {
 	static saveFile(file: string, content: string) {
 		if (fs.existsSync(file)) {
 			fs.writeFileSync(file, content, { encoding: 'utf8', flag: 'w' });
+			return true;
+		}
+		return 'File does not exits';
+	}
+
+	static removeFile(file: string) {
+		if (fs.existsSync(file)) {
+			fs.unlinkSync(file);
 			return true;
 		}
 		return 'File does not exits';

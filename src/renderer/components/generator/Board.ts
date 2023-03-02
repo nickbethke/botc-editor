@@ -11,29 +11,23 @@ import BoardConfigInterface, {
 import DirectionHelper from './helper/DirectionHelper';
 
 class Board implements BoardConfigInterface {
-	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-	// @ts-ignore
-	checkPoints: Position[];
+	checkPoints: Position[] = [];
 
-	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-	// @ts-ignore
-	eye: PositionDirection;
+	eye: PositionDirection = { position: [0, 0], direction: 'NORTH' };
 
 	height: number;
 
-	holes?: Position[];
+	holes: Position[] = [];
 
-	lembasFields?: LembasField[];
+	lembasFields: LembasField[] = [];
 
 	name: string;
 
-	riverFields?: PositionDirection[];
+	riverFields: PositionDirection[] = [];
 
-	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-	// @ts-ignore
-	startFields: PositionDirection[];
+	startFields: PositionDirection[] = [];
 
-	walls?: Position[][];
+	walls: Position[][] = [];
 
 	width: number;
 
@@ -55,9 +49,6 @@ class Board implements BoardConfigInterface {
 	 */
 	public addCheckPoint(position: BoardPosition) {
 		const { x, y } = position;
-		if (this.checkPoints === undefined) {
-			this.checkPoints = [];
-		}
 		this.checkPoints.push([x, y]);
 	}
 
@@ -68,9 +59,6 @@ class Board implements BoardConfigInterface {
 	 */
 	public addStartField(position: BoardPosition, direction: DirectionEnum) {
 		const { x, y } = position;
-		if (this.startFields === undefined) {
-			this.startFields = [];
-		}
 		this.startFields.push({
 			position: [x, y],
 			direction: DirectionHelper.dirEnumToString(direction),
@@ -96,9 +84,6 @@ class Board implements BoardConfigInterface {
 	 */
 	public addHole(position: BoardPosition) {
 		const { x, y } = position;
-		if (this.holes === undefined) {
-			this.holes = [];
-		}
 		this.holes.push([x, y]);
 	}
 
@@ -109,9 +94,6 @@ class Board implements BoardConfigInterface {
 	 */
 	public addLembasField(position: BoardPosition, amount: number) {
 		const { x, y } = position;
-		if (this.lembasFields === undefined) {
-			this.lembasFields = [];
-		}
 		this.lembasFields.push({ position: [x, y], amount });
 	}
 
@@ -122,9 +104,6 @@ class Board implements BoardConfigInterface {
 	 */
 	public addRiverField(position: BoardPosition, direction: DirectionEnum) {
 		const { x, y } = position;
-		if (this.riverFields === undefined) {
-			this.riverFields = [];
-		}
 		this.riverFields.push({
 			position: [x, y],
 			direction: DirectionHelper.dirEnumToString(direction),
@@ -136,14 +115,11 @@ class Board implements BoardConfigInterface {
 	 * @param position
 	 */
 	public addWall(position: [[number, number], [number, number]]) {
-		if (this.walls === undefined) {
-			this.walls = [];
-		}
 		this.walls.push(position);
 	}
 
 	/**
-	 * generate a random valid board via the BoardGeneration class
+	 * generate a random valid boardConfigurator via the BoardGeneration class
 	 * @param startValues?
 	 */
 	static generateRandom(

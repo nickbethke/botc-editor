@@ -2,38 +2,38 @@ import React from 'react';
 import { BsFillCursorFill, BsFillTrashFill } from 'react-icons/bs';
 import Mousetrap from 'mousetrap';
 import { ProgressBar } from 'react-loader-spinner';
-import CRiverPreset from 'renderer/components/board/RiverPreset';
+import { BiChevronLeft } from 'react-icons/bi';
 import InputLabel, {
 	OnChangeFunctionInputLabel,
 } from '../components/InputLabel';
 import InputValidator from '../helper/InputValidator';
-import { RiverPreset } from '../../main/helper/PresetsLoader';
+import { BoardPreset, RiverPreset } from '../../main/helper/PresetsLoader';
 import BoardKonfiguratorBoard, {
 	BoardKonfiguratorErrorProps,
-} from '../components/board/BoardKonfiguratorBoard';
-import FieldDragger from '../components/board/FieldDragger';
-import FieldWithPositionInterface from '../components/generator/interfaces/fieldWithPositionInterface';
-import Grass from '../components/generator/fields/grass';
-import StartField from '../components/generator/fields/startField';
+} from '../components/boardConfigurator/BoardKonfiguratorBoard';
+import FieldDragger from '../components/boardConfigurator/FieldDragger';
+import FieldWithPositionInterface from '../components/generator/interfaces/FieldWithPositionInterface';
+import Grass from '../components/generator/fields/Grass';
+import StartField from '../components/generator/fields/StartField';
 import BoardConfigInterface, {
 	DirectionEnum,
 } from '../components/interfaces/BoardConfigInterface';
-import Checkpoint from '../components/generator/fields/checkpoint';
-import SauronsEye from '../components/generator/fields/sauronsEye';
+import Checkpoint from '../components/generator/fields/Checkpoint';
+import SauronsEye from '../components/generator/fields/SauronsEye';
 import { BoardPosition } from '../components/generator/interfaces/boardPosition';
-import River from '../components/generator/fields/river';
-import FieldWithPositionAndDirectionInterface from '../components/generator/interfaces/fieldWithPositionAndDirectionInterface';
-import CheckpointSortable from '../components/board/CheckpointSortable';
+import River from '../components/generator/fields/River';
+import FieldWithPositionAndDirectionInterface from '../components/generator/interfaces/FieldWithPositionAndDirectionInterface';
+import CheckpointSortable from '../components/boardConfigurator/CheckpointSortable';
 import FieldWithPositionAndAmountInterface from '../components/generator/interfaces/FieldWithPositionAndAmountInterface';
-import Hole from '../components/generator/fields/hole';
+import Hole from '../components/generator/fields/Hole';
 import ConfirmPopup from '../components/popups/ConfirmPopup';
 import BoardGenerator, {
 	FieldsEnum,
 } from '../components/generator/BoardGenerator';
-import Lembas from '../components/generator/fields/lembas';
+import Lembas from '../components/generator/fields/Lembas';
 import Popup from '../components/popups/Popup';
 import RandomBoardStartValuesDialog from '../components/popups/RandomBoardStartValuesDialog';
-import AStar from '../components/generator/helper/AStar';
+import PresetsTab from '../components/boardConfigurator/PresetsTab';
 
 type BoardKonfiguratorProps = {
 	generator?: BoardGenerator | null;
@@ -46,7 +46,10 @@ type BoardKonfiguratorState = {
 	board: Array<Array<FieldWithPositionInterface>>;
 	openTab: 'fields' | 'presets' | 'global';
 	currentTool: 'select' | 'delete';
-	presets: Array<RiverPreset>;
+	presets: {
+		rivers: Array<RiverPreset>;
+		boards: Array<BoardPreset>;
+	};
 	isDragged: FieldsEnum | null;
 	selected: BoardPosition | null;
 	checkpoints: Array<Checkpoint>;
@@ -56,10 +59,13 @@ type BoardKonfiguratorState = {
 	error: string | null;
 	random: boolean;
 	contextMenu: JSX.Element | null;
+	popup: JSX.Element | null;
 };
 
 // TODO: Speichern Dialog: Als Preset oder als Board
+// TODO: Presets
 // TODO: Walls!!!
+// TODO: Feld löschen immer, auch wenn select nicht dort
 class BoardKonfigurator extends React.Component<
 	BoardKonfiguratorProps,
 	BoardKonfiguratorState
@@ -71,13 +77,17 @@ class BoardKonfigurator extends React.Component<
 		checkPoints: [],
 		startFields: [],
 		eye: { position: [0, 0], direction: 'NORTH' },
+		lembasFields: [],
+		riverFields: [],
+		holes: [],
+		walls: [],
 	};
 
 	static defaultState: BoardKonfiguratorState = {
 		config: BoardKonfigurator.default,
 		currentTool: 'select',
 		openTab: 'fields',
-		presets: [],
+		presets: { rivers: [], boards: [] },
 		isDragged: null,
 		board: BoardGenerator.jsonToBoard(BoardKonfigurator.default),
 		selected: BoardGenerator.positionToBoardPosition(
@@ -94,6 +104,7 @@ class BoardKonfigurator extends React.Component<
 		error: null,
 		random: false,
 		contextMenu: null,
+		popup: null,
 	};
 
 	private draggableItemClass: string =
@@ -123,7 +134,7 @@ class BoardKonfigurator extends React.Component<
 					config: { ...BoardKonfigurator.default, ...json },
 					currentTool: 'select',
 					openTab: 'fields',
-					presets: [],
+					presets: { rivers: [], boards: [] },
 					isDragged: null,
 					board: BoardGenerator.jsonToBoard(
 						json as BoardConfigInterface
@@ -141,6 +152,7 @@ class BoardKonfigurator extends React.Component<
 					error: null,
 					random: false,
 					contextMenu: null,
+					popup: null,
 				};
 			} catch (e) {
 				if (e instanceof Error)
@@ -160,7 +172,7 @@ class BoardKonfigurator extends React.Component<
 				},
 				currentTool: 'select',
 				openTab: 'fields',
-				presets: [],
+				presets: { rivers: [], boards: [] },
 				isDragged: null,
 				board: generator.board,
 				selected: null,
@@ -174,6 +186,7 @@ class BoardKonfigurator extends React.Component<
 				error: null,
 				random: false,
 				contextMenu: null,
+				popup: null,
 			};
 		} else {
 			this.state = BoardKonfigurator.defaultState;
@@ -215,6 +228,7 @@ class BoardKonfigurator extends React.Component<
 			this.setState({ openTab: 'fields' });
 		});
 		Mousetrap.bind(['command+3', 'ctrl+3'], () => {
+			this.reloadPresets();
 			this.setState({ openTab: 'presets' });
 		});
 		Mousetrap.bind(['command+e', 'ctrl+e'], () => {
@@ -296,17 +310,20 @@ class BoardKonfigurator extends React.Component<
 
 	openBoardConfig = async () => {
 		this.setState({ loading: true });
-		const boardJSON = await window.electron.dialog.openBoardConfig();
-		if (boardJSON) {
+		const boardFile = await window.electron.dialog.openBoardConfig();
+		if (boardFile) {
 			try {
 				this.setState({
-					config: { ...BoardKonfigurator.default, ...boardJSON },
+					config: {
+						...BoardKonfigurator.default,
+						...boardFile.config,
+					},
 					selected: null,
-					board: BoardGenerator.jsonToBoard(boardJSON.config),
+					board: BoardGenerator.jsonToBoard(boardFile.config),
 					checkpoints:
 						BoardGenerator.checkpointsPositionArrayToCheckpointArray(
 							BoardGenerator.positionArrayToBoardPositionArray(
-								boardJSON.config.checkPoints
+								boardFile.config.checkPoints
 							)
 						),
 					loading: false,
@@ -353,6 +370,7 @@ class BoardKonfigurator extends React.Component<
 			error,
 			random,
 			contextMenu,
+			popup: statePopup,
 		} = this.state;
 		if (board.length < 1) {
 			const newBoard: Array<Array<FieldWithPositionInterface>> = [];
@@ -368,6 +386,9 @@ class BoardKonfigurator extends React.Component<
 			return null;
 		}
 		let popup: JSX.Element | null = null;
+		if (statePopup) {
+			popup = statePopup;
+		}
 		if (leave) {
 			popup = (
 				<ConfirmPopup
@@ -429,11 +450,8 @@ class BoardKonfigurator extends React.Component<
 			);
 		}
 
-		console.log('config', JSON.stringify(config, null, 4));
-		// TODO: Saurons Auge kann man nur umplatzieren, nicht löschen!
 		// TODO: Speichern
-		// TODO: Update config, wenn was am Board geändert wird (Array<Array<FieldWithPositionInterface>> 2 BoardConfigInterface)
-		// TODO: Error Tab -> Validation
+		// TODO: Testen: Update config, wenn was am Board geändert wird (Array<Array<FieldWithPositionInterface>> 2 BoardConfigInterface)
 		return (
 			<div className="flex flex-col h-[100vh] text-white">
 				{os === 'win32' ? (
@@ -442,19 +460,27 @@ class BoardKonfigurator extends React.Component<
 				<div className="grid grid-cols-4 2xl:grid-cols-6 flex-grow bg-background">
 					<div
 						id="board-configurator-sidebar-left"
-						className="w-full h-full bg-background-700 text-white flex flex-col"
+						className="w-full h-full bg-background-700 text-white flex flex-col border-r border-gray-600"
 					>
-						<div className="p-4 text-2xl text-center">
-							Board-Konfigurator
+						<div className="flex flex-row items-center gap-8 p-4">
+							<BiChevronLeft
+								className="text-4xl border border-gray-600 cursor-pointer hover:bg-accent-500"
+								onClick={() => {
+									this.setState({ leave: true });
+								}}
+							/>
+							<div className="text-2xl flex-grow">
+								Board-Konfigurator
+							</div>
 						</div>
-						<div className="flex-grow border-t flex flex-col">
+						<div className="flex-grow border-t border-gray-600 flex flex-col">
 							<div className="flex flex-col">
-								<div className="grid grid-cols-3 border-b">
+								<div className="grid grid-cols-3 border-b border-gray-600">
 									<button
 										className={
 											openTab === 'global'
-												? this.tabOpenClass
-												: this.tabClosedClass
+												? `${this.tabOpenClass} border-r border-gray-600`
+												: `${this.tabClosedClass} border-r border-gray-600`
 										}
 										onClick={() => {
 											this.setState({
@@ -468,8 +494,8 @@ class BoardKonfigurator extends React.Component<
 									<button
 										className={
 											openTab === 'fields'
-												? this.tabOpenClass
-												: this.tabClosedClass
+												? `${this.tabOpenClass} border-r border-gray-600`
+												: `${this.tabClosedClass} border-r border-gray-600`
 										}
 										onClick={() => {
 											this.setState({
@@ -495,7 +521,7 @@ class BoardKonfigurator extends React.Component<
 							</div>
 							{this.tools()}
 						</div>
-						<div className="border-t border-b">
+						<div className="border-t border-b border-gray-600">
 							<button
 								type="button"
 								className="p-4 hover:bg-white/50 transition-colors transition w-full"
@@ -506,17 +532,17 @@ class BoardKonfigurator extends React.Component<
 								Zufälliges Board
 							</button>
 						</div>
-						<div className="grid grid-cols-3 border-t border-b">
+						<div className="grid grid-cols-3">
 							<button
 								type="button"
-								className="p-4 hover:bg-white/50 transition-colors transition"
+								className="p-4 hover:bg-white/50 transition-colors transition border-r border-gray-600"
 								onClick={this.openBoardConfig}
 							>
 								Laden
 							</button>
 							<button
 								type="button"
-								className="p-4 hover:bg-white/50 transition-colors transition"
+								className="p-4 hover:bg-white/50 transition-colors transition border-r border-gray-600"
 								onClick={this.saveBoardConfig}
 							>
 								Speichern
@@ -570,8 +596,8 @@ class BoardKonfigurator extends React.Component<
 
 		return (
 			<div className="flex flex-col flex-grow">
-				<div className="border-b">
-					<div className="grid grid-cols-2">
+				<div className="border-b border-gray-600">
+					<div className="grid grid-cols-2 bg-accent-700">
 						<button
 							className={
 								currentTool === 'select'
@@ -622,7 +648,7 @@ class BoardKonfigurator extends React.Component<
 	fields = () => {
 		return (
 			<div>
-				<div className="grid grid-cols-2 m-4 gap-4">
+				<div className="grid grid-cols-2 m-4 gap-4 pb-4 border-b border-gray-600">
 					<FieldDragger
 						type={FieldsEnum.START}
 						text="Start"
@@ -643,8 +669,7 @@ class BoardKonfigurator extends React.Component<
 						onDragEnd={this.draggerOnDragEnd}
 					/>
 				</div>
-				<hr />
-				<div className="grid grid-cols-2 m-4 gap-4">
+				<div className="grid grid-cols-2 m-4 gap-4 pb-4 border-b border-gray-600">
 					<FieldDragger
 						type={FieldsEnum.RIVER}
 						text="Fluss"
@@ -665,7 +690,6 @@ class BoardKonfigurator extends React.Component<
 						onDragEnd={this.draggerOnDragEnd}
 					/>
 				</div>
-				<hr />
 				<div className="grid grid-cols-2 m-4 gap-4">
 					<FieldDragger
 						type={FieldsEnum.WALL}
@@ -680,29 +704,21 @@ class BoardKonfigurator extends React.Component<
 	};
 
 	presets = () => {
-		const presetsElements: Array<JSX.Element> = [];
 		const { presets } = this.state;
-		presets.forEach((preset) => {
-			presetsElements.push(
-				<CRiverPreset
-					preset={preset}
-					className={this.draggableItemClass}
-					onContextMenu={(contextMenu) => {
-						this.setState({ contextMenu });
-						document.addEventListener('click', () => {
-							this.setState({ contextMenu: null });
-						});
-					}}
-					onUpdate={() => {
-						this.reloadPresets();
-					}}
-				/>
-			);
-		});
 		return (
-			<div className="grid grid-cols-2 m-4 gap-4">
-				{presetsElements.map((presetsElement) => presetsElement)}
-			</div>
+			<PresetsTab
+				presets={presets}
+				className={this.draggableItemClass}
+				onPopup={(popup) => {
+					this.setState({ popup });
+				}}
+				onContextMenu={(contextMenu) => {
+					this.setState({ contextMenu });
+				}}
+				onUpdate={() => {
+					this.reloadPresets();
+				}}
+			/>
 		);
 	};
 
@@ -819,7 +835,7 @@ class BoardKonfigurator extends React.Component<
 						<InputLabel
 							label="Board-Name"
 							type="text"
-							labelClass="text-xl"
+							labelClass="text-lg"
 							placeholder="Board-Name"
 							value={config.name}
 							onChange={(boardName) => {
@@ -845,9 +861,9 @@ class BoardKonfigurator extends React.Component<
 						<InputLabel
 							label="Breite"
 							type="range"
-							labelClass="text-xl"
+							labelClass="text-lg"
 							value={config.width}
-							min={config.height === 1 ? 2 : 1}
+							min={2}
 							onChange={this.onWidthChange}
 						/>
 					</div>
@@ -855,14 +871,14 @@ class BoardKonfigurator extends React.Component<
 						<InputLabel
 							label="Höhe"
 							type="range"
-							labelClass="text-xl"
+							labelClass="text-lg"
 							value={config.height}
-							min={config.width === 1 ? 2 : 1}
+							min={2}
 							onChange={this.onHeightChange}
 						/>
 					</div>
 				</div>
-				<div className="flex-grow p-4 border-t">
+				<div className="flex-grow p-4 border-t border-gray-600">
 					<div className="text-xl mb-2">Checkpoint Reihenfolge</div>
 					<CheckpointSortable
 						checkpoints={checkpoints}
@@ -876,9 +892,8 @@ class BoardKonfigurator extends React.Component<
 		);
 	};
 
-	handleBoardOnDrop: (position: { x: number; y: number }) => void = (
-		position
-	) => {
+	// TODO: update Checkpoints wenn ein Checkpoint überschrieben wird
+	handleBoardOnDrop: (position: BoardPosition) => void = (position) => {
 		const { isDragged, board, checkpoints, config } = this.state;
 		let newField: FieldWithPositionInterface;
 		switch (isDragged) {
@@ -994,7 +1009,7 @@ class BoardKonfigurator extends React.Component<
 	};
 
 	board = () => {
-		const { config, board, selected } = this.state;
+		const { config, board, selected, os } = this.state;
 		const nConfig = BoardGenerator.updateBoardConfigFromBoardArray(
 			config,
 			board
@@ -1034,7 +1049,7 @@ class BoardKonfigurator extends React.Component<
 							nConfig.lembasFields
 					  )
 					: [],
-				board,
+				boardConfigurator,
 				nConfig.walls
 					? BoardGenerator.genWallMap(nConfig.walls)
 					: new Map<string, boolean>()
@@ -1056,6 +1071,7 @@ class BoardKonfigurator extends React.Component<
 				selected={selected}
 				onSelect={this.handleBoardOnSelect}
 				onDrop={this.handleBoardOnDrop}
+				hasDragger={os === 'win32'}
 			/>
 		);
 	};
@@ -1092,7 +1108,7 @@ class BoardKonfigurator extends React.Component<
 						<p className="text-xl">Blickrichtung</p>
 						<select
 							id="select-direction"
-							className="bg-transparent border-b-2 text-xl px-4 py-2 focus:outline-none w-full"
+							className="bg-transparent border-b-2 text-lg px-4 py-2 w-full"
 							value={field.direction}
 							onChange={(event) => {
 								(
@@ -1118,14 +1134,14 @@ class BoardKonfigurator extends React.Component<
 		return (
 			<div
 				id="board-configurator-sidebar-right"
-				className="w-full h-full bg-background-700"
+				className="w-full h-full bg-background-700 border-l border-gray-600"
 			>
 				<div className="flex flex-col h-full">
 					<div className="flex flex-col flex-grow text-white h-1/2">
-						<div className="text-2xl text-center p-4">
+						<div className="flex items-end justify-center text-xl p-4 border-b border-gray-600 h-[68px]">
 							Feld-Eigenschaft
 						</div>
-						<div className="p-4">{option}</div>
+						<div className="p-4 bg-white/10 grow">{option}</div>
 					</div>
 				</div>
 			</div>

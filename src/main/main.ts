@@ -25,11 +25,6 @@ class AppUpdater {
 
 let mainWindow: BrowserWindow | null = null;
 
-ipcMain.on('ipc-example', async (event, arg) => {
-	const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
-	event.reply('ipc-example', msgTemplate('pong'));
-});
-
 if (process.env.NODE_ENV === 'production') {
 	const sourceMapSupport = require('source-map-support');
 	sourceMapSupport.install();
@@ -207,6 +202,10 @@ app.whenReady()
 		ipcMain.handle('file:save', (event, ...args) => {
 			return IPCHelper.saveFile(args[0], args[1]);
 		});
+		ipcMain.handle('file:remove', (event, ...args) => {
+			return IPCHelper.removeFile(args[0]);
+		});
+
 		setInterval(() => {
 			process.stdout.write(
 				`CPU: ${process

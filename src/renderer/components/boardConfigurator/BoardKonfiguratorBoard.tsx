@@ -3,16 +3,19 @@ import _uniqueId from 'lodash/uniqueId';
 import { BsChevronDown, BsChevronUp } from 'react-icons/bs';
 import Mousetrap from 'mousetrap';
 import Field from './Field';
-import FieldWithPositionInterface from '../generator/interfaces/fieldWithPositionInterface';
+import FieldWithPositionInterface from '../generator/interfaces/FieldWithPositionInterface';
 import { BoardPosition } from '../generator/interfaces/boardPosition';
 import KeyCode from '../KeyCode';
-import Lembas from '../generator/fields/lembas';
-import River from '../generator/fields/river';
+import Lembas from '../generator/fields/Lembas';
+import River from '../generator/fields/River';
 import BoardConfigInterface, {
 	Position,
 } from '../interfaces/BoardConfigInterface';
 import BoardGenerator, { FieldsEnum } from '../generator/BoardGenerator';
-import Checkpoint from '../generator/fields/checkpoint';
+import Checkpoint from '../generator/fields/Checkpoint';
+
+export type ErrorWindows = 'critical' | 'hints' | 'warning' | 'validation';
+export type HelperWindows = ErrorWindows | 'config' | 'hotkeys';
 
 export type BoardKonfiguratorErrorProps = {
 	critical: string[];
@@ -27,7 +30,7 @@ type BoardKonfiguratorBoardProps = {
 	onSelect: (position: BoardPosition | null) => boolean;
 	onDrop: (position: BoardPosition) => void;
 	selected: BoardPosition | null;
-
+	hasDragger: boolean;
 	errors: BoardKonfiguratorErrorProps;
 };
 
@@ -35,7 +38,8 @@ type BoardKonfiguratorBoardState = {
 	zoom: number;
 	selected: BoardPosition | null;
 	errorViewOpen: boolean;
-	tabOpen: 'critical' | 'warning' | 'hints' | 'validation' | 'hotkeys';
+	tabOpen: HelperWindows;
+	window: { width: number; height: number };
 };
 
 class BoardKonfiguratorBoard extends React.Component<
@@ -50,6 +54,7 @@ class BoardKonfiguratorBoard extends React.Component<
 			selected,
 			errorViewOpen: true,
 			tabOpen: 'critical',
+			window: { width: window.innerWidth, height: window.innerHeight },
 		};
 		this.handleZoom = this.handleZoom.bind(this);
 		this.handleKeyDown = this.handleKeyDown.bind(this);
@@ -150,9 +155,8 @@ class BoardKonfiguratorBoard extends React.Component<
 			hints: string[];
 			validation: string[];
 		},
-		type: 'critical' | 'hints' | 'warning' | 'validation'
+		type: ErrorWindows
 	) => {
-		console.log(errors.validation);
 		let errorMessages: string[] | null = [];
 		let symbol: string | null = null;
 		let className = '';
@@ -193,9 +197,18 @@ class BoardKonfiguratorBoard extends React.Component<
 		return null;
 	};
 
+	configPreview = () => {
+		const { config } = this.props;
+		return (
+			<div className="px-4 py-2 bg-background font-jetbrains">
+				<pre>{JSON.stringify(config, null, 4)}</pre>
+			</div>
+		);
+	};
+
 	hotKeys = () => {
 		return (
-			<div className="bg-white/25">
+			<div className="bg-[#1d234c]">
 				<div className="grid 2xl:grid-cols-3 gap-2 p-2 max-w-[800px] mx-auto justify-center">
 					<div className="flex flex-col mb-2 items-center">
 						<p className="text-lg">Allgemein</p>
@@ -361,13 +374,35 @@ class BoardKonfiguratorBoard extends React.Component<
 	}
 
 	render() {
-		const { zoom, errorViewOpen, tabOpen } = this.state;
-		const { errors } = this.props;
+		const {
+			zoom,
+			errorViewOpen,
+			tabOpen,
+			window: browserWindow,
+		} = this.state;
+		const { errors, hasDragger } = this.props;
 		const { board } = this.buildBoard();
 		const errorViewOpener = errorViewOpen ? (
 			<BsChevronDown />
 		) : (
 			<BsChevronUp />
+		);
+		const draggerHeight: number = hasDragger ? 32 : 0;
+		const errorViewHeight: number = errorViewOpen ? 287 : 36;
+		const boardViewHeight =
+			browserWindow.height - errorViewHeight - draggerHeight;
+
+		window.addEventListener(
+			'resize',
+			() => {
+				this.setState({
+					window: {
+						width: window.innerWidth,
+						height: window.innerHeight,
+					},
+				});
+			},
+			{ once: true }
 		);
 
 		let errorWindow = null;
@@ -381,49 +416,61 @@ class BoardKonfiguratorBoard extends React.Component<
 			case 'validation':
 				errorWindow = this.errorWindow(errors, tabOpen);
 				break;
+			case 'config':
+				errorWindow = this.configPreview();
+				break;
 			default:
 				break;
 		}
-
+		// TODO: Zoom: oberer Rand verschwindet
 		return (
 			<div className="h-full max-h-full flex flex-col">
 				<div
-					role="link"
+					role="presentation"
 					tabIndex={-1}
 					id="board"
-					className="relative flex-grow justify-center overflow-y-auto overflow-x-auto"
+					className="relative flex-grow justify-center overflow-y-auto overflow-x-auto p-4 transition-all"
 					onWheel={this.handleZoom}
 					onKeyDown={this.handleKeyDown}
-					style={{ zoom: `${zoom}%` }}
+					style={{ height: `${boardViewHeight}px` }}
 				>
-					<div className="absolute flex flex-col items-center top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[#5c9621] rounded p-6">
-						{board.map((row) => (
-							<div key={_uniqueId()} className="flex flex-row">
-								{row.map((field) => field)}
-							</div>
-						))}
+					<div className="relative w-full flex items-center h-full">
+						<div
+							className="flex flex-col items-center bg-[#5c9621] rounded p-6 w-fit mx-auto"
+							style={{
+								transform: `scale(${zoom / 100})`,
+							}}
+						>
+							{board.map((row) => (
+								<div
+									key={_uniqueId()}
+									className="flex flex-row"
+								>
+									{row.map((field) => field)}
+								</div>
+							))}
+						</div>
 					</div>
 				</div>
 				<div
 					id="errors"
-					className="text-white border border-t-0 bg-background-700 relative"
+					className="text-white border-t border-gray-600 bg-background-700 relative"
 				>
 					<div
 						role="presentation"
-						className="absolute top-[-34px] left-[-1px] p-2 border border-b-0 cursor-pointer"
+						className="absolute top-[-34px] left-[-1px] p-2 border border-b-0 border-gray-600 cursor-pointer bg-background-700"
 						onClick={() => {
 							this.setState({ errorViewOpen: !errorViewOpen });
 						}}
 					>
 						{errorViewOpener}
 					</div>
-					<div className="w-full h-1 bg-white cursor-row-resize" />
-					<div className="w-full flex flex-row justify-start">
+					<div className="w-full flex flex-row justify-start font-jetbrains">
 						<button
 							type="button"
 							className={`${
 								tabOpen === 'critical' ? 'bg-white/25' : ''
-							} p-4 hover:bg-white/50 transition-colors transition`}
+							} p-2 hover:bg-white/50 transition-colors 2xl:text-md text-sm transition`}
 							onClick={() => {
 								this.setState({
 									tabOpen: 'critical',
@@ -433,16 +480,14 @@ class BoardKonfiguratorBoard extends React.Component<
 						>
 							Kritisch{' '}
 							{errors.critical.length > 0 ? (
-								<span className="font-jetbrains">
-									({errors.critical.length})
-								</span>
+								<span>({errors.critical.length})</span>
 							) : null}
 						</button>
 						<button
 							type="button"
 							className={`${
 								tabOpen === 'warning' ? 'bg-white/25' : ''
-							} p-4 hover:bg-white/50 transition-colors transition`}
+							} p-2 hover:bg-white/50 transition-colors 2xl:text-md text-sm transition`}
 							onClick={() => {
 								this.setState({
 									tabOpen: 'warning',
@@ -452,16 +497,14 @@ class BoardKonfiguratorBoard extends React.Component<
 						>
 							Warnung{' '}
 							{errors.warning.length > 0 ? (
-								<span className="font-jetbrains">
-									({errors.warning.length})
-								</span>
+								<span>({errors.warning.length})</span>
 							) : null}
 						</button>
 						<button
 							type="button"
 							className={`${
 								tabOpen === 'hints' ? 'bg-white/25' : ''
-							} p-4 hover:bg-white/50 transition-colors transition`}
+							} p-2 hover:bg-white/50 transition-colors 2xl:text-md text-sm transition`}
 							onClick={() => {
 								this.setState({
 									tabOpen: 'hints',
@@ -471,16 +514,14 @@ class BoardKonfiguratorBoard extends React.Component<
 						>
 							Hinweis{' '}
 							{errors.hints.length > 0 ? (
-								<span className="font-jetbrains">
-									({errors.hints.length})
-								</span>
+								<span>({errors.hints.length})</span>
 							) : null}
 						</button>
 						<button
 							type="button"
 							className={`${
 								tabOpen === 'validation' ? 'bg-white/25' : ''
-							} border-x p-4 hover:bg-white/50 transition-colors transition`}
+							} border-l border-gray-600 p-2 hover:bg-white/50 transition-colors 2xl:text-md text-sm transition`}
 							onClick={() => {
 								this.setState({
 									tabOpen: 'validation',
@@ -490,16 +531,28 @@ class BoardKonfiguratorBoard extends React.Component<
 						>
 							Validierung{' '}
 							{errors.validation.length > 0 ? (
-								<span className="font-jetbrains">
-									({errors.validation.length})
-								</span>
+								<span>({errors.validation.length})</span>
 							) : null}
 						</button>
 						<button
 							type="button"
 							className={`${
+								tabOpen === 'config' ? 'bg-white/25' : ''
+							} border-x border-gray-600 p-2 hover:bg-white/50 transition-colors 2xl:text-md text-sm transition`}
+							onClick={() => {
+								this.setState({
+									tabOpen: 'config',
+									errorViewOpen: true,
+								});
+							}}
+						>
+							Konfiguration
+						</button>
+						<button
+							type="button"
+							className={`${
 								tabOpen === 'hotkeys' ? 'bg-white/25' : ''
-							} border-l p-4 hover:bg-white/50 transition-colors transition ml-auto`}
+							} border-l border-gray-600 p-2 hover:bg-white/50 transition-colors 2xl:text-md text-sm transition ml-auto`}
 							onClick={() => {
 								this.setState({
 									tabOpen: 'hotkeys',
@@ -512,8 +565,10 @@ class BoardKonfiguratorBoard extends React.Component<
 					</div>
 					<div
 						className={`${
-							errorViewOpen ? 'h-[250px] border-t ' : 'h-0'
-						} w-full bg-background-700 transition-all duration-200 overflow-y-auto`}
+							errorViewOpen
+								? 'h-[250px] border-t  border-gray-600'
+								: 'h-0'
+						} w-full bg-background-700 overflow-y-auto transition-all`}
 					>
 						{errorWindow}
 					</div>

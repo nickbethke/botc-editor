@@ -1,5 +1,5 @@
 import { DirectionEnum } from '../../interfaces/BoardConfigInterface';
-import FieldWithPositionInterface from './fieldWithPositionInterface';
+import FieldWithPositionInterface from './FieldWithPositionInterface';
 
 interface FieldWithPositionAndDirectionInterface
 	extends FieldWithPositionInterface {
