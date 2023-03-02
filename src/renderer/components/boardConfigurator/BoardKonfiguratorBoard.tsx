@@ -436,7 +436,7 @@ class BoardKonfiguratorBoard extends React.Component<
 				>
 					<div className="relative w-full flex items-center h-full">
 						<div
-							className="flex flex-col items-center bg-[#5c9621] rounded p-6 w-fit mx-auto"
+							className="flex flex-col items-center bg-grass rounded p-6 w-fit mx-auto"
 							style={{
 								transform: `scale(${zoom / 100})`,
 							}}

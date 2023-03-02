@@ -193,7 +193,6 @@ class Field extends React.Component<FieldProps, FieldStats> {
 							backgroundPosition: 'center',
 							backgroundSize: 'contain',
 							backgroundRepeat: 'no-repeat',
-							backgroundColor: '#5fa01e',
 						}}
 						tabIndex={-1}
 						onClick={this.handleClick}

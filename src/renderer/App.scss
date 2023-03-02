@@ -123,6 +123,13 @@ body {
 	background-position: center;
 }
 
+.bg-grass {
+	background-color: #5fa01e;
+	background-image: url('/assets/images/grass.png');
+	background-size: 512px 512px;
+	background-position: center;
+}
+
 .clickable {
 	@apply pl-2 relative border-l-[1px] border-white;
 	width: fit-content;
