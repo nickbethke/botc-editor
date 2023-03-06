@@ -121,5 +121,13 @@ contextBridge.exposeInMainWorld('electron', {
 		remove(file: string): Promise<true | string> {
 			return ipcRenderer.invoke('file:remove', file);
 		},
+		getTranslation(lang: string): Promise<Array<[string, string]> | []> {
+			return ipcRenderer.invoke('file:getTranslation', lang);
+		},
+	},
+	open: {
+		homepage() {
+			return ipcRenderer.invoke('open:homepage');
+		},
 	},
 });

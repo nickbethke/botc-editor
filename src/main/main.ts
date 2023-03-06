@@ -206,6 +206,14 @@ app.whenReady()
 			return IPCHelper.removeFile(args[0]);
 		});
 
+		ipcMain.handle('open:homepage', () => {
+			return IPCHelper.openHomepage();
+		});
+
+		ipcMain.handle('file:getTranslation', (event, ...args) => {
+			return IPCHelper.loadLanguageFile(args[0]);
+		});
+
 		setInterval(() => {
 			process.stdout.write(
 				`CPU: ${process

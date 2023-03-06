@@ -54,21 +54,25 @@ class BoardEditorChoice extends React.Component<
 				<div>
 					<div className="absolute top-[50%] left-[50%] translate-y-[-50%] translate-x-[-50%]">
 						<div className="text-center text-3xl mb-8">
-							Board Konfiguration
+							{window.languageHelper.translate(
+								'Board Configuration'
+							)}
 						</div>
 						<div className="relative flex gap-8 w-[80vw] xl:w-[70vw] 2xl:w-[60vw]  mx-auto">
 							<BoardEditorChoiceCard
-								text="Leeres Board"
+								text={window.languageHelper.translate(
+									'Empty Board'
+								)}
 								bgImage={newBGImage}
 								onClickAction={this.openNewBoardConfig}
 							/>
 							<BoardEditorChoiceCard
-								text="Zufällig"
+								text={window.languageHelper.translate('Random')}
 								bgImage={randomBGImage}
 								onClickAction={this.openRandomBoardConfig}
 							/>
 							<BoardEditorChoiceCard
-								text="Laden"
+								text={window.languageHelper.translate('Load')}
 								bgImage={loadingBGImage}
 								onClickAction={this.openLoadBoardConfig}
 							/>

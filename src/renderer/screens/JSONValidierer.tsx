@@ -159,51 +159,61 @@ class JSONValidierer extends React.Component<
 	leavePopup = (): JSX.Element => {
 		return (
 			<ConfirmPopup
-				label="Validator wirklich verlassen?"
+				label={window.languageHelper.translate('Leave Validator?')}
 				onConfirm={this.backToHomeScreen}
 				onAbort={this.abortBackToHomeScreen}
+				confirmText={window.languageHelper.translate('OK')}
+				abortText={window.languageHelper.translate('Cancel')}
 			/>
 		);
 	};
 
 	newFileSavePreviousPopup = (): JSX.Element => {
 		const { currentFile } = this.state;
-		return (
-			<ConfirmPopup
-				label={`${currentFile?.parsed.base} speichern?`}
-				onConfirm={() => {
-					this.saveFile()
-						.then(() => {
-							this.setState({
-								popup: null,
-								currentFile: null,
-								fileHasBeenEdited: false,
-								code: '{}',
+		if (currentFile) {
+			return (
+				<ConfirmPopup
+					label={window.languageHelper.translateVars('Save {0}?', [
+						currentFile.parsed.base,
+					])}
+					onConfirm={() => {
+						this.saveFile()
+							.then(() => {
+								this.setState({
+									popup: null,
+									currentFile: null,
+									fileHasBeenEdited: false,
+									code: '{}',
+								});
+								return false;
+							})
+							.catch((e) => {
+								if (e) console.log(e);
 							});
-							return false;
-						})
-						.catch((e) => {
-							if (e) console.log(e);
+					}}
+					onAbort={() => {
+						this.setState({
+							popup: null,
+							currentFile: null,
+							fileHasBeenEdited: false,
+							code: '{}',
 						});
-				}}
-				onAbort={() => {
-					this.setState({
-						popup: null,
-						currentFile: null,
-						fileHasBeenEdited: false,
-						code: '{}',
-					});
-				}}
-				confirmText="Speichern"
-				abortText="Verwerfen"
-			/>
-		);
+					}}
+					confirmText={window.languageHelper.translate('Save')}
+					abortText={window.languageHelper.translate('Discard')}
+				/>
+			);
+		}
+		return <div />;
 	};
 
 	loadingPopup = (label?: string): JSX.Element => {
 		return (
 			<Popup
-				label={label || 'Konfiguration öffnen'}
+				label={
+					label ||
+					window.languageHelper.translate('Open Configuration')
+				}
 				content={
 					<ProgressBar
 						wrapperClass="text-center mx-auto justify-center"
@@ -273,7 +283,9 @@ class JSONValidierer extends React.Component<
 			await window.electron.file.save(currentFile.path, code);
 		} else {
 			this.setState({
-				popup: this.loadingPopup('Konfiguration speichern'),
+				popup: this.loadingPopup(
+					window.languageHelper.translate('Save Configuration')
+				),
 			});
 			let save;
 			switch (type) {
@@ -330,7 +342,7 @@ class JSONValidierer extends React.Component<
 			type,
 			code,
 			codeError,
-			window,
+			window: cWindow,
 			consoleOutput,
 			currentFile,
 			fileHasBeenEdited,
@@ -348,7 +360,11 @@ class JSONValidierer extends React.Component<
 									className="text-4xl border border-gray-600 cursor-pointer hover:bg-accent-500"
 									onClick={this.handleBackButton}
 								/>
-								<div className="text-4xl">Validierer</div>
+								<div className="text-4xl">
+									{window.languageHelper.translate(
+										'Validator'
+									)}
+								</div>
 							</div>
 						</div>
 					</div>
@@ -358,7 +374,8 @@ class JSONValidierer extends React.Component<
 							className="bg-accent-500/25 hover:bg-accent-500 text-lg p-2 flex flex-row justify-center items-center gap-2 border-r border-gray-600"
 							onClick={this.openNewFile}
 						>
-							<VscNewFile /> Neu
+							<VscNewFile />{' '}
+							{window.languageHelper.translate('New')}
 						</button>
 						{currentFile ? (
 							<div
@@ -382,17 +399,19 @@ class JSONValidierer extends React.Component<
 							className="bg-accent-500/25 hover:bg-accent-500 text-lg p-2 flex flex-row justify-center items-center gap-2 border-r border-gray-600"
 							onClick={this.openFile}
 						>
-							<VscFile /> Öffnen
+							<VscFile />{' '}
+							{window.languageHelper.translate('Open')}
 						</button>
 						<button
 							type="button"
 							className="bg-accent-500/25 hover:bg-accent-500 text-lg p-2 flex flex-row justify-center items-center gap-2 border-r border-gray-600"
 							onClick={this.saveFile}
 						>
-							<VscSave /> Speichern
+							<VscSave />{' '}
+							{window.languageHelper.translate('Save')}
 						</button>
 						<p className="bg-accent-500/10 h-full text-lg p-2 flex flex-row justify-center items-center gap-2">
-							Type
+							{window.languageHelper.translate('Type')}
 						</p>
 						<div className="border-r border-gray-600">
 							<select
@@ -401,15 +420,19 @@ class JSONValidierer extends React.Component<
 								value={type}
 							>
 								<option className="rounded-none" value="partie">
-									Partie Konfiguration
+									{window.languageHelper.translate(
+										'Party Configuration'
+									)}
 								</option>
 								<option className="rounded-none" value="board">
-									Board Konfiguration
+									{window.languageHelper.translate(
+										'Board Configuration'
+									)}
 								</option>
 							</select>
 						</div>
 						<div className="border-l border-gray-600 ml-auto h-full text-sm p-2 flex flex-row justify-center items-center gap-2">
-							Version: 1.2.1
+							{window.languageHelper.translate('Version')}: 1.2.1
 						</div>
 					</div>
 					<div className="grow relative h-full">
@@ -417,8 +440,8 @@ class JSONValidierer extends React.Component<
 							<MonacoEditor
 								value={code}
 								language="json"
-								height={window.height - (149 + 280)}
-								width={window.width}
+								height={cWindow.height - (149 + 280)}
+								width={cWindow.width}
 								theme="vs-dark"
 								onChange={async (value) => {
 									await this.onChange(value);
@@ -430,7 +453,9 @@ class JSONValidierer extends React.Component<
 							<div className="w-full h-[280px] max-h-[280px] flex flex-col font-jetbrains border-r border-gray-600 xl:col-span-3">
 								<div className="text-white flex flex-col justify-center border-b border-gray-600 p-2">
 									<div className="text-xl pl-4">
-										JSON-Validation
+										{window.languageHelper.translate(
+											'JSON-Validation'
+										)}
 									</div>
 								</div>
 								<div className="w-full bg-white/10 text-white overflow-auto grow">
@@ -441,7 +466,11 @@ class JSONValidierer extends React.Component<
 							</div>
 							<div className="w-full h-[280px] max-h-[280px] flex flex-col font-jetbrains">
 								<div className="text-white flex flex-col justify-center border-b border-gray-600 p-2">
-									<div className="text-xl pl-4">Errors</div>
+									<div className="text-xl pl-4">
+										{window.languageHelper.translate(
+											'Errors'
+										)}
+									</div>
 								</div>
 								<div className="w-full text-white overflow-auto grow bg-white/10">
 									<div className="h-full max-h-full pl-6 pt-2">

@@ -1024,4 +1024,5 @@ export enum FieldsEnum {
 	LEMBAS,
 	RIVER,
 	WALL,
+	DESTINY_MOUNTAIN,
 }

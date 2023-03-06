@@ -1,0 +1,109 @@
+{
+	"lang": "de",
+	"data": [
+		[
+			"Party-Configurator",
+			"Partie-Konfigurator"
+		],
+		[
+			"Board-Configurator",
+			"Board-Konfigurator"
+		],
+		[
+			"Validator",
+			"Validierer"
+		],
+		[
+			"Exit",
+			"Beenden"
+		],
+		[
+			"Website",
+			"Webseite"
+		],
+		[
+			"Editor Version",
+			"Editor-Version"
+		],
+		[
+			"Empty Board",
+			"Leeres Board"
+		],
+		[
+			"Random",
+			"Zufällig"
+		],
+		[
+			"Load",
+			"Laden"
+		],
+		[
+			"Board Configuration",
+			"Board Konfiguration"
+		],
+		[
+			"New Party Configuration",
+			"Neue Partie Konfiguration"
+		],
+		[
+			"Party Configuration",
+			"Partie Konfiguration"
+		],
+		[
+			"New",
+			"Neu"
+		],
+		[
+			"Open",
+			"Öffnen"
+		],
+		[
+			"Save",
+			"Speichern"
+		],
+		[
+			"Type",
+			"Typ"
+		],
+		[
+			"Version",
+			"Version"
+		],
+		[
+			"JSON-Validation",
+			"JSON-Validierung"
+		],
+		[
+			"Errors",
+			"Fehler"
+		],
+		[
+			"Save Configuration",
+			"Konfiguration speichern"
+		],
+		[
+			"Open Configuration",
+			"Konfiguration öffnen"
+		],
+		[
+			"Discard",
+			"Verwerfen"
+		],
+		[
+			"Save {0}?",
+			"{0} speichern?"
+		],
+		[
+			"Leave Validator?",
+			"Validator wirklich verlassen?"
+		],
+		[
+			"OK",
+			"OK"
+		],
+		[
+			"Cancel",
+			"Abbrechen"
+		]
+	]
+}

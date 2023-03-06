@@ -35,6 +35,15 @@ import Popup from '../components/popups/Popup';
 import RandomBoardStartValuesDialog from '../components/popups/RandomBoardStartValuesDialog';
 import PresetsTab from '../components/boardConfigurator/PresetsTab';
 
+import startFieldImage from '../../../assets/texturepacks/default/start.png';
+import checkpointImage from '../../../assets/texturepacks/default/checkpoint.png';
+import destinyMountainImage from '../../../assets/texturepacks/default/schicksalsberg.png';
+import eyeImage from '../../../assets/texturepacks/default/eye.png';
+import riverImage from '../../../assets/texturepacks/default/river.png';
+import lembasImage from '../../../assets/texturepacks/default/lembas.png';
+import holeImage from '../../../assets/texturepacks/default/hole.png';
+import wallImage from '../../../assets/texturepacks/default/wall.png';
+
 type BoardKonfiguratorProps = {
 	generator?: BoardGenerator | null;
 	json?: BoardConfigInterface | null;
@@ -60,6 +69,7 @@ type BoardKonfiguratorState = {
 	random: boolean;
 	contextMenu: JSX.Element | null;
 	popup: JSX.Element | null;
+	dragInProcess: boolean;
 };
 
 // TODO: Speichern Dialog: Als Preset oder als Board
@@ -105,6 +115,7 @@ class BoardKonfigurator extends React.Component<
 		random: false,
 		contextMenu: null,
 		popup: null,
+		dragInProcess: false,
 	};
 
 	private draggableItemClass: string =
@@ -153,6 +164,7 @@ class BoardKonfigurator extends React.Component<
 					random: false,
 					contextMenu: null,
 					popup: null,
+					dragInProcess: false,
 				};
 			} catch (e) {
 				if (e instanceof Error)
@@ -187,6 +199,7 @@ class BoardKonfigurator extends React.Component<
 				random: false,
 				contextMenu: null,
 				popup: null,
+				dragInProcess: false,
 			};
 		} else {
 			this.state = BoardKonfigurator.defaultState;
@@ -349,6 +362,7 @@ class BoardKonfigurator extends React.Component<
 		);
 	};
 
+	// TODO: Wenn das Auge verloren geht steht es aber immer noch in der Config...
 	updateConfig = () => {
 		const { board, config } = this.state;
 		this.setState({
@@ -521,7 +535,18 @@ class BoardKonfigurator extends React.Component<
 							</div>
 							{this.tools()}
 						</div>
-						<div className="border-t border-b border-gray-600">
+						<div className="border-t border-b border-gray-600 grid grid-cols-2">
+							<button
+								type="button"
+								className="p-4 hover:bg-white/50 transition-colors transition w-full border-r border-gray-600"
+								onClick={() => {
+									this.setState(
+										BoardKonfigurator.defaultState
+									);
+								}}
+							>
+								Neues Board
+							</button>
 							<button
 								type="button"
 								className="p-4 hover:bg-white/50 transition-colors transition w-full"
@@ -630,7 +655,7 @@ class BoardKonfigurator extends React.Component<
 						</button>
 					</div>
 				</div>
-				<div className="bg-white/10 flex flex-col flex-grow">
+				<div className="bg-white/10 flex flex-col flex-grow relative">
 					{currentTab}
 				</div>
 			</div>
@@ -638,56 +663,62 @@ class BoardKonfigurator extends React.Component<
 	};
 
 	draggerOnDragStart: (type: FieldsEnum) => void = (type) => {
-		this.setState({ isDragged: type, currentTool: 'select' });
+		this.setState({
+			isDragged: type,
+			currentTool: 'select',
+			dragInProcess: true,
+		});
 	};
 
 	draggerOnDragEnd: () => void = () => {
-		this.setState({ isDragged: null });
+		this.setState({ isDragged: null, dragInProcess: false });
 	};
 
 	fields = () => {
 		return (
-			<div>
-				<div className="grid grid-cols-2 m-4 gap-4 pb-4 border-b border-gray-600">
+			<div className="h-full overflow-y-auto">
+				<div className="grid grid-cols-3 m-4 gap-4 pb-4 border-b border-gray-600">
 					<FieldDragger
 						type={FieldsEnum.START}
 						text="Start"
 						onDragStart={this.draggerOnDragStart}
 						onDragEnd={this.draggerOnDragEnd}
+						icon={startFieldImage}
 					/>
 					<FieldDragger
 						type={FieldsEnum.CHECKPOINT}
 						text="Checkpoint"
 						onDragStart={this.draggerOnDragStart}
 						onDragEnd={this.draggerOnDragEnd}
+						icon={checkpointImage}
 					/>
 					<FieldDragger
 						type={FieldsEnum.EYE}
 						text="Saurons Auge"
-						className="col-span-2"
 						onDragStart={this.draggerOnDragStart}
 						onDragEnd={this.draggerOnDragEnd}
+						icon={eyeImage}
 					/>
-				</div>
-				<div className="grid grid-cols-2 m-4 gap-4 pb-4 border-b border-gray-600">
 					<FieldDragger
 						type={FieldsEnum.RIVER}
 						text="Fluss"
 						onDragStart={this.draggerOnDragStart}
 						onDragEnd={this.draggerOnDragEnd}
+						icon={riverImage}
 					/>
 					<FieldDragger
 						type={FieldsEnum.LEMBAS}
-						text="LembasField"
+						text="Lembas"
 						onDragStart={this.draggerOnDragStart}
 						onDragEnd={this.draggerOnDragEnd}
+						icon={lembasImage}
 					/>
 					<FieldDragger
 						type={FieldsEnum.HOLE}
 						text="Loch"
-						className="col-span-2"
 						onDragStart={this.draggerOnDragStart}
 						onDragEnd={this.draggerOnDragEnd}
+						icon={holeImage}
 					/>
 				</div>
 				<div className="grid grid-cols-2 m-4 gap-4">
@@ -1009,7 +1040,7 @@ class BoardKonfigurator extends React.Component<
 	};
 
 	board = () => {
-		const { config, board, selected, os } = this.state;
+		const { config, board, selected, os, dragInProcess } = this.state;
 		const nConfig = BoardGenerator.updateBoardConfigFromBoardArray(
 			config,
 			board
@@ -1072,6 +1103,7 @@ class BoardKonfigurator extends React.Component<
 				onSelect={this.handleBoardOnSelect}
 				onDrop={this.handleBoardOnDrop}
 				hasDragger={os === 'win32'}
+				dragInProcess={dragInProcess}
 			/>
 		);
 	};

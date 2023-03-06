@@ -203,6 +203,29 @@ class IPCHelper {
 		}
 		return 'File does not exits';
 	}
+
+	static openHomepage() {
+		shell.openExternal('https://botc.ntk-music.de');
+	}
+
+	static loadLanguageFile(lang: string) {
+		const languagesPath = IPCHelper.getAssetPath('languages/');
+		if (fs.existsSync(path.join(languagesPath, `${lang}.json`))) {
+			return fs.readFileSync(path.join(languagesPath, `${lang}.json`), {
+				encoding: 'utf8',
+			});
+		}
+		return JSON.stringify({ lang: '', data: [] });
+	}
+
+	static getAssetPath(...paths: string[]): string {
+		return path.join(
+			app.isPackaged
+				? path.join(process.resourcesPath, 'assets')
+				: path.join(__dirname, '../../../assets'),
+			...paths
+		);
+	}
 }
 
 export default IPCHelper;

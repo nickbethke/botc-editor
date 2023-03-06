@@ -1,12 +1,13 @@
 import React from 'react';
 import _uniqueId from 'lodash/uniqueId';
-import startFieldImage from '../../../../assets/images/start.png';
-import checkpointImage from '../../../../assets/images/checkpoint.png';
-import eyeImage from '../../../../assets/images/eye.png';
-import riverImage from '../../../../assets/images/river.png';
-import lembasImage from '../../../../assets/images/lembas.png';
-import holeImage from '../../../../assets/images/hole.png';
-import wallImage from '../../../../assets/images/wall.png';
+import startFieldImage from '../../../../assets/texturepacks/default/start.png';
+import checkpointImage from '../../../../assets/texturepacks/default/checkpoint.png';
+import destinyMountainImage from '../../../../assets/texturepacks/default/schicksalsberg.png';
+import eyeImage from '../../../../assets/texturepacks/default/eye.png';
+import riverImage from '../../../../assets/texturepacks/default/river.png';
+import lembasImage from '../../../../assets/texturepacks/default/lembas.png';
+import holeImage from '../../../../assets/texturepacks/default/hole.png';
+import wallImage from '../../../../assets/texturepacks/default/wall.png';
 
 import { BoardPosition } from '../generator/interfaces/boardPosition';
 import { DirectionEnum, Position } from '../interfaces/BoardConfigInterface';
@@ -23,6 +24,7 @@ type FieldProps = {
 	attribute: DirectionEnum | number | null;
 	boardSize: { width: number; height: number };
 	wallsToBuild: Array<Position[]>;
+	dragInProcess: boolean;
 };
 type FieldStats = {
 	dragOver: boolean;
@@ -57,6 +59,7 @@ class Field extends React.Component<FieldProps, FieldStats> {
 			attribute,
 			boardSize,
 			wallsToBuild,
+			dragInProcess,
 		} = this.props;
 		const { dragOver } = this.state;
 		const id = _uniqueId('field-');
@@ -69,6 +72,10 @@ class Field extends React.Component<FieldProps, FieldStats> {
 				break;
 			case FieldsEnum.CHECKPOINT:
 				image = checkpointImage;
+				text = ((attribute as number) + 1).toString();
+				break;
+			case FieldsEnum.DESTINY_MOUNTAIN:
+				image = destinyMountainImage;
 				text = ((attribute as number) + 1).toString();
 				break;
 			case FieldsEnum.EYE:
@@ -90,7 +97,7 @@ class Field extends React.Component<FieldProps, FieldStats> {
 		}
 		const textElement = text ? (
 			<div className="absolute bottom-0 right-0 flex items-center justify-center">
-				<span className="text-2xl px-1 font-mono font-black text-white bg-gray-900/75">
+				<span className="text-2xl px-1 font-mono font-black text-white bg-gray-900/75 rounded-2xl">
 					{text}
 				</span>
 			</div>
@@ -157,6 +164,20 @@ class Field extends React.Component<FieldProps, FieldStats> {
 				/>
 			);
 		}
+
+		const style = image
+			? {
+					height: `64px`,
+					width: `64px`,
+					backgroundImage: `url(${image})`,
+					backgroundPosition: 'center',
+					backgroundSize: 'contain',
+					backgroundRepeat: 'no-repeat',
+			  }
+			: {
+					height: `64px`,
+					width: `64px`,
+			  };
 		return (
 			<div
 				className="flex flex-col"
@@ -182,18 +203,13 @@ class Field extends React.Component<FieldProps, FieldStats> {
 						type="button"
 						key={id}
 						className={`${
-							selected ? 'rounded border-red-400' : ''
-						} ${
-							dragOver ? 'border-dashed' : ''
-						} relative border hover:bg-white/25 text-transparent`}
-						style={{
-							height: `${fieldSize / 4}em`,
-							width: `${fieldSize / 4}em`,
-							backgroundImage: `url(${image})`,
-							backgroundPosition: 'center',
-							backgroundSize: 'contain',
-							backgroundRepeat: 'no-repeat',
-						}}
+							selected
+								? 'border-accent drop-shadow-lg shadow-inner shadow-lg bg-gray-600/25'
+								: 'border-transparent '
+						}${
+							dragInProcess ? 'bg-gray-800/25 ' : ''
+						} border rounded-2xl  relative hover:bg-white/25 text-transparent transition transition-all`}
+						style={style}
 						tabIndex={-1}
 						onClick={this.handleClick}
 					>

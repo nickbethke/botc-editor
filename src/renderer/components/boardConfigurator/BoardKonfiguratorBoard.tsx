@@ -32,11 +32,11 @@ type BoardKonfiguratorBoardProps = {
 	selected: BoardPosition | null;
 	hasDragger: boolean;
 	errors: BoardKonfiguratorErrorProps;
+	dragInProcess: boolean;
 };
 
 type BoardKonfiguratorBoardState = {
 	zoom: number;
-	selected: BoardPosition | null;
 	errorViewOpen: boolean;
 	tabOpen: HelperWindows;
 	window: { width: number; height: number };
@@ -48,10 +48,8 @@ class BoardKonfiguratorBoard extends React.Component<
 > {
 	constructor(props: BoardKonfiguratorBoardProps) {
 		super(props);
-		const { selected } = this.props;
 		this.state = {
 			zoom: 100,
-			selected,
 			errorViewOpen: true,
 			tabOpen: 'critical',
 			window: { width: window.innerWidth, height: window.innerHeight },
@@ -281,17 +279,14 @@ class BoardKonfiguratorBoard extends React.Component<
 
 	private buildBoard() {
 		const board: Array<Array<JSX.Element>> = [];
-		const { selected } = this.state;
 		const {
 			config,
 			onSelect,
 			onDrop,
 			board: cBoard,
 			selected: propsSelected,
+			dragInProcess,
 		} = this.props;
-		if (propsSelected && selected !== propsSelected) {
-			this.setState({ selected: propsSelected });
-		}
 
 		const { height, width } = config;
 		for (let y = 0; y < height; y += 1) {
@@ -306,6 +301,16 @@ class BoardKonfiguratorBoard extends React.Component<
 				}
 				if (boardField.fieldEnum === FieldsEnum.CHECKPOINT) {
 					attribute = (boardField as Checkpoint).order;
+					if (config.checkPoints.length > 0) {
+						const lastCheckpoint =
+							config.checkPoints[config.checkPoints.length - 1];
+						if (
+							boardField.position.x === lastCheckpoint[0] &&
+							boardField.position.y === lastCheckpoint[1]
+						) {
+							type = FieldsEnum.DESTINY_MOUNTAIN;
+						}
+					}
 				}
 
 				if (boardField.fieldEnum === FieldsEnum.LEMBAS) {
@@ -351,13 +356,17 @@ class BoardKonfiguratorBoard extends React.Component<
 						wallThickness={2}
 						wallsToBuild={wallsToBuild}
 						type={type}
+						dragInProcess={dragInProcess}
 						selected={
-							!!(selected && selected.x === x && selected.y === y)
+							!!(
+								propsSelected &&
+								propsSelected.x === x &&
+								propsSelected.y === y
+							)
 						}
 						attribute={attribute}
 						onSelect={(position) => {
 							if (onSelect(position)) {
-								this.setState({ selected: position });
 								return true;
 							}
 							return false;
@@ -380,7 +389,7 @@ class BoardKonfiguratorBoard extends React.Component<
 			tabOpen,
 			window: browserWindow,
 		} = this.state;
-		const { errors, hasDragger } = this.props;
+		const { errors, hasDragger, config } = this.props;
 		const { board } = this.buildBoard();
 		const errorViewOpener = errorViewOpen ? (
 			<BsChevronDown />
@@ -423,6 +432,7 @@ class BoardKonfiguratorBoard extends React.Component<
 				break;
 		}
 		// TODO: Zoom: oberer Rand verschwindet
+		// TODO: Felder verschiebbar machen
 		return (
 			<div className="h-full max-h-full flex flex-col">
 				<div
@@ -450,6 +460,14 @@ class BoardKonfiguratorBoard extends React.Component<
 								</div>
 							))}
 						</div>
+					</div>
+					<div className="absolute top-0 right-0 py-1 px-2 bg-white/10 font-jetbrains flex items-center gap-4 border border-t-0 border-gray-600">
+						<span className="text-[12px]">
+							&quot;{config.name}&quot;
+						</span>
+						<span className="text-[12px]">
+							{config.width} x {config.height}
+						</span>
 					</div>
 				</div>
 				<div

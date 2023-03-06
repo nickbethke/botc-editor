@@ -229,14 +229,16 @@
 		},
 		"win": {
 			"target": [
-				"nsis"
+				"nsis",
+				"msi",
+				"zip"
 			]
 		},
 		"linux": {
 			"target": [
 				"AppImage"
 			],
-			"category": "Development"
+			"category": "Utility"
 		},
 		"directories": {
 			"app": "release/app",

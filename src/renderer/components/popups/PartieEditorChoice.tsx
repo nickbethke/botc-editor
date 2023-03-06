@@ -45,16 +45,20 @@ class PartieEditorChoice extends React.Component<
 				<div>
 					<div className="absolute top-[50%] left-[50%] translate-y-[-50%] translate-x-[-50%]">
 						<div className="text-center text-3xl mb-8">
-							Partie Konfiguration
+							{window.languageHelper.translate(
+								'Party Configuration'
+							)}
 						</div>
 						<div className="relative flex gap-8 w-[80vw] xl:w-[70vw] 2xl:w-[60vw]  mx-auto">
 							<PartieEditorChoiceCard
-								text="Neue Partie Konfiguration"
+								text={window.languageHelper.translate(
+									'New Party Configuration'
+								)}
 								bgImage={newBGImage}
 								onClickAction={this.openNewConfigScreen}
 							/>
 							<PartieEditorChoiceCard
-								text="Laden"
+								text={window.languageHelper.translate('Load')}
 								bgImage={loadingBGImage}
 								onClickAction={this.openLoadPartieConfig}
 							/>

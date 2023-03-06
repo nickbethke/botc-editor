@@ -3,9 +3,11 @@ import { ParsedPath } from 'path';
 import { BoardPreset, RiverPreset } from '../main/helper/PresetsLoader';
 import PartieConfigInterface from './components/interfaces/PartieConfigInterface';
 import BoardConfigInterface from './components/interfaces/BoardConfigInterface';
+import TranslationHelper from './helper/TranslationHelper';
 
 declare global {
 	interface Window {
+		languageHelper: TranslationHelper;
 		electron: {
 			dialog: {
 				openConfig(): Promise<
@@ -58,6 +60,7 @@ declare global {
 				openDir(file: string): void;
 				save(file: string, content: string): Promise<true | string>;
 				remove(file: string): Promise<true | string>;
+				getTranslation(lang: string): Promise<string>;
 			};
 			validate(
 				json: object,
@@ -70,6 +73,9 @@ declare global {
 				isMac(): Promise<boolean>;
 				getOS(): Promise<NodeJS.Platform>;
 				getVersion(): Promise<string>;
+			};
+			open: {
+				homepage(): void;
 			};
 			ipcRenderer: {
 				on(

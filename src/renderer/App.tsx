@@ -12,6 +12,11 @@ import BoardGenerator from './components/generator/BoardGenerator';
 import PartieConfigInterface from './components/interfaces/PartieConfigInterface';
 import BoardConfigInterface from './components/interfaces/BoardConfigInterface';
 import sunImage from '../../assets/images/sun.gif';
+import deFlag from '../../assets/images/de.png';
+import gbFlag from '../../assets/images/gb.png';
+import TranslationHelper, {
+	AvailableLanguages,
+} from './helper/TranslationHelper';
 
 type AppStates = {
 	openScreen: string;
@@ -24,6 +29,7 @@ type AppStates = {
 	generator: BoardGenerator | null;
 	version: string;
 	surprise: boolean;
+	lang: AvailableLanguages;
 };
 
 class App extends React.Component<unknown, AppStates> {
@@ -36,6 +42,7 @@ class App extends React.Component<unknown, AppStates> {
 			generator: null,
 			version: '',
 			surprise: false,
+			lang: AvailableLanguages.de,
 		};
 		this.handleOpenBoardEditorChoice =
 			this.handleOpenBoardEditorChoice.bind(this);
@@ -247,6 +254,7 @@ class App extends React.Component<unknown, AppStates> {
 			);
 		}
 		const tabIndex = openPopup !== false ? -1 : 0;
+		const { lang } = this.state;
 		return (
 			<div className="text-white">
 				<div id="home" className={popup ? 'blur' : ''}>
@@ -269,7 +277,7 @@ class App extends React.Component<unknown, AppStates> {
 									Battle of the Centerländ
 								</div>
 								<div className="text-2xl 2xl:text-4xl">
-									Editor
+									{window.languageHelper.translate('Editor')}
 								</div>
 							</div>
 							<div className="flex flex-col gap-4">
@@ -279,7 +287,9 @@ class App extends React.Component<unknown, AppStates> {
 									className="text-2xl clickable"
 									onClick={this.handleOpenBoardEditorChoice}
 								>
-									Board-Konfigurator
+									{window.languageHelper.translate(
+										'Board-Configurator'
+									)}
 								</button>
 								<button
 									tabIndex={tabIndex}
@@ -287,7 +297,9 @@ class App extends React.Component<unknown, AppStates> {
 									className="text-2xl clickable"
 									onClick={this.handleOpenPartieEditorChoice}
 								>
-									Partie-Konfigurator
+									{window.languageHelper.translate(
+										'Party-Configurator'
+									)}
 								</button>
 								<button
 									tabIndex={tabIndex}
@@ -295,7 +307,9 @@ class App extends React.Component<unknown, AppStates> {
 									className="text-2xl clickable"
 									onClick={this.handleOpenValidator}
 								>
-									Validierer
+									{window.languageHelper.translate(
+										'Validator'
+									)}
 								</button>
 								<button
 									tabIndex={tabIndex}
@@ -303,14 +317,71 @@ class App extends React.Component<unknown, AppStates> {
 									className="text-2xl clickable mt-8 flex gap-4"
 									onClick={this.handleCloseApp}
 								>
-									Beenden
+									{window.languageHelper.translate('Exit')}
 								</button>
 							</div>
 						</div>
-						<div className="bg-white/10 py-0.5 px-2  w-full font-jetbrains text-right">
+						<div className="bg-white/10 p-2 w-full font-jetbrains flex flex-row justify-end gap-4">
+							<button
+								type="button"
+								className="text-[10px]"
+								onClick={() => {
+									window.electron.open.homepage();
+								}}
+							>
+								{window.languageHelper.translate('Website')}
+							</button>
 							<span className="text-[10px]">
-								Editor Version: {version}
+								{window.languageHelper.translate(
+									'Editor Version'
+								)}
+								: {version}
 							</span>
+							<button
+								type="button"
+								className="text-[10px]"
+								onClick={() => {
+									if (lang === AvailableLanguages.en) {
+										window.languageHelper
+											.switchLanguage(
+												AvailableLanguages.de
+											)
+											.then(() => {
+												this.setState({
+													lang: AvailableLanguages.de,
+												});
+												return null;
+											})
+											.catch(console.log);
+									} else {
+										window.languageHelper
+											.switchLanguage(
+												AvailableLanguages.en
+											)
+											.then(() => {
+												this.setState({
+													lang: AvailableLanguages.en,
+												});
+												return null;
+											})
+											.catch(console.log);
+									}
+								}}
+							>
+								<img
+									src={
+										lang === AvailableLanguages.en
+											? deFlag
+											: gbFlag
+									}
+									alt={
+										lang === AvailableLanguages.en
+											? 'DE'
+											: 'GB'
+									}
+									className="h-3"
+								/>
+							</button>
 						</div>
 					</div>
 				</div>
