@@ -104,6 +104,110 @@
 		[
 			"Cancel",
 			"Abbrechen"
+		],
+		[
+			"as Preset",
+			"als Preset"
+		],
+		[
+			"as Configuration",
+			"als Konfiguration"
+		],
+		[
+			"Close",
+			"Schließen"
+		],
+		[
+			"Empty",
+			"Leer"
+		],
+		[
+			"from Random",
+			"von zufälligem Board"
+		],
+		[
+			"Dark Mode",
+			"Dunkler Modus"
+		],
+		[
+			"Open Configuration",
+			"Konfiguration öffnen"
+		],
+		[
+			"Open Presets Folder",
+			"Presets-Ordner öffnen"
+		],
+		[
+			"Settings",
+			"Einstellungen"
+		],
+		[
+			"Board",
+			"Spielbrett"
+		],
+		[
+			"Board Settings",
+			"Spielbrett Einstellungen"
+		],
+		[
+			"Board Name",
+			"Spielbrett Name"
+		],
+		[
+			"Board Width",
+			"Spielbrett Breite"
+		],
+		[
+			"Board Height",
+			"Spielbrett Höhe"
+		],
+		[
+			"Fields",
+			"Felder"
+		],
+		[
+			"Presets",
+			"Presets"
+		],
+		[
+			"Start",
+			"Start Feld"
+		],
+		[
+			"Checkpoint",
+			"Kontrollpunkt"
+		],
+		[
+			"Saurons Eye",
+			"Saurons Auge"
+		],
+		[
+			"Lembas Field",
+			"Lembas Feld"
+		],
+		[
+			"River",
+			"Fluss"
+		],
+		[
+			"Hole",
+			"Loch"
+		],
+		[
+			"Wall",
+			"Wand"
+		],
+		[
+			"Delete",
+			"Löschen"
+		],
+		[
+			"Checkpoint Order",
+			"Kontrollpunktreihenfolge"
+		],
+		[
+			"Warnings",
+			"Warnungen"
 		]
 	]
 }

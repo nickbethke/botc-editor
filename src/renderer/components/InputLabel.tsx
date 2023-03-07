@@ -37,7 +37,7 @@ class InputLabel extends React.Component<InputLabelProps, InputLabelState> {
 			helperText: '',
 			validator: undefined,
 			min: 0,
-			labelClass: 'text-lg',
+			labelClass: '',
 			max: 20,
 			label: false,
 			bothSides: false,
@@ -135,7 +135,7 @@ class InputLabel extends React.Component<InputLabelProps, InputLabelState> {
 		}
 		if (type === 'text' || type === 'number') {
 			return (
-				<div className="flex flex-col">
+				<div className="flex flex-row gap-2 items-center">
 					<div>
 						<label htmlFor={this.id} className={`${labelClass}`}>
 							{label}
@@ -144,7 +144,7 @@ class InputLabel extends React.Component<InputLabelProps, InputLabelState> {
 					<div>
 						<input
 							id={this.id}
-							className={`bg-transparent border-b-2 text-xl px-4 py-2 focus:outline-none w-full${validClass}`}
+							className={`dark:bg-muted-900/25 bg-muted-100/25 px-4 py-2 focus:outline-none w-full${validClass}`}
 							type={type}
 							placeholder={placeholder}
 							onChange={this.handleOnChange}

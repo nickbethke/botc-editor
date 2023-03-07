@@ -14,16 +14,30 @@ import BoardConfigInterface from './components/interfaces/BoardConfigInterface';
 import sunImage from '../../assets/images/sun.gif';
 import deFlag from '../../assets/images/de.png';
 import gbFlag from '../../assets/images/gb.png';
-import TranslationHelper, {
-	AvailableLanguages,
-} from './helper/TranslationHelper';
+import { AvailableLanguages } from './helper/TranslationHelper';
+import BoardConfiguratorV2 from './screens/BoardConfiguratorV2';
 
+type AppProps = {
+	os: NodeJS.Platform;
+};
 type AppStates = {
-	openScreen: string;
+	openScreen:
+		| 'home'
+		| 'validator'
+		| 'boardConfigV2FromRandomScreen'
+		| 'boardConfigFromRandomScreen'
+		| 'partieConfigNewScreen'
+		| 'partieConfigLoadScreen'
+		| 'boardConfigNewScreen'
+		| 'boardConfigLoadScreen'
+		| 'boardConfigV2LoadScreen'
+		| 'boardConfigV2NewScreen';
 	openPopup:
 		| 'boardEditorChoice'
+		| 'boardEditorChoiceV2'
 		| 'partieEditorChoice'
 		| 'randomBoardStartValues'
+		| 'randomBoardV2StartValues'
 		| false;
 	toLoad: object | null;
 	generator: BoardGenerator | null;
@@ -32,8 +46,8 @@ type AppStates = {
 	lang: AvailableLanguages;
 };
 
-class App extends React.Component<unknown, AppStates> {
-	constructor(props: unknown) {
+class App extends React.Component<AppProps, AppStates> {
+	constructor(props: AppProps) {
 		super(props);
 		this.state = {
 			openScreen: 'home',
@@ -80,6 +94,10 @@ class App extends React.Component<unknown, AppStates> {
 		this.setState({ openPopup: 'boardEditorChoice' });
 	};
 
+	handleOpenBoardEditorChoiceV2 = () => {
+		this.setState({ openPopup: 'boardEditorChoiceV2' });
+	};
+
 	handleOpenPartieEditorChoice = () => {
 		this.setState({ openPopup: 'partieEditorChoice' });
 	};
@@ -120,6 +138,9 @@ class App extends React.Component<unknown, AppStates> {
 			case 'boardConfigNewScreen':
 			case 'boardConfigLoadScreen':
 				return this.boardConfigScreen();
+			case 'boardConfigV2NewScreen':
+			case 'boardConfigV2LoadScreen':
+				return this.boardConfigV2Screen();
 			case 'boardConfigFromRandomScreen':
 				return this.boardConfigScreen(generator);
 			case 'validator':
@@ -179,6 +200,20 @@ class App extends React.Component<unknown, AppStates> {
 		return null;
 	};
 
+	boardConfigV2Screen = () => {
+		const { openScreen } = this.state;
+		const { os } = this.props;
+		if (openScreen === 'boardConfigV2NewScreen') {
+			return (
+				<BoardConfiguratorV2
+					os={os}
+					onClose={this.handleCloseChildScreen}
+				/>
+			);
+		}
+		return null;
+	};
+
 	validatorScreen = () => {
 		const { openScreen } = this.state;
 		if (openScreen === 'validator') {
@@ -189,7 +224,7 @@ class App extends React.Component<unknown, AppStates> {
 
 	homeScreen() {
 		const { openPopup, version, surprise } = this.state;
-		let popup: JSX.Element | string = '';
+		let popup: JSX.Element | null = null;
 		if (openPopup === 'boardEditorChoice') {
 			popup = (
 				<BoardEditorChoice
@@ -215,6 +250,33 @@ class App extends React.Component<unknown, AppStates> {
 				/>
 			);
 		}
+		if (openPopup === 'boardEditorChoiceV2') {
+			popup = (
+				<BoardEditorChoice
+					onClose={() => {
+						this.setState({ openPopup: false });
+					}}
+					onLoadConfig={async () => {
+						const boardJSON =
+							await window.electron.dialog.openBoardConfig();
+						if (boardJSON) {
+							this.setState({
+								openScreen: 'boardConfigV2LoadScreen',
+								toLoad: boardJSON.config,
+							});
+						}
+					}}
+					onNewConfig={() => {
+						this.setState({ openScreen: 'boardConfigV2NewScreen' });
+					}}
+					onRandomConfig={() => {
+						this.setState({
+							openPopup: 'randomBoardV2StartValues',
+						});
+					}}
+				/>
+			);
+		}
 		if (openPopup === 'randomBoardStartValues') {
 			popup = (
 				<RandomBoardStartValuesDialog
@@ -225,6 +287,22 @@ class App extends React.Component<unknown, AppStates> {
 						this.setState({
 							generator,
 							openScreen: 'boardConfigFromRandomScreen',
+							openPopup: false,
+						});
+					}}
+				/>
+			);
+		}
+		if (openPopup === 'randomBoardV2StartValues') {
+			popup = (
+				<RandomBoardStartValuesDialog
+					onClose={() => {
+						this.setState({ openPopup: 'boardEditorChoiceV2' });
+					}}
+					onGenerated={(generator) => {
+						this.setState({
+							generator,
+							openScreen: 'boardConfigV2FromRandomScreen',
 							openPopup: false,
 						});
 					}}
@@ -255,6 +333,7 @@ class App extends React.Component<unknown, AppStates> {
 		}
 		const tabIndex = openPopup !== false ? -1 : 0;
 		const { lang } = this.state;
+		const { os } = this.props;
 		return (
 			<div className="text-white">
 				<div id="home" className={popup ? 'blur' : ''}>
@@ -281,6 +360,16 @@ class App extends React.Component<unknown, AppStates> {
 								</div>
 							</div>
 							<div className="flex flex-col gap-4">
+								<button
+									tabIndex={tabIndex}
+									type="button"
+									className="text-2xl clickable"
+									onClick={this.handleOpenBoardEditorChoiceV2}
+								>
+									{window.languageHelper.translate(
+										'Board-Configurator V2'
+									)}
+								</button>
 								<button
 									tabIndex={tabIndex}
 									type="button"
@@ -335,7 +424,9 @@ class App extends React.Component<unknown, AppStates> {
 								{window.languageHelper.translate(
 									'Editor Version'
 								)}
-								: {version}
+								: {version}{' '}
+								{window.languageHelper.translate('Platform')}:{' '}
+								{os}
 							</span>
 							<button
 								type="button"

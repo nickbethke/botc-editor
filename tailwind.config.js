@@ -3,6 +3,7 @@ const tailwindcssNesting = require('tailwindcss/nesting');
 const autoprefixer = require('autoprefixer');
 
 module.exports = {
+	darkMode: 'class',
 	content: ['./src/**/*.{html,js,tsx,ejs}'],
 	theme: {
 		extend: {
@@ -32,6 +33,19 @@ module.exports = {
 					700: '#2A6142',
 					800: '#193A27',
 					900: '#08130D',
+				},
+				muted: {
+					DEFAULT: '#6B808E',
+					50: '#D3D9DE',
+					100: '#C7CFD5',
+					200: '#B0BCC3',
+					300: '#99A8B2',
+					400: '#8194A0',
+					500: '#6B808E',
+					600: '#53636E',
+					700: '#3B464E',
+					800: '#23292E',
+					900: '#0B0D0E',
 				},
 			},
 		},

@@ -1,19 +1,18 @@
 {
-	"name": "River Preset 01",
-	"data": [
-		{
-			"position": [
-				0,
-				0
-			],
-			"direction": "EAST"
-		},
-		{
-			"position": [
-				0,
-				1
-			],
-			"direction": "EAST"
-		}
-	]
+    "name": "River Preset 01",
+    "data": [{
+            "position": [
+                0,
+                0
+            ],
+            "direction": "EAST"
+        },
+        {
+            "position": [
+                0,
+                1
+            ],
+            "direction": "EAST"
+        }
+    ]
 }

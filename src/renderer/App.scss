@@ -143,11 +143,11 @@ body {
 
 input[type='range']::-webkit-slider-thumb {
 	-webkit-appearance: none;
-	height: 16px;
-	width: 16px;
+	height: 12px;
+	width: 12px;
 	background: #ffffff;
 	border: 2px solid white;
-	@apply bg-accent-500 rounded-3xl;
+	@apply dark:bg-muted-900 bg-muted-200 rounded-3xl;
 }
 
 select option {

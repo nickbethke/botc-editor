@@ -37,12 +37,10 @@ import PresetsTab from '../components/boardConfigurator/PresetsTab';
 
 import startFieldImage from '../../../assets/texturepacks/default/start.png';
 import checkpointImage from '../../../assets/texturepacks/default/checkpoint.png';
-import destinyMountainImage from '../../../assets/texturepacks/default/schicksalsberg.png';
 import eyeImage from '../../../assets/texturepacks/default/eye.png';
 import riverImage from '../../../assets/texturepacks/default/river.png';
 import lembasImage from '../../../assets/texturepacks/default/lembas.png';
 import holeImage from '../../../assets/texturepacks/default/hole.png';
-import wallImage from '../../../assets/texturepacks/default/wall.png';
 
 type BoardKonfiguratorProps = {
 	generator?: BoardGenerator | null;
@@ -603,7 +601,7 @@ class BoardKonfigurator extends React.Component<
 				currentTab = this.fields();
 				break;
 			case 'presets':
-				currentTab = this.presets();
+				currentTab = this.renderPresets();
 				break;
 			case 'global':
 			default:
@@ -734,7 +732,7 @@ class BoardKonfigurator extends React.Component<
 		);
 	};
 
-	presets = () => {
+	renderPresets = () => {
 		const { presets } = this.state;
 		return (
 			<PresetsTab
@@ -1006,6 +1004,9 @@ class BoardKonfigurator extends React.Component<
 				});
 				board[position.y][position.x] = newField;
 				this.setState({ board }, this.updateConfig);
+				break;
+			case FieldsEnum.RIVER_PRESET:
+				console.log('RIVER_PRESET', position);
 				break;
 			default:
 				break;

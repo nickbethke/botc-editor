@@ -1,5 +1,6 @@
 import React from 'react';
 import { BsChevronDown, BsChevronUp } from 'react-icons/bs';
+import _uniqueId from 'lodash/uniqueId';
 import CBoardPreset from './BoardPreset';
 import CRiverPreset from './RiverPreset';
 import { BoardPreset, RiverPreset } from '../../../main/helper/PresetsLoader';
@@ -22,6 +23,7 @@ class PresetsTab extends React.Component<PresetsTabProps, PresetsTabState> {
 		this.state = { boardsOpen: true, riversOpen: true };
 	}
 
+	// TODO: Preset Vorschau
 	render() {
 		const { presets, className, onContextMenu, onUpdate, onPopup } =
 			this.props;
@@ -34,8 +36,10 @@ class PresetsTab extends React.Component<PresetsTabProps, PresetsTabState> {
 			boards: [],
 		};
 		presets.rivers.forEach((preset) => {
+			const key = _uniqueId('river-preset-');
 			presetsElements.rivers.push(
 				<CRiverPreset
+					key={key}
 					preset={preset}
 					className={className}
 					onContextMenu={(contextMenu) => {
@@ -56,8 +60,10 @@ class PresetsTab extends React.Component<PresetsTabProps, PresetsTabState> {
 			);
 		});
 		presets.boards.forEach((preset) => {
+			const key = _uniqueId('board-preset-');
 			presetsElements.boards.push(
 				<CBoardPreset
+					key={key}
 					preset={preset}
 					className={className}
 					onContextMenu={(contextMenu) => {

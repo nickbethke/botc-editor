@@ -33,7 +33,7 @@ class DblClickInput extends React.Component<
 					type="number"
 					min={min}
 					max={max}
-					className="bg-transparent border-b-2 text-xl pl-4 focus:outline-none"
+					className="bg-transparent border-b-2 pl-4 focus:outline-none w-16"
 					onBlur={() => {
 						this.setState({ open: false });
 						onChange(value);

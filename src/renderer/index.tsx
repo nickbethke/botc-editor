@@ -6,13 +6,20 @@ import TranslationHelper, {
 } from './helper/TranslationHelper';
 
 window.languageHelper = new TranslationHelper(AvailableLanguages.de);
-
-const container = document.getElementById('root');
-if (container) {
-	const root = createRoot(container);
-	root.render(
-		<React.StrictMode>
-			<App />
-		</React.StrictMode>
-	);
-}
+window.electron.app
+	.getOS()
+	.then((os) => {
+		const container = document.getElementById('root');
+		if (container) {
+			const root = createRoot(container);
+			root.render(
+				<React.StrictMode>
+					<App os={os} />
+				</React.StrictMode>
+			);
+		}
+		return null;
+	})
+	.catch((reason) => {
+		if (reason) console.log(reason);
+	});

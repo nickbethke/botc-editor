@@ -208,7 +208,7 @@ class Field extends React.Component<FieldProps, FieldStats> {
 								: 'border-transparent '
 						}${
 							dragInProcess ? 'bg-gray-800/25 ' : ''
-						} border rounded-2xl  relative hover:bg-white/25 text-transparent transition transition-all`}
+						} border rounded-2xl  relative hover:bg-white/25 text-transparent`}
 						style={style}
 						tabIndex={-1}
 						onClick={this.handleClick}

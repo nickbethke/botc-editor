@@ -42,7 +42,7 @@ class FieldDragger extends React.Component<FieldDraggerProps, never> {
 		return (
 			<div
 				className={`${this.draggableItemClass} ${className}`}
-				draggable="true"
+				draggable
 				onDragStart={this.handleDragStart}
 				onDragEnd={this.handleDragEnd}
 			>

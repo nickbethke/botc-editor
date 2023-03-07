@@ -1025,4 +1025,6 @@ export enum FieldsEnum {
 	RIVER,
 	WALL,
 	DESTINY_MOUNTAIN,
+	RIVER_PRESET,
+	BOARD_PRESET,
 }
