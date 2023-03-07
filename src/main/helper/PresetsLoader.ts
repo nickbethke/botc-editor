@@ -4,7 +4,6 @@ import path from 'path';
 import { app } from 'electron';
 import * as RiverPresetSchema from '../../schema/riverPreset.schema.json';
 import * as BoardPresetSchema from '../../schema/boardPreset.schema.json';
-import IPCHelper from './IPCHelper';
 
 export type RiverPreset = {
 	name: string;
