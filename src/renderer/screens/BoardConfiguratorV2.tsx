@@ -164,7 +164,9 @@ class BoardConfiguratorV2 extends React.Component<
 					<div className="dragger w-[100vw] h-8 bg-muted" />
 				) : null}
 				<div
-					className="dark:bg-muted-800 bg-muted-400 py-1 px-4"
+					className={`dark:bg-muted-800 bg-muted-400 py-1 px-4 ${
+						os === 'darwin' ? 'pl-24' : ''
+					}`}
 					style={{ width: `${windowDimensions.width}px` }}
 				>
 					<TopMenu
