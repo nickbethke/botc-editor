@@ -56,6 +56,7 @@ declare global {
 				}>;
 			};
 			file: {
+				openPresetDir(): void;
 				openExternal(file: string): void;
 				openDir(file: string): void;
 				save(file: string, content: string): Promise<true | string>;
@@ -86,6 +87,9 @@ declare global {
 					channel: Channels,
 					func: (...args: unknown[]) => void
 				): void;
+			};
+			clipboard: {
+				write(text: string): void;
 			};
 		};
 	}

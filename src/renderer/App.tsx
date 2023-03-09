@@ -141,6 +141,8 @@ class App extends React.Component<AppProps, AppStates> {
 			case 'boardConfigV2NewScreen':
 			case 'boardConfigV2LoadScreen':
 				return this.boardConfigV2Screen();
+			case 'boardConfigV2FromRandomScreen':
+				return this.boardConfigV2Screen(generator);
 			case 'boardConfigFromRandomScreen':
 				return this.boardConfigScreen(generator);
 			case 'validator':
@@ -200,14 +202,32 @@ class App extends React.Component<AppProps, AppStates> {
 		return null;
 	};
 
-	boardConfigV2Screen = () => {
-		const { openScreen } = this.state;
+	boardConfigV2Screen = (generator: BoardGenerator | null = null) => {
+		const { openScreen, toLoad } = this.state;
 		const { os } = this.props;
 		if (openScreen === 'boardConfigV2NewScreen') {
 			return (
 				<BoardConfiguratorV2
 					os={os}
 					onClose={this.handleCloseChildScreen}
+				/>
+			);
+		}
+		if (openScreen === 'boardConfigV2LoadScreen') {
+			return (
+				<BoardConfiguratorV2
+					os={os}
+					onClose={this.handleCloseChildScreen}
+					config={toLoad as BoardConfigInterface}
+				/>
+			);
+		}
+		if (openScreen === 'boardConfigV2FromRandomScreen' && generator) {
+			return (
+				<BoardConfiguratorV2
+					os={os}
+					onClose={this.handleCloseChildScreen}
+					config={generator.boardJSON}
 				/>
 			);
 		}

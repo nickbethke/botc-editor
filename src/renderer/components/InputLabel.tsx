@@ -135,24 +135,20 @@ class InputLabel extends React.Component<InputLabelProps, InputLabelState> {
 		}
 		if (type === 'text' || type === 'number') {
 			return (
-				<div className="flex flex-row gap-2 items-center">
-					<div>
-						<label htmlFor={this.id} className={`${labelClass}`}>
-							{label}
-						</label>
-					</div>
-					<div>
-						<input
-							id={this.id}
-							className={`dark:bg-muted-900/25 bg-muted-100/25 px-4 py-2 focus:outline-none w-full${validClass}`}
-							type={type}
-							placeholder={placeholder}
-							onChange={this.handleOnChange}
-							min={min || -1}
-							max={max || 20}
-							value={value?.toString()}
-						/>
-					</div>
+				<div className="flex flex-col gap-2 max-w-full">
+					<label htmlFor={this.id} className={`${labelClass}`}>
+						{label}:
+					</label>
+					<input
+						id={this.id}
+						className={`rounded dark:bg-muted-900/25 bg-muted-100/25 px-4 py-2 focus:outline-none${validClass}`}
+						type={type}
+						placeholder={placeholder || label || ''}
+						onChange={this.handleOnChange}
+						min={min || -1}
+						max={max || 20}
+						value={value?.toString()}
+					/>
 					{helper}
 					{warningHelper}
 					{invalidHelper}
@@ -167,7 +163,7 @@ class InputLabel extends React.Component<InputLabelProps, InputLabelState> {
 							htmlFor={this.id}
 							className={`${labelClass} flex flex-row gap-2`}
 						>
-							<span>{label}:</span>
+							<span>{label ? `${label}:` : ''}</span>
 							<DblClickInput
 								value={Number.parseInt(
 									value.toString() ? value.toString() : '0',

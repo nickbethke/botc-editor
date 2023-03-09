@@ -14,6 +14,7 @@ import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import { resolveHtmlPath } from './util';
 import IPCHelper from './helper/IPCHelper';
+import PresetsLoader from './helper/PresetsLoader';
 
 class AppUpdater {
 	constructor() {
@@ -156,10 +157,10 @@ app.whenReady()
 		});
 
 		ipcMain.handle('dialog:openBoardConfig', async () => {
-			return IPCHelper.handleFileOpen('board');
+			return IPCHelper.handleFileOpen('board', mainWindow);
 		});
 		ipcMain.handle('dialog:openPartieConfig', async () => {
-			return IPCHelper.handleFileOpen('partie');
+			return IPCHelper.handleFileOpen('partie', mainWindow);
 		});
 		ipcMain.handle('dialog:savePartieConfig', async (event, ...args) => {
 			return IPCHelper.handleSavePartieConfig(args[0]);
@@ -168,7 +169,7 @@ app.whenReady()
 			return IPCHelper.handleSaveBoardConfig(args[0]);
 		});
 		ipcMain.handle('dialog:openConfig', async () => {
-			return IPCHelper.handleFileOpen();
+			return IPCHelper.handleFileOpen('', mainWindow);
 		});
 		ipcMain.handle('validate:json', (event, ...args) => {
 			return IPCHelper.jsonValidate(args[0], args[1]);
@@ -212,6 +213,15 @@ app.whenReady()
 
 		ipcMain.handle('file:getTranslation', (event, ...args) => {
 			return IPCHelper.loadLanguageFile(args[0]);
+		});
+
+		ipcMain.handle('file:openPresetDir', () => {
+			return IPCHelper.openDirectoryDirectly(
+				path.join(PresetsLoader.getAssetPath(), '/presets/')
+			);
+		});
+		ipcMain.handle('clipboard:write', (event, ...args) => {
+			return IPCHelper.clipBoardWrite(args[0]);
 		});
 
 		setInterval(() => {

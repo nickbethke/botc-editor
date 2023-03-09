@@ -208,6 +208,54 @@
 		[
 			"Warnings",
 			"Warnungen"
+		],
+		[
+			"Ctrl",
+			"Strg"
+		],
+		[
+			"Global Settings",
+			"Globale Einstellungen"
+		],
+		[
+			"North",
+			"Norden"
+		],
+		[
+			"South",
+			"Süden"
+		],
+		[
+			"East",
+			"Osten"
+		],
+		[
+			"West",
+			"Westen"
+		],
+		[
+			"Direction",
+			"Blickrichtung"
+		],
+		[
+			"Amount",
+			"Menge"
+		],
+		[
+			"Configuration Preview",
+			"Konfigurationsvorschau"
+		],
+		[
+			"Wall Tool",
+			"Wand Tool"
+		],
+		[
+			"File",
+			"Datei"
+		],
+		[
+			"View",
+			"Ansicht"
 		]
 	]
 }

@@ -1,6 +1,7 @@
 import React from 'react';
 import {
 	VscCircleLargeOutline,
+	VscEdit,
 	VscEye,
 	VscFolder,
 	VscHome,
@@ -13,12 +14,31 @@ import { MdBorderStyle, MdOutlineFastfood } from 'react-icons/md';
 import { BiWater } from 'react-icons/bi';
 import { FieldsEnum } from '../generator/BoardGenerator';
 import SidebarMenuItem, { SidebarMenuItemSeparator } from './SidebarMenuItem';
+import BoardConfigInterface, {
+	DirectionEnum,
+} from '../interfaces/BoardConfigInterface';
+import InputLabel from '../InputLabel';
+import { EditorToolType } from '../../screens/BoardConfiguratorV2';
+import { BoardPosition } from '../generator/interfaces/boardPosition';
+import {
+	getDirectionFieldConfig,
+	getFieldType,
+	getLembasFieldConfig,
+	updateLembasFieldAmount,
+	updateRiverFieldDirection,
+	updateStartFieldDirection,
+} from './HelperFunctions';
+import DirectionHelper from '../generator/helper/DirectionHelper';
 
 type LeftSidebarProps = {
-	toolChange: (tool: LeftSidebarCurrentTool) => void;
+	toolChange: (tool: EditorToolType) => void;
 	tabChange: (tab: LeftSidebarOpenTab) => void;
-	currentTool: LeftSidebarCurrentTool;
+	currentTool: EditorToolType;
 	openTab: LeftSidebarOpenTab;
+	config: BoardConfigInterface;
+	onConfigUpdate: (config: BoardConfigInterface) => void;
+	configType: LeftSidebarConfigType;
+	fieldInEdit: BoardPosition | null;
 };
 
 export type LeftSidebarOpenTab =
@@ -26,28 +46,202 @@ export type LeftSidebarOpenTab =
 	| 'settings'
 	| 'checkpointOrder'
 	| null;
-export type LeftSidebarCurrentTool = FieldsEnum | 'delete';
+export type LeftSidebarConfigType = 'global' | 'amount' | 'direction';
 
 class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 	content = () => {
 		const { openTab } = this.props;
 		switch (openTab) {
-			case 'presets':
-				return this.presets();
 			case 'settings':
 				return this.settings();
 			case 'checkpointOrder':
 				return this.checkpointOrder();
+			case 'presets':
+				return this.presets();
 			default:
 				return null;
 		}
 	};
 
 	settings = () => {
+		const { configType } = this.props;
+		switch (configType) {
+			case 'global':
+				return this.settingsGlobal();
+			case 'direction':
+				return (
+					<>
+						{this.settingsGlobal()}
+						{this.settingsDirection()}
+					</>
+				);
+			case 'amount':
+				return (
+					<>
+						{this.settingsGlobal()}
+						{this.settingsAmount()}
+					</>
+				);
+			default:
+				return null;
+		}
+	};
+
+	settingsDirection = () => {
+		const { config, fieldInEdit } = this.props;
+		if (fieldInEdit) {
+			const directionField = getDirectionFieldConfig(fieldInEdit, config);
+			return (
+				<div className="flex flex-col">
+					<div className="p-2 border-y dark:border-muted-700 border-muted-400">
+						{window.languageHelper.translate('Direction')}
+					</div>
+					<div className="p-4 flex flex-col gap-4">
+						<select
+							id="select-direction"
+							className="bg-transparent border-b-2 text-lg px-4 py-2 w-full"
+							value={DirectionHelper.stringToDirEnum(
+								directionField?.direction || 'NORTH'
+							)}
+							onChange={(event) => {
+								this.onDirectionChange(event);
+							}}
+						>
+							<option value={DirectionEnum.NORTH}>
+								{window.languageHelper.translate('North')}
+							</option>
+							<option value={DirectionEnum.EAST}>
+								{window.languageHelper.translate('East')}
+							</option>
+							<option value={DirectionEnum.SOUTH}>
+								{window.languageHelper.translate('South')}
+							</option>
+							<option value={DirectionEnum.WEST}>
+								{window.languageHelper.translate('West')}
+							</option>
+						</select>
+					</div>
+				</div>
+			);
+		}
+		return null;
+	};
+
+	onDirectionChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+		const { config, onConfigUpdate, fieldInEdit } = this.props;
+		if (fieldInEdit) {
+			const type = getFieldType(fieldInEdit, config);
+			const direction = Number.parseInt(
+				event.target.value,
+				10
+			) as DirectionEnum;
+
+			if (type === FieldsEnum.EYE) {
+				onConfigUpdate({
+					...config,
+					eye: {
+						...config.eye,
+						direction: DirectionHelper.dirEnumToString(direction),
+					},
+				});
+			}
+			if (type === FieldsEnum.RIVER) {
+				onConfigUpdate(
+					updateRiverFieldDirection(config, fieldInEdit, direction)
+				);
+			}
+			if (type === FieldsEnum.START) {
+				onConfigUpdate(
+					updateStartFieldDirection(config, fieldInEdit, direction)
+				);
+			}
+		}
+	};
+
+	settingsAmount = () => {
+		const { config, onConfigUpdate, fieldInEdit } = this.props;
+		if (fieldInEdit) {
+			const amountField = getLembasFieldConfig(fieldInEdit, config);
+			return (
+				<div className="flex flex-col">
+					<div className="p-2 border-y dark:border-muted-700 border-muted-400">
+						{window.languageHelper.translate('Amount')}
+					</div>
+					<div className="p-4 flex flex-col gap-4">
+						<InputLabel
+							type="range"
+							value={amountField ? amountField.amount : 0}
+							min={0}
+							max={20}
+							onChange={(value) => {
+								const amount = Number.parseInt(
+									value.toString(),
+									10
+								);
+								onConfigUpdate(
+									updateLembasFieldAmount(
+										config,
+										fieldInEdit,
+										amount
+									)
+								);
+							}}
+						/>
+					</div>
+				</div>
+			);
+		}
+		return null;
+	};
+
+	settingsGlobal = () => {
+		const { config, onConfigUpdate } = this.props;
 		return (
 			<div className="flex flex-col">
 				<div className="p-2 border-b dark:border-muted-700 border-muted-400">
-					{window.languageHelper.translate('Settings')}
+					{window.languageHelper.translate('Global Settings')}
+				</div>
+				<div className="p-4 flex flex-col gap-4">
+					<InputLabel
+						type="text"
+						label={window.languageHelper.translate('Board Name')}
+						value={config.name}
+						onChange={(value) => {
+							const newConfig = {
+								...config,
+								name: value.toString(),
+							};
+							onConfigUpdate(newConfig);
+						}}
+					/>
+					<InputLabel
+						type="range"
+						label={window.languageHelper.translate('Board Width')}
+						value={config.width}
+						min={2}
+						max={20}
+						onChange={(value) => {
+							const newConfig = {
+								...config,
+								width: Number.parseInt(value.toString(), 10),
+							};
+							onConfigUpdate(newConfig);
+						}}
+					/>
+					<InputLabel
+						type="range"
+						label={window.languageHelper.translate('Board Height')}
+						value={config.height}
+						min={2}
+						max={20}
+						onChange={(value) => {
+							const newConfig = {
+								...config,
+								height: Number.parseInt(value.toString(), 10),
+							};
+							onConfigUpdate(newConfig);
+						}}
+					/>
 				</div>
 			</div>
 		);
@@ -73,7 +267,7 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 		);
 	};
 
-	handleCurrentToolChange = (currentTool: LeftSidebarCurrentTool) => {
+	handleCurrentToolChange = (currentTool: EditorToolType) => {
 		const { toolChange } = this.props;
 		toolChange(currentTool);
 	};
@@ -87,9 +281,28 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 		}
 	};
 
-	private toolSelection(currentTool: LeftSidebarCurrentTool) {
+	private toolSelection(currentTool: EditorToolType) {
 		return (
 			<>
+				<SidebarMenuItem
+					label={window.languageHelper.translate('Edit')}
+					open={currentTool === 'edit'}
+					icon={<VscEdit />}
+					onClick={() => {
+						this.handleCurrentToolChange('edit');
+					}}
+					shortCut={`${window.languageHelper.translate('Ctrl')}+E`}
+				/>
+				<SidebarMenuItem
+					label={window.languageHelper.translate('Delete')}
+					open={currentTool === 'delete'}
+					icon={<VscTrash />}
+					onClick={() => {
+						this.handleCurrentToolChange('delete');
+					}}
+					shortCut={`${window.languageHelper.translate('Ctrl')}+D`}
+				/>
+				<SidebarMenuItemSeparator />
 				<SidebarMenuItem
 					label={window.languageHelper.translate('Start')}
 					open={currentTool === FieldsEnum.START}
@@ -97,6 +310,7 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 					onClick={() => {
 						this.handleCurrentToolChange(FieldsEnum.START);
 					}}
+					shortCut={`${window.languageHelper.translate('Ctrl')}+1`}
 				/>
 				<SidebarMenuItem
 					label={window.languageHelper.translate('Checkpoint')}
@@ -105,6 +319,7 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 					onClick={() => {
 						this.handleCurrentToolChange(FieldsEnum.CHECKPOINT);
 					}}
+					shortCut={`${window.languageHelper.translate('Ctrl')}+2`}
 				/>
 				<SidebarMenuItem
 					label={window.languageHelper.translate('Saurons Eye')}
@@ -113,6 +328,7 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 					onClick={() => {
 						this.handleCurrentToolChange(FieldsEnum.EYE);
 					}}
+					shortCut={`${window.languageHelper.translate('Ctrl')}+3`}
 				/>
 				<SidebarMenuItem
 					label={window.languageHelper.translate('Lembas Field')}
@@ -121,6 +337,7 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 					onClick={() => {
 						this.handleCurrentToolChange(FieldsEnum.LEMBAS);
 					}}
+					shortCut={`${window.languageHelper.translate('Ctrl')}+4`}
 				/>
 				<SidebarMenuItem
 					label={window.languageHelper.translate('River Field')}
@@ -129,6 +346,7 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 					onClick={() => {
 						this.handleCurrentToolChange(FieldsEnum.RIVER);
 					}}
+					shortCut={`${window.languageHelper.translate('Ctrl')}+5`}
 				/>
 				<SidebarMenuItem
 					label={window.languageHelper.translate('Hole')}
@@ -137,24 +355,17 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 					onClick={() => {
 						this.handleCurrentToolChange(FieldsEnum.HOLE);
 					}}
+					shortCut={`${window.languageHelper.translate('Ctrl')}+6`}
 				/>
 				<SidebarMenuItemSeparator />
 				<SidebarMenuItem
-					label={window.languageHelper.translate('Wall')}
+					label={window.languageHelper.translate('Wall Tool')}
 					open={currentTool === FieldsEnum.WALL}
 					icon={<MdBorderStyle />}
 					onClick={() => {
 						this.handleCurrentToolChange(FieldsEnum.WALL);
 					}}
-				/>
-				<SidebarMenuItemSeparator />
-				<SidebarMenuItem
-					label={window.languageHelper.translate('Delete')}
-					open={currentTool === 'delete'}
-					icon={<VscTrash />}
-					onClick={() => {
-						this.handleCurrentToolChange('delete');
-					}}
+					shortCut={`${window.languageHelper.translate('Ctrl')}+7`}
 				/>
 			</>
 		);
@@ -170,6 +381,7 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 					onClick={() => {
 						this.handleOpenTabChange('settings');
 					}}
+					shortCut="Alt+1"
 				/>
 				<SidebarMenuItem
 					label={window.languageHelper.translate('Checkpoint Order')}
@@ -178,6 +390,7 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 					onClick={() => {
 						this.handleOpenTabChange('checkpointOrder');
 					}}
+					shortCut="Alt+2"
 				/>
 				<SidebarMenuItem
 					label={window.languageHelper.translate('Presets')}
@@ -186,6 +399,7 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 					onClick={() => {
 						this.handleOpenTabChange('presets');
 					}}
+					shortCut="Alt+3"
 				/>
 			</>
 		);

@@ -109,6 +109,9 @@ contextBridge.exposeInMainWorld('electron', {
 		},
 	},
 	file: {
+		openPresetDir() {
+			return ipcRenderer.invoke('file:openPresetDir');
+		},
 		openExternal(file: string) {
 			return ipcRenderer.invoke('file:openExternal', file);
 		},
@@ -128,6 +131,11 @@ contextBridge.exposeInMainWorld('electron', {
 	open: {
 		homepage() {
 			return ipcRenderer.invoke('open:homepage');
+		},
+	},
+	clipboard: {
+		write(text: string): Promise<void> {
+			return ipcRenderer.invoke('clipboard:write', text);
 		},
 	},
 });

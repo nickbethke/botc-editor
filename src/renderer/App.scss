@@ -107,7 +107,6 @@ body {
 }
 
 .font-jetbrains {
-	font-size: 14px;
 	font-family: 'JetBrains Mono', Consolas, 'Liberation Mono', Menlo, Courier,
 		monospace;
 	font-feature-settings: 'liga' 0, 'calt' 0;
@@ -229,15 +228,31 @@ input {
 }
 
 ::-webkit-scrollbar {
-	width: 10px;
+	width: 1em;
+}
+
+::-webkit-scrollbar-corner {
+	@apply bg-muted-300;
 }
 
 ::-webkit-scrollbar-track {
-	-webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.5);
+	@apply bg-muted-300;
 }
 
 ::-webkit-scrollbar-thumb {
-	@apply bg-white/40;
+	@apply bg-muted-100;
+}
+
+.dark ::-webkit-scrollbar-corner {
+	@apply bg-muted-700;
+}
+
+.dark ::-webkit-scrollbar-track {
+	@apply bg-muted-700;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+	@apply bg-muted-600;
 }
 
 .user-select,
@@ -247,4 +262,52 @@ input {
 
 .no-user-select {
 	user-select: none;
+}
+
+.isWall {
+	background-image: url('/assets/texturepacks/default/wall.png');
+	background-size: cover;
+	background-position: center;
+}
+
+.isEye {
+	background-image: url('/assets/texturepacks/default/eye.png');
+	background-size: contain;
+	background-position: center;
+}
+
+.isCheckpoint {
+	background-image: url('/assets/texturepacks/default/checkpoint.png');
+	background-size: contain;
+	background-position: center;
+}
+
+.isDestinyMountain {
+	background-image: url('/assets/texturepacks/default/schicksalsberg.png');
+	background-size: contain;
+	background-position: center;
+}
+
+.isStartField {
+	background-image: url('/assets/texturepacks/default/start.png');
+	background-size: contain;
+	background-position: center;
+}
+
+.isLembasField {
+	background-image: url('/assets/texturepacks/default/lembas.png');
+	background-size: contain;
+	background-position: center;
+}
+
+.isRiver {
+	background-image: url('/assets/texturepacks/default/river.png');
+	background-size: contain;
+	background-position: center;
+}
+
+.isHole {
+	background-image: url('/assets/texturepacks/default/hole.png');
+	background-size: contain;
+	background-position: center;
 }

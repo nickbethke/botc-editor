@@ -1,4 +1,4 @@
-import { app, dialog, shell } from 'electron';
+import { app, dialog, shell, clipboard, BrowserWindow } from 'electron';
 import fs from 'fs';
 import Ajv, { JSONSchemaType } from 'ajv';
 import * as os from 'os';
@@ -37,67 +37,126 @@ class IPCHelper {
 	};
 
 	static handleFileOpen = async (
-		type = ''
+		type = '',
+		window: BrowserWindow | null
 	): Promise<
 		| { parsedPath: ParsedPath; path: string; config: BoardConfigInterface }
 		| false
 	> => {
 		if (type === 'board') {
-			const { canceled, filePaths } = await dialog.showOpenDialog({
-				title: 'Board-Konfiguration auswählen',
-				properties: ['openFile'],
-				filters: [{ name: 'Board-Konfig', extensions: ['json'] }],
-			});
-			if (canceled) {
+			let currentCanceled;
+			let currentFilePaths;
+			if (window) {
+				const { canceled, filePaths } = await dialog.showOpenDialog(
+					window,
+					{
+						title: 'Board-Konfiguration auswählen',
+						properties: ['openFile'],
+						filters: [
+							{ name: 'Board-Konfig', extensions: ['json'] },
+						],
+					}
+				);
+				currentCanceled = canceled;
+				currentFilePaths = filePaths;
+			} else {
+				const { canceled, filePaths } = await dialog.showOpenDialog({
+					title: 'Board-Konfiguration auswählen',
+					properties: ['openFile'],
+					filters: [{ name: 'Board-Konfig', extensions: ['json'] }],
+				});
+				currentCanceled = canceled;
+				currentFilePaths = filePaths;
+			}
+			if (currentCanceled) {
 				return false;
 			}
 			const config = JSON.parse(
-				fs.readFileSync(filePaths[0], { encoding: 'utf8' })
+				fs.readFileSync(currentFilePaths[0], { encoding: 'utf8' })
 			) as BoardConfigInterface;
 			return {
 				config,
-				parsedPath: path.parse(filePaths[0]),
-				path: filePaths[0],
+				parsedPath: path.parse(currentFilePaths[0]),
+				path: currentFilePaths[0],
 			};
 		}
 		if (type === 'partie') {
-			const { canceled, filePaths } = await dialog.showOpenDialog({
-				title: 'Partie-Konfiguration auswählen',
-				properties: ['openFile'],
-				filters: [{ name: 'Partie-Konfig', extensions: ['json'] }],
-			});
-			if (canceled) {
+			let currentCanceled;
+			let currentFilePaths;
+			if (window) {
+				const { canceled, filePaths } = await dialog.showOpenDialog(
+					window,
+					{
+						title: 'Partie-Konfiguration auswählen',
+						properties: ['openFile'],
+						filters: [
+							{ name: 'Partie-Konfig', extensions: ['json'] },
+						],
+					}
+				);
+				currentCanceled = canceled;
+				currentFilePaths = filePaths;
+			} else {
+				const { canceled, filePaths } = await dialog.showOpenDialog({
+					title: 'Partie-Konfiguration auswählen',
+					properties: ['openFile'],
+					filters: [{ name: 'Partie-Konfig', extensions: ['json'] }],
+				});
+				currentCanceled = canceled;
+				currentFilePaths = filePaths;
+			}
+			if (currentCanceled) {
 				return false;
 			}
 			const config = JSON.parse(
-				fs.readFileSync(filePaths[0], { encoding: 'utf8' })
+				fs.readFileSync(currentFilePaths[0], { encoding: 'utf8' })
 			) as BoardConfigInterface;
 			return {
 				config,
-				parsedPath: path.parse(filePaths[0]),
-				path: filePaths[0],
+				parsedPath: path.parse(currentFilePaths[0]),
+				path: currentFilePaths[0],
 			};
 		}
 		if (type === '') {
-			const { canceled, filePaths } = await dialog.showOpenDialog({
-				title: 'Konfiguration auswählen',
-				properties: ['openFile'],
-				filters: [
-					{ name: 'Partie-Konfig', extensions: ['json'] },
-					{ name: 'Board-Konfig', extensions: ['json'] },
-				],
-			});
-			if (canceled) {
+			let currentCanceled;
+			let currentFilePaths;
+			if (window) {
+				const { canceled, filePaths } = await dialog.showOpenDialog(
+					window,
+					{
+						title: 'Konfiguration auswählen',
+						properties: ['openFile'],
+						filters: [
+							{ name: 'Partie-Konfig', extensions: ['json'] },
+							{ name: 'Board-Konfig', extensions: ['json'] },
+						],
+					}
+				);
+				currentCanceled = canceled;
+				currentFilePaths = filePaths;
+			} else {
+				const { canceled, filePaths } = await dialog.showOpenDialog({
+					title: 'Konfiguration auswählen',
+					properties: ['openFile'],
+					filters: [
+						{ name: 'Partie-Konfig', extensions: ['json'] },
+						{ name: 'Board-Konfig', extensions: ['json'] },
+					],
+				});
+				currentCanceled = canceled;
+				currentFilePaths = filePaths;
+			}
+			if (currentCanceled) {
 				return false;
 			}
 			const config = JSON.parse(
-				fs.readFileSync(filePaths[0], { encoding: 'utf8' })
+				fs.readFileSync(currentFilePaths[0], { encoding: 'utf8' })
 			) as BoardConfigInterface;
 
 			return {
 				config,
-				parsedPath: path.parse(filePaths[0]),
-				path: filePaths[0],
+				parsedPath: path.parse(currentFilePaths[0]),
+				path: currentFilePaths[0],
 			};
 		}
 		return false;
@@ -188,6 +247,10 @@ class IPCHelper {
 		shell.openPath(dir).catch(console.log);
 	}
 
+	static openDirectoryDirectly(dir: string) {
+		shell.openPath(dir).catch(console.log);
+	}
+
 	static saveFile(file: string, content: string) {
 		if (fs.existsSync(file)) {
 			fs.writeFileSync(file, content, { encoding: 'utf8', flag: 'w' });
@@ -225,6 +288,10 @@ class IPCHelper {
 				: path.join(__dirname, '../../../assets'),
 			...paths
 		);
+	}
+
+	static clipBoardWrite(text: string) {
+		clipboard.writeText(text);
 	}
 }
 
