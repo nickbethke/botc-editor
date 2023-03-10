@@ -69,14 +69,14 @@ class ConfirmPopupV2 extends React.Component<
 		}
 	}
 
-	async componentDidUpdate(
+	componentDidUpdate(
 		prevProps: Readonly<ConfirmPopupV2Props>,
 		prevState: Readonly<ConfirmPopupV2State>
 	) {
 		const { offClick: preOffClick } = prevState;
 		const { offClick } = this.state;
 		if (offClick !== preOffClick && !preOffClick) {
-			await window.electron.app.beep();
+			window.electron.app.beep();
 			setTimeout(() => {
 				this.setState({ offClick: false });
 			}, 500);

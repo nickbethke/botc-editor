@@ -80,7 +80,7 @@ declare global {
 					settings: SettingsInterface;
 				}>;
 				updateSettings(settings: SettingsInterface): SettingsInterface;
-				beep(): Promise<void>;
+				beep(): void;
 			};
 			open: {
 				homepage(): void;
