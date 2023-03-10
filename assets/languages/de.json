@@ -256,6 +256,26 @@
 		[
 			"View",
 			"Ansicht"
+		],
+		[
+			"Board-Configurator V2",
+			"Board-Konfigurator Version 2.0"
+		],
+		[
+			"German",
+			"Deutsch"
+		],
+		[
+			"English",
+			"Englisch"
+		],
+		[
+			"Language",
+			"Sprache"
+		],
+		[
+			"Popups movable",
+			"Popups bewegbar"
 		]
 	]
 }

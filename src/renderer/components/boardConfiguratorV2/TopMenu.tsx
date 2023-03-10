@@ -20,7 +20,7 @@ export enum TopMenuActions {
 	SAVE_AS_PRESET,
 	CLOSE,
 	DARK_MODE,
-	PREFERENCES,
+	SETTINGS,
 	ZOOM_RESET,
 	ZOOM_IN,
 	ZOOM_OUT,
@@ -105,7 +105,7 @@ function TopMenu(props: TopMenuProps) {
 				<TopMenuSeparator />
 				<TopMenuItem
 					className="text-left"
-					action={TopMenuActions.PREFERENCES}
+					action={TopMenuActions.SETTINGS}
 					onAction={onAction}
 					icon={<VscSettingsGear />}
 					label={`${window.languageHelper.translate('Settings')}...`}

@@ -3,6 +3,7 @@ import { ParsedPath } from 'path';
 import BoardConfigInterface from '../renderer/components/interfaces/BoardConfigInterface';
 import PartieConfigInterface from '../renderer/components/interfaces/PartieConfigInterface';
 import { BoardPreset, RiverPreset } from './helper/PresetsLoader';
+import { SettingsInterface } from '../interfaces/SettingsInterface';
 
 export type Channels = 'ipc-example';
 
@@ -98,6 +99,20 @@ contextBridge.exposeInMainWorld('electron', {
 		},
 		getVersion() {
 			return ipcRenderer.invoke('get:version');
+		},
+		prefetch(): Promise<{
+			os: NodeJS.Platform;
+			settings: SettingsInterface;
+		}> {
+			return ipcRenderer.invoke('get:prefetch');
+		},
+		updateSettings(
+			settings: SettingsInterface
+		): Promise<SettingsInterface> {
+			return ipcRenderer.invoke('update:settings', settings);
+		},
+		beep(): Promise<void> {
+			return ipcRenderer.invoke('beep');
 		},
 	},
 	load: {

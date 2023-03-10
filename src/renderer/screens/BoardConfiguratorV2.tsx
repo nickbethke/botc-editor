@@ -38,12 +38,17 @@ import {
 	removeWall,
 } from '../components/boardConfiguratorV2/HelperFunctions';
 import ConfirmPopupV2 from '../components/boardConfiguratorV2/ConfirmPopupV2';
+import { SettingsInterface } from '../../interfaces/SettingsInterface';
+import SettingsPopup from '../components/popups/SettingsPopup';
 
 export type EditorToolType = FieldsEnum | 'delete' | 'edit';
+type EditorPopupType = null | 'newFileSaveCurrent' | 'settings';
 
 type BoardConfiguratorV2Props = {
 	os: NodeJS.Platform;
 	onClose: () => void;
+	settings: SettingsInterface;
+	onSettingsUpdate: (settings: SettingsInterface) => void;
 	config?: BoardConfigInterface;
 };
 type BoardConfiguratorV2State = {
@@ -52,8 +57,7 @@ type BoardConfiguratorV2State = {
 		height: number;
 	};
 	sidebars: { left: number; right: number };
-	darkMode: boolean;
-	popup: null | 'newFileSaveCurrent';
+	popup: EditorPopupType;
 	popupPosition: { x: number; y: number };
 	popupDimension: { width: number; height: number };
 	currentTool: EditorToolType;
@@ -97,7 +101,6 @@ class BoardConfiguratorV2 extends React.Component<
 				left: 52,
 				right: 52,
 			},
-			darkMode: true,
 			popup: null,
 			popupPosition: {
 				x: window.innerWidth / 2,
@@ -131,7 +134,6 @@ class BoardConfiguratorV2 extends React.Component<
 		prevState: Readonly<BoardConfiguratorV2State>
 	) {
 		const {
-			darkMode,
 			sideBarTabLeft,
 			sidebars,
 			sideBarTabRight,
@@ -148,12 +150,6 @@ class BoardConfiguratorV2 extends React.Component<
 			currentTool: preTool,
 			popup: prePopup,
 		} = prevState;
-		const html = document.querySelector('html');
-		if (darkMode) {
-			html?.classList.add('dark');
-		} else {
-			html?.classList.remove('dark');
-		}
 		if (sideBarTabLeft === null && sidebars.left > 52) {
 			this.setState({ sidebars: { ...sidebars, left: 52 } });
 		}
@@ -167,7 +163,6 @@ class BoardConfiguratorV2 extends React.Component<
 			this.setState({ sidebars: { ...sidebars, right: 400 } });
 		}
 		if (preTool === 'edit' && currentTool !== 'edit') {
-			console.log('Switch from Edit');
 			this.setState({
 				sideBarTabLeftConfigType: 'global',
 				fieldInEdit: null,
@@ -212,15 +207,6 @@ class BoardConfiguratorV2 extends React.Component<
 
 	handleOnFieldOrWallClick: FieldTypeOnClick = (type, position) => {
 		const { currentTool, config } = this.state;
-		console.log(
-			`Placing: ${
-				currentTool === 'delete' || currentTool === 'edit'
-					? currentTool
-					: FieldsEnum[currentTool]
-			}`,
-			'Position',
-			position
-		);
 		if (type === 'field') {
 			this.handleFieldPlacement(
 				position as BoardPosition,
@@ -408,8 +394,7 @@ class BoardConfiguratorV2 extends React.Component<
 	}
 
 	onTopMenuAction = (action: TopMenuActions) => {
-		const { onClose } = this.props;
-		const { darkMode } = this.state;
+		const { onClose, settings, onSettingsUpdate } = this.props;
 		switch (action) {
 			case TopMenuActions.NEW:
 				this.setState({ popup: 'newFileSaveCurrent' });
@@ -424,12 +409,13 @@ class BoardConfiguratorV2 extends React.Component<
 				onClose();
 				break;
 			case TopMenuActions.DARK_MODE:
-				this.setState({ darkMode: !darkMode });
+				onSettingsUpdate({ ...settings, darkMode: !settings.darkMode });
 				break;
 			case TopMenuActions.OPEN_PRESET_FOLDER:
 				window.electron.file.openPresetDir();
 				break;
-			case TopMenuActions.PREFERENCES:
+			case TopMenuActions.SETTINGS:
+				this.setState({ popup: 'settings' });
 				break;
 			case TopMenuActions.ZOOM_IN:
 				this.zoomIn();
@@ -447,7 +433,7 @@ class BoardConfiguratorV2 extends React.Component<
 
 	popup = (): JSX.Element | null => {
 		const { popup, popupPosition } = this.state;
-		const { os } = this.props;
+		const { os, settings, onSettingsUpdate } = this.props;
 		switch (popup) {
 			case 'newFileSaveCurrent':
 				return (
@@ -479,11 +465,38 @@ class BoardConfiguratorV2 extends React.Component<
 							this.setState({ popupDimension: dimension });
 						}}
 						os={os}
+						topOffset
+						settings={settings}
 					>
 						{window.languageHelper.translate(
 							'The current file has not yet been saved. Do you want to discard the current changes?'
 						)}
 					</ConfirmPopupV2>
+				);
+			case 'settings':
+				return (
+					<SettingsPopup
+						settings={settings}
+						onAbort={() => {
+							this.setState({ popup: null });
+						}}
+						onConfirm={(newSettings) => {
+							onSettingsUpdate(newSettings);
+							this.setState({ popup: null });
+						}}
+						position={popupPosition}
+						onPositionChange={(position, callback) => {
+							this.setState(
+								{ popupPosition: position },
+								callback
+							);
+						}}
+						onDimensionChange={(dimension) => {
+							this.setState({ popupDimension: dimension });
+						}}
+						os={os}
+						topOffset
+					/>
 				);
 			default:
 				return null;
@@ -572,10 +585,8 @@ class BoardConfiguratorV2 extends React.Component<
 		});
 
 		Mousetrap.bind('ctrl+shift+d', () => {
-			const { darkMode } = this.state;
-			this.setState({
-				darkMode: !darkMode,
-			});
+			const { settings, onSettingsUpdate } = this.props;
+			onSettingsUpdate({ ...settings, darkMode: !settings.darkMode });
 		});
 
 		Mousetrap.bind(['command+enter', 'ctrl+enter'], () => {
@@ -651,11 +662,10 @@ class BoardConfiguratorV2 extends React.Component<
 	}
 
 	render() {
-		const { os } = this.props;
+		const { os, settings } = this.props;
 		const {
 			windowDimensions,
 			sidebars,
-			darkMode,
 			currentTool,
 			sideBarTabLeft,
 			sideBarTabRight,
@@ -666,7 +676,7 @@ class BoardConfiguratorV2 extends React.Component<
 			popup,
 		} = this.state;
 		this.addEventListeners();
-		const topMenuHeight = this.getTopMenuHeight(darkMode);
+		const topMenuHeight = this.getTopMenuHeight(settings.darkMode);
 		const mainHeight =
 			windowDimensions.height -
 			(os === 'win32' ? 32 + topMenuHeight : topMenuHeight);
@@ -674,18 +684,16 @@ class BoardConfiguratorV2 extends React.Component<
 			windowDimensions.width - (sidebars.left + sidebars.right);
 		return (
 			<section className="text-white font-lato dark:bg-muted-800 bg-muted-600">
+				{os === 'win32' ? (
+					<div className="dragger w-[100vw] h-8 bg-muted flex items-center px-2 text-sm">
+						{window.languageHelper.translate('Board Configurator')}
+					</div>
+				) : null}
 				<div
 					className={`${
-						popup !== null ? 'blur' : ''
+						popup !== null && 'blur'
 					} transition transition-[filter]`}
 				>
-					{os === 'win32' ? (
-						<div className="dragger w-[100vw] h-8 bg-muted flex items-center px-2 text-sm">
-							{window.languageHelper.translate(
-								'Board Configurator'
-							)}
-						</div>
-					) : null}
 					<div
 						className={`dark:bg-muted-800 bg-muted-500 dark:border-0 border-t border-muted-400 px-1 ${
 							os === 'darwin' ? 'pl-24' : ''
@@ -694,7 +702,7 @@ class BoardConfiguratorV2 extends React.Component<
 					>
 						<TopMenu
 							onAction={this.onTopMenuAction}
-							darkMode={darkMode}
+							darkMode={settings.darkMode}
 						/>
 					</div>
 					<div

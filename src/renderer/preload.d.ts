@@ -4,6 +4,7 @@ import { BoardPreset, RiverPreset } from '../main/helper/PresetsLoader';
 import PartieConfigInterface from './components/interfaces/PartieConfigInterface';
 import BoardConfigInterface from './components/interfaces/BoardConfigInterface';
 import TranslationHelper from './helper/TranslationHelper';
+import { SettingsInterface } from '../interfaces/SettingsInterface';
 
 declare global {
 	interface Window {
@@ -74,6 +75,12 @@ declare global {
 				isMac(): Promise<boolean>;
 				getOS(): Promise<NodeJS.Platform>;
 				getVersion(): Promise<string>;
+				prefetch(): Promise<{
+					os: NodeJS.Platform;
+					settings: SettingsInterface;
+				}>;
+				updateSettings(settings: SettingsInterface): SettingsInterface;
+				beep(): Promise<void>;
 			};
 			open: {
 				homepage(): void;

@@ -1,4 +1,4 @@
-import { app, dialog, shell, clipboard, BrowserWindow } from 'electron';
+import { app, BrowserWindow, clipboard, dialog, shell } from 'electron';
 import fs from 'fs';
 import Ajv, { JSONSchemaType } from 'ajv';
 import * as os from 'os';
@@ -8,10 +8,19 @@ import * as BoardConfigSchema from '../../schema/boardConfigSchema.json';
 import PresetsLoader, { BoardPreset, RiverPreset } from './PresetsLoader';
 import PartieConfigInterface from '../../renderer/components/interfaces/PartieConfigInterface';
 import BoardConfigInterface from '../../renderer/components/interfaces/BoardConfigInterface';
+import * as SettingsSchema from '../../schema/settings.schema.json';
+import { SettingsInterface } from '../../interfaces/SettingsInterface';
 
 class IPCHelper {
+	static readonly defaultSettings: SettingsInterface = {
+		darkMode: true,
+		language: 'de',
+		popupsDraggable: true,
+	};
+
 	static handleSavePartieConfig = async (
-		json: string
+		json: string,
+		window: BrowserWindow | null
 	): Promise<
 		| {
 				parsedPath: ParsedPath;
@@ -19,18 +28,34 @@ class IPCHelper {
 		  }
 		| false
 	> => {
-		const { canceled, filePath } = await dialog.showSaveDialog({
-			title: 'Partie-Konfiguration speichern',
-			filters: [{ name: 'Partie-Konfig', extensions: ['json'] }],
-		});
-		if (canceled) {
+		let currentCanceled;
+		let currentFilePath;
+		if (window) {
+			const { canceled, filePath } = await dialog.showSaveDialog(window, {
+				title: 'Partie-Konfiguration speichern',
+				filters: [{ name: 'Partie-Konfig', extensions: ['json'] }],
+			});
+			currentCanceled = canceled;
+			currentFilePath = filePath;
+		} else {
+			const { canceled, filePath } = await dialog.showSaveDialog({
+				title: 'Partie-Konfiguration speichern',
+				filters: [{ name: 'Partie-Konfig', extensions: ['json'] }],
+			});
+			currentCanceled = canceled;
+			currentFilePath = filePath;
+		}
+		if (currentCanceled) {
 			return false;
 		}
-		if (filePath) {
-			fs.writeFileSync(filePath, json, { encoding: 'utf8', flag: 'w' });
+		if (currentFilePath) {
+			fs.writeFileSync(currentFilePath, json, {
+				encoding: 'utf8',
+				flag: 'w',
+			});
 			return {
-				parsedPath: path.parse(filePath),
-				path: filePath,
+				parsedPath: path.parse(currentFilePath),
+				path: currentFilePath,
 			};
 		}
 		return false;
@@ -199,7 +224,8 @@ class IPCHelper {
 	};
 
 	static handleSaveBoardConfig = async (
-		json: string
+		json: string,
+		window: BrowserWindow | null
 	): Promise<
 		| {
 				parsedPath: ParsedPath;
@@ -207,18 +233,34 @@ class IPCHelper {
 		  }
 		| false
 	> => {
-		const { canceled, filePath } = await dialog.showSaveDialog({
-			title: 'Board-Konfiguration speichern',
-			filters: [{ name: 'Board-Konfig', extensions: ['json'] }],
-		});
-		if (canceled) {
+		let currentCanceled;
+		let currentFilePath;
+		if (window) {
+			const { canceled, filePath } = await dialog.showSaveDialog(window, {
+				title: 'Board-Konfiguration speichern',
+				filters: [{ name: 'Board-Konfig', extensions: ['json'] }],
+			});
+			currentCanceled = canceled;
+			currentFilePath = filePath;
+		} else {
+			const { canceled, filePath } = await dialog.showSaveDialog({
+				title: 'Board-Konfiguration speichern',
+				filters: [{ name: 'Board-Konfig', extensions: ['json'] }],
+			});
+			currentCanceled = canceled;
+			currentFilePath = filePath;
+		}
+		if (currentCanceled) {
 			return false;
 		}
-		if (filePath) {
-			fs.writeFileSync(filePath, json, { encoding: 'utf8', flag: 'w' });
+		if (currentFilePath) {
+			fs.writeFileSync(currentFilePath, json, {
+				encoding: 'utf8',
+				flag: 'w',
+			});
 			return {
-				parsedPath: path.parse(filePath),
-				path: filePath,
+				parsedPath: path.parse(currentFilePath),
+				path: currentFilePath,
 			};
 		}
 		return false;
@@ -292,6 +334,63 @@ class IPCHelper {
 
 	static clipBoardWrite(text: string) {
 		clipboard.writeText(text);
+	}
+
+	static prefetch(): {
+		os: NodeJS.Platform;
+		settings: SettingsInterface;
+	} {
+		const settingsPath = IPCHelper.getAssetPath('/settings.json');
+		if (!fs.existsSync(settingsPath)) {
+			fs.writeFileSync(
+				settingsPath,
+				JSON.stringify(IPCHelper.defaultSettings, null, 4)
+			);
+			return {
+				os: IPCHelper.getOS(),
+				settings: IPCHelper.defaultSettings,
+			};
+		}
+		const content = fs.readFileSync(settingsPath, 'utf8');
+		const ajv = new Ajv({ allErrors: true });
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
+		const validate = ajv.compile(SettingsSchema);
+
+		try {
+			if (validate(JSON.parse(content))) {
+				return {
+					os: IPCHelper.getOS(),
+					settings: JSON.parse(content) as SettingsInterface,
+				};
+			}
+			return {
+				os: IPCHelper.getOS(),
+				settings: IPCHelper.defaultSettings,
+			};
+		} catch (e) {
+			return {
+				os: IPCHelper.getOS(),
+				settings: IPCHelper.defaultSettings,
+			};
+		}
+	}
+
+	static updateSettings(settings: SettingsInterface) {
+		const settingsPath = IPCHelper.getAssetPath('/settings.json');
+		if (!fs.existsSync(settingsPath)) {
+			fs.writeFileSync(
+				settingsPath,
+				JSON.stringify(
+					{ ...IPCHelper.defaultSettings, settings },
+					null,
+					4
+				)
+			);
+			return { ...IPCHelper.defaultSettings, settings };
+		}
+		fs.writeFileSync(settingsPath, JSON.stringify(settings, null, 4));
+		return settings;
 	}
 }
 

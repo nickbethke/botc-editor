@@ -1,6 +1,7 @@
 import React from 'react';
 import './App.scss';
 import Mousetrap from 'mousetrap';
+import { isEqual } from 'lodash';
 import BoardEditorChoice from './components/popups/BoardEditorChoice';
 import PartieEditorChoice from './components/popups/PartieEditorChoice';
 import PartieKonfigurator from './screens/PartieKonfigurator';
@@ -12,38 +13,49 @@ import BoardGenerator from './components/generator/BoardGenerator';
 import PartieConfigInterface from './components/interfaces/PartieConfigInterface';
 import BoardConfigInterface from './components/interfaces/BoardConfigInterface';
 import sunImage from '../../assets/images/sun.gif';
-import deFlag from '../../assets/images/de.png';
-import gbFlag from '../../assets/images/gb.png';
-import { AvailableLanguages } from './helper/TranslationHelper';
+import TranslationHelper, {
+	AvailableLanguages,
+} from './helper/TranslationHelper';
 import BoardConfiguratorV2 from './screens/BoardConfiguratorV2';
+import { TopMenuSeparator } from './components/boardConfiguratorV2/TopMenuItem';
+import { SettingsInterface } from '../interfaces/SettingsInterface';
+import SettingsPopup from './components/popups/SettingsPopup';
+
+type AppPopups =
+	| 'boardEditorChoice'
+	| 'boardEditorChoiceV2'
+	| 'partieEditorChoice'
+	| 'randomBoardStartValues'
+	| 'randomBoardV2StartValues'
+	| 'settings'
+	| null;
+
+type AppScreens =
+	| 'home'
+	| 'validator'
+	| 'boardConfigV2FromRandomScreen'
+	| 'boardConfigFromRandomScreen'
+	| 'partieConfigNewScreen'
+	| 'partieConfigLoadScreen'
+	| 'boardConfigNewScreen'
+	| 'boardConfigLoadScreen'
+	| 'boardConfigV2LoadScreen'
+	| 'boardConfigV2NewScreen';
 
 type AppProps = {
 	os: NodeJS.Platform;
+	settings: SettingsInterface;
 };
 type AppStates = {
-	openScreen:
-		| 'home'
-		| 'validator'
-		| 'boardConfigV2FromRandomScreen'
-		| 'boardConfigFromRandomScreen'
-		| 'partieConfigNewScreen'
-		| 'partieConfigLoadScreen'
-		| 'boardConfigNewScreen'
-		| 'boardConfigLoadScreen'
-		| 'boardConfigV2LoadScreen'
-		| 'boardConfigV2NewScreen';
-	openPopup:
-		| 'boardEditorChoice'
-		| 'boardEditorChoiceV2'
-		| 'partieEditorChoice'
-		| 'randomBoardStartValues'
-		| 'randomBoardV2StartValues'
-		| false;
+	openScreen: AppScreens;
+	openPopup: AppPopups;
 	toLoad: object | null;
 	generator: BoardGenerator | null;
 	version: string;
 	surprise: boolean;
-	lang: AvailableLanguages;
+	settings: SettingsInterface;
+	popupPosition: { x: number; y: number };
+	popupDimension: { width: number; height: number };
 };
 
 class App extends React.Component<AppProps, AppStates> {
@@ -51,12 +63,20 @@ class App extends React.Component<AppProps, AppStates> {
 		super(props);
 		this.state = {
 			openScreen: 'home',
-			openPopup: false,
+			openPopup: null,
 			toLoad: null,
 			generator: null,
 			version: '',
 			surprise: false,
-			lang: AvailableLanguages.de,
+			settings: props.settings,
+			popupPosition: {
+				x: window.innerWidth / 2,
+				y: window.innerHeight / 2,
+			},
+			popupDimension: {
+				width: 0,
+				height: 0,
+			},
 		};
 		this.handleOpenBoardEditorChoice =
 			this.handleOpenBoardEditorChoice.bind(this);
@@ -77,7 +97,7 @@ class App extends React.Component<AppProps, AppStates> {
 			if (openPopup === 'randomBoardStartValues') {
 				this.setState({ openPopup: 'boardEditorChoice' });
 			} else {
-				this.setState({ openPopup: false });
+				this.setState({ openPopup: null });
 			}
 		});
 
@@ -88,6 +108,67 @@ class App extends React.Component<AppProps, AppStates> {
 				this.setState({ surprise: !surprise });
 			}
 		);
+		if (props.settings.darkMode) {
+			document.documentElement.classList.add('dark');
+		}
+		document.documentElement.setAttribute('lang', props.settings.language);
+	}
+
+	componentDidUpdate(
+		prevProps: Readonly<AppProps>,
+		prevState: Readonly<AppStates>
+	) {
+		const { openPopup: prePopup, settings: preSettings } = prevState;
+		const {
+			openPopup: popup,
+			popupPosition,
+			popupDimension,
+			settings,
+		} = this.state;
+
+		if (!isEqual(preSettings, settings)) {
+			if (settings.darkMode) {
+				document.documentElement.classList.add('dark');
+			} else {
+				document.documentElement.classList.remove('dark');
+			}
+			document.documentElement.setAttribute('lang', settings.language);
+		}
+		if (prePopup !== popup) {
+			this.setState({
+				popupPosition: {
+					x: window.innerWidth / 2,
+					y: window.innerHeight / 2,
+				},
+			});
+		}
+		if (popupPosition.x < 0) {
+			this.setState({ popupPosition: { x: 0, y: popupPosition.y } });
+		}
+		if (popupPosition.y < 0) {
+			this.setState({
+				popupPosition: {
+					x: popupPosition.x,
+					y: 0,
+				},
+			});
+		}
+		if (popupPosition.x + popupDimension.width > window.innerWidth) {
+			this.setState({
+				popupPosition: {
+					x: window.innerWidth - popupDimension.width,
+					y: popupPosition.y,
+				},
+			});
+		}
+		if (popupPosition.y + popupDimension.height > window.innerHeight) {
+			this.setState({
+				popupPosition: {
+					x: popupPosition.x,
+					y: window.innerHeight - popupDimension.height,
+				},
+			});
+		}
 	}
 
 	handleOpenBoardEditorChoice = () => {
@@ -102,6 +183,10 @@ class App extends React.Component<AppProps, AppStates> {
 		this.setState({ openPopup: 'partieEditorChoice' });
 	};
 
+	handleOpenSettings = () => {
+		this.setState({ openPopup: 'settings' });
+	};
+
 	handleCloseApp = () => {
 		window.electron.app.close();
 	};
@@ -111,10 +196,22 @@ class App extends React.Component<AppProps, AppStates> {
 	};
 
 	handleCloseChildScreen = () => {
-		this.setState({ openScreen: 'home', openPopup: false });
+		this.setState({ openScreen: 'home', openPopup: null });
+	};
+
+	handleSettingsChange = async (settings: SettingsInterface) => {
+		const newSettings = await window.electron.app.updateSettings(settings);
+		const lang = TranslationHelper.stringToEnum(newSettings.language);
+		await this.handleLanguageChange(lang);
+		this.setState({ settings: newSettings });
+	};
+
+	handleLanguageChange = async (lang: AvailableLanguages) => {
+		await window.languageHelper.switchLanguage(lang);
 	};
 
 	render = () => {
+		this.addEventListeners();
 		const { version } = this.state;
 		if (version === '') {
 			window.electron.app
@@ -203,13 +300,15 @@ class App extends React.Component<AppProps, AppStates> {
 	};
 
 	boardConfigV2Screen = (generator: BoardGenerator | null = null) => {
-		const { openScreen, toLoad } = this.state;
+		const { openScreen, toLoad, settings } = this.state;
 		const { os } = this.props;
 		if (openScreen === 'boardConfigV2NewScreen') {
 			return (
 				<BoardConfiguratorV2
 					os={os}
 					onClose={this.handleCloseChildScreen}
+					settings={settings}
+					onSettingsUpdate={this.handleSettingsChange}
 				/>
 			);
 		}
@@ -219,6 +318,8 @@ class App extends React.Component<AppProps, AppStates> {
 					os={os}
 					onClose={this.handleCloseChildScreen}
 					config={toLoad as BoardConfigInterface}
+					settings={settings}
+					onSettingsUpdate={this.handleSettingsChange}
 				/>
 			);
 		}
@@ -228,6 +329,8 @@ class App extends React.Component<AppProps, AppStates> {
 					os={os}
 					onClose={this.handleCloseChildScreen}
 					config={generator.boardJSON}
+					settings={settings}
+					onSettingsUpdate={this.handleSettingsChange}
 				/>
 			);
 		}
@@ -244,115 +347,8 @@ class App extends React.Component<AppProps, AppStates> {
 
 	homeScreen() {
 		const { openPopup, version, surprise } = this.state;
-		let popup: JSX.Element | null = null;
-		if (openPopup === 'boardEditorChoice') {
-			popup = (
-				<BoardEditorChoice
-					onClose={() => {
-						this.setState({ openPopup: false });
-					}}
-					onLoadConfig={async () => {
-						const boardJSON =
-							await window.electron.dialog.openBoardConfig();
-						if (boardJSON) {
-							this.setState({
-								openScreen: 'boardConfigLoadScreen',
-								toLoad: boardJSON.config,
-							});
-						}
-					}}
-					onNewConfig={() => {
-						this.setState({ openScreen: 'boardConfigNewScreen' });
-					}}
-					onRandomConfig={() => {
-						this.setState({ openPopup: 'randomBoardStartValues' });
-					}}
-				/>
-			);
-		}
-		if (openPopup === 'boardEditorChoiceV2') {
-			popup = (
-				<BoardEditorChoice
-					onClose={() => {
-						this.setState({ openPopup: false });
-					}}
-					onLoadConfig={async () => {
-						const boardJSON =
-							await window.electron.dialog.openBoardConfig();
-						if (boardJSON) {
-							this.setState({
-								openScreen: 'boardConfigV2LoadScreen',
-								toLoad: boardJSON.config,
-							});
-						}
-					}}
-					onNewConfig={() => {
-						this.setState({ openScreen: 'boardConfigV2NewScreen' });
-					}}
-					onRandomConfig={() => {
-						this.setState({
-							openPopup: 'randomBoardV2StartValues',
-						});
-					}}
-				/>
-			);
-		}
-		if (openPopup === 'randomBoardStartValues') {
-			popup = (
-				<RandomBoardStartValuesDialog
-					onClose={() => {
-						this.setState({ openPopup: 'boardEditorChoice' });
-					}}
-					onGenerated={(generator) => {
-						this.setState({
-							generator,
-							openScreen: 'boardConfigFromRandomScreen',
-							openPopup: false,
-						});
-					}}
-				/>
-			);
-		}
-		if (openPopup === 'randomBoardV2StartValues') {
-			popup = (
-				<RandomBoardStartValuesDialog
-					onClose={() => {
-						this.setState({ openPopup: 'boardEditorChoiceV2' });
-					}}
-					onGenerated={(generator) => {
-						this.setState({
-							generator,
-							openScreen: 'boardConfigV2FromRandomScreen',
-							openPopup: false,
-						});
-					}}
-				/>
-			);
-		}
-		if (openPopup === 'partieEditorChoice') {
-			popup = (
-				<PartieEditorChoice
-					onClose={() => {
-						this.setState({ openPopup: false });
-					}}
-					onNewConfig={() => {
-						this.setState({ openScreen: 'partieConfigNewScreen' });
-					}}
-					onLoadConfig={async () => {
-						const partieJSON =
-							await window.electron.dialog.openPartieConfig();
-						if (partieJSON) {
-							this.setState({
-								openScreen: 'partieConfigLoadScreen',
-								toLoad: partieJSON.config,
-							});
-						}
-					}}
-				/>
-			);
-		}
-		const tabIndex = openPopup !== false ? -1 : 0;
-		const { lang } = this.state;
+		const popup = this.popup(openPopup);
+		const tabIndex = openPopup !== null ? -1 : 0;
 		const { os } = this.props;
 		return (
 			<div className="text-white">
@@ -375,11 +371,11 @@ class App extends React.Component<AppProps, AppStates> {
 								<div className="text-4xl 2xl:text-6xl">
 									Battle of the Centerländ
 								</div>
-								<div className="text-2xl 2xl:text-4xl">
+								<div className="text-2xl 2xl:text-4xl tracking-widest">
 									{window.languageHelper.translate('Editor')}
 								</div>
 							</div>
-							<div className="flex flex-col gap-4">
+							<div className="flex flex-col gap-4 w-fit">
 								<button
 									tabIndex={tabIndex}
 									type="button"
@@ -420,79 +416,49 @@ class App extends React.Component<AppProps, AppStates> {
 										'Validator'
 									)}
 								</button>
+								<TopMenuSeparator />
 								<button
 									tabIndex={tabIndex}
 									type="button"
-									className="text-2xl clickable mt-8 flex gap-4"
+									className="text-2xl clickable"
+									onClick={this.handleOpenSettings}
+								>
+									{window.languageHelper.translate(
+										'Settings'
+									)}
+								</button>
+								<TopMenuSeparator />
+								<button
+									tabIndex={tabIndex}
+									type="button"
+									className="text-2xl clickable"
 									onClick={this.handleCloseApp}
 								>
 									{window.languageHelper.translate('Exit')}
 								</button>
 							</div>
 						</div>
-						<div className="bg-white/10 p-2 w-full font-jetbrains flex flex-row justify-end gap-4">
+						<div className="bg-white/10 p-2 w-full font-jetbrains flex flex-row items-center justify-end gap-2 text-[10px]">
 							<button
 								type="button"
-								className="text-[10px]"
 								onClick={() => {
 									window.electron.open.homepage();
 								}}
 							>
 								{window.languageHelper.translate('Website')}
 							</button>
-							<span className="text-[10px]">
+							|
+							<span>
 								{window.languageHelper.translate(
 									'Editor Version'
 								)}
-								: {version}{' '}
+								: {version}
+							</span>
+							|
+							<span>
 								{window.languageHelper.translate('Platform')}:{' '}
 								{os}
 							</span>
-							<button
-								type="button"
-								className="text-[10px]"
-								onClick={() => {
-									if (lang === AvailableLanguages.en) {
-										window.languageHelper
-											.switchLanguage(
-												AvailableLanguages.de
-											)
-											.then(() => {
-												this.setState({
-													lang: AvailableLanguages.de,
-												});
-												return null;
-											})
-											.catch(console.log);
-									} else {
-										window.languageHelper
-											.switchLanguage(
-												AvailableLanguages.en
-											)
-											.then(() => {
-												this.setState({
-													lang: AvailableLanguages.en,
-												});
-												return null;
-											})
-											.catch(console.log);
-									}
-								}}
-							>
-								<img
-									src={
-										lang === AvailableLanguages.en
-											? deFlag
-											: gbFlag
-									}
-									alt={
-										lang === AvailableLanguages.en
-											? 'DE'
-											: 'GB'
-									}
-									className="h-3"
-								/>
-							</button>
 						</div>
 					</div>
 				</div>
@@ -500,6 +466,172 @@ class App extends React.Component<AppProps, AppStates> {
 					{popup}
 				</div>
 			</div>
+		);
+	}
+
+	private popup(openPopup: AppPopups) {
+		const { popupPosition, settings } = this.state;
+		const { os } = this.props;
+		let popup: JSX.Element | null;
+		switch (openPopup) {
+			case 'boardEditorChoice':
+				popup = (
+					<BoardEditorChoice
+						onClose={() => {
+							this.setState({ openPopup: null });
+						}}
+						onLoadConfig={async () => {
+							const boardJSON =
+								await window.electron.dialog.openBoardConfig();
+							if (boardJSON) {
+								this.setState({
+									openScreen: 'boardConfigLoadScreen',
+									toLoad: boardJSON.config,
+								});
+							}
+						}}
+						onNewConfig={() => {
+							this.setState({
+								openScreen: 'boardConfigNewScreen',
+							});
+						}}
+						onRandomConfig={() => {
+							this.setState({
+								openPopup: 'randomBoardStartValues',
+							});
+						}}
+					/>
+				);
+				break;
+			case 'boardEditorChoiceV2':
+				popup = (
+					<BoardEditorChoice
+						onClose={() => {
+							this.setState({ openPopup: null });
+						}}
+						onLoadConfig={async () => {
+							const boardJSON =
+								await window.electron.dialog.openBoardConfig();
+							if (boardJSON) {
+								this.setState({
+									openScreen: 'boardConfigV2LoadScreen',
+									toLoad: boardJSON.config,
+								});
+							}
+						}}
+						onNewConfig={() => {
+							this.setState({
+								openScreen: 'boardConfigV2NewScreen',
+							});
+						}}
+						onRandomConfig={() => {
+							this.setState({
+								openPopup: 'randomBoardV2StartValues',
+							});
+						}}
+					/>
+				);
+				break;
+			case 'randomBoardStartValues':
+				popup = (
+					<RandomBoardStartValuesDialog
+						onClose={() => {
+							this.setState({ openPopup: 'boardEditorChoice' });
+						}}
+						onGenerated={(generator) => {
+							this.setState({
+								generator,
+								openScreen: 'boardConfigFromRandomScreen',
+								openPopup: null,
+							});
+						}}
+					/>
+				);
+				break;
+			case 'randomBoardV2StartValues':
+				popup = (
+					<RandomBoardStartValuesDialog
+						onClose={() => {
+							this.setState({ openPopup: 'boardEditorChoiceV2' });
+						}}
+						onGenerated={(generator) => {
+							this.setState({
+								generator,
+								openScreen: 'boardConfigV2FromRandomScreen',
+								openPopup: null,
+							});
+						}}
+					/>
+				);
+				break;
+			case 'partieEditorChoice':
+				popup = (
+					<PartieEditorChoice
+						onClose={() => {
+							this.setState({ openPopup: null });
+						}}
+						onNewConfig={() => {
+							this.setState({
+								openScreen: 'partieConfigNewScreen',
+							});
+						}}
+						onLoadConfig={async () => {
+							const partieJSON =
+								await window.electron.dialog.openPartieConfig();
+							if (partieJSON) {
+								this.setState({
+									openScreen: 'partieConfigLoadScreen',
+									toLoad: partieJSON.config,
+								});
+							}
+						}}
+					/>
+				);
+				break;
+			case 'settings':
+				popup = (
+					<SettingsPopup
+						settings={settings}
+						position={popupPosition}
+						onPositionChange={(position, callback) => {
+							this.setState(
+								{ popupPosition: position },
+								callback
+							);
+						}}
+						onDimensionChange={(dimension) => {
+							this.setState({ popupDimension: dimension });
+						}}
+						os={os}
+						onAbort={() => {
+							this.setState({ openPopup: null });
+						}}
+						onConfirm={async (s) => {
+							await this.handleSettingsChange(s);
+							this.setState({ openPopup: null });
+						}}
+					/>
+				);
+				break;
+			default:
+				popup = null;
+				break;
+		}
+		return popup;
+	}
+
+	private addEventListeners() {
+		window.addEventListener(
+			'resize',
+			() => {
+				this.setState({
+					popupPosition: {
+						x: window.innerWidth / 2,
+						y: window.innerHeight / 2,
+					},
+				});
+			},
+			{ once: true }
 		);
 	}
 }

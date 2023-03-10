@@ -7,14 +7,14 @@ import TranslationHelper, {
 
 window.languageHelper = new TranslationHelper(AvailableLanguages.de);
 window.electron.app
-	.getOS()
-	.then((os) => {
+	.prefetch()
+	.then((prefetch) => {
 		const container = document.getElementById('root');
 		if (container) {
 			const root = createRoot(container);
 			root.render(
 				<React.StrictMode>
-					<App os={os} />
+					<App os={prefetch.os} settings={prefetch.settings} />
 				</React.StrictMode>
 			);
 		}

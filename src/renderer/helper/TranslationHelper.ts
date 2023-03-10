@@ -59,6 +59,16 @@ class TranslationHelper {
 				.catch(console.log);
 		});
 	}
+
+	static stringToEnum(language: string): AvailableLanguages {
+		switch (language) {
+			case 'de':
+			default:
+				return AvailableLanguages.de;
+			case 'en':
+				return AvailableLanguages.en;
+		}
+	}
 }
 
 export default TranslationHelper;

@@ -135,8 +135,6 @@ function FieldHelper(props: FieldHelperProps) {
 				];
 			break;
 		case FieldsEnum.CHECKPOINT:
-			text = ((attribute as number) + 1).toString();
-			break;
 		case FieldsEnum.DESTINY_MOUNTAIN:
 			text = ((attribute as number) + 1).toString();
 			break;

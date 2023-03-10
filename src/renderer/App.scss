@@ -88,7 +88,7 @@
 }
 
 body {
-	font-family: 'Salsa', cursive;
+	font-family: 'Lato', sans-serif;
 }
 
 .dragger {
@@ -129,14 +129,26 @@ body {
 	background-position: center;
 }
 
+*:focus {
+	@apply outline-accent;
+}
+
 .clickable {
-	@apply pl-2 relative border-l-[1px] border-white;
-	width: fit-content;
-	transition: border-left 0.2s ease-in-out;
+	position: relative;
+	display: inline;
+	@apply w-full text-left pl-3 pr-2 transition transition-all;
+
+	&::before {
+		content: '';
+		@apply w-1 bg-white h-full absolute top-0 left-0 block transition transition-all opacity-50;
+	}
 
 	&:hover,
 	&:focus {
-		@apply border-l-8 border-l-accent cursor-pointer;
+		@apply pl-5 pr-0;
+		&::before {
+			@apply bg-accent w-3 opacity-100;
+		}
 	}
 }
 
@@ -153,9 +165,6 @@ select option {
 	@apply text-[#222222];
 }
 
-/* Hide default HTML checkbox */
-/* The slider */
-/* Rounded sliders */
 .switch {
 	position: relative;
 	display: inline-block;
@@ -176,7 +185,7 @@ span.slider {
 	left: 0;
 	right: 0;
 	bottom: 0;
-	background-color: #ccc;
+	@apply bg-muted;
 	-webkit-transition: 0.4s;
 	transition: 0.4s;
 
@@ -197,7 +206,7 @@ input {
 	&:checked {
 		+ {
 			.slider {
-				@apply bg-accent-500;
+				@apply bg-accent;
 
 				&:before {
 					transform: translateX(16px);
@@ -310,4 +319,17 @@ input {
 	background-image: url('/assets/texturepacks/default/hole.png');
 	background-size: contain;
 	background-position: center;
+}
+
+.popup-warn {
+	animation: popup-warn 0.2s linear infinite;
+}
+
+@keyframes popup-warn {
+	0% {
+		transform: translateX(-3px);
+	}
+	50% {
+		transform: translateX(3px);
+	}
 }

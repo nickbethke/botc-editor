@@ -163,10 +163,10 @@ app.whenReady()
 			return IPCHelper.handleFileOpen('partie', mainWindow);
 		});
 		ipcMain.handle('dialog:savePartieConfig', async (event, ...args) => {
-			return IPCHelper.handleSavePartieConfig(args[0]);
+			return IPCHelper.handleSavePartieConfig(args[0], mainWindow);
 		});
 		ipcMain.handle('dialog:saveBoardConfig', async (event, ...args) => {
-			return IPCHelper.handleSaveBoardConfig(args[0]);
+			return IPCHelper.handleSaveBoardConfig(args[0], mainWindow);
 		});
 		ipcMain.handle('dialog:openConfig', async () => {
 			return IPCHelper.handleFileOpen('', mainWindow);
@@ -222,6 +222,17 @@ app.whenReady()
 		});
 		ipcMain.handle('clipboard:write', (event, ...args) => {
 			return IPCHelper.clipBoardWrite(args[0]);
+		});
+
+		ipcMain.handle('get:prefetch', () => {
+			return IPCHelper.prefetch();
+		});
+
+		ipcMain.handle('update:settings', (event, ...args) => {
+			return IPCHelper.updateSettings(args[0]);
+		});
+		ipcMain.handle('beep', () => {
+			return shell.beep();
 		});
 
 		setInterval(() => {
