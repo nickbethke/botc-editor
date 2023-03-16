@@ -12,6 +12,7 @@ import {
 } from 'react-icons/vsc';
 import { MdBorderStyle, MdOutlineFastfood } from 'react-icons/md';
 import { BiWater } from 'react-icons/bi';
+import { BsCursor } from 'react-icons/bs';
 import { FieldsEnum } from '../generator/BoardGenerator';
 import SidebarMenuItem, { SidebarMenuItemSeparator } from './SidebarMenuItem';
 import BoardConfigInterface, {
@@ -29,6 +30,7 @@ import {
 	updateStartFieldDirection,
 } from './HelperFunctions';
 import DirectionHelper from '../generator/helper/DirectionHelper';
+import CheckpointSortableV2 from './CheckpointSortableV2';
 
 type LeftSidebarProps = {
 	toolChange: (tool: EditorToolType) => void;
@@ -174,15 +176,11 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 							min={0}
 							max={20}
 							onChange={(value) => {
-								const amount = Number.parseInt(
-									value.toString(),
-									10
-								);
 								onConfigUpdate(
 									updateLembasFieldAmount(
 										config,
 										fieldInEdit,
-										amount
+										value
 									)
 								);
 							}}
@@ -206,10 +204,10 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 						type="text"
 						label={window.languageHelper.translate('Board Name')}
 						value={config.name}
-						onChange={(value) => {
+						onChange={(name) => {
 							const newConfig = {
 								...config,
-								name: value.toString(),
+								name,
 							};
 							onConfigUpdate(newConfig);
 						}}
@@ -220,10 +218,10 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 						value={config.width}
 						min={2}
 						max={20}
-						onChange={(value) => {
+						onChange={(width) => {
 							const newConfig = {
 								...config,
-								width: Number.parseInt(value.toString(), 10),
+								width,
 							};
 							onConfigUpdate(newConfig);
 						}}
@@ -234,10 +232,10 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 						value={config.height}
 						min={2}
 						max={20}
-						onChange={(value) => {
+						onChange={(height) => {
 							const newConfig = {
 								...config,
-								height: Number.parseInt(value.toString(), 10),
+								height,
 							};
 							onConfigUpdate(newConfig);
 						}}
@@ -248,10 +246,23 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 	};
 
 	checkpointOrder = () => {
+		const { config, onConfigUpdate } = this.props;
 		return (
 			<div className="flex flex-col">
 				<div className="p-2 border-b dark:border-muted-700 border-muted-400">
 					{window.languageHelper.translate('Checkpoint Order')}
+				</div>
+				<div className="p-4 flex flex-col gap-4">
+					<CheckpointSortableV2
+						checkpoints={config.checkPoints}
+						onUpdate={(checkpoints) => {
+							onConfigUpdate({
+								...config,
+								checkPoints: checkpoints,
+							});
+						}}
+						onSelect={() => {}}
+					/>
 				</div>
 			</div>
 		);
@@ -285,7 +296,16 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 		return (
 			<>
 				<SidebarMenuItem
-					label={window.languageHelper.translate('Edit')}
+					label={window.languageHelper.translate('Mouse')}
+					open={currentTool === null}
+					icon={<BsCursor />}
+					onClick={() => {
+						this.handleCurrentToolChange(null);
+					}}
+					shortCut={`${window.languageHelper.translate('Ctrl')}+0`}
+				/>
+				<SidebarMenuItem
+					label={window.languageHelper.translate('Edit Field')}
 					open={currentTool === 'edit'}
 					icon={<VscEdit />}
 					onClick={() => {
@@ -303,6 +323,7 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 					shortCut={`${window.languageHelper.translate('Ctrl')}+D`}
 				/>
 				<SidebarMenuItemSeparator />
+
 				<SidebarMenuItem
 					label={window.languageHelper.translate('Start')}
 					open={currentTool === FieldsEnum.START}

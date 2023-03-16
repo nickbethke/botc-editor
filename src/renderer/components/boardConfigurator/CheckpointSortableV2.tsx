@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
 import SortableList, { SortableItem, SortableKnob } from 'react-easy-sort';
-import { BsChevronBarExpand } from 'react-icons/bs';
-import Checkpoint from '../generator/fields/Checkpoint';
+import { VscGripper } from 'react-icons/vsc';
 import { BoardPosition } from '../generator/interfaces/boardPosition';
+import { Position } from '../interfaces/BoardConfigInterface';
 
-const CheckpointSortable = (props: {
-	checkpoints: Array<Checkpoint>;
-	onUpdate: (checkpoints: Array<Checkpoint>) => void;
+type CheckpointSortableV2Props = {
+	checkpoints: Array<Position>;
+	onUpdate: (checkpoints: Array<Position>) => void;
 	onSelect: (position: BoardPosition) => void;
-}) => {
+};
+const CheckpointSortableV2 = (props: CheckpointSortableV2Props) => {
 	const { checkpoints, onUpdate, onSelect } = props;
 	const [items, setItems] = useState(checkpoints);
 	const ref = React.createRef<HTMLDivElement>();
@@ -46,9 +47,7 @@ const CheckpointSortable = (props: {
 		);
 		const helperArray = [];
 		for (let i = 0; i < newCheckpointOrder.length; i += 1) {
-			const checkpoint = newCheckpointOrder[i];
-			const { position } = checkpoint;
-			helperArray[i] = new Checkpoint(position, i);
+			helperArray[i] = newCheckpointOrder[i];
 		}
 		setItems(helperArray);
 		onUpdate(helperArray);
@@ -63,31 +62,43 @@ const CheckpointSortable = (props: {
 			lockAxis="y"
 			onSortEnd={onSortEnd}
 			className={`${
-				items.length > 0 ? 'p-2 border' : ''
-			} flex flex-col gap-2`}
-			draggedItemClassName="dragged text-white"
+				items.length > 0 &&
+				'p-2 border dark:border-muted-700 border-muted-400'
+			} flex flex-col gap-2 text-[14px]`}
+			draggedItemClassName="dragged text-white bg-muted"
 			customHolderRef={ref}
 		>
-			{items.map((item) => {
+			{items.map((item, index) => {
 				const checkpoint = item;
-				const text = `Checkpoint {y:${checkpoint.position.y}, x:${checkpoint.position.x}}`;
+				const x = checkpoint[0];
+				const y = checkpoint[1];
+				const order = index;
+				const text = (
+					<div className="flex gap-2 items-center">
+						<span>
+							{order + 1 < 10 ? `0${order + 1}` : order + 1}.
+						</span>
+						<span>Checkpoint</span>
+						<span>
+							[{x}, {y}]
+						</span>
+					</div>
+				);
 				return (
-					<SortableItem key={item.order}>
+					<SortableItem key={order}>
 						<div
 							role="presentation"
-							className="relative item border p-1 font-mono flex items-center gap-2 cursor-pointer bg-white/25"
+							className="relative item border dark:border-muted-700 border-muted-400 p-1 flex items-center gap-2 cursor-pointer bg-muted-700"
 							onDoubleClick={() => {
-								onSelect(item.position);
+								onSelect({ x, y });
 							}}
 						>
 							<SortableKnob>
 								<div className="text-white text-2xl cursor-grabbing">
-									<BsChevronBarExpand />
+									<VscGripper />
 								</div>
 							</SortableKnob>
-							<span className="flex-grow">
-								{item.order + 1}. {text}
-							</span>
+							<span className="flex-grow">{text}</span>
 						</div>
 					</SortableItem>
 				);
@@ -95,4 +106,4 @@ const CheckpointSortable = (props: {
 		</SortableList>
 	);
 };
-export default CheckpointSortable;
+export default CheckpointSortableV2;

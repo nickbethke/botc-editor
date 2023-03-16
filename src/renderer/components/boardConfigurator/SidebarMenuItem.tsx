@@ -35,6 +35,13 @@ class SidebarMenuItem extends React.Component<
 		const { hover } = this.state;
 		if (!hover) {
 			this.setState({ hover: true });
+			document.addEventListener(
+				'click',
+				() => {
+					this.setState({ hover: false });
+				},
+				{ once: true }
+			);
 		}
 	};
 
@@ -94,7 +101,10 @@ class SidebarMenuItem extends React.Component<
 
 export function SidebarMenuItemSeparator() {
 	return (
-		<hr className="border-t dark:border-muted-700 border-muted-400 mx-2 my-1" />
+		<hr
+			key={_uniqueId('sidebar-menu-item-separator-')}
+			className="border-t dark:border-muted-700 border-muted-400 mx-2 my-1"
+		/>
 	);
 }
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import { SettingsInterface } from '../../../interfaces/SettingsInterface';
-import ConfirmPopupV2 from '../boardConfiguratorV2/ConfirmPopupV2';
+import ConfirmPopupV2 from '../boardConfigurator/ConfirmPopupV2';
 import InputLabel from '../InputLabel';
 import TranslationHelper, {
 	AvailableLanguages,
@@ -101,11 +101,11 @@ class SettingsPopup extends React.Component<
 						<InputLabel
 							type="switch"
 							value={settings.darkMode}
-							onChange={(value) => {
+							onChange={(darkMode) => {
 								this.setState({
 									settings: {
 										...settings,
-										darkMode: !!value,
+										darkMode,
 									},
 								});
 							}}
@@ -118,11 +118,11 @@ class SettingsPopup extends React.Component<
 						<InputLabel
 							type="switch"
 							value={settings.popupsDraggable}
-							onChange={(value) => {
+							onChange={(popupsDraggable) => {
 								this.setState({
 									settings: {
 										...settings,
-										popupsDraggable: !!value,
+										popupsDraggable,
 									},
 								});
 							}}

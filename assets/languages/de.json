@@ -276,6 +276,94 @@
 		[
 			"Popups movable",
 			"Popups bewegbar"
+		],
+		[
+			"Edit Field",
+			"Feld bearbeiten"
+		],
+		[
+			"Mouse",
+			"Maus"
+		],
+		[
+			"Edit",
+			"Bearbeiten"
+		],
+		[
+			"The current file has not yet been saved. Do you want to discard the current changes?",
+			"Die aktuelle Konfiguration wurde noch nicht gespeichert. Möchten Sie alle Änderungen verwerfen?"
+		],
+		[
+			"Save as",
+			"Speichern als"
+		],
+		[
+			"Unsaved File",
+			"Ungespeicherte Datei"
+		],
+		[
+			"Configuration",
+			"Konfiguration"
+		],
+		[
+			"Empty",
+			"Leer"
+		],
+		[
+			"Close Board Configurator",
+			"Board-Konfigurator schließen"
+		],
+		[
+			"Random Board - Start Values",
+			"Zufälliges Board - Startwerte"
+		],
+		[
+			"New Config",
+			"Neue Konfiguration"
+		],
+		[
+			"Checkpoints",
+			"Kontrollpunkte"
+		],
+		[
+			"Start Fields",
+			"Startfelder"
+		],
+		[
+			"Lembas Fields",
+			"Lembas-Felder"
+		],
+		[
+			"Lembas Count",
+			"Lembas Anzahl"
+		],
+		[
+			"Rivers",
+			"Flüsse"
+		],
+		[
+			"Walls",
+			"Wände"
+		],
+		[
+			"Complex",
+			"Komplex"
+		],
+		[
+			"Iterative",
+			"Iterativ"
+		],
+		[
+			"Generate",
+			"Generieren"
+		],
+		[
+			"Exact Lembas Count or Random between 0 and Lembas Count",
+			"Exakte Lembas-Anzahl oder zufällig Anzahl zwischen 0 und Lembas-Anzahl"
+		],
+		[
+			"possible empty fields / total number of fields",
+			"Mögliche leere Felder / Felder Gesamtanzahl"
 		]
 	]
 }

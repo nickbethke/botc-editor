@@ -1,5 +1,5 @@
 import React, { MouseEventHandler } from 'react';
-import destinyMountainImage from '../../../../assets/texturepacks/default/schicksalsberg.png';
+import destinyMountainImage from '../../../../assets/textures/schicksalsberg.png';
 import { SettingsInterface } from '../../../interfaces/SettingsInterface';
 
 export type ConfirmPopupV2Props = {
@@ -185,8 +185,8 @@ class ConfirmPopupV2 extends React.Component<
 							/>
 							<span>{title}</span>
 						</div>
-						<div className="py-2 px-4">{children}</div>
-						<div className="py-2 px-4 flex justify-end gap-4 items-center text-sm">
+						<div className="py-2 px-4 mb-2">{children}</div>
+						<div className="py-2 px-4 flex justify-end gap-4 items-center text-sm border-t dark:border-muted-700 border-muted-400">
 							<button
 								className="py-1 px-2 bg-accent-600 rounded hover:bg-accent-500"
 								type="button"

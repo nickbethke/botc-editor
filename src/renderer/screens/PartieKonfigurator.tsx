@@ -4,7 +4,7 @@ import backgroundImage from '../../../assets/images/bg-color-III.jpg';
 import InputLabel from '../components/InputLabel';
 import Notification from '../components/Notification';
 import Error from '../components/Error';
-import InputValidator from '../helper/InputValidator';
+import InputValidator, { InputValidatorType } from '../helper/InputValidator';
 
 import ConfirmPopup from '../components/popups/ConfirmPopup';
 import PartieConfigInterface from '../components/interfaces/PartieConfigInterface';
@@ -137,22 +137,20 @@ class PartieKonfigurator extends React.Component<
 									max={200}
 									value={values.maxRounds}
 									validator={
-										new InputValidator(
-											InputValidator.TYPE_NUMBER,
-											{
-												number: {
-													ifSmallerThen: {
-														number: 3,
-														error: 'Ungünstige Rundenanzahl. Das Spiel wäre sehr schnell vorbei!',
-														except: -1,
-													},
-													ifBiggerThen: {
-														number: 50,
-														error: 'Ungünstige Rundenanzahl. Das Spiel würde sehr lange dauern!',
-													},
+										new InputValidator({
+											type: InputValidatorType.TYPE_NUMBER,
+											options: {
+												ifSmallerThen: {
+													number: 3,
+													error: 'Ungünstige Rundenanzahl. Das Spiel wäre sehr schnell vorbei!',
+													except: -1,
 												},
-											}
-										)
+												ifBiggerThen: {
+													number: 50,
+													error: 'Ungünstige Rundenanzahl. Das Spiel würde sehr lange dauern!',
+												},
+											},
+										})
 									}
 									onChange={(value) => {
 										this.setState({
@@ -173,18 +171,16 @@ class PartieKonfigurator extends React.Component<
 									type="number"
 									value={values.startLembas}
 									validator={
-										new InputValidator(
-											InputValidator.TYPE_NUMBER,
-											{
-												number: {
-													ifSmallerThen: {
-														number: 5,
-														error: 'Ungünstige Start LembasField-Anzahl!',
-														except: -1,
-													},
+										new InputValidator({
+											type: InputValidatorType.TYPE_NUMBER,
+											options: {
+												ifSmallerThen: {
+													number: 5,
+													error: 'Ungünstige Start LembasField-Anzahl!',
+													except: -1,
 												},
-											}
-										)
+											},
+										})
 									}
 									onChange={(value) => {
 										this.setState({

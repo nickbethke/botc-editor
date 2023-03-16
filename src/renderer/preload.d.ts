@@ -67,7 +67,7 @@ declare global {
 			validate(
 				json: object,
 				type: 'partie' | 'board'
-			): Promise<boolean | string>;
+			): Promise<true | string>;
 			app: {
 				close(): void;
 				isWin(): Promise<boolean>;

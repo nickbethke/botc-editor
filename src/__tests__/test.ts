@@ -1,5 +1,6 @@
 import BoardGenerator, {
 	defaultStartValues,
+	RandomBoardStartValues,
 } from '../renderer/components/generator/BoardGenerator';
 import Board from '../renderer/components/generator/Board';
 import FieldWithPositionInterface from '../renderer/components/generator/interfaces/FieldWithPositionInterface';
@@ -11,7 +12,6 @@ import River from '../renderer/components/generator/fields/River';
 import Checkpoint from '../renderer/components/generator/fields/Checkpoint';
 import AStar from '../renderer/components/generator/helper/AStar';
 import Hole from '../renderer/components/generator/fields/Hole';
-import { RandomBoardStartValues } from '../renderer/components/popups/RandomBoardStartValuesDialog';
 
 describe('start values unchanged', () => {
 	test('no start values equal to default after generation', () => {

@@ -8,7 +8,7 @@ import {
 } from 'react-icons/vsc';
 import TopMenuItem, { TopMenuSeparator } from './TopMenuItem';
 import TopMenuItemCollapsable from './TopMenuItemCollapsable';
-import destinyMountainImage from '../../../../assets/texturepacks/default/schicksalsberg.png';
+import destinyMountainImage from '../../../../assets/textures/schicksalsberg.png';
 import TopMenuSubItemCollapsable from './TopMenuSubItemCollapsable';
 
 export enum TopMenuActions {
@@ -17,6 +17,7 @@ export enum TopMenuActions {
 	OPEN,
 	OPEN_PRESET_FOLDER,
 	SAVE,
+	SAVE_AS_CONFIG,
 	SAVE_AS_PRESET,
 	CLOSE,
 	DARK_MODE,
@@ -51,16 +52,14 @@ function TopMenu(props: TopMenuProps) {
 						action={TopMenuActions.NEW}
 						onAction={onAction}
 						icon={<VscNewFile />}
-						label={window.languageHelper.translate(
-							'New from Empty'
-						)}
+						label={window.languageHelper.translate('Empty')}
 					/>
 					<TopMenuItem
 						className="text-left"
 						action={TopMenuActions.NEW_FROM_RANDOM}
 						onAction={onAction}
 						label={`${window.languageHelper.translate(
-							'New from Random'
+							'Random'
 						)}...`}
 					/>
 				</TopMenuSubItemCollapsable>
@@ -68,20 +67,26 @@ function TopMenu(props: TopMenuProps) {
 					className="text-left"
 					action={TopMenuActions.OPEN}
 					onAction={onAction}
-					label={`${window.languageHelper.translate(
-						'Open Configuration'
-					)}...`}
+					label={`${window.languageHelper.translate('Open')}...`}
+					shortCut={`${window.languageHelper.translate('Ctrl')}+O`}
 				/>
 				<TopMenuSeparator />
+				<TopMenuItem
+					className="text-left"
+					action={TopMenuActions.SAVE}
+					onAction={onAction}
+					label={`${window.languageHelper.translate('Save')}...`}
+					shortCut={`${window.languageHelper.translate('Ctrl')}+S`}
+				/>
 				<TopMenuSubItemCollapsable
-					label={window.languageHelper.translate('Save')}
+					label={window.languageHelper.translate('Save as')}
 				>
 					<TopMenuItem
 						className="text-left"
 						action={TopMenuActions.SAVE}
 						onAction={onAction}
 						label={`${window.languageHelper.translate(
-							'as Configuration'
+							'Configuration'
 						)}...`}
 					/>
 					<TopMenuItem
@@ -89,7 +94,7 @@ function TopMenu(props: TopMenuProps) {
 						action={TopMenuActions.SAVE_AS_PRESET}
 						onAction={onAction}
 						label={`${window.languageHelper.translate(
-							'as Preset'
+							'Preset'
 						)}...`}
 					/>
 				</TopMenuSubItemCollapsable>

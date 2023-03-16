@@ -3,23 +3,52 @@ import _uniqueId from 'lodash/uniqueId';
 import InputValidator from '../helper/InputValidator';
 import DblClickInput from './DblClickInput';
 
-export interface OnChangeFunctionInputLabel {
-	(value: string | number): void;
-}
-
-type InputLabelProps = {
-	label?: string | false;
-	type: 'text' | 'number' | 'range' | 'switch';
-	placeholder?: string;
-	value: number | string | boolean;
+type InputLabelStringProps = {
+	type: 'text';
+	value: string;
 	helperText?: string;
-	validator?: InputValidator;
+	onChange: (value: string) => void;
 	min?: number;
 	max?: number;
-	onChange: OnChangeFunctionInputLabel;
-	labelClass?: string;
+};
+
+type InputLabelNumberProps = {
+	type: 'number';
+	value: number;
+	helperText?: string;
+	onChange: (value: number) => void;
+	min?: number;
+	max?: number;
+};
+type InputLabelRangeProps = {
+	type: 'range';
+	value: number;
+	helperText?: string;
+	onChange: (value: number) => void;
+	min?: number;
+	max?: number;
+};
+type InputLabelSwitchProps = {
+	type: 'switch';
+	value: boolean;
+	helperText?: string;
+	onChange: (value: boolean) => void;
 	bothSides?: boolean;
 };
+type InputLabelConditionalProps =
+	| InputLabelStringProps
+	| InputLabelNumberProps
+	| InputLabelSwitchProps
+	| InputLabelRangeProps;
+
+type InputLabelCommonProps = {
+	label?: string | false;
+	placeholder?: string;
+	helperText?: string;
+	validator?: InputValidator;
+	labelClass?: string;
+};
+type InputLabelProps = InputLabelCommonProps & InputLabelConditionalProps;
 type InputLabelState = {
 	hasWarning: boolean;
 	warningText: string[];
@@ -36,11 +65,8 @@ class InputLabel extends React.Component<InputLabelProps, InputLabelState> {
 			placeholder: '',
 			helperText: '',
 			validator: undefined,
-			min: 0,
 			labelClass: '',
-			max: 20,
 			label: false,
-			bothSides: false,
 		};
 	}
 
@@ -58,10 +84,9 @@ class InputLabel extends React.Component<InputLabelProps, InputLabelState> {
 	}
 
 	handleOnChange(e: ChangeEvent<HTMLInputElement>) {
-		const { type } = this.props;
-		if (type !== 'switch') {
-			const { value } = e.target;
-			const { validator, onChange } = this.props;
+		const { value } = e.target;
+		const { validator, onChange, type } = this.props;
+		if (type === 'text') {
 			if (validator) {
 				const { valid, warning } = validator.validate(value);
 				this.setState({
@@ -75,12 +100,38 @@ class InputLabel extends React.Component<InputLabelProps, InputLabelState> {
 				this.setState({ value });
 			}
 			onChange(value);
-		} else {
-			const { checked: value } = e.target;
-			const { onChange } = this.props;
-
-			this.setState({ value });
-			onChange(value ? 1 : 0);
+		} else if (type === 'number') {
+			if (validator) {
+				const { valid, warning } = validator.validate(value);
+				this.setState({
+					warningText: warning.text,
+					isValid: valid.is,
+					errorMsg: valid.text,
+					hasWarning: warning.has,
+					value,
+				});
+			} else {
+				this.setState({ value });
+			}
+			onChange(Number.parseInt(value, 10));
+		} else if (type === 'range') {
+			if (validator) {
+				const { valid, warning } = validator.validate(value);
+				this.setState({
+					warningText: warning.text,
+					isValid: valid.is,
+					errorMsg: valid.text,
+					hasWarning: warning.has,
+					value,
+				});
+			} else {
+				this.setState({ value });
+			}
+			onChange(Number.parseInt(value, 10));
+		} else if (type === 'switch') {
+			const { checked } = e.target;
+			this.setState({ value: checked });
+			onChange(checked);
 		}
 	}
 
@@ -90,12 +141,9 @@ class InputLabel extends React.Component<InputLabelProps, InputLabelState> {
 		const {
 			helperText,
 			label,
-			min,
 			type,
 			placeholder,
 			labelClass,
-			max,
-			bothSides,
 			value: propsValue,
 			onChange,
 		} = this.props;
@@ -134,6 +182,7 @@ class InputLabel extends React.Component<InputLabelProps, InputLabelState> {
 			validClass = ' border-b-red-400';
 		}
 		if (type === 'text' || type === 'number') {
+			const { max, min } = this.props;
 			return (
 				<div className="flex flex-col gap-2 max-w-full">
 					<label htmlFor={this.id} className={`${labelClass}`}>
@@ -156,6 +205,7 @@ class InputLabel extends React.Component<InputLabelProps, InputLabelState> {
 			);
 		}
 		if (type === 'range') {
+			const { max, min } = this.props;
 			return (
 				<div className="flex flex-col">
 					<div>
@@ -195,29 +245,35 @@ class InputLabel extends React.Component<InputLabelProps, InputLabelState> {
 				</div>
 			);
 		}
-		return (
-			<div>
-				<label
-					htmlFor={this.id}
-					className={`${labelClass} flex flex-row gap-2 justify-center items-center`}
-				>
-					{label ? <span className="min-h-8">{label}</span> : null}
-					<div className="switch">
-						<input
-							type="checkbox"
-							id={this.id}
-							checked={!!value}
-							onChange={this.handleOnChange}
-						/>
-						<span
-							className={`${
-								bothSides ? 'slider-both' : ''
-							} slider round`}
-						/>
-					</div>
-				</label>
-			</div>
-		);
+		if (type === 'switch') {
+			const { bothSides } = this.props;
+			return (
+				<div>
+					<label
+						htmlFor={this.id}
+						className={`${labelClass} flex flex-row gap-2 justify-center items-center`}
+					>
+						{label ? (
+							<span className="min-h-8">{label}</span>
+						) : null}
+						<div className="switch">
+							<input
+								type="checkbox"
+								id={this.id}
+								checked={!!value}
+								onChange={this.handleOnChange}
+							/>
+							<span
+								className={`${
+									bothSides ? 'slider-both' : ''
+								} slider round`}
+							/>
+						</div>
+					</label>
+				</div>
+			);
+		}
+		return null;
 	}
 }
 

@@ -1,15 +1,14 @@
 import React from 'react';
-import { OnChangeFunctionInputLabel } from './InputLabel';
 
 type DblClickInputProps = {
 	value: number;
-	onChange: OnChangeFunctionInputLabel;
+	onChange: (value: number) => void;
 	min: number;
 	max: number;
 };
 type DblClickInputState = {
 	open: boolean;
-	value: string | number;
+	value: number;
 };
 
 class DblClickInput extends React.Component<

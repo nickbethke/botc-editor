@@ -1,14 +1,12 @@
 import React from 'react';
 import './App.scss';
 import Mousetrap from 'mousetrap';
-import { isEqual } from 'lodash';
+import { isBoolean, isEqual } from 'lodash';
+import { ParsedPath } from 'path';
 import BoardEditorChoice from './components/popups/BoardEditorChoice';
 import PartieEditorChoice from './components/popups/PartieEditorChoice';
 import PartieKonfigurator from './screens/PartieKonfigurator';
-
-import BoardKonfigurator from './screens/BoardKonfigurator';
 import JSONValidierer from './screens/JSONValidierer';
-import RandomBoardStartValuesDialog from './components/popups/RandomBoardStartValuesDialog';
 import BoardGenerator from './components/generator/BoardGenerator';
 import PartieConfigInterface from './components/interfaces/PartieConfigInterface';
 import BoardConfigInterface from './components/interfaces/BoardConfigInterface';
@@ -17,28 +15,26 @@ import TranslationHelper, {
 	AvailableLanguages,
 } from './helper/TranslationHelper';
 import BoardConfiguratorV2 from './screens/BoardConfiguratorV2';
-import { TopMenuSeparator } from './components/boardConfiguratorV2/TopMenuItem';
+import { TopMenuSeparator } from './components/boardConfigurator/TopMenuItem';
 import { SettingsInterface } from '../interfaces/SettingsInterface';
 import SettingsPopup from './components/popups/SettingsPopup';
+import RandomBoardStartValuesDialogV2 from './components/popups/RandomBoardStartValuesDialogV2';
+import PopupV2 from './components/boardConfigurator/PopupV2';
 
 type AppPopups =
-	| 'boardEditorChoice'
 	| 'boardEditorChoiceV2'
 	| 'partieEditorChoice'
-	| 'randomBoardStartValues'
 	| 'randomBoardV2StartValues'
 	| 'settings'
+	| 'error'
 	| null;
 
 type AppScreens =
 	| 'home'
 	| 'validator'
 	| 'boardConfigV2FromRandomScreen'
-	| 'boardConfigFromRandomScreen'
 	| 'partieConfigNewScreen'
 	| 'partieConfigLoadScreen'
-	| 'boardConfigNewScreen'
-	| 'boardConfigLoadScreen'
 	| 'boardConfigV2LoadScreen'
 	| 'boardConfigV2NewScreen';
 
@@ -56,6 +52,7 @@ type AppStates = {
 	settings: SettingsInterface;
 	popupPosition: { x: number; y: number };
 	popupDimension: { width: number; height: number };
+	errorMessage: { title: string; error: string } | null;
 };
 
 class App extends React.Component<AppProps, AppStates> {
@@ -77,9 +74,8 @@ class App extends React.Component<AppProps, AppStates> {
 				width: 0,
 				height: 0,
 			},
+			errorMessage: null,
 		};
-		this.handleOpenBoardEditorChoice =
-			this.handleOpenBoardEditorChoice.bind(this);
 		this.handleOpenPartieEditorChoice =
 			this.handleOpenPartieEditorChoice.bind(this);
 		this.handleCloseApp = this.handleCloseApp.bind(this);
@@ -87,15 +83,15 @@ class App extends React.Component<AppProps, AppStates> {
 		this.handleCloseChildScreen = this.handleCloseChildScreen.bind(this);
 
 		Mousetrap.bind(['command+b', 'ctrl+b'], () => {
-			this.setState({ openPopup: 'boardEditorChoice' });
+			this.setState({ openPopup: 'boardEditorChoiceV2' });
 		});
 		Mousetrap.bind(['command+p', 'ctrl+p'], () => {
 			this.setState({ openPopup: 'partieEditorChoice' });
 		});
 		Mousetrap.bind(['esc'], () => {
 			const { openPopup } = this.state;
-			if (openPopup === 'randomBoardStartValues') {
-				this.setState({ openPopup: 'boardEditorChoice' });
+			if (openPopup === 'randomBoardV2StartValues') {
+				this.setState({ openPopup: 'boardEditorChoiceV2' });
 			} else {
 				this.setState({ openPopup: null });
 			}
@@ -134,7 +130,7 @@ class App extends React.Component<AppProps, AppStates> {
 			}
 			document.documentElement.setAttribute('lang', settings.language);
 		}
-		if (prePopup !== popup) {
+		if (popup === null && prePopup !== popup) {
 			this.setState({
 				popupPosition: {
 					x: window.innerWidth / 2,
@@ -170,10 +166,6 @@ class App extends React.Component<AppProps, AppStates> {
 			});
 		}
 	}
-
-	handleOpenBoardEditorChoice = () => {
-		this.setState({ openPopup: 'boardEditorChoice' });
-	};
 
 	handleOpenBoardEditorChoiceV2 = () => {
 		this.setState({ openPopup: 'boardEditorChoiceV2' });
@@ -232,16 +224,11 @@ class App extends React.Component<AppProps, AppStates> {
 			case 'partieConfigNewScreen':
 			case 'partieConfigLoadScreen':
 				return this.partieConfigScreen();
-			case 'boardConfigNewScreen':
-			case 'boardConfigLoadScreen':
-				return this.boardConfigScreen();
 			case 'boardConfigV2NewScreen':
 			case 'boardConfigV2LoadScreen':
 				return this.boardConfigV2Screen();
 			case 'boardConfigV2FromRandomScreen':
 				return this.boardConfigV2Screen(generator);
-			case 'boardConfigFromRandomScreen':
-				return this.boardConfigScreen(generator);
 			case 'validator':
 				return this.validatorScreen();
 			default:
@@ -272,33 +259,6 @@ class App extends React.Component<AppProps, AppStates> {
 		return null;
 	};
 
-	boardConfigScreen = (generator: BoardGenerator | null = null) => {
-		const { openScreen, toLoad } = this.state;
-		if (openScreen === 'boardConfigNewScreen') {
-			return <BoardKonfigurator onClose={this.handleCloseChildScreen} />;
-		}
-		if (openScreen === 'boardConfigLoadScreen') {
-			return (
-				<BoardKonfigurator
-					onClose={this.handleCloseChildScreen}
-					json={toLoad as BoardConfigInterface}
-				/>
-			);
-		}
-		if (
-			openScreen === 'boardConfigFromRandomScreen' &&
-			generator instanceof BoardGenerator
-		) {
-			return (
-				<BoardKonfigurator
-					onClose={this.handleCloseChildScreen}
-					generator={generator}
-				/>
-			);
-		}
-		return null;
-	};
-
 	boardConfigV2Screen = (generator: BoardGenerator | null = null) => {
 		const { openScreen, toLoad, settings } = this.state;
 		const { os } = this.props;
@@ -317,9 +277,23 @@ class App extends React.Component<AppProps, AppStates> {
 				<BoardConfiguratorV2
 					os={os}
 					onClose={this.handleCloseChildScreen}
-					config={toLoad as BoardConfigInterface}
+					config={
+						(
+							toLoad as {
+								parsedPath: ParsedPath;
+								path: string;
+								config: BoardConfigInterface;
+							}
+						).config
+					}
 					settings={settings}
 					onSettingsUpdate={this.handleSettingsChange}
+					file={
+						toLoad as {
+							parsedPath: ParsedPath;
+							path: string;
+						}
+					}
 				/>
 			);
 		}
@@ -343,6 +317,35 @@ class App extends React.Component<AppProps, AppStates> {
 			return <JSONValidierer onClose={this.handleCloseChildScreen} />;
 		}
 		return null;
+	};
+
+	errorPopup = () => {
+		const { popupPosition, settings, errorMessage } = this.state;
+		const { os } = this.props;
+		return (
+			<PopupV2
+				title={
+					errorMessage
+						? errorMessage.title
+						: window.languageHelper.translate('Error')
+				}
+				closeButtonText={window.languageHelper.translate('Close')}
+				onClose={() => {
+					this.setState({ openPopup: null });
+				}}
+				position={popupPosition}
+				onPositionChange={(position, callback) => {
+					this.setState({ popupPosition: position }, callback);
+				}}
+				onDimensionChange={(dimension) => {
+					this.setState({ popupDimension: dimension });
+				}}
+				os={os}
+				settings={settings}
+			>
+				<pre>{errorMessage?.error}</pre>
+			</PopupV2>
+		);
 	};
 
 	homeScreen() {
@@ -381,16 +384,6 @@ class App extends React.Component<AppProps, AppStates> {
 									type="button"
 									className="text-2xl clickable"
 									onClick={this.handleOpenBoardEditorChoiceV2}
-								>
-									{window.languageHelper.translate(
-										'Board-Configurator V2'
-									)}
-								</button>
-								<button
-									tabIndex={tabIndex}
-									type="button"
-									className="text-2xl clickable"
-									onClick={this.handleOpenBoardEditorChoice}
 								>
 									{window.languageHelper.translate(
 										'Board-Configurator'
@@ -474,34 +467,8 @@ class App extends React.Component<AppProps, AppStates> {
 		const { os } = this.props;
 		let popup: JSX.Element | null;
 		switch (openPopup) {
-			case 'boardEditorChoice':
-				popup = (
-					<BoardEditorChoice
-						onClose={() => {
-							this.setState({ openPopup: null });
-						}}
-						onLoadConfig={async () => {
-							const boardJSON =
-								await window.electron.dialog.openBoardConfig();
-							if (boardJSON) {
-								this.setState({
-									openScreen: 'boardConfigLoadScreen',
-									toLoad: boardJSON.config,
-								});
-							}
-						}}
-						onNewConfig={() => {
-							this.setState({
-								openScreen: 'boardConfigNewScreen',
-							});
-						}}
-						onRandomConfig={() => {
-							this.setState({
-								openPopup: 'randomBoardStartValues',
-							});
-						}}
-					/>
-				);
+			case 'error':
+				popup = this.errorPopup();
 				break;
 			case 'boardEditorChoiceV2':
 				popup = (
@@ -513,36 +480,40 @@ class App extends React.Component<AppProps, AppStates> {
 							const boardJSON =
 								await window.electron.dialog.openBoardConfig();
 							if (boardJSON) {
-								this.setState({
-									openScreen: 'boardConfigV2LoadScreen',
-									toLoad: boardJSON.config,
-								});
+								const validation =
+									await window.electron.validate(
+										boardJSON,
+										'board'
+									);
+								if (isBoolean(validation) && validation) {
+									this.setState({
+										openScreen: 'boardConfigV2LoadScreen',
+										toLoad: boardJSON,
+										generator: null,
+									});
+								} else {
+									this.setState({
+										errorMessage: {
+											title: window.languageHelper.translate(
+												'Board Configuration Validation Error'
+											),
+											error: validation,
+										},
+										openPopup: 'error',
+									});
+								}
 							}
 						}}
 						onNewConfig={() => {
 							this.setState({
 								openScreen: 'boardConfigV2NewScreen',
+								generator: null,
 							});
 						}}
 						onRandomConfig={() => {
 							this.setState({
 								openPopup: 'randomBoardV2StartValues',
-							});
-						}}
-					/>
-				);
-				break;
-			case 'randomBoardStartValues':
-				popup = (
-					<RandomBoardStartValuesDialog
-						onClose={() => {
-							this.setState({ openPopup: 'boardEditorChoice' });
-						}}
-						onGenerated={(generator) => {
-							this.setState({
-								generator,
-								openScreen: 'boardConfigFromRandomScreen',
-								openPopup: null,
+								generator: null,
 							});
 						}}
 					/>
@@ -550,17 +521,29 @@ class App extends React.Component<AppProps, AppStates> {
 				break;
 			case 'randomBoardV2StartValues':
 				popup = (
-					<RandomBoardStartValuesDialog
-						onClose={() => {
+					<RandomBoardStartValuesDialogV2
+						onAbort={() => {
 							this.setState({ openPopup: 'boardEditorChoiceV2' });
 						}}
-						onGenerated={(generator) => {
+						onConfirm={(generator) => {
 							this.setState({
 								generator,
 								openScreen: 'boardConfigV2FromRandomScreen',
 								openPopup: null,
 							});
 						}}
+						settings={settings}
+						position={popupPosition}
+						onPositionChange={(position, callback) => {
+							this.setState(
+								{ popupPosition: position },
+								callback
+							);
+						}}
+						onDimensionChange={(dimension) => {
+							this.setState({ popupDimension: dimension });
+						}}
+						os={os}
 					/>
 				);
 				break;

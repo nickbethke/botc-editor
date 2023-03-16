@@ -1,335 +1,336 @@
-/*
- * @NOTE: Prepend a `~` to css file paths that are in your node_modules
- *        See https://github.com/webpack-contrib/sass-loader#imports
- */
-
-@font-face {
-	font-family: 'Salsa';
-	font-style: normal;
-	font-weight: 400;
-	src: url('/assets/fonts/salsa/salsa-v17-latin-regular.eot'); /* IE9 Compat Modes */
-	src: local(''),
-		url('/assets/fonts/salsa/salsa-v17-latin-regular.eot?#iefix')
-			format('embedded-opentype'),
-		/* IE6-IE8 */ url('/assets/fonts/salsa/salsa-v17-latin-regular.woff2')
-			format('woff2'),
-		/* Super Modern Browsers */
-			url('/assets/fonts/salsa/salsa-v17-latin-regular.woff')
-			format('woff'),
-		/* Modern Browsers */
-			url('/assets/fonts/salsa/salsa-v17-latin-regular.ttf')
-			format('truetype'),
-		/* Safari, Android, iOS */
-			url('/assets/fonts/salsa/salsa-v17-latin-regular.svg#Salsa')
-			format('svg'); /* Legacy iOS */
-}
-
-@font-face {
-	font-display: swap;
-	font-family: 'Lato';
-	font-style: normal;
-	font-weight: 400;
-	src: url('/assets/fonts/lato/lato-v23-latin-regular.eot'); /* IE9 Compat Modes */
-	src: url('/assets/fonts/lato/lato-v23-latin-regular.eot?#iefix')
-			format('embedded-opentype'),
-		/* IE6-IE8 */ url('/assets/fonts/lato/lato-v23-latin-regular.woff2')
-			format('woff2'),
-		/* Super Modern Browsers */
-			url('/assets/fonts/lato/lato-v23-latin-regular.woff') format('woff'),
-		/* Modern Browsers */
-			url('/assets/fonts/lato/lato-v23-latin-regular.ttf')
-			format('truetype'),
-		/* Safari, Android, iOS */
-			url('/assets/fonts/lato/lato-v23-latin-regular.svg#Lato')
-			format('svg'); /* Legacy iOS */
-}
-
-@font-face {
-	font-display: swap;
-	font-family: 'JetBrains Mono';
-	font-style: normal;
-	font-weight: 400;
-	src: url('/assets/fonts/jetbrains-mono/JetBrainsMono-Regular.woff2');
-}
-
-@font-face {
-	font-display: swap;
-	font-family: 'JetBrains Mono';
-	font-style: italic;
-	font-weight: 400;
-	src: url('/assets/fonts/jetbrains-mono/JetBrainsMono-Italic.woff2');
-}
-
-@font-face {
-	font-display: swap;
-	font-family: 'JetBrains Mono';
-	font-style: normal;
-	font-weight: bold;
-	src: url('/assets/fonts/jetbrains-mono/JetBrainsMono-Bold.woff2');
-}
-
-@font-face {
-	font-display: swap;
-	font-family: 'JetBrains Mono';
-	font-style: normal;
-	font-weight: 900;
-	src: url('/assets/fonts/jetbrains-mono/JetBrainsMono-ExtraBold.woff2');
-}
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-*,
-*::after,
-*::before {
-	user-select: none;
-	box-sizing: border-box;
-}
-
-body {
-	font-family: 'Lato', sans-serif;
-}
-
-.dragger {
-	-webkit-app-region: drag;
-	-webkit-user-select: none;
-}
-
-.font-lato {
-	font-family: 'Lato', sans-serif;
-}
-
-.font-mono {
-	font-family: Consolas, 'Liberation Mono', Menlo, Courier, monospace;
-	font-feature-settings: 'liga' 0, 'calt' 0;
-	letter-spacing: 0;
-}
-
-.font-jetbrains {
-	font-family: 'JetBrains Mono', Consolas, 'Liberation Mono', Menlo, Courier,
-		monospace;
-	font-feature-settings: 'liga' 0, 'calt' 0;
-	letter-spacing: 0;
-}
-
-#homeScreenBG {
-	@apply fixed w-[50vw] h-[100vh] right-0;
-	background-color: #6b808e;
-	background-image: url('/assets/images/bg-color-2x.jpg');
-	background-size: contain;
-	background-repeat: no-repeat;
-	background-position: center;
-}
-
-.bg-grass {
-	background-color: #5fa01e;
-	background-image: url('/assets/texturepacks/default/grass.png');
-	background-size: 512px 512px;
-	background-position: center;
-}
-
-*:focus {
-	@apply outline-accent;
-}
-
-.clickable {
-	position: relative;
-	display: inline;
-	@apply w-full text-left pl-3 pr-2 transition transition-all;
-
-	&::before {
-		content: '';
-		@apply w-1 bg-white h-full absolute top-0 left-0 block transition transition-all opacity-50;
+@layer base {
+	@font-face {
+		font-family: 'Salsa';
+		font-style: normal;
+		font-weight: 400;
+		src: url('/assets/fonts/salsa/salsa-v17-latin-regular.eot'); /* IE9 Compat Modes */
+		src: local(''),
+			url('/assets/fonts/salsa/salsa-v17-latin-regular.eot?#iefix')
+				format('embedded-opentype'),
+			/* IE6-IE8 */
+				url('/assets/fonts/salsa/salsa-v17-latin-regular.woff2')
+				format('woff2'),
+			/* Super Modern Browsers */
+				url('/assets/fonts/salsa/salsa-v17-latin-regular.woff')
+				format('woff'),
+			/* Modern Browsers */
+				url('/assets/fonts/salsa/salsa-v17-latin-regular.ttf')
+				format('truetype'),
+			/* Safari, Android, iOS */
+				url('/assets/fonts/salsa/salsa-v17-latin-regular.svg#Salsa')
+				format('svg'); /* Legacy iOS */
 	}
 
-	&:hover,
-	&:focus {
-		@apply pl-5 pr-0;
+	@font-face {
+		font-display: swap;
+		font-family: 'Lato';
+		font-style: normal;
+		font-weight: 400;
+		src: url('/assets/fonts/lato/lato-v23-latin-regular.eot'); /* IE9 Compat Modes */
+		src: url('/assets/fonts/lato/lato-v23-latin-regular.eot?#iefix')
+				format('embedded-opentype'),
+			/* IE6-IE8 */ url('/assets/fonts/lato/lato-v23-latin-regular.woff2')
+				format('woff2'),
+			/* Super Modern Browsers */
+				url('/assets/fonts/lato/lato-v23-latin-regular.woff')
+				format('woff'),
+			/* Modern Browsers */
+				url('/assets/fonts/lato/lato-v23-latin-regular.ttf')
+				format('truetype'),
+			/* Safari, Android, iOS */
+				url('/assets/fonts/lato/lato-v23-latin-regular.svg#Lato')
+				format('svg'); /* Legacy iOS */
+	}
+
+	@font-face {
+		font-display: swap;
+		font-family: 'JetBrains Mono';
+		font-style: normal;
+		font-weight: 400;
+		src: url('/assets/fonts/jetbrains-mono/JetBrainsMono-Regular.woff2');
+	}
+
+	@font-face {
+		font-display: swap;
+		font-family: 'JetBrains Mono';
+		font-style: italic;
+		font-weight: 400;
+		src: url('/assets/fonts/jetbrains-mono/JetBrainsMono-Italic.woff2');
+	}
+
+	@font-face {
+		font-display: swap;
+		font-family: 'JetBrains Mono';
+		font-style: normal;
+		font-weight: bold;
+		src: url('/assets/fonts/jetbrains-mono/JetBrainsMono-Bold.woff2');
+	}
+
+	@font-face {
+		font-display: swap;
+		font-family: 'JetBrains Mono';
+		font-style: normal;
+		font-weight: 900;
+		src: url('/assets/fonts/jetbrains-mono/JetBrainsMono-ExtraBold.woff2');
+	}
+
+	*,
+	*::after,
+	*::before {
+		user-select: none;
+		box-sizing: border-box;
+	}
+
+	body {
+		font-family: 'Lato', sans-serif;
+	}
+
+	.font-lato {
+		font-family: 'Lato', sans-serif;
+	}
+
+	.font-mono {
+		font-family: Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+		font-feature-settings: 'liga' 0, 'calt' 0;
+		letter-spacing: 0;
+	}
+
+	.font-jetbrains {
+		font-family: 'JetBrains Mono', Consolas, 'Liberation Mono', Menlo,
+			Courier, monospace;
+		font-feature-settings: 'liga' 0, 'calt' 0;
+		letter-spacing: 0;
+	}
+}
+
+@layer components {
+	.dragger {
+		-webkit-app-region: drag;
+		-webkit-user-select: none;
+	}
+
+	#homeScreenBG {
+		@apply fixed w-[50vw] h-[100vh] right-0;
+		background-color: #6b808e;
+		background-image: url('/assets/images/bg-color-2x.jpg');
+		background-size: contain;
+		background-repeat: no-repeat;
+		background-position: center;
+	}
+
+	.bg-grass {
+		background-color: #5fa01e;
+		background-image: url('/assets/textures/grass.png');
+		background-size: 512px 512px;
+		background-position: center;
+	}
+
+	*:focus {
+		@apply outline-accent;
+	}
+
+	.clickable {
+		position: relative;
+		display: inline;
+		@apply w-full text-left pl-3 pr-2 transition transition-all;
+
 		&::before {
-			@apply bg-accent w-3 opacity-100;
+			content: '';
+			@apply w-1 bg-white h-full absolute top-0 left-0 block transition transition-all opacity-50;
+		}
+
+		&:hover,
+		&:focus {
+			@apply pl-5 pr-0;
+			&::before {
+				@apply bg-accent w-3 opacity-100;
+			}
 		}
 	}
-}
 
-input[type='range']::-webkit-slider-thumb {
-	-webkit-appearance: none;
-	height: 12px;
-	width: 12px;
-	background: #ffffff;
-	border: 2px solid white;
-	@apply dark:bg-muted-900 bg-muted-200 rounded-3xl;
-}
-
-select option {
-	@apply text-[#222222];
-}
-
-.switch {
-	position: relative;
-	display: inline-block;
-	width: 40px;
-	@apply h-6;
-
-	input {
-		opacity: 0;
-		width: 0;
-		height: 0;
+	input[type='range']::-webkit-slider-thumb {
+		-webkit-appearance: none;
+		height: 12px;
+		width: 12px;
+		background: #ffffff;
+		border: 2px solid white;
+		@apply dark:bg-muted-900 bg-muted-200 rounded-3xl;
 	}
-}
 
-span.slider {
-	position: absolute;
-	cursor: pointer;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	@apply bg-muted;
-	-webkit-transition: 0.4s;
-	transition: 0.4s;
+	select option {
+		@apply text-[#222222];
+	}
 
-	&:before {
+	.switch {
+		position: relative;
+		display: inline-block;
+		width: 40px;
+		@apply h-6;
+
+		input {
+			opacity: 0;
+			width: 0;
+			height: 0;
+		}
+	}
+
+	span.slider {
 		position: absolute;
-		content: '';
-		height: 16px;
-		width: 16px;
-		left: 4px;
-		bottom: 4px;
-		background-color: white;
+		cursor: pointer;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		@apply bg-muted;
 		-webkit-transition: 0.4s;
 		transition: 0.4s;
+
+		&:before {
+			position: absolute;
+			content: '';
+			height: 16px;
+			width: 16px;
+			left: 4px;
+			bottom: 4px;
+			background-color: white;
+			-webkit-transition: 0.4s;
+			transition: 0.4s;
+		}
 	}
-}
 
-input {
-	&:checked {
-		+ {
-			.slider {
-				@apply bg-accent;
+	input {
+		&:checked {
+			+ {
+				.slider {
+					@apply bg-accent;
 
-				&:before {
-					transform: translateX(16px);
+					&:before {
+						transform: translateX(16px);
+					}
+				}
+			}
+		}
+
+		&:focus {
+			+ {
+				.slider {
+					box-shadow: 0 0 1px rgb(75 176 119);
 				}
 			}
 		}
 	}
 
-	&:focus {
-		+ {
-			.slider {
-				box-shadow: 0 0 1px rgb(75 176 119);
-			}
+	.slider-both {
+		@apply bg-accent-500;
+	}
+
+	.slider.round {
+		border-radius: 34px;
+
+		&:before {
+			border-radius: 50%;
 		}
 	}
-}
 
-.slider-both {
-	@apply bg-accent-500;
-}
-
-.slider.round {
-	border-radius: 34px;
-
-	&:before {
-		border-radius: 50%;
+	::-webkit-scrollbar {
+		width: 1em;
 	}
-}
 
-::-webkit-scrollbar {
-	width: 1em;
-}
-
-::-webkit-scrollbar-corner {
-	@apply bg-muted-300;
-}
-
-::-webkit-scrollbar-track {
-	@apply bg-muted-300;
-}
-
-::-webkit-scrollbar-thumb {
-	@apply bg-muted-100;
-}
-
-.dark ::-webkit-scrollbar-corner {
-	@apply bg-muted-700;
-}
-
-.dark ::-webkit-scrollbar-track {
-	@apply bg-muted-700;
-}
-
-.dark ::-webkit-scrollbar-thumb {
-	@apply bg-muted-600;
-}
-
-.user-select,
-.user-select * {
-	user-select: text;
-}
-
-.no-user-select {
-	user-select: none;
-}
-
-.isWall {
-	background-image: url('/assets/texturepacks/default/wall.png');
-	background-size: cover;
-	background-position: center;
-}
-
-.isEye {
-	background-image: url('/assets/texturepacks/default/eye.png');
-	background-size: contain;
-	background-position: center;
-}
-
-.isCheckpoint {
-	background-image: url('/assets/texturepacks/default/checkpoint.png');
-	background-size: contain;
-	background-position: center;
-}
-
-.isDestinyMountain {
-	background-image: url('/assets/texturepacks/default/schicksalsberg.png');
-	background-size: contain;
-	background-position: center;
-}
-
-.isStartField {
-	background-image: url('/assets/texturepacks/default/start.png');
-	background-size: contain;
-	background-position: center;
-}
-
-.isLembasField {
-	background-image: url('/assets/texturepacks/default/lembas.png');
-	background-size: contain;
-	background-position: center;
-}
-
-.isRiver {
-	background-image: url('/assets/texturepacks/default/river.png');
-	background-size: contain;
-	background-position: center;
-}
-
-.isHole {
-	background-image: url('/assets/texturepacks/default/hole.png');
-	background-size: contain;
-	background-position: center;
-}
-
-.popup-warn {
-	animation: popup-warn 0.2s linear infinite;
-}
-
-@keyframes popup-warn {
-	0% {
-		transform: translateX(-3px);
+	::-webkit-scrollbar-corner {
+		@apply bg-muted-300;
 	}
-	50% {
-		transform: translateX(3px);
+
+	::-webkit-scrollbar-track {
+		@apply bg-muted-300;
+	}
+
+	::-webkit-scrollbar-thumb {
+		@apply bg-muted-100;
+	}
+
+	.dark ::-webkit-scrollbar-corner {
+		@apply bg-muted-700;
+	}
+
+	.dark ::-webkit-scrollbar-track {
+		@apply bg-muted-700;
+	}
+
+	.dark ::-webkit-scrollbar-thumb {
+		@apply bg-muted-600;
+	}
+
+	.user-select,
+	.user-select * {
+		user-select: text;
+	}
+
+	.no-user-select {
+		user-select: none;
+	}
+
+	.isWall {
+		background-image: url('/assets/textures/wall.png');
+		background-size: cover;
+		background-position: center;
+	}
+
+	.isEye {
+		background-image: url('/assets/textures/eye.png');
+		background-size: contain;
+		background-position: center;
+	}
+
+	.isCheckpoint {
+		background-image: url('/assets/textures/checkpoint.png');
+		background-size: contain;
+		background-position: center;
+	}
+
+	.isDestinyMountain {
+		background-image: url('/assets/textures/schicksalsberg.png');
+		background-size: contain;
+		background-position: center;
+	}
+
+	.isStartField {
+		background-image: url('/assets/textures/start.png');
+		background-size: contain;
+		background-position: center;
+	}
+
+	.isLembasField {
+		background-image: url('/assets/textures/lembas.png');
+		background-size: contain;
+		background-position: center;
+	}
+
+	.isRiver {
+		background-image: url('/assets/textures/river.png');
+		background-size: contain;
+		background-position: center;
+	}
+
+	.isHole {
+		background-image: url('/assets/textures/hole.png');
+		background-size: contain;
+		background-position: center;
+	}
+
+	.popup-warn {
+		animation: popup-warn 0.2s linear infinite;
+	}
+
+	@keyframes popup-warn {
+		0% {
+			transform: translateX(-3px);
+		}
+		50% {
+			transform: translateX(3px);
+		}
 	}
 }

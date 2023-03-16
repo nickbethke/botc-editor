@@ -1,20 +1,21 @@
 import React from 'react';
 import Mousetrap from 'mousetrap';
+import { ParsedPath } from 'path';
 import TopMenu, {
 	TopMenuActions,
-} from '../components/boardConfiguratorV2/TopMenu';
+} from '../components/boardConfigurator/TopMenu';
 import BoardConfigInterface from '../components/interfaces/BoardConfigInterface';
 import LeftSidebar, {
 	LeftSidebarConfigType,
 	LeftSidebarOpenTab,
-} from '../components/boardConfiguratorV2/LeftSidebar';
+} from '../components/boardConfigurator/LeftSidebar';
 import { FieldsEnum } from '../components/generator/BoardGenerator';
 import RightSidebar, {
 	RightSidebarOpenTab,
-} from '../components/boardConfiguratorV2/RightSidebar';
+} from '../components/boardConfigurator/RightSidebar';
 import MainEditor, {
 	FieldTypeOnClick,
-} from '../components/boardConfiguratorV2/MainEditor';
+} from '../components/boardConfigurator/MainEditor';
 import {
 	BoardPosition,
 	boardPosition2String,
@@ -36,13 +37,20 @@ import {
 	removeRiver,
 	removeStartField,
 	removeWall,
-} from '../components/boardConfiguratorV2/HelperFunctions';
-import ConfirmPopupV2 from '../components/boardConfiguratorV2/ConfirmPopupV2';
+} from '../components/boardConfigurator/HelperFunctions';
+import ConfirmPopupV2 from '../components/boardConfigurator/ConfirmPopupV2';
 import { SettingsInterface } from '../../interfaces/SettingsInterface';
 import SettingsPopup from '../components/popups/SettingsPopup';
+import RandomBoardStartValuesDialogV2 from '../components/popups/RandomBoardStartValuesDialogV2';
 
-export type EditorToolType = FieldsEnum | 'delete' | 'edit';
-type EditorPopupType = null | 'newFileSaveCurrent' | 'settings';
+export type EditorToolType = FieldsEnum | 'delete' | 'edit' | null;
+type EditorPopupType =
+	| null
+	| 'newFileSaveCurrent'
+	| 'closeSaveCurrent'
+	| 'settings'
+	| 'newFromRandom'
+	| 'newRandomFileSaveCurrent';
 
 type BoardConfiguratorV2Props = {
 	os: NodeJS.Platform;
@@ -50,6 +58,10 @@ type BoardConfiguratorV2Props = {
 	settings: SettingsInterface;
 	onSettingsUpdate: (settings: SettingsInterface) => void;
 	config?: BoardConfigInterface;
+	file?: {
+		parsedPath: ParsedPath;
+		path: string;
+	} | null;
 };
 type BoardConfiguratorV2State = {
 	windowDimensions: {
@@ -67,6 +79,11 @@ type BoardConfiguratorV2State = {
 	config: BoardConfigInterface;
 	mainEditorZoom: number;
 	fieldInEdit: BoardPosition | null;
+	file: {
+		parsedPath: ParsedPath;
+		path: string;
+	} | null;
+	fileSaved: boolean;
 };
 
 class BoardConfiguratorV2 extends React.Component<
@@ -92,6 +109,7 @@ class BoardConfiguratorV2 extends React.Component<
 	// TODO: Warnings
 	constructor(props: BoardConfiguratorV2Props) {
 		super(props);
+
 		this.state = {
 			windowDimensions: {
 				width: window.innerWidth,
@@ -110,13 +128,15 @@ class BoardConfiguratorV2 extends React.Component<
 				width: 0,
 				height: 0,
 			},
-			currentTool: FieldsEnum.START,
+			currentTool: null,
 			sideBarTabLeft: null,
 			sideBarTabLeftConfigType: 'global',
 			sideBarTabRight: null,
 			config: props.config || BoardConfiguratorV2.defaultBoard,
 			mainEditorZoom: 1,
 			fieldInEdit: null,
+			file: props.file || null,
+			fileSaved: !!props.file,
 		};
 		this.addEventListeners = this.addEventListeners.bind(this);
 		this.onTopMenuAction = this.onTopMenuAction.bind(this);
@@ -126,7 +146,7 @@ class BoardConfiguratorV2 extends React.Component<
 	}
 
 	static get defaultProps() {
-		return { config: BoardConfiguratorV2.defaultBoard };
+		return { config: BoardConfiguratorV2.defaultBoard, file: null };
 	}
 
 	componentDidUpdate(
@@ -142,6 +162,8 @@ class BoardConfiguratorV2 extends React.Component<
 			windowDimensions,
 			popupDimension,
 			popup,
+			config,
+			file,
 		} = this.state;
 		const { os } = this.props;
 		const {
@@ -149,6 +171,8 @@ class BoardConfiguratorV2 extends React.Component<
 			sideBarTabRight: preSideBarTabRight,
 			currentTool: preTool,
 			popup: prePopup,
+			config: preConfig,
+			file: preFile,
 		} = prevState;
 		if (sideBarTabLeft === null && sidebars.left > 52) {
 			this.setState({ sidebars: { ...sidebars, left: 52 } });
@@ -203,6 +227,9 @@ class BoardConfiguratorV2 extends React.Component<
 				},
 			});
 		}
+		if (preConfig !== config && file === preFile) {
+			this.setState({ fileSaved: false });
+		}
 	}
 
 	handleOnFieldOrWallClick: FieldTypeOnClick = (type, position) => {
@@ -232,7 +259,11 @@ class BoardConfiguratorV2 extends React.Component<
 		} else if (currentTool === 'edit') {
 			this.handleFieldEdit(position, config);
 		} else {
-			this.handleFieldPlacing(position, config, currentTool);
+			this.handleFieldPlacing(
+				position,
+				config,
+				currentTool as FieldsEnum
+			);
 		}
 	}
 
@@ -266,12 +297,14 @@ class BoardConfiguratorV2 extends React.Component<
 
 	private handleFieldEdit(
 		position: BoardPosition,
-		config: BoardConfigInterface
+		config: BoardConfigInterface,
+		ignorePrev = false
 	) {
 		const positionString = boardPosition2String(position);
 
 		const { fieldInEdit } = this.state;
 		if (
+			!ignorePrev &&
 			fieldInEdit &&
 			positionString === boardPosition2String(fieldInEdit)
 		) {
@@ -293,6 +326,7 @@ class BoardConfiguratorV2 extends React.Component<
 					this.setState({
 						fieldInEdit: position,
 						sideBarTabLeftConfigType: 'global',
+						sideBarTabLeft: 'checkpointOrder',
 					});
 					break;
 				case FieldsEnum.START:
@@ -393,20 +427,64 @@ class BoardConfiguratorV2 extends React.Component<
 		}
 	}
 
-	onTopMenuAction = (action: TopMenuActions) => {
+	onTopMenuAction = async (action: TopMenuActions) => {
 		const { onClose, settings, onSettingsUpdate } = this.props;
+		const { config, fileSaved } = this.state;
 		switch (action) {
 			case TopMenuActions.NEW:
-				this.setState({ popup: 'newFileSaveCurrent' });
+				if (!fileSaved) {
+					this.setState({ popup: 'newFileSaveCurrent' });
+				} else {
+					this.setState(
+						{
+							config: BoardConfiguratorV2.defaultBoard,
+							file: null,
+							fileSaved: true,
+						},
+						() => {
+							this.setState({
+								fileSaved: true,
+							});
+						}
+					);
+				}
+				break;
+			case TopMenuActions.NEW_FROM_RANDOM:
+				if (!fileSaved) {
+					this.setState({ popup: 'newRandomFileSaveCurrent' });
+				} else {
+					this.setState({ popup: 'newFromRandom' });
+				}
 				break;
 			case TopMenuActions.OPEN:
+				this.openConfiguration();
 				break;
 			case TopMenuActions.SAVE:
+				await this.saveConfig();
+				break;
+			case TopMenuActions.SAVE_AS_CONFIG:
+				window.electron.dialog
+					.saveBoardConfig(JSON.stringify(config, null, 4))
+					.then((savedFile) => {
+						if (savedFile) {
+							this.setState({
+								file: savedFile,
+								fileSaved: true,
+							});
+							return;
+						}
+						throw new Error('File not saved');
+					})
+					.catch(() => {});
 				break;
 			case TopMenuActions.SAVE_AS_PRESET:
 				break;
 			case TopMenuActions.CLOSE:
-				onClose();
+				if (!fileSaved) {
+					this.setState({ popup: 'closeSaveCurrent' });
+				} else {
+					onClose();
+				}
 				break;
 			case TopMenuActions.DARK_MODE:
 				onSettingsUpdate({ ...settings, darkMode: !settings.darkMode });
@@ -435,7 +513,46 @@ class BoardConfiguratorV2 extends React.Component<
 		const { popup, popupPosition } = this.state;
 		const { os, settings, onSettingsUpdate } = this.props;
 		switch (popup) {
+			case 'closeSaveCurrent':
+				return (
+					<ConfirmPopupV2
+						title={window.languageHelper.translate(
+							'Close Board Configurator'
+						)}
+						abortButtonText={window.languageHelper.translate(
+							'Cancel'
+						)}
+						onAbort={() => {
+							this.setState({ popup: null });
+						}}
+						confirmButtonText={window.languageHelper.translate(
+							'Discard'
+						)}
+						onConfirm={() => {
+							const { onClose } = this.props;
+							onClose();
+						}}
+						position={popupPosition}
+						onPositionChange={(position, callback) => {
+							this.setState(
+								{ popupPosition: position },
+								callback
+							);
+						}}
+						onDimensionChange={(dimension) => {
+							this.setState({ popupDimension: dimension });
+						}}
+						os={os}
+						topOffset
+						settings={settings}
+					>
+						{window.languageHelper.translate(
+							'The current file has not yet been saved. Do you want to discard the current changes?'
+						)}
+					</ConfirmPopupV2>
+				);
 			case 'newFileSaveCurrent':
+			case 'newRandomFileSaveCurrent':
 				return (
 					<ConfirmPopupV2
 						title={window.languageHelper.translate('New Config')}
@@ -449,10 +566,22 @@ class BoardConfiguratorV2 extends React.Component<
 							'Discard'
 						)}
 						onConfirm={() => {
-							this.setState({
-								popup: null,
-								config: BoardConfiguratorV2.defaultBoard,
-							});
+							if (popup === 'newRandomFileSaveCurrent') {
+								this.setState({ popup: 'newFromRandom' });
+							} else {
+								this.setState(
+									{
+										popup: null,
+										config: BoardConfiguratorV2.defaultBoard,
+										file: null,
+									},
+									() => {
+										this.setState({
+											fileSaved: true,
+										});
+									}
+								);
+							}
 						}}
 						position={popupPosition}
 						onPositionChange={(position, callback) => {
@@ -498,6 +627,33 @@ class BoardConfiguratorV2 extends React.Component<
 						topOffset
 					/>
 				);
+			case 'newFromRandom':
+				return (
+					<RandomBoardStartValuesDialogV2
+						onAbort={() => {
+							this.setState({ popup: null });
+						}}
+						settings={settings}
+						onConfirm={(generator) => {
+							this.setState({
+								config: generator.boardJSON,
+								popup: null,
+							});
+						}}
+						position={popupPosition}
+						onPositionChange={(position, callback) => {
+							this.setState(
+								{ popupPosition: position },
+								callback
+							);
+						}}
+						onDimensionChange={(dimension) => {
+							this.setState({ popupDimension: dimension });
+						}}
+						os={os}
+						topOffset
+					/>
+				);
 			default:
 				return null;
 		}
@@ -506,6 +662,23 @@ class BoardConfiguratorV2 extends React.Component<
 	getTopMenuHeight = (darkMode: boolean) => {
 		return darkMode ? 37 : 38;
 	};
+
+	private openConfiguration() {
+		window.electron.dialog
+			.openBoardConfig()
+			.then((loadedConfig) => {
+				if (loadedConfig) {
+					this.setState({
+						config: loadedConfig.config,
+						file: loadedConfig,
+						fileSaved: true,
+					});
+					return null;
+				}
+				return new Error('Config not loadable');
+			})
+			.catch(() => {});
+	}
 
 	private zoomOut() {
 		const { mainEditorZoom } = this.state;
@@ -516,7 +689,33 @@ class BoardConfiguratorV2 extends React.Component<
 		this.setState({ mainEditorZoom: mainEditorZoom - 0.1 });
 	}
 
-	private addEventListeners() {
+	private saveConfig() {
+		const { file, fileSaved, config } = this.state;
+		if (!fileSaved) {
+			if (file) {
+				window.electron.file
+					.save(file.path, JSON.stringify(config, null, 4))
+					.catch(() => {});
+				this.setState({ fileSaved: true });
+			} else {
+				window.electron.dialog
+					.saveBoardConfig(JSON.stringify(config, null, 4))
+					.then((savedFile) => {
+						if (savedFile) {
+							this.setState({
+								file: savedFile,
+								fileSaved: true,
+							});
+							return;
+						}
+						throw new Error('File not saved');
+					})
+					.catch(() => {});
+			}
+		}
+	}
+
+	private async addEventListeners() {
 		Mousetrap.bind('alt+1', () => {
 			const { sideBarTabLeft } = this.state;
 			this.setState({
@@ -539,7 +738,9 @@ class BoardConfiguratorV2 extends React.Component<
 				sideBarTabLeft: sideBarTabLeft === 'presets' ? null : 'presets',
 			});
 		});
-
+		Mousetrap.bind(['ctrl+0', 'alt+0'], () => {
+			this.setState({ currentTool: null });
+		});
 		Mousetrap.bind('ctrl+1', () => {
 			this.setState({ currentTool: FieldsEnum.START });
 		});
@@ -589,6 +790,10 @@ class BoardConfiguratorV2 extends React.Component<
 			onSettingsUpdate({ ...settings, darkMode: !settings.darkMode });
 		});
 
+		Mousetrap.bind('ctrl+alt+s', () => {
+			this.setState({ popup: 'settings' });
+		});
+
 		Mousetrap.bind(['command+enter', 'ctrl+enter'], () => {
 			this.setState({ mainEditorZoom: 1 });
 		});
@@ -598,6 +803,13 @@ class BoardConfiguratorV2 extends React.Component<
 		Mousetrap.bind(['command+-', 'ctrl+-'], () => {
 			this.zoomOut();
 		});
+		Mousetrap.bind(['command+s', 'ctrl+s'], () => {
+			this.saveConfig();
+		});
+		Mousetrap.bind(['command+o', 'ctrl+o'], () => {
+			this.openConfiguration();
+		});
+
 		const { fieldInEdit, config } = this.state;
 		if (fieldInEdit) {
 			Mousetrap.bind('up', () => {
@@ -674,8 +886,10 @@ class BoardConfiguratorV2 extends React.Component<
 			sideBarTabLeftConfigType,
 			fieldInEdit,
 			popup,
+			fileSaved,
+			file,
 		} = this.state;
-		this.addEventListeners();
+		this.addEventListeners().catch(() => {});
 		const topMenuHeight = this.getTopMenuHeight(settings.darkMode);
 		const mainHeight =
 			windowDimensions.height -
@@ -687,6 +901,11 @@ class BoardConfiguratorV2 extends React.Component<
 				{os === 'win32' ? (
 					<div className="dragger w-[100vw] h-8 bg-muted flex items-center px-2 text-sm">
 						{window.languageHelper.translate('Board Configurator')}
+						{' - '}
+						{file
+							? file.path
+							: window.languageHelper.translate('Unsaved File')}
+						{fileSaved ? '' : ` *`}
 					</div>
 				) : null}
 				<div
@@ -756,6 +975,23 @@ class BoardConfiguratorV2 extends React.Component<
 									this.handleOnFieldOrWallClick
 								}
 								fieldInEdit={fieldInEdit}
+								onChangeToEdit={(position) => {
+									this.setState(
+										{
+											currentTool: 'edit',
+										},
+										() => {
+											this.handleFieldEdit(
+												position,
+												config,
+												true
+											);
+										}
+									);
+								}}
+								file={file}
+								fileSaved={fileSaved}
+								fileSep={os === 'win32' ? '\\' : '/'}
 							/>
 						</div>
 						<div
