@@ -482,7 +482,7 @@ class App extends React.Component<AppProps, AppStates> {
 							if (boardJSON) {
 								const validation =
 									await window.electron.validate(
-										boardJSON,
+										boardJSON.config,
 										'board'
 									);
 								if (isBoolean(validation) && validation) {

@@ -80,6 +80,9 @@ contextBridge.exposeInMainWorld('electron', {
 		> => {
 			return ipcRenderer.invoke('dialog:saveBoardConfig', json);
 		},
+		saveScreenShot(file: string, content: string): Promise<boolean> {
+			return ipcRenderer.invoke('dialog:saveScreenshot', file, content);
+		},
 	},
 	app: {
 		close() {

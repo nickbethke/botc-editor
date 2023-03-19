@@ -12,6 +12,7 @@ import LeftSidebar, {
 import { FieldsEnum } from '../components/generator/BoardGenerator';
 import RightSidebar, {
 	RightSidebarOpenTab,
+	Warnings,
 } from '../components/boardConfigurator/RightSidebar';
 import MainEditor, {
 	FieldTypeOnClick,
@@ -42,6 +43,7 @@ import ConfirmPopupV2 from '../components/boardConfigurator/ConfirmPopupV2';
 import { SettingsInterface } from '../../interfaces/SettingsInterface';
 import SettingsPopup from '../components/popups/SettingsPopup';
 import RandomBoardStartValuesDialogV2 from '../components/popups/RandomBoardStartValuesDialogV2';
+import AStar from '../components/generator/helper/AStar';
 
 export type EditorToolType = FieldsEnum | 'delete' | 'edit' | null;
 type EditorPopupType =
@@ -63,6 +65,10 @@ type BoardConfiguratorV2Props = {
 		path: string;
 	} | null;
 };
+type WarningsMap = Map<
+	number,
+	{ type: Warnings; title: string; content: string }
+>;
 type BoardConfiguratorV2State = {
 	windowDimensions: {
 		width: number;
@@ -84,6 +90,7 @@ type BoardConfiguratorV2State = {
 		path: string;
 	} | null;
 	fileSaved: boolean;
+	warnings: WarningsMap;
 };
 
 class BoardConfiguratorV2 extends React.Component<
@@ -137,12 +144,17 @@ class BoardConfiguratorV2 extends React.Component<
 			fieldInEdit: null,
 			file: props.file || null,
 			fileSaved: !!props.file,
+			warnings: new Map<
+				number,
+				{ type: Warnings; title: string; content: string }
+			>(),
 		};
 		this.addEventListeners = this.addEventListeners.bind(this);
 		this.onTopMenuAction = this.onTopMenuAction.bind(this);
 		this.handleOnFieldOrWallClick =
 			this.handleOnFieldOrWallClick.bind(this);
 		document.querySelector('html')?.classList.add('dark');
+		this.handleConfigurationUpdate();
 	}
 
 	static get defaultProps() {
@@ -227,10 +239,47 @@ class BoardConfiguratorV2 extends React.Component<
 				},
 			});
 		}
-		if (preConfig !== config && file === preFile) {
-			this.setState({ fileSaved: false });
+		if (preConfig !== config) {
+			this.setState({ warnings: this.handleConfigurationUpdate() });
+			if (file === preFile) {
+				this.setState({ fileSaved: false });
+			}
 		}
 	}
+
+	handleConfigurationUpdate = (): WarningsMap => {
+		const { config } = this.state;
+		const newWarnings: WarningsMap = new Map();
+		const { result, errors } = AStar.checkBoardConfig(config);
+		if (!result) {
+			for (let i = 0; i < errors.length; i += 1) {
+				const error = errors[i];
+				if (error.start && error.end) {
+					newWarnings.set(i, {
+						type: Warnings.pathImpossible,
+						title: window.languageHelper.translate('Pathfinding'),
+						content: window.languageHelper.translateVars(
+							'The current board state is not playable, because {0} to {1} has no valid path.',
+							[
+								`[${error.start.x}, ${error.start.y}]`,
+								`[${error.end.x}, ${error.end.y}]`,
+							]
+						),
+					});
+				} else {
+					newWarnings.set(i, {
+						type: Warnings.pathImpossible,
+						title: window.languageHelper.translate('Pathfinding'),
+						content: window.languageHelper.translate(
+							'The current board state is not playable.'
+						),
+					});
+				}
+			}
+		}
+
+		return newWarnings;
+	};
 
 	handleOnFieldOrWallClick: FieldTypeOnClick = (type, position) => {
 		const { currentTool, config } = this.state;
@@ -888,6 +937,7 @@ class BoardConfiguratorV2 extends React.Component<
 			popup,
 			fileSaved,
 			file,
+			warnings,
 		} = this.state;
 		this.addEventListeners().catch(() => {});
 		const topMenuHeight = this.getTopMenuHeight(settings.darkMode);
@@ -1007,6 +1057,7 @@ class BoardConfiguratorV2 extends React.Component<
 								tabChange={(tab) => {
 									this.setState({ sideBarTabRight: tab });
 								}}
+								warnings={warnings}
 							/>
 						</div>
 					</div>

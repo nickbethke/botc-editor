@@ -478,14 +478,25 @@ class MainEditor extends React.Component<MainEditorProps, MainEditorState> {
 
 	render() {
 		const { config, zoom, file, fileSaved, fileSep } = this.props;
+
+		const element = document.getElementById('main-editor-board-board');
+		const element2 = document.getElementById('main-editor');
+		if (element && element2) {
+			if (element.clientHeight * zoom < element2.clientHeight) {
+				element2.style.overflowY = 'hidden';
+			} else {
+				element2.style.overflowY = 'auto';
+			}
+		}
+
 		const { contextMenu } = this.state;
 		const board = this.buildBoard(config);
 		return (
-			<div>
-				<div className="bg-muted-800 px-2 py-1 text-sm text-muted-200">
+			<div className="max-h-full h-full">
+				<div className="dark:bg-muted-800 bg-muted-600 px-2 py-[10px] text-sm dark:text-muted-200 text-muted-50">
 					{file ? (
 						<>
-							<span className="text-muted-400">
+							<span className="dark:text-muted-400">
 								{file.parsedPath.dir}
 								{fileSep}
 							</span>
@@ -498,7 +509,8 @@ class MainEditor extends React.Component<MainEditorProps, MainEditorState> {
 				</div>
 				<div
 					id="main-editor"
-					className="relative h-full max-w-full max-h-full flex overflow-auto p-4 z-0"
+					className="relative h-full max-w-full flex overflow-auto p-4 z-0"
+					style={{ maxHeight: 'calc(100% - 40px)' }}
 				>
 					<div
 						id="main-editor-board"
@@ -506,6 +518,7 @@ class MainEditor extends React.Component<MainEditorProps, MainEditorState> {
 						onWheel={this.handleZoom}
 					>
 						<div
+							id="main-editor-board-board"
 							className="flex flex-col rounded gap-2 p-2"
 							style={{
 								transform: `scale(${zoom})`,

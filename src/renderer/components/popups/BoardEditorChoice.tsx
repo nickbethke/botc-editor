@@ -52,7 +52,7 @@ class BoardEditorChoice extends React.Component<
 					onClick={this.handlePopupClose}
 				/>
 				<div>
-					<div className="absolute top-[50%] left-[50%] translate-y-[-50%] translate-x-[-50%]">
+					<div className="absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]">
 						<div className="text-center text-3xl mb-8">
 							{window.languageHelper.translate(
 								'Board Configuration'

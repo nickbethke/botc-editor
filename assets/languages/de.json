@@ -364,6 +364,22 @@
 		[
 			"possible empty fields / total number of fields",
 			"Mögliche leere Felder / Felder Gesamtanzahl"
-		]
+		],
+		[
+			"The current board state is not playable, because {0} to {1} has no valid path.",
+			"Das aktuelle Spielbrett ist im aktuellen Zustand nicht bespielbar, da {0} zu {1} keinen gültigen Weg aufweist."
+		],
+		[
+			"Pathfinding",
+			"Wegfindung"
+		],
+		[
+			"The current board state is not playable.",
+			"Das aktuelle Spielbrett ist im aktuellen Zustand nicht bespielbar."
+		],
+		[
+			"The current board state is playable.",
+			"Das aktuelle Spielbrett ist im aktuellen Zustand bespielbar."
+		],["Save as screenshot","Als Bildschirmfoto speichern"]
 	]
 }

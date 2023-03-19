@@ -281,16 +281,16 @@ class IPCHelper {
 	};
 
 	static openFile(file: string) {
-		shell.openPath(file).catch(console.log);
+		shell.openPath(file).catch(() => {});
 	}
 
 	static openDirectory(file: string) {
 		const { dir } = path.parse(file);
-		shell.openPath(dir).catch(console.log);
+		shell.openPath(dir).catch(() => {});
 	}
 
 	static openDirectoryDirectly(dir: string) {
-		shell.openPath(dir).catch(console.log);
+		shell.openPath(dir).catch(() => {});
 	}
 
 	static saveFile(file: string, content: string) {
@@ -301,6 +301,49 @@ class IPCHelper {
 		return 'File does not exits';
 	}
 
+	static async saveScreenShotDialog(
+		file: string,
+		content: string,
+		window: BrowserWindow | null
+	) {
+		let currentCanceled;
+		let currentFilePath;
+		if (window) {
+			const { canceled, filePath } = await dialog.showSaveDialog(window, {
+				title: 'Screenshot speichern',
+				defaultPath: file,
+				filters: [{ name: 'Images', extensions: ['png'] }],
+			});
+			currentCanceled = canceled;
+			currentFilePath = filePath;
+		} else {
+			const { canceled, filePath } = await dialog.showSaveDialog({
+				title: 'Screenshot speichern',
+				defaultPath: file,
+				filters: [{ name: 'Images', extensions: ['png'] }],
+			});
+			currentCanceled = canceled;
+			currentFilePath = filePath;
+		}
+		if (currentCanceled) {
+			return false;
+		}
+		if (currentFilePath) {
+			const regex = /^data:.+\/(.+);base64,(.*)$/;
+
+			const matches = content.match(regex);
+			if (matches) {
+				const data = matches[2];
+				const buffer = Buffer.from(data, 'base64');
+				fs.writeFileSync(currentFilePath, buffer);
+				IPCHelper.openFile(currentFilePath);
+				return true;
+			}
+			return false;
+		}
+		return false;
+	}
+
 	static removeFile(file: string) {
 		if (fs.existsSync(file)) {
 			fs.unlinkSync(file);
@@ -309,8 +352,8 @@ class IPCHelper {
 		return 'File does not exits';
 	}
 
-	static openHomepage() {
-		shell.openExternal('https://botc.ntk-music.de');
+	static async openHomepage() {
+		await shell.openExternal('https://battle-of-the-centerlaend.web.app');
 	}
 
 	static loadLanguageFile(lang: string) {

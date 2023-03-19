@@ -1,12 +1,33 @@
 import React from 'react';
 import { VscCopy, VscJson, VscWarning } from 'react-icons/vsc';
+import _uniqueId from 'lodash/uniqueId';
+import { TbScreenShare } from 'react-icons/tb';
+import html2canvas from 'html2canvas';
 import SidebarMenuItem from './SidebarMenuItem';
 import BoardConfigInterface from '../interfaces/BoardConfigInterface';
+
+export enum Warnings {
+	pathPossible,
+	pathImpossible,
+}
+
+export function Warning(props: { title: string; content: string }) {
+	const { title, content } = props;
+	return (
+		<div className="m-2 text-sm border dark:border-muted-700 border-muted-400 rounded flex flex-col dark:bg-muted-800 bg-muted-600">
+			<div className="border-b dark:border-muted-700 border-muted-400 px-2 py-1">
+				{title}
+			</div>
+			<div className="px-2 py-1">{content}</div>
+		</div>
+	);
+}
 
 type RightSidebarProps = {
 	tabChange: (tab: RightSidebarOpenTab) => void;
 	openTab: RightSidebarOpenTab;
 	config: BoardConfigInterface;
+	warnings: Map<Warnings, { title: string; content: string }>;
 };
 
 export type RightSidebarOpenTab = 'warnings' | 'configPreview' | null;
@@ -25,10 +46,20 @@ class RightSidebar extends React.Component<RightSidebarProps, unknown> {
 	};
 
 	notifications = () => {
+		const { warnings } = this.props;
 		return (
-			<div className="flex flex-col">
+			<div className="flex flex-col h-full">
 				<div className="p-2 border-b dark:border-muted-700 border-muted-400">
 					{window.languageHelper.translate('Warnings')}
+				</div>
+				<div className="flex bg-muted-900/25 flex-col gap-1 flex-grow">
+					{Array.from(warnings).map((value) => (
+						<Warning
+							key={_uniqueId('sidebar-warning-')}
+							title={value[1].title}
+							content={value[1].content}
+						/>
+					))}
 				</div>
 			</div>
 		);
@@ -53,7 +84,7 @@ class RightSidebar extends React.Component<RightSidebarProps, unknown> {
 						{window.languageHelper.translate('Copy')}
 					</button>
 				</div>
-				<div className="flex-grow bg-muted-900/25 relative p-2 w-[347px] overflow-x-auto">
+				<div className="flex-grow bg-muted-900/25 relative p-2 w-[347px] overflow-z-auto">
 					<pre className="h-full font-jetbrains user-select text-sm">
 						{JSON.stringify(config, null, 4)}
 					</pre>
@@ -72,13 +103,22 @@ class RightSidebar extends React.Component<RightSidebarProps, unknown> {
 	};
 
 	private tabSwitch(openTab: RightSidebarOpenTab) {
+		const { warnings, config } = this.props;
 		return (
 			<>
 				<SidebarMenuItem
 					right
 					label={window.languageHelper.translate('Warnings')}
 					open={openTab === 'warnings'}
-					icon={<VscWarning />}
+					icon={
+						<VscWarning
+							className={
+								warnings.size
+									? 'text-orange-400'
+									: 'text-accent'
+							}
+						/>
+					}
 					onClick={() => {
 						this.handleOpenTabChange('warnings');
 					}}
@@ -95,6 +135,29 @@ class RightSidebar extends React.Component<RightSidebarProps, unknown> {
 						this.handleOpenTabChange('configPreview');
 					}}
 					shortCut={`${window.languageHelper.translate('Alt')}++`}
+				/>
+				<SidebarMenuItem
+					right
+					label={window.languageHelper.translate(
+						'Save as screenshot'
+					)}
+					open={false}
+					icon={<TbScreenShare />}
+					onClick={async () => {
+						const element = document.getElementById(
+							'main-editor-board-board'
+						);
+						if (element) {
+							const canvas = await html2canvas(element, {
+								backgroundColor: null,
+							});
+							const image = canvas.toDataURL('image/png', 1.0);
+							await window.electron.dialog.saveScreenShot(
+								`${config.name}.png`,
+								image
+							);
+						}
+					}}
 				/>
 			</>
 		);

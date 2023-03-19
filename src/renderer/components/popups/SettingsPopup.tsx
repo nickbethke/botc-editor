@@ -66,7 +66,7 @@ class SettingsPopup extends React.Component<
 				topOffset={topOffset}
 				settings={settings}
 			>
-				<div className="flex flex-col gap-4">
+				<div className="flex flex-col gap-4 p-4">
 					<div className="grid grid-cols-2 items-center gap-8">
 						<p>{window.languageHelper.translate('Language')}</p>
 						<select

@@ -49,6 +49,7 @@ declare global {
 					  }
 					| false
 				>;
+				saveScreenShot(file: string, content: string): Promise<boolean>;
 			};
 			load: {
 				presets(): Promise<{
@@ -65,7 +66,7 @@ declare global {
 				getTranslation(lang: string): Promise<string>;
 			};
 			validate(
-				json: object,
+				json: BoardConfigInterface | PartieConfigInterface,
 				type: 'partie' | 'board'
 			): Promise<true | string>;
 			app: {

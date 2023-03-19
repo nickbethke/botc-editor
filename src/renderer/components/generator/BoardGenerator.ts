@@ -235,10 +235,10 @@ class BoardGenerator {
 	): Array<Array<FieldWithPositionInterface>> {
 		const board = new Array<Array<FieldWithPositionInterface>>();
 
-		for (let y = 0; y < height; y += 1) {
+		for (let x = 0; x < width; x += 1) {
 			const row: FieldWithPositionInterface[] =
 				new Array<FieldWithPositionInterface>();
-			for (let x = 0; x < width; x += 1) {
+			for (let y = 0; y < height; y += 1) {
 				row.push(new Grass({ x, y }));
 			}
 			board.push(row);
@@ -249,7 +249,7 @@ class BoardGenerator {
 	private genSauronsEye() {
 		const position = this.getRandomPosition();
 		const direction = BoardGenerator.getRandomDirection();
-		this.board[position.y][position.x] = new SauronsEye(
+		this.board[position.x][position.y] = new SauronsEye(
 			position,
 			direction
 		);
@@ -266,7 +266,7 @@ class BoardGenerator {
 	private genStartField() {
 		const position = this.getRandomPosition();
 		const direction = BoardGenerator.getRandomDirection();
-		this.board[position.y][position.x] = new StartField(
+		this.board[position.x][position.y] = new StartField(
 			position,
 			direction
 		);
@@ -282,7 +282,7 @@ class BoardGenerator {
 
 	private genCheckpoint(order: number) {
 		const position = this.getRandomPosition();
-		this.board[position.y][position.x] = new Checkpoint(position, order);
+		this.board[position.x][position.y] = new Checkpoint(position, order);
 		this.boardJSON.addCheckPoint(position);
 		this.checkpoints.push(position);
 	}
@@ -318,7 +318,7 @@ class BoardGenerator {
 			);
 			// if all paths is possible add the hole field
 			if (result) {
-				this.board[position.y][position.x] = new Hole(position);
+				this.board[position.x][position.y] = new Hole(position);
 				this.boardJSON.addHole(position);
 				this.holesSet += 1;
 			}
@@ -343,7 +343,7 @@ class BoardGenerator {
 			? this.startValues.maxLembasAmountOnField
 			: this.getRandomLembasAmount();
 		// add lembasFields field
-		this.board[position.y][position.x] = new Lembas(position, amount);
+		this.board[position.x][position.y] = new Lembas(position, amount);
 		this.lembasFields.push({ position, amount });
 		this.boardJSON.addLembasField(position, amount);
 	}
@@ -369,7 +369,7 @@ class BoardGenerator {
 		for (let i = 0; i < riverCount; i += 1) {
 			const position = this.getRandomPosition();
 			const direction = BoardGenerator.getRandomDirection();
-			this.board[position.y][position.x] = new River(position, direction);
+			this.board[position.x][position.y] = new River(position, direction);
 			this.boardJSON.addRiverField(position, direction);
 		}
 	}
@@ -384,7 +384,7 @@ class BoardGenerator {
 			let startPosition = this.getRandomPosition();
 			let startDirection = BoardGenerator.getRandomDirection();
 
-			this.board[startPosition.y][startPosition.x] = new River(
+			this.board[startPosition.x][startPosition.y] = new River(
 				startPosition,
 				startDirection
 			);
@@ -437,7 +437,7 @@ class BoardGenerator {
 								: DirectionEnum.SOUTH;
 						}
 						startPosition = selected.position;
-						this.board[startPosition.y][startPosition.x] =
+						this.board[startPosition.x][startPosition.y] =
 							new River(startPosition, startDirection);
 						this.boardJSON.addRiverField(
 							startPosition,
@@ -750,7 +750,7 @@ class BoardGenerator {
 	}
 
 	private isFieldFree(position: BoardPosition): boolean {
-		return this.board[position.y][position.x] instanceof Grass;
+		return this.board[position.x][position.y] instanceof Grass;
 	}
 
 	static getRandomDirection(): DirectionEnum {
@@ -875,19 +875,19 @@ class BoardGenerator {
 			const d = BoardGenerator.directionToDirectionEnum(
 				startField.direction
 			);
-			board[position.y][position.x] = new StartField(position, d);
+			board[position.x][position.y] = new StartField(position, d);
 		}
 
 		for (let i = 0; i < json.checkPoints.length; i += 1) {
 			const checkPoint = json.checkPoints[i];
 			const position = BoardGenerator.positionToBoardPosition(checkPoint);
-			board[position.y][position.x] = new Checkpoint(position, i);
+			board[position.x][position.y] = new Checkpoint(position, i);
 		}
 		if (json.holes) {
 			for (let i = 0; i < json.holes.length; i += 1) {
 				const hole = json.holes[i];
 				const position = BoardGenerator.positionToBoardPosition(hole);
-				board[position.y][position.x] = new Hole(position);
+				board[position.x][position.y] = new Hole(position);
 			}
 		}
 		if (json.lembasFields) {
@@ -896,7 +896,7 @@ class BoardGenerator {
 				const position = BoardGenerator.positionToBoardPosition(
 					lembasField.position
 				);
-				board[position.y][position.x] = new Lembas(
+				board[position.x][position.y] = new Lembas(
 					position,
 					lembasField.amount
 				);
@@ -912,7 +912,7 @@ class BoardGenerator {
 				const d = BoardGenerator.directionToDirectionEnum(
 					riverField.direction
 				);
-				board[position.y][position.x] = new River(position, d);
+				board[position.x][position.y] = new River(position, d);
 			}
 		}
 
@@ -932,84 +932,6 @@ class BoardGenerator {
 
 	public wallCount(): number {
 		return this.walls;
-	}
-
-	static updateBoardConfigFromBoardArray(
-		config: BoardConfigInterface,
-		board: Array<Array<FieldWithPositionInterface>>
-	): BoardConfigInterface {
-		console.warn('UPDATE config from boardConfigurator');
-		const newConfig: BoardConfigInterface = {
-			...config,
-			startFields: [],
-			checkPoints: [],
-			riverFields: [],
-			lembasFields: [],
-			holes: [],
-		};
-		for (let y = 0; y < board.length; y += 1) {
-			const row = board[y];
-			for (let x = 0; x < row.length; x += 1) {
-				const field = row[x];
-				if (field instanceof SauronsEye) {
-					newConfig.eye = {
-						position: BoardGenerator.boardPositionToPosition(
-							field.position
-						),
-						direction: BoardGenerator.directionEnumToDirection(
-							field.direction
-						),
-					};
-				}
-				if (field instanceof Checkpoint) {
-					newConfig.checkPoints[field.order] =
-						BoardGenerator.boardPositionToPosition(field.position);
-				}
-				if (field instanceof StartField) {
-					newConfig.startFields.push({
-						position: BoardGenerator.boardPositionToPosition(
-							field.position
-						),
-						direction: BoardGenerator.directionEnumToDirection(
-							field.direction
-						),
-					});
-				}
-				if (field instanceof Hole) {
-					if (!newConfig.holes) {
-						newConfig.holes = [];
-					}
-					newConfig.holes.push(
-						BoardGenerator.boardPositionToPosition(field.position)
-					);
-				}
-				if (field instanceof Lembas) {
-					if (!newConfig.lembasFields) {
-						newConfig.lembasFields = [];
-					}
-					newConfig.lembasFields.push({
-						position: BoardGenerator.boardPositionToPosition(
-							field.position
-						),
-						amount: field.amount,
-					});
-				}
-				if (field instanceof River) {
-					if (!newConfig.riverFields) {
-						newConfig.riverFields = [];
-					}
-					newConfig.riverFields.push({
-						position: BoardGenerator.boardPositionToPosition(
-							field.position
-						),
-						direction: BoardGenerator.directionEnumToDirection(
-							field.direction
-						),
-					});
-				}
-			}
-		}
-		return newConfig;
 	}
 }
 

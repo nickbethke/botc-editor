@@ -4,6 +4,15 @@ import { BoardPosition } from '../BoardGenerator';
 import Hole from '../fields/Hole';
 import River from '../fields/River';
 import BoardConfigInterface from '../../interfaces/BoardConfigInterface';
+import {
+	position2BoardPosition,
+	wallConfig2Map,
+} from '../interfaces/boardPosition';
+import directionHelper from './DirectionHelper';
+import StartField from '../fields/StartField';
+import Checkpoint from '../fields/Checkpoint';
+import Lembas from '../fields/Lembas';
+import Grass from '../fields/Grass';
 
 export type AStarElement = {
 	state: BoardPosition;
@@ -118,8 +127,8 @@ class AStar {
 
 	generateNextSteps(state: BoardPosition) {
 		// Define an array to store the next steps
-		const height = this.board.length;
-		const width = this.board[0].length;
+		const width = this.board.length;
+		const height = this.board[0].length;
 
 		const next = [];
 
@@ -187,8 +196,8 @@ class AStar {
 
 	isObstacle(x: number, y: number): boolean {
 		return (
-			this.board[y][x] instanceof SauronsEye ||
-			this.board[y][x] instanceof Hole
+			this.board[x][y] instanceof SauronsEye ||
+			this.board[x][y] instanceof Hole
 		);
 	}
 
@@ -227,8 +236,8 @@ class AStar {
 			const point = path[i];
 			if (
 				!(
-					this.board[point[1]][point[0]] instanceof SauronsEye ||
-					this.board[point[1]][point[0]] instanceof River
+					this.board[point[0]][point[1]] instanceof SauronsEye ||
+					this.board[point[0]][point[1]] instanceof River
 				)
 			) {
 				interSections += 1;
@@ -357,15 +366,139 @@ class AStar {
 		};
 	}
 
+	static pathPossibleAll(
+		checkpoints: Array<BoardPosition>,
+		startFields: Array<BoardPosition>,
+		lembasFields: Array<{ position: BoardPosition; amount: number }>,
+		board: Array<Array<FieldWithPositionInterface>>,
+		walls: Map<string, boolean>
+	): {
+		result: boolean;
+		errors: Array<{
+			start: BoardPosition | null;
+			end: BoardPosition | null;
+		}>;
+	} {
+		let result = true;
+		const errors: Array<{
+			start: BoardPosition | null;
+			end: BoardPosition | null;
+		}> = [];
+
+		for (let i = 0; i < startFields.length; i += 1) {
+			const currStartField = startFields[i];
+			for (let j = 0; j < checkpoints.length; j += 1) {
+				const checkpoint = checkpoints[j];
+
+				const aStar = new AStar(
+					currStartField,
+					checkpoint,
+					board,
+					walls
+				);
+				const path = aStar.AStar();
+
+				if (path.length < 1) {
+					result = false;
+					errors.push({
+						start: currStartField,
+						end: checkpoint,
+					});
+				}
+			}
+		}
+		return {
+			result,
+			errors,
+		};
+	}
+
 	// TODO: Methode to check from BoardConfig Type
 	public static checkBoardConfig(config: BoardConfigInterface): {
 		result: boolean;
-		error: { start: BoardPosition | null; end: BoardPosition | null };
+		errors: Array<{
+			start: BoardPosition | null;
+			end: BoardPosition | null;
+		}>;
 	} {
-		return {
-			result: true,
-			error: { start: null, end: null },
-		};
+		const board: Array<Array<FieldWithPositionInterface>> = [];
+
+		for (let x = 0; x < config.width; x += 1) {
+			const row: Array<FieldWithPositionInterface> = [];
+
+			for (let y = 0; y < config.height; y += 1) {
+				row.push(new Grass({ x, y }));
+			}
+			board.push(row);
+		}
+
+		const eye = new SauronsEye(
+			position2BoardPosition(config.eye.position),
+			directionHelper.stringToDirEnum(config.eye.direction)
+		);
+		board[eye.position.x][eye.position.y] = eye;
+
+		config.startFields.forEach((startField) => {
+			const start = new StartField(
+				position2BoardPosition(startField.position),
+				directionHelper.stringToDirEnum(startField.direction)
+			);
+			board[start.position.x][start.position.y] = start;
+		});
+
+		config.checkPoints.forEach((checkPoint, index) => {
+			const check = new Checkpoint(
+				position2BoardPosition(checkPoint),
+				index
+			);
+			board[check.position.x][check.position.y] = check;
+		});
+
+		config.lembasFields.forEach((lembasField) => {
+			const lembas = new Lembas(
+				position2BoardPosition(lembasField.position),
+				lembasField.amount
+			);
+			board[lembas.position.x][lembas.position.y] = lembas;
+		});
+
+		config.riverFields.forEach((riverField) => {
+			const river = new River(
+				position2BoardPosition(riverField.position),
+				directionHelper.stringToDirEnum(riverField.direction)
+			);
+			board[river.position.x][river.position.y] = river;
+		});
+
+		config.holes.forEach((holeField) => {
+			const hole = new Hole(position2BoardPosition(holeField));
+			board[hole.position.x][hole.position.y] = hole;
+		});
+
+		const walls = wallConfig2Map(config.walls);
+
+		const checkpoints = config.checkPoints.map((e) => {
+			return position2BoardPosition(e);
+		});
+
+		const startFields = config.startFields.map((e) => {
+			return position2BoardPosition(e.position);
+		});
+
+		const lembasFields = config.lembasFields.map((e) => {
+			return {
+				position: position2BoardPosition(e.position),
+				amount: e.amount,
+			};
+		});
+
+		return AStar.pathPossibleAll(
+			checkpoints,
+			startFields,
+			lembasFields,
+			board,
+			walls
+		);
 	}
 }
 
