@@ -938,7 +938,6 @@ class BoardGenerator {
 export default BoardGenerator;
 
 export enum FieldsEnum {
-	GRASS,
 	START,
 	CHECKPOINT,
 	EYE,
@@ -947,6 +946,4 @@ export enum FieldsEnum {
 	RIVER,
 	WALL,
 	DESTINY_MOUNTAIN,
-	RIVER_PRESET,
-	BOARD_PRESET,
 }

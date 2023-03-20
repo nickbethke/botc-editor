@@ -7,7 +7,6 @@ import SidebarMenuItem from './SidebarMenuItem';
 import BoardConfigInterface from '../interfaces/BoardConfigInterface';
 
 export enum Warnings {
-	pathPossible,
 	pathImpossible,
 }
 

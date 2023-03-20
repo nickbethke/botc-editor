@@ -385,5 +385,3 @@ export function getLembasFieldConfig(
 	}
 	return null;
 }
-
-export default {};

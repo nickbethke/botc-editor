@@ -56,7 +56,7 @@ class JSONValidierer extends React.Component<
 		};
 
 		Mousetrap.bind(['command+s', 'ctrl+s'], () => {
-			this.saveFile().catch(console.log);
+			this.saveFile().catch(() => {});
 		});
 
 		monaco.editor.addEditorAction({
@@ -65,7 +65,7 @@ class JSONValidierer extends React.Component<
 			// eslint-disable-next-line no-bitwise
 			keybindings: [KeyMod.CtrlCmd | KeyCode.KeyS],
 			run: () => {
-				this.saveFile().then(console.log).catch(console.log);
+				this.saveFile().catch(() => {});
 			},
 		});
 
@@ -75,7 +75,7 @@ class JSONValidierer extends React.Component<
 			// eslint-disable-next-line no-bitwise
 			keybindings: [KeyMod.CtrlCmd | KeyCode.KeyO],
 			run: () => {
-				this.openFile().then(console.log).catch(console.log);
+				this.openFile().catch(() => {});
 			},
 		});
 
@@ -187,9 +187,7 @@ class JSONValidierer extends React.Component<
 								});
 								return false;
 							})
-							.catch((e) => {
-								if (e) console.log(e);
-							});
+							.catch(() => {});
 					}}
 					onAbort={() => {
 						this.setState({

@@ -88,15 +88,6 @@ contextBridge.exposeInMainWorld('electron', {
 		close() {
 			return ipcRenderer.invoke('app-close');
 		},
-		isWin() {
-			return ipcRenderer.invoke('get:isWin');
-		},
-		isMac() {
-			return ipcRenderer.invoke('get:isMac');
-		},
-		isLinux() {
-			return ipcRenderer.invoke('get:isLinux');
-		},
 		getOS() {
 			return ipcRenderer.invoke('get:os');
 		},
@@ -132,9 +123,6 @@ contextBridge.exposeInMainWorld('electron', {
 		},
 		openExternal(file: string) {
 			return ipcRenderer.invoke('file:openExternal', file);
-		},
-		openDir(file: string) {
-			return ipcRenderer.invoke('file:openDir', file);
 		},
 		save(file: string, content: string): Promise<true | string> {
 			return ipcRenderer.invoke('file:save', file, content);

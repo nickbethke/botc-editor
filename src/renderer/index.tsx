@@ -20,6 +20,4 @@ window.electron.app
 		}
 		return null;
 	})
-	.catch((reason) => {
-		if (reason) console.log(reason);
-	});
+	.catch(() => {});

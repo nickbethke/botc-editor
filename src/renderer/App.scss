@@ -122,13 +122,6 @@
 		background-position: center;
 	}
 
-	.bg-grass {
-		background-color: #5fa01e;
-		background-image: url('/assets/textures/grass.png');
-		background-size: 512px 512px;
-		background-position: center;
-	}
-
 	*:focus {
 		@apply outline-accent;
 	}
