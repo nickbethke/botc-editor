@@ -136,7 +136,7 @@ function TopMenu(props: TopMenuProps) {
 						className="text-left"
 						action={TopMenuActions.ZOOM_RESET}
 						onAction={onAction}
-						label={window.languageHelper.translate('100%')}
+						label="100%"
 						shortCut={`${window.languageHelper.translate(
 							'Ctrl'
 						)}+Enter`}

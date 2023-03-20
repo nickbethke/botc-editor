@@ -5,9 +5,9 @@ import PartieConfigInterface from '../renderer/components/interfaces/PartieConfi
 import { BoardPreset, RiverPreset } from './helper/PresetsLoader';
 import { SettingsInterface } from '../interfaces/SettingsInterface';
 
-export type Channels = 'ipc-example';
+export type Channels = 'enter-full-screen' | 'leave-full-screen';
 
-contextBridge.exposeInMainWorld('electron', {
+const electronHandler = {
 	ipcRenderer: {
 		on(channel: Channels, func: (...args: unknown[]) => void) {
 			const subscription = (
@@ -130,7 +130,7 @@ contextBridge.exposeInMainWorld('electron', {
 		remove(file: string): Promise<true | string> {
 			return ipcRenderer.invoke('file:remove', file);
 		},
-		getTranslation(lang: string): Promise<Array<[string, string]> | []> {
+		getTranslation(lang: string): Promise<string> {
 			return ipcRenderer.invoke('file:getTranslation', lang);
 		},
 	},
@@ -144,4 +144,8 @@ contextBridge.exposeInMainWorld('electron', {
 			return ipcRenderer.invoke('clipboard:write', text);
 		},
 	},
-});
+};
+
+contextBridge.exposeInMainWorld('electron', electronHandler);
+
+export type ElectronHandler = typeof electronHandler;

@@ -76,7 +76,7 @@ class ConfirmPopupV2 extends React.Component<
 		const { offClick: preOffClick } = prevState;
 		const { offClick } = this.state;
 		if (offClick !== preOffClick && !preOffClick) {
-			window.electron.app.beep();
+			window.electron.app.beep().catch(() => {});
 			setTimeout(() => {
 				this.setState({ offClick: false });
 			}, 500);
@@ -106,7 +106,7 @@ class ConfirmPopupV2 extends React.Component<
 			<div
 				role="presentation"
 				id="popupV2-container"
-				className="w-[100vw] absolute left-0 bg-black/25"
+				className="w-[100vw] absolute left-0 bg-black/25 text-white"
 				style={{
 					top: os === 'win32' && topOffset ? 32 : 0,
 					height:

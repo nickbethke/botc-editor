@@ -493,30 +493,38 @@ class MainEditor extends React.Component<MainEditorProps, MainEditorState> {
 		const board = this.buildBoard(config);
 		return (
 			<div className="max-h-full h-full">
-				<div className="dark:bg-muted-800 bg-muted-600 px-2 py-[10px] text-sm dark:text-muted-200 text-muted-50">
+				<div className="px-2 dark:bg-muted-800 bg-muted-600 text-sm dark:text-muted-200 text-muted-50 h-fit overflow-x-hidden">
 					{file ? (
-						<>
-							<span className="dark:text-muted-400">
+						<div className="flex items-center gap-0 h-full">
+							<span className="py-[10px]">
 								{file.parsedPath.dir}
 								{fileSep}
 							</span>
-							{file.parsedPath.base}
-						</>
+							<span>
+								{file.parsedPath.base}
+								{fileSaved ? '' : ` *`}
+							</span>
+							<span className="px-2">-</span>
+							<span>{config.name}</span>
+						</div>
 					) : (
-						window.languageHelper.translate('Unsaved File')
+						<div className="flex items-center gap-0 h-full">
+							<span className="py-[10px]">
+								{window.languageHelper.translate(
+									'Unsaved File'
+								)}
+								{fileSaved ? '' : ` *`}
+							</span>
+						</div>
 					)}
-					{fileSaved ? '' : ` *`}
 				</div>
 				<div
 					id="main-editor"
 					className="relative h-full max-w-full flex overflow-auto p-4 z-0"
-					style={{ maxHeight: 'calc(100% - 40px)' }}
+					style={{ maxHeight: 'calc(100% - 42px)' }}
+					onWheel={this.handleZoom}
 				>
-					<div
-						id="main-editor-board"
-						className="h-fit"
-						onWheel={this.handleZoom}
-					>
+					<div id="main-editor-board" className="h-fit">
 						<div
 							id="main-editor-board-board"
 							className="flex flex-col rounded gap-2 p-2"

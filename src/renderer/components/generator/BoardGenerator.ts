@@ -938,6 +938,7 @@ class BoardGenerator {
 export default BoardGenerator;
 
 export enum FieldsEnum {
+	GRASS,
 	START,
 	CHECKPOINT,
 	EYE,

@@ -1,6 +1,7 @@
 import React from 'react';
 import Mousetrap from 'mousetrap';
 import { ParsedPath } from 'path';
+import _uniqueId from 'lodash/uniqueId';
 import TopMenu, {
 	TopMenuActions,
 } from '../components/boardConfigurator/TopMenu';
@@ -12,7 +13,6 @@ import LeftSidebar, {
 import { FieldsEnum } from '../components/generator/BoardGenerator';
 import RightSidebar, {
 	RightSidebarOpenTab,
-	Warnings,
 } from '../components/boardConfigurator/RightSidebar';
 import MainEditor, {
 	FieldTypeOnClick,
@@ -44,6 +44,7 @@ import { SettingsInterface } from '../../interfaces/SettingsInterface';
 import SettingsPopup from '../components/popups/SettingsPopup';
 import RandomBoardStartValuesDialogV2 from '../components/popups/RandomBoardStartValuesDialogV2';
 import AStar from '../components/generator/helper/AStar';
+import { Warnings, WarningsMap } from '../components/boardConfigurator/Warning';
 
 export type EditorToolType = FieldsEnum | 'delete' | 'edit' | null;
 type EditorPopupType =
@@ -65,10 +66,6 @@ type BoardConfiguratorV2Props = {
 		path: string;
 	} | null;
 };
-type WarningsMap = Map<
-	number,
-	{ type: Warnings; title: string; content: string }
->;
 type BoardConfiguratorV2State = {
 	windowDimensions: {
 		width: number;
@@ -116,7 +113,7 @@ class BoardConfiguratorV2 extends React.Component<
 	// TODO: Warnings
 	constructor(props: BoardConfiguratorV2Props) {
 		super(props);
-
+		const conf = props.config || BoardConfiguratorV2.defaultBoard;
 		this.state = {
 			windowDimensions: {
 				width: window.innerWidth,
@@ -139,22 +136,18 @@ class BoardConfiguratorV2 extends React.Component<
 			sideBarTabLeft: null,
 			sideBarTabLeftConfigType: 'global',
 			sideBarTabRight: null,
-			config: props.config || BoardConfiguratorV2.defaultBoard,
+			config: conf,
 			mainEditorZoom: 1,
 			fieldInEdit: null,
 			file: props.file || null,
 			fileSaved: !!props.file,
-			warnings: new Map<
-				number,
-				{ type: Warnings; title: string; content: string }
-			>(),
+			warnings: this.checkWarnings(conf),
 		};
 		this.addEventListeners = this.addEventListeners.bind(this);
 		this.onTopMenuAction = this.onTopMenuAction.bind(this);
 		this.handleOnFieldOrWallClick =
 			this.handleOnFieldOrWallClick.bind(this);
 		document.querySelector('html')?.classList.add('dark');
-		this.handleConfigurationUpdate();
 	}
 
 	static get defaultProps() {
@@ -174,8 +167,6 @@ class BoardConfiguratorV2 extends React.Component<
 			windowDimensions,
 			popupDimension,
 			popup,
-			config,
-			file,
 		} = this.state;
 		const { os } = this.props;
 		const {
@@ -183,8 +174,6 @@ class BoardConfiguratorV2 extends React.Component<
 			sideBarTabRight: preSideBarTabRight,
 			currentTool: preTool,
 			popup: prePopup,
-			config: preConfig,
-			file: preFile,
 		} = prevState;
 		if (sideBarTabLeft === null && sidebars.left > 52) {
 			this.setState({ sidebars: { ...sidebars, left: 52 } });
@@ -239,47 +228,7 @@ class BoardConfiguratorV2 extends React.Component<
 				},
 			});
 		}
-		if (preConfig !== config) {
-			this.setState({ warnings: this.handleConfigurationUpdate() });
-			if (file === preFile) {
-				this.setState({ fileSaved: false });
-			}
-		}
 	}
-
-	handleConfigurationUpdate = (): WarningsMap => {
-		const { config } = this.state;
-		const newWarnings: WarningsMap = new Map();
-		const { result, errors } = AStar.checkBoardConfig(config);
-		if (!result) {
-			for (let i = 0; i < errors.length; i += 1) {
-				const error = errors[i];
-				if (error.start && error.end) {
-					newWarnings.set(i, {
-						type: Warnings.pathImpossible,
-						title: window.languageHelper.translate('Pathfinding'),
-						content: window.languageHelper.translateVars(
-							'The current board state is not playable, because {0} to {1} has no valid path.',
-							[
-								`[${error.start.x}, ${error.start.y}]`,
-								`[${error.end.x}, ${error.end.y}]`,
-							]
-						),
-					});
-				} else {
-					newWarnings.set(i, {
-						type: Warnings.pathImpossible,
-						title: window.languageHelper.translate('Pathfinding'),
-						content: window.languageHelper.translate(
-							'The current board state is not playable.'
-						),
-					});
-				}
-			}
-		}
-
-		return newWarnings;
-	};
 
 	handleOnFieldOrWallClick: FieldTypeOnClick = (type, position) => {
 		const { currentTool, config } = this.state;
@@ -325,19 +274,19 @@ class BoardConfiguratorV2 extends React.Component<
 			case FieldsEnum.EYE:
 				break;
 			case FieldsEnum.CHECKPOINT:
-				this.setState({ config: removeCheckpoint(position, config) });
+				this.onConfigUpdate(removeCheckpoint(position, config));
 				break;
 			case FieldsEnum.START:
-				this.setState({ config: removeStartField(position, config) });
+				this.onConfigUpdate(removeStartField(position, config));
 				break;
 			case FieldsEnum.LEMBAS:
-				this.setState({ config: removeLembasField(position, config) });
+				this.onConfigUpdate(removeLembasField(position, config));
 				break;
 			case FieldsEnum.RIVER:
-				this.setState({ config: removeRiver(position, config) });
+				this.onConfigUpdate(removeRiver(position, config));
 				break;
 			case FieldsEnum.HOLE:
-				this.setState({ config: removeHole(position, config) });
+				this.onConfigUpdate(removeHole(position, config));
 				break;
 			default:
 				break;
@@ -422,22 +371,22 @@ class BoardConfiguratorV2 extends React.Component<
 	) {
 		switch (currentTool) {
 			case FieldsEnum.EYE:
-				this.setState({ config: moveSauronsEye(position, config) });
+				this.onConfigUpdate(moveSauronsEye(position, config));
 				break;
 			case FieldsEnum.CHECKPOINT:
-				this.setState({ config: addCheckpoint(position, config) });
+				this.onConfigUpdate(addCheckpoint(position, config));
 				break;
 			case FieldsEnum.START:
-				this.setState({ config: addStartField(position, config) });
+				this.onConfigUpdate(addStartField(position, config));
 				break;
 			case FieldsEnum.LEMBAS:
-				this.setState({ config: addLembasField(position, config) });
+				this.onConfigUpdate(addLembasField(position, config));
 				break;
 			case FieldsEnum.RIVER:
-				this.setState({ config: addRiver(position, config) });
+				this.onConfigUpdate(addRiver(position, config));
 				break;
 			case FieldsEnum.HOLE:
-				this.setState({ config: addHole(position, config) });
+				this.onConfigUpdate(addHole(position, config));
 				break;
 			default:
 				break;
@@ -453,28 +402,107 @@ class BoardConfiguratorV2 extends React.Component<
 		const wallMap = wallConfig2Map(config.walls);
 		if (currentTool === FieldsEnum.WALL) {
 			if (!wallMap.get(positionString)) {
-				this.setState({
-					config: {
-						...config,
-						walls: [
-							...config.walls,
-							wallBoardPosition2WallPosition(position),
-						],
-					},
+				this.onConfigUpdate({
+					...config,
+					walls: [
+						...config.walls,
+						wallBoardPosition2WallPosition(position),
+					],
 				});
 			}
 			if (wallMap.get(positionString)) {
-				this.setState({
-					config: removeWall(position, config),
-				});
+				this.onConfigUpdate(removeWall(position, config));
 			}
 		}
 		if (currentTool === 'delete' && !!wallMap.get(positionString)) {
-			this.setState({
-				config: removeWall(position, config),
-			});
+			this.onConfigUpdate(removeWall(position, config));
 		}
 	}
+
+	checkWarnings = (startConfig?: BoardConfigInterface): WarningsMap => {
+		let handledConfig;
+		if (startConfig) {
+			handledConfig = startConfig;
+		} else {
+			const { config } = this.state;
+			handledConfig = config;
+		}
+		const newWarnings: WarningsMap = new Map();
+		const { result, errors } = AStar.checkBoardConfig(handledConfig);
+		if (!result) {
+			for (let i = 0; i < errors.length; i += 1) {
+				const error = errors[i];
+				if (error.start && error.end) {
+					newWarnings.set(_uniqueId('warning-'), {
+						type: Warnings.pathImpossible,
+						title: window.languageHelper.translate('Pathfinding'),
+						content: window.languageHelper.translateVars(
+							'The current board state is not playable, because {0} to {1} has no valid path.',
+							[
+								`[${error.start.x}, ${error.start.y}]`,
+								`[${error.end.x}, ${error.end.y}]`,
+							]
+						),
+						fields: [error.start, error.end],
+					});
+				} else {
+					newWarnings.set(_uniqueId('warning-'), {
+						type: Warnings.pathImpossible,
+						title: window.languageHelper.translate('Pathfinding'),
+						content: window.languageHelper.translate(
+							'The current board state is not playable.'
+						),
+					});
+				}
+			}
+		}
+
+		if (handledConfig.startFields.length < 2) {
+			newWarnings.set(_uniqueId('warning-'), {
+				type: Warnings.configurationInvalid,
+				title: window.languageHelper.translate('Startfields'),
+				content: window.languageHelper.translate(
+					'The current game board state is not playable because there are not enough starting spaces.'
+				),
+				helper: [
+					window.languageHelper.translateVars('Minimum {0}', ['1']),
+				],
+			});
+		} else if (handledConfig.startFields.length > 6) {
+			newWarnings.set(_uniqueId('warning-'), {
+				type: Warnings.configurationInvalid,
+				title: window.languageHelper.translate('Startfields'),
+				content: window.languageHelper.translate(
+					'The current game board state is invalid because there are too many starting spaces.'
+				),
+				helper: [
+					window.languageHelper.translateVars('Maximum {0}', ['6']),
+				],
+			});
+		}
+
+		if (handledConfig.checkPoints.length < 1) {
+			newWarnings.set(_uniqueId('warning-'), {
+				type: Warnings.configurationInvalid,
+				title: window.languageHelper.translate('Checkpoints'),
+				content: window.languageHelper.translate(
+					'The current game board state is not playable because there are not enough checkpoints.'
+				),
+				helper: [
+					window.languageHelper.translateVars('Minimum {0}', ['1']),
+				],
+			});
+		}
+
+		return newWarnings;
+	};
+
+	onConfigUpdate = (newConfig: BoardConfigInterface) => {
+		this.setState({
+			warnings: this.checkWarnings(newConfig),
+			config: newConfig,
+		});
+	};
 
 	onTopMenuAction = async (action: TopMenuActions) => {
 		const { onClose, settings, onSettingsUpdate } = this.props;
@@ -484,18 +512,11 @@ class BoardConfiguratorV2 extends React.Component<
 				if (!fileSaved) {
 					this.setState({ popup: 'newFileSaveCurrent' });
 				} else {
-					this.setState(
-						{
-							config: BoardConfiguratorV2.defaultBoard,
-							file: null,
-							fileSaved: true,
-						},
-						() => {
-							this.setState({
-								fileSaved: true,
-							});
-						}
-					);
+					this.onConfigUpdate(BoardConfiguratorV2.defaultBoard);
+					this.setState({
+						file: null,
+						fileSaved: true,
+					});
 				}
 				break;
 			case TopMenuActions.NEW_FROM_RANDOM:
@@ -539,7 +560,7 @@ class BoardConfiguratorV2 extends React.Component<
 				onSettingsUpdate({ ...settings, darkMode: !settings.darkMode });
 				break;
 			case TopMenuActions.OPEN_PRESET_FOLDER:
-				window.electron.file.openPresetDir();
+				window.electron.file.openPresetDir().catch(() => {});
 				break;
 			case TopMenuActions.SETTINGS:
 				this.setState({ popup: 'settings' });
@@ -618,18 +639,14 @@ class BoardConfiguratorV2 extends React.Component<
 							if (popup === 'newRandomFileSaveCurrent') {
 								this.setState({ popup: 'newFromRandom' });
 							} else {
-								this.setState(
-									{
-										popup: null,
-										config: BoardConfiguratorV2.defaultBoard,
-										file: null,
-									},
-									() => {
-										this.setState({
-											fileSaved: true,
-										});
-									}
+								this.onConfigUpdate(
+									BoardConfiguratorV2.defaultBoard
 								);
+								this.setState({
+									popup: null,
+									file: null,
+									fileSaved: true,
+								});
 							}
 						}}
 						position={popupPosition}
@@ -684,8 +701,10 @@ class BoardConfiguratorV2 extends React.Component<
 						}}
 						settings={settings}
 						onConfirm={(generator) => {
+							this.onConfigUpdate(generator.boardJSON);
 							this.setState({
-								config: generator.boardJSON,
+								file: null,
+								fileSaved: false,
 								popup: null,
 							});
 						}}
@@ -717,8 +736,8 @@ class BoardConfiguratorV2 extends React.Component<
 			.openBoardConfig()
 			.then((loadedConfig) => {
 				if (loadedConfig) {
+					this.onConfigUpdate(loadedConfig.config);
 					this.setState({
-						config: loadedConfig.config,
 						file: loadedConfig,
 						fileSaved: true,
 					});
@@ -950,7 +969,7 @@ class BoardConfiguratorV2 extends React.Component<
 			<section className="text-white font-lato dark:bg-muted-800 bg-muted-600">
 				{os === 'win32' ? (
 					<div className="dragger w-[100vw] h-8 bg-muted flex items-center px-2 text-sm">
-						{window.languageHelper.translate('Board Configurator')}
+						{window.languageHelper.translate('Board-Configurator')}
 						{' - '}
 						{file
 							? file.path
@@ -991,12 +1010,22 @@ class BoardConfiguratorV2 extends React.Component<
 							<LeftSidebar
 								config={config}
 								onConfigUpdate={(newConfig) => {
-									this.setState({ config: newConfig });
+									this.onConfigUpdate(newConfig);
 								}}
 								openTab={sideBarTabLeft}
 								currentTool={currentTool}
 								toolChange={(tool) => {
-									this.setState({ currentTool: tool });
+									if (
+										tool === 'edit' &&
+										currentTool !== 'edit'
+									) {
+										this.setState({
+											currentTool: tool,
+											fieldInEdit: null,
+										});
+									} else {
+										this.setState({ currentTool: tool });
+									}
 								}}
 								tabChange={(tab) => {
 									this.setState({ sideBarTabLeft: tab });
@@ -1058,6 +1087,9 @@ class BoardConfiguratorV2 extends React.Component<
 									this.setState({ sideBarTabRight: tab });
 								}}
 								warnings={warnings}
+								onFieldSelect={(position) => {
+									this.setState({ fieldInEdit: position });
+								}}
 							/>
 						</div>
 					</div>

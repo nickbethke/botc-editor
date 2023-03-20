@@ -87,12 +87,6 @@ const createWindow = async () => {
 		},
 	});
 
-	mainWindow.on('resize', () => {
-		if (mainWindow) {
-			process.stdout.write(`resize: ${mainWindow.getSize()}\r`);
-		}
-	});
-
 	await mainWindow.loadURL(resolveHtmlPath('index.html'));
 
 	mainWindow.on('ready-to-show', () => {
@@ -159,6 +153,11 @@ app.whenReady()
 		ipcMain.handle('dialog:openConfig', async () => {
 			return IPCHelper.handleFileOpen('', mainWindow);
 		});
+
+		ipcMain.handle('dialog:saveScreenshot', (event, ...args) => {
+			return IPCHelper.saveScreenShotDialog(args[0], args[1], mainWindow);
+		});
+
 		ipcMain.handle('validate:json', (event, ...args) => {
 			return IPCHelper.jsonValidate(args[0], args[1]);
 		});
@@ -221,10 +220,6 @@ app.whenReady()
 		});
 		ipcMain.handle('beep', () => {
 			return shell.beep();
-		});
-
-		ipcMain.handle('dialog:saveScreenshot', (event, ...args) => {
-			return IPCHelper.saveScreenShotDialog(args[0], args[1], mainWindow);
 		});
 	})
 	.catch(() => {});

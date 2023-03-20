@@ -5,28 +5,15 @@ import { TbScreenShare } from 'react-icons/tb';
 import html2canvas from 'html2canvas';
 import SidebarMenuItem from './SidebarMenuItem';
 import BoardConfigInterface from '../interfaces/BoardConfigInterface';
-
-export enum Warnings {
-	pathImpossible,
-}
-
-export function Warning(props: { title: string; content: string }) {
-	const { title, content } = props;
-	return (
-		<div className="m-2 text-sm border dark:border-muted-700 border-muted-400 rounded flex flex-col dark:bg-muted-800 bg-muted-600">
-			<div className="border-b dark:border-muted-700 border-muted-400 px-2 py-1">
-				{title}
-			</div>
-			<div className="px-2 py-1">{content}</div>
-		</div>
-	);
-}
+import Warning, { WarningsMap } from './Warning';
+import { BoardPosition } from '../generator/interfaces/boardPosition';
 
 type RightSidebarProps = {
 	tabChange: (tab: RightSidebarOpenTab) => void;
 	openTab: RightSidebarOpenTab;
 	config: BoardConfigInterface;
-	warnings: Map<Warnings, { title: string; content: string }>;
+	warnings: WarningsMap;
+	onFieldSelect: (position: BoardPosition) => void;
 };
 
 export type RightSidebarOpenTab = 'warnings' | 'configPreview' | null;
@@ -45,18 +32,21 @@ class RightSidebar extends React.Component<RightSidebarProps, unknown> {
 	};
 
 	notifications = () => {
-		const { warnings } = this.props;
+		const { warnings, onFieldSelect } = this.props;
 		return (
 			<div className="flex flex-col h-full">
 				<div className="p-2 border-b dark:border-muted-700 border-muted-400">
 					{window.languageHelper.translate('Warnings')}
 				</div>
-				<div className="flex bg-muted-900/25 flex-col gap-1 flex-grow">
+				<div className="flex bg-muted-900/25 flex-col gap-1 flex-grow max-h-full overflow-y-auto">
 					{Array.from(warnings).map((value) => (
 						<Warning
 							key={_uniqueId('sidebar-warning-')}
 							title={value[1].title}
 							content={value[1].content}
+							helper={value[1].helper}
+							fields={value[1].fields}
+							onFieldSelect={onFieldSelect}
 						/>
 					))}
 				</div>
@@ -74,16 +64,16 @@ class RightSidebar extends React.Component<RightSidebarProps, unknown> {
 						className="px-2 py-1 rounded bg-muted-900/25 hover:bg-muted-100/10 flex items-center gap-2"
 						type="button"
 						onClick={() => {
-							window.electron.clipboard.write(
-								JSON.stringify(config, null, 4)
-							);
+							window.electron.clipboard
+								.write(JSON.stringify(config, null, 4))
+								.catch(() => {});
 						}}
 					>
 						<VscCopy />
 						{window.languageHelper.translate('Copy')}
 					</button>
 				</div>
-				<div className="flex-grow bg-muted-900/25 relative p-2 w-[347px] overflow-z-auto">
+				<div className="flex-grow bg-muted-900/25 relative p-2 w-[347px] overflow-y-auto">
 					<pre className="h-full font-jetbrains user-select text-sm">
 						{JSON.stringify(config, null, 4)}
 					</pre>

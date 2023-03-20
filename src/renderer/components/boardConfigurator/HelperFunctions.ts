@@ -136,7 +136,7 @@ export function removeHole(
 export function removeWall(
 	position: [BoardPosition, BoardPosition],
 	config: BoardConfigInterface
-) {
+): BoardConfigInterface {
 	const filteredWallArray = config.walls.filter(
 		(e) =>
 			wallPosition2String(e as [Position, Position]) !==

@@ -53,6 +53,7 @@ type AppStates = {
 	popupPosition: { x: number; y: number };
 	popupDimension: { width: number; height: number };
 	errorMessage: { title: string; error: string } | null;
+	fullScreen: boolean;
 };
 
 class App extends React.Component<AppProps, AppStates> {
@@ -75,6 +76,7 @@ class App extends React.Component<AppProps, AppStates> {
 				height: 0,
 			},
 			errorMessage: null,
+			fullScreen: false,
 		};
 		this.handleOpenPartieEditorChoice =
 			this.handleOpenPartieEditorChoice.bind(this);
@@ -180,7 +182,7 @@ class App extends React.Component<AppProps, AppStates> {
 	};
 
 	handleCloseApp = () => {
-		window.electron.app.close();
+		window.electron.app.close().catch(() => {});
 	};
 
 	handleOpenValidator = () => {
@@ -237,12 +239,17 @@ class App extends React.Component<AppProps, AppStates> {
 	};
 
 	partieConfigScreen = () => {
-		const { openScreen } = this.state;
+		const { openScreen, settings, fullScreen } = this.state;
+		const { os } = this.props;
 		if (openScreen === 'partieConfigNewScreen') {
 			return (
 				<PartieKonfigurator
 					onClose={this.handleCloseChildScreen}
 					loadedValues={null}
+					settings={settings}
+					os={os}
+					onSettingsUpdate={this.handleSettingsChange}
+					fullScreen={fullScreen}
 				/>
 			);
 		}
@@ -251,8 +258,12 @@ class App extends React.Component<AppProps, AppStates> {
 			this.setState({ toLoad: null });
 			return (
 				<PartieKonfigurator
+					settings={settings}
+					os={os}
 					onClose={this.handleCloseChildScreen}
 					loadedValues={toLoad as PartieConfigInterface}
+					onSettingsUpdate={this.handleSettingsChange}
+					fullScreen={fullScreen}
 				/>
 			);
 		}
@@ -352,7 +363,6 @@ class App extends React.Component<AppProps, AppStates> {
 		const { openPopup, version, surprise } = this.state;
 		const popup = this.popup(openPopup);
 		const tabIndex = openPopup !== null ? -1 : 0;
-		const { os } = this.props;
 		return (
 			<div className="text-white">
 				<div id="home" className={popup ? 'blur' : ''}>
@@ -434,8 +444,8 @@ class App extends React.Component<AppProps, AppStates> {
 						<div className="bg-white/10 p-2 w-full font-jetbrains flex flex-row items-center justify-end gap-2 text-[10px]">
 							<button
 								type="button"
-								onClick={() => {
-									window.electron.open.homepage();
+								onClick={async () => {
+									await window.electron.open.homepage();
 								}}
 							>
 								{window.languageHelper.translate('Website')}
@@ -446,11 +456,6 @@ class App extends React.Component<AppProps, AppStates> {
 									'Editor Version'
 								)}
 								: {version}
-							</span>
-							|
-							<span>
-								{window.languageHelper.translate('Platform')}:{' '}
-								{os}
 							</span>
 						</div>
 					</div>
@@ -612,6 +617,7 @@ class App extends React.Component<AppProps, AppStates> {
 						x: window.innerWidth / 2,
 						y: window.innerHeight / 2,
 					},
+					fullScreen: !window.screenTop && !window.screenY,
 				});
 			},
 			{ once: true }

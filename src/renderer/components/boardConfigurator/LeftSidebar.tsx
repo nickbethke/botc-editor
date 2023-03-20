@@ -171,6 +171,9 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 					</div>
 					<div className="p-4 flex flex-col gap-4">
 						<InputLabel
+							label={window.languageHelper.translate(
+								'Lembas amount'
+							)}
 							type="range"
 							value={amountField ? amountField.amount : 0}
 							min={0}

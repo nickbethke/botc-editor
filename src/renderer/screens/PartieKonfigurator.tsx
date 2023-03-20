@@ -1,23 +1,39 @@
 import React from 'react';
 import { BiChevronLeft } from 'react-icons/bi';
+import { VscColorMode } from 'react-icons/vsc';
 import backgroundImage from '../../../assets/images/bg-color-III.jpg';
+import backgroundImageDark from '../../../assets/images/bg-color-II.jpg';
 import InputLabel from '../components/InputLabel';
 import Notification from '../components/Notification';
 import Error from '../components/Error';
 import InputValidator, { InputValidatorType } from '../helper/InputValidator';
 
-import ConfirmPopup from '../components/popups/ConfirmPopup';
 import PartieConfigInterface from '../components/interfaces/PartieConfigInterface';
+import ConfirmPopupV2 from '../components/boardConfigurator/ConfirmPopupV2';
+import { SettingsInterface } from '../../interfaces/SettingsInterface';
 
 type PartieKonfiguratorProps = {
 	onClose: () => void;
 	loadedValues: PartieConfigInterface | null;
+	os: NodeJS.Platform;
+	settings: SettingsInterface;
+	onSettingsUpdate: (settings: SettingsInterface) => void;
+	fullScreen: boolean;
 };
 type PartieKonfiguratorState = {
 	values: PartieConfigInterface;
 	popupLeave: boolean;
+
+	windowDimensions: {
+		width: number;
+		height: number;
+	};
+
+	popupPosition: { x: number; y: number };
+	popupDimension: { width: number; height: number };
 };
 
+// TODO: Translations
 class PartieKonfigurator extends React.Component<
 	PartieKonfiguratorProps,
 	PartieKonfiguratorState
@@ -44,7 +60,64 @@ class PartieKonfigurator extends React.Component<
 		this.state = {
 			values: this.default,
 			popupLeave: false,
+			windowDimensions: {
+				width: window.innerWidth,
+				height: window.innerHeight,
+			},
+			popupPosition: {
+				x: window.innerWidth / 2,
+				y: window.innerHeight / 2,
+			},
+			popupDimension: {
+				width: 0,
+				height: 0,
+			},
 		};
+	}
+
+	componentDidUpdate(
+		prevProps: Readonly<PartieKonfiguratorProps>,
+		prevState: Readonly<PartieKonfiguratorState>
+	) {
+		const { popupLeave: prePopupLeave } = prevState;
+		const { popupPosition, popupDimension, windowDimensions, popupLeave } =
+			this.state;
+		const { os } = this.props;
+		if (popupPosition.x < 0) {
+			this.setState({ popupPosition: { x: 0, y: popupPosition.y } });
+		}
+		if (popupPosition.y < (os === 'win32' ? 32 : 0)) {
+			this.setState({
+				popupPosition: {
+					x: popupPosition.x,
+					y: os === 'win32' ? 32 : 0,
+				},
+			});
+		}
+		if (popupPosition.x + popupDimension.width > windowDimensions.width) {
+			this.setState({
+				popupPosition: {
+					x: windowDimensions.width - popupDimension.width,
+					y: popupPosition.y,
+				},
+			});
+		}
+		if (popupPosition.y + popupDimension.height > windowDimensions.height) {
+			this.setState({
+				popupPosition: {
+					x: popupPosition.x,
+					y: windowDimensions.height - popupDimension.height,
+				},
+			});
+		}
+		if (prePopupLeave !== popupLeave) {
+			this.setState({
+				popupPosition: {
+					x: window.innerWidth / 2,
+					y: window.innerHeight / 2,
+				},
+			});
+		}
 	}
 
 	handleBackButton = () => {
@@ -87,8 +160,9 @@ class PartieKonfigurator extends React.Component<
 
 	render = () => {
 		let { values } = this.state;
-		const { popupLeave } = this.state;
-		const { loadedValues } = this.props;
+		const { popupLeave, popupPosition } = this.state;
+		const { loadedValues, os, settings, onSettingsUpdate, fullScreen } =
+			this.props;
 
 		if (loadedValues) {
 			values = { ...this.default, ...loadedValues };
@@ -98,36 +172,116 @@ class PartieKonfigurator extends React.Component<
 		let popupLeaveR = null;
 		if (popupLeave) {
 			popupLeaveR = (
-				<ConfirmPopup
-					label="Partie-Konfigurator wirklich verlassen?"
+				<ConfirmPopupV2
+					title={window.languageHelper.translate(
+						'Close Party Configurator'
+					)}
 					onConfirm={this.backToHomeScreen}
 					onAbort={this.abortBackToHomeScreen}
-				/>
+					settings={settings}
+					onPositionChange={(position, callback) => {
+						this.setState({ popupPosition: position }, callback);
+					}}
+					onDimensionChange={(dimension) => {
+						this.setState({ popupDimension: dimension });
+					}}
+					position={popupPosition}
+					confirmButtonText={window.languageHelper.translate(
+						'Discard'
+					)}
+					os={os}
+					abortButtonText={window.languageHelper.translate('Cancel')}
+				>
+					{window.languageHelper.translate(
+						'The current file has not yet been saved. Do you want to discard the current changes?'
+					)}
+				</ConfirmPopupV2>
 			);
 		}
+		const notWinDragger = !fullScreen ? (
+			<div className="dragger w-[100vw] h-8 bg-muted" />
+		) : null;
 		return (
-			<div>
-				<div className="dragger absolute top-0 left-0 w-[100vw] h-8" />
+			<div className="dark:bg-muted-800 bg-muted-600 flex flex-col">
+				{os === 'win32' ? (
+					<div className="dragger w-[100vw] h-8 bg-muted" />
+				) : (
+					notWinDragger
+				)}
 				{popupLeaveR}
-				<div className="text-white grid grid-cols-3 2xl:grid-cols-2 gap-0 h-[100vh] w-[100vw]">
+				<div
+					className="text-white grid grid-cols-3 2xl:grid-cols-2 gap-0 grow w-[100vw]"
+					style={{
+						minHeight:
+							fullScreen && os !== 'win32'
+								? '100vh'
+								: 'calc(100vh - 32px)',
+					}}
+				>
 					<div
+						className="transition transition-all"
 						style={{
-							backgroundImage: `url(${backgroundImage})`,
+							backgroundImage: `url(${
+								settings.darkMode
+									? backgroundImageDark
+									: backgroundImage
+							})`,
 							backgroundSize: 'cover',
 						}}
 					/>
-					<div className="col-span-2 2xl:col-span-1 m-8 flex flex-col gap-8">
+					<div className="col-span-2 2xl:col-span-1 m-8 flex flex-col gap-4 transition transition-all">
 						<div className="flex flex-row justify-start gap-8">
 							<button
 								type="button"
-								className="border border-white cursor-pointer hover:bg-accent-500"
+								className="rounded border dark:border-muted-700 border-muted-400 hover:bg-accent-500 transition transition-colors"
 								onClick={this.handleBackButton}
 							>
 								<BiChevronLeft className="text-4xl" />
 							</button>
 							<div className="text-4xl">Partie Konfigurator</div>
+							<button
+								type="button"
+								className="p-1 dark:bg-muted-800 bg-muted-600 dark:hover:bg-muted-700 hover:bg-muted-500 transition transition-colors flex items-center ml-auto"
+								onClick={() => {
+									onSettingsUpdate({
+										...settings,
+										darkMode: !settings.darkMode,
+									});
+								}}
+							>
+								<VscColorMode
+									title={window.languageHelper.translate(
+										'Dark Mode'
+									)}
+									className={`${
+										settings.darkMode ? '' : 'rotate-180'
+									} transition transition-all transform-gpu text-lg`}
+								/>
+							</button>
 						</div>
-						<div>{this.notification}</div>
+						<div className="flex gap-4">
+							<div>
+								<button
+									type="button"
+									className="rounded border dark:border-muted-700 border-muted-400 dark:bg-muted-800 bg-muted-500 dark:hover:bg-accent-500 hover:bg-accent-500 transition transition-colors px-4 py-2"
+									onClick={this.handleSaveClick}
+								>
+									Speichern
+								</button>
+							</div>
+							<div>
+								<button
+									type="button"
+									className="rounded border dark:border-muted-700 border-muted-400 dark:bg-muted-800 bg-muted-500 dark:hover:bg-accent-500  hover:bg-accent-500 transition transition-colors px-4 py-2"
+									onClick={this.openLoadPartieConfig}
+								>
+									Laden
+								</button>
+							</div>
+						</div>
+						{this.notification ? (
+							<div>{this.notification}</div>
+						) : null}
 						<div className="grid grid-cols-2 gap-8">
 							<div>
 								<InputLabel
@@ -315,26 +469,6 @@ class PartieKonfigurator extends React.Component<
 									}}
 									value={values.serverIngameDelay}
 								/>
-							</div>
-						</div>
-						<div className="grid grid-cols-2 gap-8">
-							<div>
-								<button
-									type="button"
-									className="w-full border border-white p-4 hover:bg-accent-500 text-lg bg-white/25"
-									onClick={this.handleSaveClick}
-								>
-									Speichern
-								</button>
-							</div>
-							<div>
-								<button
-									type="button"
-									className="w-full border border-white p-4 hover:bg-accent-500 text-lg bg-white/25"
-									onClick={this.openLoadPartieConfig}
-								>
-									Laden
-								</button>
 							</div>
 						</div>
 					</div>

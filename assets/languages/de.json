@@ -380,6 +380,78 @@
 		[
 			"The current board state is playable.",
 			"Das aktuelle Spielbrett ist im aktuellen Zustand bespielbar."
-		],["Save as screenshot","Als Bildschirmfoto speichern"]
+		],
+		[
+			"Save as screenshot",
+			"Als Bildschirmfoto speichern"
+		],
+		[
+			"Holes",
+			"Löcher"
+		],
+		[
+			"The current game board state is not playable because there are not enough starting spaces.",
+			"Der aktuelle Spielbrett Zustand ist nicht spielbar, da zu wenig Start Felder vorhanden sind."
+		],
+		[
+			"Lembas amount",
+			"Lembas Anzahl"
+		],
+		[
+			"Editor",
+			"Editor"
+		],
+		[
+			"Startfields",
+			"Startfelder"
+		],
+		[
+			"Minimum {0}",
+			"Mindestens {0}"
+		],
+		[
+			"The current game board state is not playable because there are not enough checkpoints.",
+			"[Der aktuelle Spielbrett Zustand ist nicht spielbar, da zu wenig Kontrollpunkte vorhanden sind.]"
+		],
+		[
+			"Maximum {0}",
+			"Maximal {0}"
+		],
+		[
+			"Logo",
+			"Logo"
+		],
+		[
+			"Preset",
+			"Preset"
+		],
+		[
+			"Zoom",
+			"Zoom"
+		],
+		[
+			"Zoom in",
+			"Heranzoomen"
+		],
+		[
+			"Zoom out",
+			"Herauszoomen"
+		],
+		[
+			"Alt",
+			"Alt"
+		],
+		[
+			"River Field",
+			"Flussfeld"
+		],
+		[
+			"Field",
+			"Feld"
+		],
+		[
+			"Close Party Configurator",
+			"Partie-Konfigurator schließen"
+		]
 	]
 }
