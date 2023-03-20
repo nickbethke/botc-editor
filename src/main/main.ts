@@ -10,19 +10,9 @@
  */
 import path from 'path';
 import { app, BrowserWindow, ipcMain, shell } from 'electron';
-import { autoUpdater } from 'electron-updater';
-import log from 'electron-log';
 import { resolveHtmlPath } from './util';
 import IPCHelper from './helper/IPCHelper';
 import PresetsLoader from './helper/PresetsLoader';
-
-class AppUpdater {
-	constructor() {
-		log.transports.file.level = 'info';
-		autoUpdater.logger = log;
-		autoUpdater.checkForUpdatesAndNotify().catch(() => {});
-	}
-}
 
 let mainWindow: BrowserWindow | null = null;
 
@@ -114,7 +104,7 @@ const createWindow = async () => {
 
 	// Remove this if your app does not use auto updates
 	// eslint-disable-next-line
-	new AppUpdater();
+	// new AppUpdater();
 };
 
 /**
@@ -128,7 +118,91 @@ app.on('window-all-closed', () => {
 		app.quit();
 	}
 });
+const registerHandlers = () => {
+	ipcMain.handle('dialog:openBoardConfig', async () => {
+		return IPCHelper.handleFileOpen('board', mainWindow);
+	});
+	ipcMain.handle('dialog:openPartieConfig', async () => {
+		return IPCHelper.handleFileOpen('partie', mainWindow);
+	});
+	ipcMain.handle('dialog:savePartieConfig', async (event, ...args) => {
+		return IPCHelper.handleSavePartieConfig(args[0], mainWindow);
+	});
+	ipcMain.handle('dialog:saveBoardConfig', async (event, ...args) => {
+		return IPCHelper.handleSaveBoardConfig(args[0], mainWindow);
+	});
+	ipcMain.handle('dialog:openConfig', async () => {
+		return IPCHelper.handleFileOpen('', mainWindow);
+	});
 
+	ipcMain.handle('dialog:saveScreenshot', (event, ...args) => {
+		return IPCHelper.saveScreenShotDialog(args[0], args[1], mainWindow);
+	});
+
+	ipcMain.handle('validate:json', (event, ...args) => {
+		return IPCHelper.jsonValidate(args[0], args[1]);
+	});
+	ipcMain.handle('app-close', IPCHelper.closeApp);
+
+	ipcMain.handle('load:presets', () => {
+		return IPCHelper.loadPresets();
+	});
+	ipcMain.handle('get:isLinux', () => {
+		return IPCHelper.getOS() === 'linux';
+	});
+	ipcMain.handle('get:isMac', () => {
+		return IPCHelper.getOS() === 'darwin';
+	});
+	ipcMain.handle('get:isWin', () => {
+		return IPCHelper.getOS() === 'win32';
+	});
+	ipcMain.handle('get:os', () => {
+		return IPCHelper.getOS();
+	});
+	ipcMain.handle('get:version', () => {
+		return app.getVersion();
+	});
+	ipcMain.handle('file:openExternal', (event, ...args) => {
+		return IPCHelper.openFile(args[0]);
+	});
+	ipcMain.handle('file:openDir', (event, ...args) => {
+		return IPCHelper.openDirectory(args[0]);
+	});
+	ipcMain.handle('file:save', (event, ...args) => {
+		return IPCHelper.saveFile(args[0], args[1]);
+	});
+	ipcMain.handle('file:remove', (event, ...args) => {
+		return IPCHelper.removeFile(args[0]);
+	});
+
+	ipcMain.handle('open:homepage', () => {
+		return IPCHelper.openHomepage();
+	});
+
+	ipcMain.handle('file:getTranslation', (event, ...args) => {
+		return IPCHelper.loadLanguageFile(args[0]);
+	});
+
+	ipcMain.handle('file:openPresetDir', () => {
+		return IPCHelper.openDirectoryDirectly(
+			path.join(PresetsLoader.getAssetPath(), '/presets/')
+		);
+	});
+	ipcMain.handle('clipboard:write', (event, ...args) => {
+		return IPCHelper.clipBoardWrite(args[0]);
+	});
+
+	ipcMain.handle('get:prefetch', () => {
+		return IPCHelper.prefetch();
+	});
+
+	ipcMain.handle('update:settings', (event, ...args) => {
+		return IPCHelper.updateSettings(args[0]);
+	});
+	ipcMain.handle('beep', () => {
+		return shell.beep();
+	});
+};
 app.whenReady()
 	.then(() => {
 		createWindow();
@@ -137,89 +211,6 @@ app.whenReady()
 			// dock icon is clicked and there are no other windows openExternal.
 			if (mainWindow === null) createWindow();
 		});
-
-		ipcMain.handle('dialog:openBoardConfig', async () => {
-			return IPCHelper.handleFileOpen('board', mainWindow);
-		});
-		ipcMain.handle('dialog:openPartieConfig', async () => {
-			return IPCHelper.handleFileOpen('partie', mainWindow);
-		});
-		ipcMain.handle('dialog:savePartieConfig', async (event, ...args) => {
-			return IPCHelper.handleSavePartieConfig(args[0], mainWindow);
-		});
-		ipcMain.handle('dialog:saveBoardConfig', async (event, ...args) => {
-			return IPCHelper.handleSaveBoardConfig(args[0], mainWindow);
-		});
-		ipcMain.handle('dialog:openConfig', async () => {
-			return IPCHelper.handleFileOpen('', mainWindow);
-		});
-
-		ipcMain.handle('dialog:saveScreenshot', (event, ...args) => {
-			return IPCHelper.saveScreenShotDialog(args[0], args[1], mainWindow);
-		});
-
-		ipcMain.handle('validate:json', (event, ...args) => {
-			return IPCHelper.jsonValidate(args[0], args[1]);
-		});
-		ipcMain.handle('app-close', IPCHelper.closeApp);
-
-		ipcMain.handle('load:presets', () => {
-			return IPCHelper.loadPresets();
-		});
-		ipcMain.handle('get:isLinux', () => {
-			return IPCHelper.getOS() === 'linux';
-		});
-		ipcMain.handle('get:isMac', () => {
-			return IPCHelper.getOS() === 'darwin';
-		});
-		ipcMain.handle('get:isWin', () => {
-			return IPCHelper.getOS() === 'win32';
-		});
-		ipcMain.handle('get:os', () => {
-			return IPCHelper.getOS();
-		});
-		ipcMain.handle('get:version', () => {
-			return app.getVersion();
-		});
-		ipcMain.handle('file:openExternal', (event, ...args) => {
-			return IPCHelper.openFile(args[0]);
-		});
-		ipcMain.handle('file:openDir', (event, ...args) => {
-			return IPCHelper.openDirectory(args[0]);
-		});
-		ipcMain.handle('file:save', (event, ...args) => {
-			return IPCHelper.saveFile(args[0], args[1]);
-		});
-		ipcMain.handle('file:remove', (event, ...args) => {
-			return IPCHelper.removeFile(args[0]);
-		});
-
-		ipcMain.handle('open:homepage', () => {
-			return IPCHelper.openHomepage();
-		});
-
-		ipcMain.handle('file:getTranslation', (event, ...args) => {
-			return IPCHelper.loadLanguageFile(args[0]);
-		});
-
-		ipcMain.handle('file:openPresetDir', () => {
-			return IPCHelper.openDirectoryDirectly(
-				path.join(PresetsLoader.getAssetPath(), '/presets/')
-			);
-		});
-		ipcMain.handle('clipboard:write', (event, ...args) => {
-			return IPCHelper.clipBoardWrite(args[0]);
-		});
-
-		ipcMain.handle('get:prefetch', () => {
-			return IPCHelper.prefetch();
-		});
-
-		ipcMain.handle('update:settings', (event, ...args) => {
-			return IPCHelper.updateSettings(args[0]);
-		});
-		ipcMain.handle('beep', () => {
-			return shell.beep();
-		});
+		registerHandlers();
 	})
 	.catch(() => {});

@@ -199,7 +199,7 @@ class PartieKonfigurator extends React.Component<
 			);
 		}
 		const notWinDragger = !fullScreen ? (
-			<div className="dragger w-[100vw] h-8 bg-muted" />
+			<div className="dragger w-[100vw] h-8 absolute top-0 left-0" />
 		) : null;
 		return (
 			<div className="dark:bg-muted-800 bg-muted-600 flex flex-col">
