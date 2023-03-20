@@ -68,17 +68,17 @@ describe('a-star', () => {
 		const board: Array<Array<FieldWithPositionInterface>> = [
 			[
 				new Grass({ x: 0, y: 0 }),
-				new SauronsEye({ x: 1, y: 0 }, DirectionEnum.NORTH),
-				new StartField({ x: 2, y: 0 }, DirectionEnum.NORTH),
-			],
-			[
 				new StartField({ x: 0, y: 1 }, DirectionEnum.NORTH),
-				new Checkpoint({ x: 1, y: 1 }, 0),
-				new River({ x: 1, y: 1 }, DirectionEnum.NORTH),
+				new Grass({ x: 0, y: 2 }),
 			],
 			[
-				new Grass({ x: 0, y: 2 }),
+				new SauronsEye({ x: 1, y: 0 }, DirectionEnum.NORTH),
+				new Checkpoint({ x: 1, y: 1 }, 0),
 				new Checkpoint({ x: 1, y: 2 }, 1),
+			],
+			[
+				new StartField({ x: 2, y: 0 }, DirectionEnum.NORTH),
+				new River({ x: 2, y: 1 }, DirectionEnum.NORTH),
 				new Grass({ x: 2, y: 2 }),
 			],
 		];
@@ -139,17 +139,17 @@ describe('a-star', () => {
 		const board: Array<Array<FieldWithPositionInterface>> = [
 			[
 				new Hole({ x: 0, y: 0 }),
-				new SauronsEye({ x: 1, y: 0 }, DirectionEnum.NORTH),
-				new StartField({ x: 2, y: 0 }, DirectionEnum.NORTH),
-			],
-			[
 				new StartField({ x: 0, y: 1 }, DirectionEnum.NORTH),
-				new Checkpoint({ x: 1, y: 1 }, 0),
-				new River({ x: 1, y: 1 }, DirectionEnum.NORTH),
+				new Grass({ x: 0, y: 2 }),
 			],
 			[
-				new Grass({ x: 0, y: 2 }),
+				new SauronsEye({ x: 1, y: 0 }, DirectionEnum.NORTH),
+				new Checkpoint({ x: 1, y: 1 }, 0),
 				new Checkpoint({ x: 1, y: 2 }, 1),
+			],
+			[
+				new StartField({ x: 2, y: 0 }, DirectionEnum.NORTH),
+				new River({ x: 2, y: 1 }, DirectionEnum.NORTH),
 				new Grass({ x: 2, y: 2 }),
 			],
 		];
@@ -175,12 +175,11 @@ describe('a-star', () => {
 		const board: Array<Array<FieldWithPositionInterface>> = [
 			[
 				new SauronsEye({ x: 0, y: 0 }, DirectionEnum.NORTH),
-				new Hole({ x: 1, y: 0 }),
-				new StartField({ x: 2, y: 0 }, DirectionEnum.NORTH),
-			],
-			[
 				new Checkpoint({ x: 0, y: 1 }, DirectionEnum.NORTH),
-				new Hole({ x: 1, y: 1 }),
+			],
+			[new Hole({ x: 1, y: 0 }), new Hole({ x: 1, y: 1 })],
+			[
+				new StartField({ x: 2, y: 0 }, DirectionEnum.NORTH),
 				new StartField({ x: 2, y: 1 }, DirectionEnum.NORTH),
 			],
 		];

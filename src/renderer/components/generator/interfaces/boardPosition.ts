@@ -42,6 +42,11 @@ export function wallPosition2String(position: [Position, Position]): string {
 	return position2String(position[0]) + position2String(position[1]);
 }
 
+/**
+ * Convert Wall Array to Map
+ * @see {@link Map}
+ * @param walls
+ */
 export function wallConfig2Map(
 	walls: Array<Array<Position>>
 ): Map<string, true> {
