@@ -29,10 +29,7 @@ type JSONValidatorState = {
 	fileHasBeenEdited: boolean;
 };
 
-class JSONValidierer extends React.Component<
-	JSONValidatorProps,
-	JSONValidatorState
-> {
+class JSONValidierer extends React.Component<JSONValidatorProps, JSONValidatorState> {
 	constructor(props: JSONValidatorProps) {
 		super(props);
 
@@ -105,10 +102,7 @@ class JSONValidierer extends React.Component<
 	onChange = async (newValue: string) => {
 		const { type } = this.state;
 		try {
-			const valid = await window.electron.validate(
-				JSON.parse(newValue),
-				type
-			);
+			const valid = await window.electron.validate(JSON.parse(newValue), type);
 			if (typeof valid === 'string') {
 				this.setState({
 					codeError: valid,
@@ -119,15 +113,12 @@ class JSONValidierer extends React.Component<
 				});
 			}
 		} catch (error) {
-			if (error instanceof Error)
-				this.setState({ consoleOutput: [...[`${error.message}`]] });
+			if (error instanceof Error) this.setState({ consoleOutput: [...[`${error.message}`]] });
 		}
 		let validator;
 		if (type === 'board') {
 			try {
-				validator = new BoardConfigValidator(
-					JSON.parse(newValue) as BoardConfigInterface
-				);
+				validator = new BoardConfigValidator(JSON.parse(newValue) as BoardConfigInterface);
 				this.setState({
 					consoleOutput: [...validator.errors],
 				});
@@ -139,9 +130,7 @@ class JSONValidierer extends React.Component<
 			}
 		} else {
 			try {
-				validator = new PartieConfigValidator(
-					JSON.parse(newValue) as PartieConfigInterface
-				);
+				validator = new PartieConfigValidator(JSON.parse(newValue) as PartieConfigInterface);
 				this.setState({
 					consoleOutput: [...validator.errors],
 				});
@@ -173,9 +162,7 @@ class JSONValidierer extends React.Component<
 		if (currentFile) {
 			return (
 				<ConfirmPopup
-					label={window.languageHelper.translateVars('Save {0}?', [
-						currentFile.parsed.base,
-					])}
+					label={window.languageHelper.translateVars('Save {0}?', [currentFile.parsed.base])}
 					onConfirm={() => {
 						this.saveFile()
 							.then(() => {
@@ -208,10 +195,7 @@ class JSONValidierer extends React.Component<
 	loadingPopup = (label?: string): JSX.Element => {
 		return (
 			<Popup
-				label={
-					label ||
-					window.languageHelper.translate('Open Configuration')
-				}
+				label={label || window.languageHelper.translate('Open Configuration')}
 				content={
 					<ProgressBar
 						wrapperClass="text-center mx-auto justify-center"
@@ -267,8 +251,7 @@ class JSONValidierer extends React.Component<
 					}
 				);
 			} catch (error) {
-				if (error instanceof Error)
-					this.setState({ consoleOutput: [...[error.message]] });
+				if (error instanceof Error) this.setState({ consoleOutput: [...[error.message]] });
 			}
 		}
 		this.setState({ popup: null });
@@ -281,9 +264,7 @@ class JSONValidierer extends React.Component<
 			await window.electron.file.save(currentFile.path, code);
 		} else {
 			this.setState({
-				popup: this.loadingPopup(
-					window.languageHelper.translate('Save Configuration')
-				),
+				popup: this.loadingPopup(window.languageHelper.translate('Save Configuration')),
 			});
 			let save;
 			switch (type) {
@@ -335,20 +316,11 @@ class JSONValidierer extends React.Component<
 	};
 
 	render = () => {
-		const {
-			popup,
-			type,
-			code,
-			codeError,
-			window: cWindow,
-			consoleOutput,
-			currentFile,
-			fileHasBeenEdited,
-		} = this.state;
+		const { popup, type, code, codeError, window: cWindow, consoleOutput, currentFile, fileHasBeenEdited } = this.state;
 		const errorMsg = this.genErrorMsg(codeError);
 
 		return (
-			<div>
+			<div className="dark:bg-muted-800 bg-muted-500">
 				<div className="dragger absolute top-0 left-0 w-[100vw] h-8" />
 				<div className="flex flex-col h-[100vh]">
 					<div className="text-white w-[100vw]">
@@ -358,11 +330,7 @@ class JSONValidierer extends React.Component<
 									className="text-4xl border border-gray-600 cursor-pointer hover:bg-accent-500"
 									onClick={this.handleBackButton}
 								/>
-								<div className="text-4xl">
-									{window.languageHelper.translate(
-										'Validator'
-									)}
-								</div>
+								<div className="text-4xl">{window.languageHelper.translate('Validator')}</div>
 							</div>
 						</div>
 					</div>
@@ -372,17 +340,10 @@ class JSONValidierer extends React.Component<
 							className="bg-accent-500/25 hover:bg-accent-500 text-lg p-2 flex flex-row justify-center items-center gap-2 border-r border-gray-600"
 							onClick={this.openNewFile}
 						>
-							<VscNewFile />{' '}
-							{window.languageHelper.translate('New')}
+							<VscNewFile /> {window.languageHelper.translate('New')}
 						</button>
 						{currentFile ? (
-							<div
-								className={
-									currentFile
-										? 'border-r border-gray-600 h-full'
-										: ''
-								}
-							>
+							<div className={currentFile ? 'border-r border-gray-600 h-full' : ''}>
 								<span
 									className="text-lg p-2 h-full font-jetbrains flex flex-row justify-center items-center"
 									title={currentFile?.path}
@@ -397,16 +358,14 @@ class JSONValidierer extends React.Component<
 							className="bg-accent-500/25 hover:bg-accent-500 text-lg p-2 flex flex-row justify-center items-center gap-2 border-r border-gray-600"
 							onClick={this.openFile}
 						>
-							<VscFile />{' '}
-							{window.languageHelper.translate('Open')}
+							<VscFile /> {window.languageHelper.translate('Open')}
 						</button>
 						<button
 							type="button"
 							className="bg-accent-500/25 hover:bg-accent-500 text-lg p-2 flex flex-row justify-center items-center gap-2 border-r border-gray-600"
 							onClick={this.saveFile}
 						>
-							<VscSave />{' '}
-							{window.languageHelper.translate('Save')}
+							<VscSave /> {window.languageHelper.translate('Save')}
 						</button>
 						<p className="bg-accent-500/10 h-full text-lg p-2 flex flex-row justify-center items-center gap-2">
 							{window.languageHelper.translate('Type')}
@@ -418,14 +377,10 @@ class JSONValidierer extends React.Component<
 								value={type}
 							>
 								<option className="rounded-none" value="partie">
-									{window.languageHelper.translate(
-										'Party Configuration'
-									)}
+									{window.languageHelper.translate('Party Configuration')}
 								</option>
 								<option className="rounded-none" value="board">
-									{window.languageHelper.translate(
-										'Board Configuration'
-									)}
+									{window.languageHelper.translate('Board Configuration')}
 								</option>
 							</select>
 						</div>
@@ -450,33 +405,21 @@ class JSONValidierer extends React.Component<
 						<div className="grid xl:grid-cols-4 grid-cols-2">
 							<div className="w-full h-[280px] max-h-[280px] flex flex-col font-jetbrains border-r border-gray-600 xl:col-span-3">
 								<div className="text-white flex flex-col justify-center border-b border-gray-600 p-2">
-									<div className="text-xl pl-4">
-										{window.languageHelper.translate(
-											'JSON-Validation'
-										)}
-									</div>
+									<div className="text-xl pl-4">{window.languageHelper.translate('JSON-Validation')}</div>
 								</div>
 								<div className="w-full bg-white/10 text-white overflow-auto grow">
-									<div className="h-full max-h-full pl-2 user-select">
-										{errorMsg}
-									</div>
+									<div className="h-full max-h-full pl-2 user-select">{errorMsg}</div>
 								</div>
 							</div>
 							<div className="w-full h-[280px] max-h-[280px] flex flex-col font-jetbrains">
 								<div className="text-white flex flex-col justify-center border-b border-gray-600 p-2">
-									<div className="text-xl pl-4">
-										{window.languageHelper.translate(
-											'Errors'
-										)}
-									</div>
+									<div className="text-xl pl-4">{window.languageHelper.translate('Errors')}</div>
 								</div>
 								<div className="w-full text-white overflow-auto grow bg-white/10">
 									<div className="h-full max-h-full pl-6 pt-2">
 										<pre className="user-select">
 											{consoleOutput.map((error) => (
-												<p className="text-red-500">
-													{error}
-												</p>
+												<p className="text-red-500">{error}</p>
 											))}
 										</pre>
 									</div>
@@ -497,8 +440,7 @@ class JSONValidierer extends React.Component<
 		} else if (codeError === 'validate') {
 			errorMsg[0] = (
 				<div className="pt-1">
-					<span className="text-red-500">ERROR: </span>Code konnte
-					nicht validiert werden - kein valides JSON
+					<span className="text-red-500">ERROR: </span>Code konnte nicht validiert werden - kein valides JSON
 				</div>
 			);
 		} else {
@@ -506,19 +448,11 @@ class JSONValidierer extends React.Component<
 				let i = 0;
 				JSON.parse(codeError).forEach((e: DefinedError) => {
 					const instancePath =
-						e.instancePath !== '' ? (
-							<p className="font-black text-red-500 pt-1">
-								{`${e.instancePath}`}&nbsp;
-							</p>
-						) : null;
+						e.instancePath !== '' ? <p className="font-black text-red-500 pt-1">{`${e.instancePath}`}&nbsp;</p> : null;
 					errorMsg[i] = (
 						<div className="flex fex-cols" key={i}>
-							<p className="mr-2 pr-2 border-r pt-1 no-user-select">
-								{i + 1 < 10 ? `0${i + 1}` : i + 1}
-							</p>
-							<p className="font-black pt-1">
-								{`${e.keyword.toUpperCase()}:`}&nbsp;
-							</p>
+							<p className="mr-2 pr-2 border-r pt-1 no-user-select">{i + 1 < 10 ? `0${i + 1}` : i + 1}</p>
+							<p className="font-black pt-1">{`${e.keyword.toUpperCase()}:`}&nbsp;</p>
 							{instancePath}
 							<p className="pt-1">{e.message}</p>
 						</div>
@@ -526,8 +460,7 @@ class JSONValidierer extends React.Component<
 					i += 1;
 				});
 			} catch (error) {
-				if (error instanceof Error)
-					this.setState({ consoleOutput: [...[error.message]] });
+				if (error instanceof Error) this.setState({ consoleOutput: [...[error.message]] });
 			}
 		}
 		return errorMsg;

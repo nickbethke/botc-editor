@@ -1,7 +1,4 @@
-import BoardGenerator, {
-	BoardPosition,
-	RandomBoardStartValues,
-} from './BoardGenerator';
+import BoardGenerator, { BoardPosition, RandomBoardStartValues } from './BoardGenerator';
 import BoardConfigInterface, {
 	DirectionEnum,
 	LembasField,
@@ -122,9 +119,7 @@ class Board implements BoardConfigInterface {
 	 * generate a random valid boardConfigurator via the BoardGeneration class
 	 * @param startValues?
 	 */
-	static generateRandom(
-		startValues?: RandomBoardStartValues
-	): BoardGenerator {
+	static generateRandom(startValues?: RandomBoardStartValues): BoardGenerator {
 		return new BoardGenerator(startValues);
 	}
 }

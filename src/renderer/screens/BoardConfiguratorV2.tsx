@@ -2,21 +2,12 @@ import React from 'react';
 import Mousetrap from 'mousetrap';
 import { ParsedPath } from 'path';
 import _uniqueId from 'lodash/uniqueId';
-import TopMenu, {
-	TopMenuActions,
-} from '../components/boardConfigurator/TopMenu';
+import TopMenu, { TopMenuActions } from '../components/boardConfigurator/TopMenu';
 import BoardConfigInterface from '../components/interfaces/BoardConfigInterface';
-import LeftSidebar, {
-	LeftSidebarConfigType,
-	LeftSidebarOpenTab,
-} from '../components/boardConfigurator/LeftSidebar';
+import LeftSidebar, { LeftSidebarConfigType, LeftSidebarOpenTab } from '../components/boardConfigurator/LeftSidebar';
 import { FieldsEnum } from '../components/generator/BoardGenerator';
-import RightSidebar, {
-	RightSidebarOpenTab,
-} from '../components/boardConfigurator/RightSidebar';
-import MainEditor, {
-	FieldTypeOnClick,
-} from '../components/boardConfigurator/MainEditor';
+import RightSidebar, { RightSidebarOpenTab } from '../components/boardConfigurator/RightSidebar';
+import MainEditor, { FieldTypeOnClick } from '../components/boardConfigurator/MainEditor';
 import {
 	BoardPosition,
 	boardPosition2String,
@@ -90,10 +81,7 @@ type BoardConfiguratorV2State = {
 	warnings: WarningsMap;
 };
 
-class BoardConfiguratorV2 extends React.Component<
-	BoardConfiguratorV2Props,
-	BoardConfiguratorV2State
-> {
+class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, BoardConfiguratorV2State> {
 	static defaultBoard: BoardConfigInterface = {
 		height: 2,
 		width: 2,
@@ -145,19 +133,18 @@ class BoardConfiguratorV2 extends React.Component<
 		};
 		this.addEventListeners = this.addEventListeners.bind(this);
 		this.onTopMenuAction = this.onTopMenuAction.bind(this);
-		this.handleOnFieldOrWallClick =
-			this.handleOnFieldOrWallClick.bind(this);
+		this.handleOnFieldOrWallClick = this.handleOnFieldOrWallClick.bind(this);
 		document.querySelector('html')?.classList.add('dark');
 	}
 
 	static get defaultProps() {
-		return { config: BoardConfiguratorV2.defaultBoard, file: null };
+		return {
+			config: BoardConfiguratorV2.defaultBoard,
+			file: null,
+		};
 	}
 
-	componentDidUpdate(
-		prevProps: Readonly<BoardConfiguratorV2Props>,
-		prevState: Readonly<BoardConfiguratorV2State>
-	) {
+	componentDidUpdate(prevProps: Readonly<BoardConfiguratorV2Props>, prevState: Readonly<BoardConfiguratorV2State>) {
 		const {
 			sideBarTabLeft,
 			sidebars,
@@ -233,42 +220,23 @@ class BoardConfiguratorV2 extends React.Component<
 	handleOnFieldOrWallClick: FieldTypeOnClick = (type, position) => {
 		const { currentTool, config } = this.state;
 		if (type === 'field') {
-			this.handleFieldPlacement(
-				position as BoardPosition,
-				config,
-				currentTool
-			);
+			this.handleFieldPlacement(position as BoardPosition, config, currentTool);
 		} else if (type === 'wall') {
-			this.handleWallPlacement(
-				position as [BoardPosition, BoardPosition],
-				config,
-				currentTool
-			);
+			this.handleWallPlacement(position as [BoardPosition, BoardPosition], config, currentTool);
 		}
 	};
 
-	private handleFieldPlacement(
-		position: BoardPosition,
-		config: BoardConfigInterface,
-		currentTool: EditorToolType
-	) {
+	private handleFieldPlacement(position: BoardPosition, config: BoardConfigInterface, currentTool: EditorToolType) {
 		if (currentTool === 'delete') {
 			this.handleFieldDelete(position, config);
 		} else if (currentTool === 'edit') {
 			this.handleFieldEdit(position, config);
 		} else {
-			this.handleFieldPlacing(
-				position,
-				config,
-				currentTool as FieldsEnum
-			);
+			this.handleFieldPlacing(position, config, currentTool as FieldsEnum);
 		}
 	}
 
-	private handleFieldDelete(
-		position: BoardPosition,
-		config: BoardConfigInterface
-	) {
+	private handleFieldDelete(position: BoardPosition, config: BoardConfigInterface) {
 		const type = getFieldType(position, config);
 		switch (type) {
 			case FieldsEnum.EYE:
@@ -293,19 +261,11 @@ class BoardConfiguratorV2 extends React.Component<
 		}
 	}
 
-	private handleFieldEdit(
-		position: BoardPosition,
-		config: BoardConfigInterface,
-		ignorePrev = false
-	) {
+	private handleFieldEdit(position: BoardPosition, config: BoardConfigInterface, ignorePrev = false) {
 		const positionString = boardPosition2String(position);
 
 		const { fieldInEdit } = this.state;
-		if (
-			!ignorePrev &&
-			fieldInEdit &&
-			positionString === boardPosition2String(fieldInEdit)
-		) {
+		if (!ignorePrev && fieldInEdit && positionString === boardPosition2String(fieldInEdit)) {
 			this.setState({
 				fieldInEdit: null,
 				sideBarTabLeftConfigType: 'global',
@@ -364,11 +324,7 @@ class BoardConfiguratorV2 extends React.Component<
 		}
 	}
 
-	private handleFieldPlacing(
-		position: BoardPosition,
-		config: BoardConfigInterface,
-		currentTool: FieldsEnum
-	) {
+	private handleFieldPlacing(position: BoardPosition, config: BoardConfigInterface, currentTool: FieldsEnum) {
 		switch (currentTool) {
 			case FieldsEnum.EYE:
 				this.onConfigUpdate(moveSauronsEye(position, config));
@@ -404,10 +360,7 @@ class BoardConfiguratorV2 extends React.Component<
 			if (!wallMap.get(positionString)) {
 				this.onConfigUpdate({
 					...config,
-					walls: [
-						...config.walls,
-						wallBoardPosition2WallPosition(position),
-					],
+					walls: [...config.walls, wallBoardPosition2WallPosition(position)],
 				});
 			}
 			if (wallMap.get(positionString)) {
@@ -438,10 +391,7 @@ class BoardConfiguratorV2 extends React.Component<
 						title: window.languageHelper.translate('Pathfinding'),
 						content: window.languageHelper.translateVars(
 							'The current board state is not playable, because {0} to {1} has no valid path.',
-							[
-								`[${error.start.x}, ${error.start.y}]`,
-								`[${error.end.x}, ${error.end.y}]`,
-							]
+							[`[${error.start.x}, ${error.start.y}]`, `[${error.end.x}, ${error.end.y}]`]
 						),
 						fields: [error.start, error.end],
 					});
@@ -449,9 +399,7 @@ class BoardConfiguratorV2 extends React.Component<
 					newWarnings.set(_uniqueId('warning-'), {
 						type: Warnings.pathImpossible,
 						title: window.languageHelper.translate('Pathfinding'),
-						content: window.languageHelper.translate(
-							'The current board state is not playable.'
-						),
+						content: window.languageHelper.translate('The current board state is not playable.'),
 					});
 				}
 			}
@@ -460,24 +408,20 @@ class BoardConfiguratorV2 extends React.Component<
 		if (handledConfig.startFields.length < 2) {
 			newWarnings.set(_uniqueId('warning-'), {
 				type: Warnings.configurationInvalid,
-				title: window.languageHelper.translate('Startfields'),
+				title: window.languageHelper.translate('Start fields'),
 				content: window.languageHelper.translate(
 					'The current game board state is not playable because there are not enough starting spaces.'
 				),
-				helper: [
-					window.languageHelper.translateVars('Minimum {0}', ['1']),
-				],
+				helper: [window.languageHelper.translateVars('Minimum {0}', ['1'])],
 			});
 		} else if (handledConfig.startFields.length > 6) {
 			newWarnings.set(_uniqueId('warning-'), {
 				type: Warnings.configurationInvalid,
-				title: window.languageHelper.translate('Startfields'),
+				title: window.languageHelper.translate('Start fields'),
 				content: window.languageHelper.translate(
 					'The current game board state is invalid because there are too many starting spaces.'
 				),
-				helper: [
-					window.languageHelper.translateVars('Maximum {0}', ['6']),
-				],
+				helper: [window.languageHelper.translateVars('Maximum {0}', ['6'])],
 			});
 		}
 
@@ -488,9 +432,7 @@ class BoardConfiguratorV2 extends React.Component<
 				content: window.languageHelper.translate(
 					'The current game board state is not playable because there are not enough checkpoints.'
 				),
-				helper: [
-					window.languageHelper.translateVars('Minimum {0}', ['1']),
-				],
+				helper: [window.languageHelper.translateVars('Minimum {0}', ['1'])],
 			});
 		}
 
@@ -586,28 +528,19 @@ class BoardConfiguratorV2 extends React.Component<
 			case 'closeSaveCurrent':
 				return (
 					<ConfirmPopupV2
-						title={window.languageHelper.translate(
-							'Close Board Configurator'
-						)}
-						abortButtonText={window.languageHelper.translate(
-							'Cancel'
-						)}
+						title={window.languageHelper.translate('Close Board Configurator')}
+						abortButtonText={window.languageHelper.translate('Cancel')}
 						onAbort={() => {
 							this.setState({ popup: null });
 						}}
-						confirmButtonText={window.languageHelper.translate(
-							'Discard'
-						)}
+						confirmButtonText={window.languageHelper.translate('Discard')}
 						onConfirm={() => {
 							const { onClose } = this.props;
 							onClose();
 						}}
 						position={popupPosition}
 						onPositionChange={(position, callback) => {
-							this.setState(
-								{ popupPosition: position },
-								callback
-							);
+							this.setState({ popupPosition: position }, callback);
 						}}
 						onDimensionChange={(dimension) => {
 							this.setState({ popupDimension: dimension });
@@ -626,22 +559,16 @@ class BoardConfiguratorV2 extends React.Component<
 				return (
 					<ConfirmPopupV2
 						title={window.languageHelper.translate('New Config')}
-						abortButtonText={window.languageHelper.translate(
-							'Cancel'
-						)}
+						abortButtonText={window.languageHelper.translate('Cancel')}
 						onAbort={() => {
 							this.setState({ popup: null });
 						}}
-						confirmButtonText={window.languageHelper.translate(
-							'Discard'
-						)}
+						confirmButtonText={window.languageHelper.translate('Discard')}
 						onConfirm={() => {
 							if (popup === 'newRandomFileSaveCurrent') {
 								this.setState({ popup: 'newFromRandom' });
 							} else {
-								this.onConfigUpdate(
-									BoardConfiguratorV2.defaultBoard
-								);
+								this.onConfigUpdate(BoardConfiguratorV2.defaultBoard);
 								this.setState({
 									popup: null,
 									file: null,
@@ -651,10 +578,7 @@ class BoardConfiguratorV2 extends React.Component<
 						}}
 						position={popupPosition}
 						onPositionChange={(position, callback) => {
-							this.setState(
-								{ popupPosition: position },
-								callback
-							);
+							this.setState({ popupPosition: position }, callback);
 						}}
 						onDimensionChange={(dimension) => {
 							this.setState({ popupDimension: dimension });
@@ -681,10 +605,7 @@ class BoardConfiguratorV2 extends React.Component<
 						}}
 						position={popupPosition}
 						onPositionChange={(position, callback) => {
-							this.setState(
-								{ popupPosition: position },
-								callback
-							);
+							this.setState({ popupPosition: position }, callback);
 						}}
 						onDimensionChange={(dimension) => {
 							this.setState({ popupDimension: dimension });
@@ -710,10 +631,7 @@ class BoardConfiguratorV2 extends React.Component<
 						}}
 						position={popupPosition}
 						onPositionChange={(position, callback) => {
-							this.setState(
-								{ popupPosition: position },
-								callback
-							);
+							this.setState({ popupPosition: position }, callback);
 						}}
 						onDimensionChange={(dimension) => {
 							this.setState({ popupDimension: dimension });
@@ -761,9 +679,7 @@ class BoardConfiguratorV2 extends React.Component<
 		const { file, fileSaved, config } = this.state;
 		if (!fileSaved) {
 			if (file) {
-				window.electron.file
-					.save(file.path, JSON.stringify(config, null, 4))
-					.catch(() => {});
+				window.electron.file.save(file.path, JSON.stringify(config, null, 4)).catch(() => {});
 				this.setState({ fileSaved: true });
 			} else {
 				window.electron.dialog
@@ -787,17 +703,13 @@ class BoardConfiguratorV2 extends React.Component<
 		Mousetrap.bind('alt+1', () => {
 			const { sideBarTabLeft } = this.state;
 			this.setState({
-				sideBarTabLeft:
-					sideBarTabLeft === 'settings' ? null : 'settings',
+				sideBarTabLeft: sideBarTabLeft === 'settings' ? null : 'settings',
 			});
 		});
 		Mousetrap.bind('alt+2', () => {
 			const { sideBarTabLeft } = this.state;
 			this.setState({
-				sideBarTabLeft:
-					sideBarTabLeft === 'checkpointOrder'
-						? null
-						: 'checkpointOrder',
+				sideBarTabLeft: sideBarTabLeft === 'checkpointOrder' ? null : 'checkpointOrder',
 			});
 		});
 		Mousetrap.bind('alt+3', () => {
@@ -839,17 +751,13 @@ class BoardConfiguratorV2 extends React.Component<
 		Mousetrap.bind('alt+-', () => {
 			const { sideBarTabRight } = this.state;
 			this.setState({
-				sideBarTabRight:
-					sideBarTabRight === 'warnings' ? null : 'warnings',
+				sideBarTabRight: sideBarTabRight === 'warnings' ? null : 'warnings',
 			});
 		});
 		Mousetrap.bind('alt++', () => {
 			const { sideBarTabRight } = this.state;
 			this.setState({
-				sideBarTabRight:
-					sideBarTabRight === 'configPreview'
-						? null
-						: 'configPreview',
+				sideBarTabRight: sideBarTabRight === 'configPreview' ? null : 'configPreview',
 			});
 		});
 
@@ -882,34 +790,22 @@ class BoardConfiguratorV2 extends React.Component<
 		if (fieldInEdit) {
 			Mousetrap.bind('up', () => {
 				if (fieldInEdit && fieldInEdit.y > 0) {
-					this.handleFieldEdit(
-						{ y: fieldInEdit.y - 1, x: fieldInEdit.x },
-						config
-					);
+					this.handleFieldEdit({ y: fieldInEdit.y - 1, x: fieldInEdit.x }, config);
 				}
 			});
 			Mousetrap.bind('down', () => {
 				if (fieldInEdit && fieldInEdit.y < config.height - 1) {
-					this.handleFieldEdit(
-						{ y: fieldInEdit.y + 1, x: fieldInEdit.x },
-						config
-					);
+					this.handleFieldEdit({ y: fieldInEdit.y + 1, x: fieldInEdit.x }, config);
 				}
 			});
 			Mousetrap.bind('left', () => {
 				if (fieldInEdit && fieldInEdit.x > 0) {
-					this.handleFieldEdit(
-						{ y: fieldInEdit.y, x: fieldInEdit.x - 1 },
-						config
-					);
+					this.handleFieldEdit({ y: fieldInEdit.y, x: fieldInEdit.x - 1 }, config);
 				}
 			});
 			Mousetrap.bind('right', () => {
 				if (fieldInEdit && fieldInEdit.x < config.width - 1) {
-					this.handleFieldEdit(
-						{ y: fieldInEdit.y, x: fieldInEdit.x + 1 },
-						config
-					);
+					this.handleFieldEdit({ y: fieldInEdit.y, x: fieldInEdit.x + 1 }, config);
 				}
 			});
 		}
@@ -960,38 +856,26 @@ class BoardConfiguratorV2 extends React.Component<
 		} = this.state;
 		this.addEventListeners().catch(() => {});
 		const topMenuHeight = this.getTopMenuHeight(settings.darkMode);
-		const mainHeight =
-			windowDimensions.height -
-			(os === 'win32' ? 32 + topMenuHeight : topMenuHeight);
-		const mainWidth =
-			windowDimensions.width - (sidebars.left + sidebars.right);
+		const mainHeight = windowDimensions.height - (os === 'win32' ? 32 + topMenuHeight : topMenuHeight);
+		const mainWidth = windowDimensions.width - (sidebars.left + sidebars.right);
 		return (
 			<section className="text-white font-lato dark:bg-muted-800 bg-muted-600">
 				{os === 'win32' ? (
 					<div className="dragger w-[100vw] h-8 bg-muted flex items-center px-2 text-sm">
 						{window.languageHelper.translate('Board-Configurator')}
 						{' - '}
-						{file
-							? file.path
-							: window.languageHelper.translate('Unsaved File')}
+						{file ? file.path : window.languageHelper.translate('Unsaved File')}
 						{fileSaved ? '' : ` *`}
 					</div>
 				) : null}
-				<div
-					className={`${
-						popup !== null && 'blur'
-					} transition transition-[filter]`}
-				>
+				<div className={`${popup !== null && 'blur'} transition transition-[filter]`}>
 					<div
 						className={`dark:bg-muted-800 bg-muted-500 dark:border-0 border-t border-muted-400 px-1 ${
 							os === 'darwin' ? 'pl-24' : ''
 						}`}
 						style={{ width: `${windowDimensions.width}px` }}
 					>
-						<TopMenu
-							onAction={this.onTopMenuAction}
-							darkMode={settings.darkMode}
-						/>
+						<TopMenu onAction={this.onTopMenuAction} darkMode={settings.darkMode} />
 					</div>
 					<div
 						className="flex flex-row border-t dark:border-muted-700 border-muted-400"
@@ -1015,10 +899,7 @@ class BoardConfiguratorV2 extends React.Component<
 								openTab={sideBarTabLeft}
 								currentTool={currentTool}
 								toolChange={(tool) => {
-									if (
-										tool === 'edit' &&
-										currentTool !== 'edit'
-									) {
+									if (tool === 'edit' && currentTool !== 'edit') {
 										this.setState({
 											currentTool: tool,
 											fieldInEdit: null,
@@ -1050,9 +931,7 @@ class BoardConfiguratorV2 extends React.Component<
 								onZoom={(zoom) => {
 									this.setState({ mainEditorZoom: zoom });
 								}}
-								onFieldOrWallClick={
-									this.handleOnFieldOrWallClick
-								}
+								onFieldOrWallClick={this.handleOnFieldOrWallClick}
 								fieldInEdit={fieldInEdit}
 								onChangeToEdit={(position) => {
 									this.setState(
@@ -1060,11 +939,7 @@ class BoardConfiguratorV2 extends React.Component<
 											currentTool: 'edit',
 										},
 										() => {
-											this.handleFieldEdit(
-												position,
-												config,
-												true
-											);
+											this.handleFieldEdit(position, config, true);
 										}
 									);
 								}}

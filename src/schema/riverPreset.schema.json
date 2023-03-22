@@ -7,6 +7,16 @@
 		"name": {
 			"type": "string"
 		},
+		"width": {
+			"type": "number",
+			"minimum": 1,
+			"maximum": 20
+		},
+		"height": {
+			"type": "number",
+			"minimum": 1,
+			"maximum": 20
+		},
 		"data": {
 			"type": "array",
 			"items": {
@@ -40,6 +50,8 @@
 	},
 	"required": [
 		"data",
-		"name"
+		"name",
+		"width",
+		"height"
 	]
 }

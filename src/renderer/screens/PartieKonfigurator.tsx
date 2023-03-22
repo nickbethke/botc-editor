@@ -34,10 +34,7 @@ type PartieKonfiguratorState = {
 };
 
 // TODO: Translations
-class PartieKonfigurator extends React.Component<
-	PartieKonfiguratorProps,
-	PartieKonfiguratorState
-> {
+class PartieKonfigurator extends React.Component<PartieKonfiguratorProps, PartieKonfiguratorState> {
 	private default: PartieConfigInterface = {
 		maxRounds: 0,
 		reviveRounds: 0,
@@ -75,13 +72,9 @@ class PartieKonfigurator extends React.Component<
 		};
 	}
 
-	componentDidUpdate(
-		prevProps: Readonly<PartieKonfiguratorProps>,
-		prevState: Readonly<PartieKonfiguratorState>
-	) {
+	componentDidUpdate(prevProps: Readonly<PartieKonfiguratorProps>, prevState: Readonly<PartieKonfiguratorState>) {
 		const { popupLeave: prePopupLeave } = prevState;
-		const { popupPosition, popupDimension, windowDimensions, popupLeave } =
-			this.state;
+		const { popupPosition, popupDimension, windowDimensions, popupLeave } = this.state;
 		const { os } = this.props;
 		if (popupPosition.x < 0) {
 			this.setState({ popupPosition: { x: 0, y: popupPosition.y } });
@@ -137,10 +130,7 @@ class PartieKonfigurator extends React.Component<
 		const { values } = this.state;
 		const json = JSON.stringify({ ...this.default, ...values }, null, 4);
 		const answer = await window.electron.dialog.savePartieConfig(json);
-		if (answer)
-			this.notification = (
-				<Notification label="Erfolgreich gespeichert" />
-			);
+		if (answer) this.notification = <Notification label="Erfolgreich gespeichert" />;
 		this.setState({ values: { ...this.default, ...values } });
 	};
 
@@ -152,17 +142,14 @@ class PartieKonfigurator extends React.Component<
 			});
 			this.notification = <Notification label="Erfolgreich geladen" />;
 		} else {
-			this.notification = (
-				<Error label="Laden der Datei fehlgeschlagen!" />
-			);
+			this.notification = <Error label="Laden der Datei fehlgeschlagen!" />;
 		}
 	};
 
 	render = () => {
 		let { values } = this.state;
 		const { popupLeave, popupPosition } = this.state;
-		const { loadedValues, os, settings, onSettingsUpdate, fullScreen } =
-			this.props;
+		const { loadedValues, os, settings, onSettingsUpdate, fullScreen } = this.props;
 
 		if (loadedValues) {
 			values = { ...this.default, ...loadedValues };
@@ -173,9 +160,7 @@ class PartieKonfigurator extends React.Component<
 		if (popupLeave) {
 			popupLeaveR = (
 				<ConfirmPopupV2
-					title={window.languageHelper.translate(
-						'Close Party Configurator'
-					)}
+					title={window.languageHelper.translate('Close Party Configurator')}
 					onConfirm={this.backToHomeScreen}
 					onAbort={this.abortBackToHomeScreen}
 					settings={settings}
@@ -186,9 +171,7 @@ class PartieKonfigurator extends React.Component<
 						this.setState({ popupDimension: dimension });
 					}}
 					position={popupPosition}
-					confirmButtonText={window.languageHelper.translate(
-						'Discard'
-					)}
+					confirmButtonText={window.languageHelper.translate('Discard')}
 					os={os}
 					abortButtonText={window.languageHelper.translate('Cancel')}
 				>
@@ -198,34 +181,21 @@ class PartieKonfigurator extends React.Component<
 				</ConfirmPopupV2>
 			);
 		}
-		const notWinDragger = !fullScreen ? (
-			<div className="dragger w-[100vw] h-8 absolute top-0 left-0" />
-		) : null;
+		const notWinDragger = !fullScreen ? <div className="dragger w-[100vw] h-8 absolute top-0 left-0" /> : null;
 		return (
-			<div className="dark:bg-muted-800 bg-muted-600 flex flex-col">
-				{os === 'win32' ? (
-					<div className="dragger w-[100vw] h-8 bg-muted" />
-				) : (
-					notWinDragger
-				)}
+			<div className="dark:bg-muted-800 bg-muted-600 flex flex-col duration-500">
+				{os === 'win32' ? <div className="dragger w-[100vw] h-8 bg-muted" /> : notWinDragger}
 				{popupLeaveR}
 				<div
 					className="text-white grid grid-cols-3 2xl:grid-cols-2 gap-0 grow w-[100vw]"
 					style={{
-						minHeight:
-							fullScreen && os !== 'win32'
-								? '100vh'
-								: 'calc(100vh - 32px)',
+						minHeight: fullScreen && os !== 'win32' ? '100vh' : 'calc(100vh - 32px)',
 					}}
 				>
 					<div
-						className="transition transition-all"
+						className="transition transition-all duration-500"
 						style={{
-							backgroundImage: `url(${
-								settings.darkMode
-									? backgroundImageDark
-									: backgroundImage
-							})`,
+							backgroundImage: `url(${settings.darkMode ? backgroundImageDark : backgroundImage})`,
 							backgroundSize: 'cover',
 						}}
 					/>
@@ -250,12 +220,8 @@ class PartieKonfigurator extends React.Component<
 								}}
 							>
 								<VscColorMode
-									title={window.languageHelper.translate(
-										'Dark Mode'
-									)}
-									className={`${
-										settings.darkMode ? '' : 'rotate-180'
-									} transition transition-all transform-gpu text-lg`}
+									title={window.languageHelper.translate('Dark Mode')}
+									className={`${settings.darkMode ? '' : 'rotate-180'} transition transition-all transform-gpu text-lg`}
 								/>
 							</button>
 						</div>
@@ -279,9 +245,7 @@ class PartieKonfigurator extends React.Component<
 								</button>
 							</div>
 						</div>
-						{this.notification ? (
-							<div>{this.notification}</div>
-						) : null}
+						{this.notification ? <div>{this.notification}</div> : null}
 						<div className="grid grid-cols-2 gap-8">
 							<div>
 								<InputLabel
@@ -311,9 +275,7 @@ class PartieKonfigurator extends React.Component<
 											popupLeave: false,
 											values: {
 												...values,
-												maxRounds: Number.parseFloat(
-													value.toString()
-												),
+												maxRounds: Number.parseFloat(value.toString()),
 											},
 										});
 									}}
@@ -340,9 +302,7 @@ class PartieKonfigurator extends React.Component<
 										this.setState({
 											values: {
 												...values,
-												startLembas: Number.parseFloat(
-													value.toString()
-												),
+												startLembas: Number.parseFloat(value.toString()),
 											},
 										});
 									}}
@@ -358,9 +318,7 @@ class PartieKonfigurator extends React.Component<
 										this.setState({
 											values: {
 												...values,
-												shotLembas: Number.parseFloat(
-													value.toString()
-												),
+												shotLembas: Number.parseFloat(value.toString()),
 											},
 										});
 									}}
@@ -375,10 +333,7 @@ class PartieKonfigurator extends React.Component<
 										this.setState({
 											values: {
 												...values,
-												riverMoveCount:
-													Number.parseFloat(
-														value.toString()
-													),
+												riverMoveCount: Number.parseFloat(value.toString()),
 											},
 										});
 									}}
@@ -396,9 +351,7 @@ class PartieKonfigurator extends React.Component<
 										this.setState({
 											values: {
 												...values,
-												reviveRounds: Number.parseFloat(
-													value.toString()
-												),
+												reviveRounds: Number.parseFloat(value.toString()),
 											},
 										});
 									}}
@@ -416,10 +369,7 @@ class PartieKonfigurator extends React.Component<
 										this.setState({
 											values: {
 												...values,
-												characterChoiceTimeout:
-													Number.parseFloat(
-														value.toString()
-													),
+												characterChoiceTimeout: Number.parseFloat(value.toString()),
 											},
 										});
 									}}
@@ -439,10 +389,7 @@ class PartieKonfigurator extends React.Component<
 										this.setState({
 											values: {
 												...values,
-												cardSelectionTimeout:
-													Number.parseFloat(
-														value.toString()
-													),
+												cardSelectionTimeout: Number.parseFloat(value.toString()),
 											},
 										});
 									}}
@@ -460,10 +407,7 @@ class PartieKonfigurator extends React.Component<
 										this.setState({
 											values: {
 												...values,
-												serverIngameDelay:
-													Number.parseFloat(
-														value.toString()
-													),
+												serverIngameDelay: Number.parseFloat(value.toString()),
 											},
 										});
 									}}

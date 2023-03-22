@@ -14,11 +14,7 @@ const CheckpointSortableV2 = (props: CheckpointSortableV2Props) => {
 	const [items, setItems] = useState(checkpoints);
 	const ref = React.createRef<HTMLDivElement>();
 
-	function arrayMoveMutable<T>(
-		array: T[],
-		fromIndex: number,
-		toIndex: number
-	) {
+	function arrayMoveMutable<T>(array: T[], fromIndex: number, toIndex: number) {
 		const startIndex = fromIndex < 0 ? array.length + fromIndex : fromIndex;
 
 		if (startIndex >= 0 && startIndex < array.length) {
@@ -29,22 +25,14 @@ const CheckpointSortableV2 = (props: CheckpointSortableV2Props) => {
 		}
 	}
 
-	function arrayMoveImmutable<T>(
-		array: T[],
-		fromIndex: number,
-		toIndex: number
-	): T[] {
+	function arrayMoveImmutable<T>(array: T[], fromIndex: number, toIndex: number): T[] {
 		const nArray = [...array];
 		arrayMoveMutable(nArray, fromIndex, toIndex);
 		return nArray;
 	}
 
 	const onSortEnd = (oldIndex: number, newIndex: number) => {
-		const newCheckpointOrder = arrayMoveImmutable(
-			items,
-			oldIndex,
-			newIndex
-		);
+		const newCheckpointOrder = arrayMoveImmutable(items, oldIndex, newIndex);
 		const helperArray = [];
 		for (let i = 0; i < newCheckpointOrder.length; i += 1) {
 			helperArray[i] = newCheckpointOrder[i];
@@ -62,8 +50,7 @@ const CheckpointSortableV2 = (props: CheckpointSortableV2Props) => {
 			lockAxis="y"
 			onSortEnd={onSortEnd}
 			className={`${
-				items.length > 0 &&
-				'p-2 border dark:border-muted-700 border-muted-400'
+				items.length > 0 && 'p-2 border dark:border-muted-700 border-muted-400'
 			} flex flex-col gap-2 text-[14px]`}
 			draggedItemClassName="dragged text-white bg-muted"
 			customHolderRef={ref}
@@ -75,9 +62,7 @@ const CheckpointSortableV2 = (props: CheckpointSortableV2Props) => {
 				const order = index;
 				const text = (
 					<div className="flex gap-2 items-center">
-						<span>
-							{order + 1 < 10 ? `0${order + 1}` : order + 1}.
-						</span>
+						<span>{order + 1 < 10 ? `0${order + 1}` : order + 1}.</span>
 						<span>Checkpoint</span>
 						<span>
 							[{x}, {y}]

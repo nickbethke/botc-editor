@@ -1,7 +1,4 @@
-import {
-	Direction,
-	DirectionEnum,
-} from '../../interfaces/BoardConfigInterface';
+import { Direction, DirectionEnum } from '../../interfaces/BoardConfigInterface';
 
 class DirectionHelper {
 	/**

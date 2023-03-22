@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-	VscCircleLargeOutline,
+	VscCircleLarge,
 	VscEdit,
 	VscEye,
 	VscFolder,
@@ -15,9 +15,7 @@ import { BiWater } from 'react-icons/bi';
 import { BsCursor } from 'react-icons/bs';
 import { FieldsEnum } from '../generator/BoardGenerator';
 import SidebarMenuItem, { SidebarMenuItemSeparator } from './SidebarMenuItem';
-import BoardConfigInterface, {
-	DirectionEnum,
-} from '../interfaces/BoardConfigInterface';
+import BoardConfigInterface, { DirectionEnum } from '../interfaces/BoardConfigInterface';
 import InputLabel from '../InputLabel';
 import { EditorToolType } from '../../screens/BoardConfiguratorV2';
 import { BoardPosition } from '../generator/interfaces/boardPosition';
@@ -43,11 +41,7 @@ type LeftSidebarProps = {
 	fieldInEdit: BoardPosition | null;
 };
 
-export type LeftSidebarOpenTab =
-	| 'presets'
-	| 'settings'
-	| 'checkpointOrder'
-	| null;
+export type LeftSidebarOpenTab = 'presets' | 'settings' | 'checkpointOrder' | null;
 export type LeftSidebarConfigType = 'global' | 'amount' | 'direction';
 
 class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
@@ -102,25 +96,15 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 						<select
 							id="select-direction"
 							className="bg-transparent border-b-2 text-lg px-4 py-2 w-full"
-							value={DirectionHelper.stringToDirEnum(
-								directionField?.direction || 'NORTH'
-							)}
+							value={DirectionHelper.stringToDirEnum(directionField?.direction || 'NORTH')}
 							onChange={(event) => {
 								this.onDirectionChange(event);
 							}}
 						>
-							<option value={DirectionEnum.NORTH}>
-								{window.languageHelper.translate('North')}
-							</option>
-							<option value={DirectionEnum.EAST}>
-								{window.languageHelper.translate('East')}
-							</option>
-							<option value={DirectionEnum.SOUTH}>
-								{window.languageHelper.translate('South')}
-							</option>
-							<option value={DirectionEnum.WEST}>
-								{window.languageHelper.translate('West')}
-							</option>
+							<option value={DirectionEnum.NORTH}>{window.languageHelper.translate('North')}</option>
+							<option value={DirectionEnum.EAST}>{window.languageHelper.translate('East')}</option>
+							<option value={DirectionEnum.SOUTH}>{window.languageHelper.translate('South')}</option>
+							<option value={DirectionEnum.WEST}>{window.languageHelper.translate('West')}</option>
 						</select>
 					</div>
 				</div>
@@ -133,10 +117,7 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 		const { config, onConfigUpdate, fieldInEdit } = this.props;
 		if (fieldInEdit) {
 			const type = getFieldType(fieldInEdit, config);
-			const direction = Number.parseInt(
-				event.target.value,
-				10
-			) as DirectionEnum;
+			const direction = Number.parseInt(event.target.value, 10) as DirectionEnum;
 
 			if (type === FieldsEnum.EYE) {
 				onConfigUpdate({
@@ -148,14 +129,10 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 				});
 			}
 			if (type === FieldsEnum.RIVER) {
-				onConfigUpdate(
-					updateRiverFieldDirection(config, fieldInEdit, direction)
-				);
+				onConfigUpdate(updateRiverFieldDirection(config, fieldInEdit, direction));
 			}
 			if (type === FieldsEnum.START) {
-				onConfigUpdate(
-					updateStartFieldDirection(config, fieldInEdit, direction)
-				);
+				onConfigUpdate(updateStartFieldDirection(config, fieldInEdit, direction));
 			}
 		}
 	};
@@ -171,21 +148,13 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 					</div>
 					<div className="p-4 flex flex-col gap-4">
 						<InputLabel
-							label={window.languageHelper.translate(
-								'Lembas amount'
-							)}
+							label={window.languageHelper.translate('Lembas amount')}
 							type="range"
 							value={amountField ? amountField.amount : 0}
 							min={0}
 							max={20}
 							onChange={(value) => {
-								onConfigUpdate(
-									updateLembasFieldAmount(
-										config,
-										fieldInEdit,
-										value
-									)
-								);
+								onConfigUpdate(updateLembasFieldAmount(config, fieldInEdit, value));
 							}}
 						/>
 					</div>
@@ -375,7 +344,7 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 				<SidebarMenuItem
 					label={window.languageHelper.translate('Hole')}
 					open={currentTool === FieldsEnum.HOLE}
-					icon={<VscCircleLargeOutline />}
+					icon={<VscCircleLarge />}
 					onClick={() => {
 						this.handleCurrentToolChange(FieldsEnum.HOLE);
 					}}

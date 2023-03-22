@@ -8,10 +8,7 @@ type NotificationState = {
 	visible: boolean;
 };
 
-class Notification extends React.Component<
-	NotificationProps,
-	NotificationState
-> {
+class Notification extends React.Component<NotificationProps, NotificationState> {
 	constructor(props: NotificationProps) {
 		super(props);
 		this.state = { visible: true };

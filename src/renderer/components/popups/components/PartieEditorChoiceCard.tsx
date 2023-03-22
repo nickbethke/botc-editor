@@ -11,10 +11,7 @@ type PartieEditorChoiceCardState = {
 	hover: boolean;
 };
 
-class PartieEditorChoiceCard extends React.Component<
-	PartieEditorChoiceCardProps,
-	PartieEditorChoiceCardState
-> {
+class PartieEditorChoiceCard extends React.Component<PartieEditorChoiceCardProps, PartieEditorChoiceCardState> {
 	constructor(props: PartieEditorChoiceCardProps) {
 		super(props);
 		this.state = { hover: false };
@@ -50,18 +47,14 @@ class PartieEditorChoiceCard extends React.Component<
 					/>
 					<div
 						className={`transition-all absolute top-0 left-0 w-full h-full${
-							hover
-								? ' bg-background-800/0'
-								: ' bg-background-800/50'
+							hover ? ' bg-background-800/0' : ' bg-background-800/50'
 						}`}
 					/>
 				</div>
 				<div className="z-20 absolute top-0 left-0 h-full w-full">
 					<div
 						className={`transition-all absolute bottom-0 text-center w-full text-xl${
-							hover
-								? ' bg-accent-500 p-8'
-								: ' bg-background-800/50 p-4'
+							hover ? ' bg-accent-500 p-8' : ' bg-background-800/50 p-4'
 						}`}
 					>
 						{text}

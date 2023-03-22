@@ -30,9 +30,7 @@ function Warning(props: WarningProps) {
 	const { title, content, helper, fields, onFieldSelect } = props;
 	return (
 		<div className="m-2 text-sm border dark:border-muted-700 border-muted-400 rounded flex flex-col dark:bg-muted-800 bg-muted-600">
-			<div className="border-b dark:border-muted-700 border-muted-400 px-2 py-1">
-				{title}
-			</div>
+			<div className="border-b dark:border-muted-700 border-muted-400 px-2 py-1">{title}</div>
 			<div className="px-2 py-1">{content}</div>
 			{fields ? (
 				<div className="flex gap-2 px-2 py-1 mb-2">
@@ -45,8 +43,7 @@ function Warning(props: WarningProps) {
 								onFieldSelect(field);
 							}}
 						>
-							{window.languageHelper.translate('Field')}: [
-							{field.x}, {field.y}]
+							{window.languageHelper.translate('Field')}: [{field.x}, {field.y}]
 						</button>
 					))}
 				</div>

@@ -8,8 +8,10 @@ type InputLabelStringProps = {
 	value: string;
 	helperText?: string;
 	onChange: (value: string) => void;
+	onEnter?: (value: string) => void;
 	min?: number;
 	max?: number;
+	small?: boolean;
 };
 
 type InputLabelNumberProps = {
@@ -17,8 +19,10 @@ type InputLabelNumberProps = {
 	value: number;
 	helperText?: string;
 	onChange: (value: number) => void;
+	onEnter?: (value: string) => void;
 	min?: number;
 	max?: number;
+	small?: boolean;
 };
 type InputLabelRangeProps = {
 	type: 'range';
@@ -138,15 +142,7 @@ class InputLabel extends React.Component<InputLabelProps, InputLabelState> {
 	render() {
 		let helper: string | JSX.Element = '';
 
-		const {
-			helperText,
-			label,
-			type,
-			placeholder,
-			labelClass,
-			value: propsValue,
-			onChange,
-		} = this.props;
+		const { helperText, label, type, placeholder, labelClass, value: propsValue, onChange } = this.props;
 		const { value } = this.state;
 
 		if (propsValue !== value) {
@@ -160,18 +156,10 @@ class InputLabel extends React.Component<InputLabelProps, InputLabelState> {
 		let warningHelper: string | JSX.Element = '';
 		let invalidHelper: string | JSX.Element = '';
 		if (hasWarning) {
-			warningHelper = (
-				<div className="text-sm text-orange-400 pl-4">
-					{warningText.join(' | ')}
-				</div>
-			);
+			warningHelper = <div className="text-sm text-orange-400 pl-4">{warningText.join(' | ')}</div>;
 		}
 		if (!isValid && errorMsg) {
-			invalidHelper = (
-				<div className="text-sm text-red-400 pl-4">
-					{errorMsg.join(' | ')}
-				</div>
-			);
+			invalidHelper = <div className="text-sm text-red-400 pl-4">{errorMsg.join(' | ')}</div>;
 		}
 		let validClass = '';
 		if (isValid) {
@@ -182,11 +170,11 @@ class InputLabel extends React.Component<InputLabelProps, InputLabelState> {
 			validClass = ' border-b-red-400';
 		}
 		if (type === 'text' || type === 'number') {
-			const { max, min } = this.props;
+			const { max, min, onEnter, small } = this.props;
 			return (
-				<div className="flex flex-col gap-2 max-w-full">
+				<div className={`flex flex-col ${label ? 'gap-2' : ''} ${small ? 'text-sm' : ''} max-w-full`}>
 					<label htmlFor={this.id} className={`${labelClass}`}>
-						{label}:
+						{label ? `${label}:` : ''}
 					</label>
 					<input
 						id={this.id}
@@ -197,6 +185,11 @@ class InputLabel extends React.Component<InputLabelProps, InputLabelState> {
 						min={min || -1}
 						max={max || 20}
 						value={value?.toString()}
+						onKeyDown={(event) => {
+							if (event.key === 'Enter' && typeof onEnter === 'function') {
+								onEnter(value?.toString());
+							}
+						}}
 					/>
 					{helper}
 					{warningHelper}
@@ -209,16 +202,10 @@ class InputLabel extends React.Component<InputLabelProps, InputLabelState> {
 			return (
 				<div className="flex flex-col">
 					<div>
-						<label
-							htmlFor={this.id}
-							className={`${labelClass} flex flex-row gap-2`}
-						>
+						<label htmlFor={this.id} className={`${labelClass} flex flex-row gap-2`}>
 							<span>{label ? `${label}:` : ''}</span>
 							<DblClickInput
-								value={Number.parseInt(
-									value.toString() ? value.toString() : '0',
-									10
-								)}
+								value={Number.parseInt(value.toString() ? value.toString() : '0', 10)}
 								onChange={(v) => {
 									this.setState({ value: v });
 									onChange(v);
@@ -249,25 +236,11 @@ class InputLabel extends React.Component<InputLabelProps, InputLabelState> {
 			const { bothSides } = this.props;
 			return (
 				<div>
-					<label
-						htmlFor={this.id}
-						className={`${labelClass} flex flex-row gap-2 justify-center items-center`}
-					>
-						{label ? (
-							<span className="min-h-8">{label}</span>
-						) : null}
+					<label htmlFor={this.id} className={`${labelClass} flex flex-row gap-2 justify-center items-center`}>
+						{label ? <span className="min-h-8">{label}</span> : null}
 						<div className="switch">
-							<input
-								type="checkbox"
-								id={this.id}
-								checked={!!value}
-								onChange={this.handleOnChange}
-							/>
-							<span
-								className={`${
-									bothSides ? 'slider-both' : ''
-								} slider round`}
-							/>
+							<input type="checkbox" id={this.id} checked={!!value} onChange={this.handleOnChange} />
+							<span className={`${bothSides ? 'slider-both' : ''} slider round`} />
 						</div>
 					</label>
 				</div>

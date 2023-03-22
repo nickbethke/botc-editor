@@ -64,9 +64,7 @@ class RightSidebar extends React.Component<RightSidebarProps, unknown> {
 						className="px-2 py-1 rounded bg-muted-900/25 hover:bg-muted-100/10 flex items-center gap-2"
 						type="button"
 						onClick={() => {
-							window.electron.clipboard
-								.write(JSON.stringify(config, null, 4))
-								.catch(() => {});
+							window.electron.clipboard.write(JSON.stringify(config, null, 4)).catch(() => {});
 						}}
 					>
 						<VscCopy />
@@ -74,9 +72,7 @@ class RightSidebar extends React.Component<RightSidebarProps, unknown> {
 					</button>
 				</div>
 				<div className="flex-grow bg-muted-900/25 relative p-2 w-[347px] overflow-y-auto">
-					<pre className="h-full font-jetbrains user-select text-sm">
-						{JSON.stringify(config, null, 4)}
-					</pre>
+					<pre className="h-full font-jetbrains user-select text-sm">{JSON.stringify(config, null, 4)}</pre>
 				</div>
 			</div>
 		);
@@ -96,28 +92,18 @@ class RightSidebar extends React.Component<RightSidebarProps, unknown> {
 		return (
 			<>
 				<SidebarMenuItem
-					right
+					position="right"
 					label={window.languageHelper.translate('Warnings')}
 					open={openTab === 'warnings'}
-					icon={
-						<VscWarning
-							className={
-								warnings.size
-									? 'text-orange-400'
-									: 'text-accent'
-							}
-						/>
-					}
+					icon={<VscWarning className={warnings.size ? 'text-orange-400' : 'text-accent'} />}
 					onClick={() => {
 						this.handleOpenTabChange('warnings');
 					}}
 					shortCut={`${window.languageHelper.translate('Alt')}+-`}
 				/>
 				<SidebarMenuItem
-					right
-					label={window.languageHelper.translate(
-						'Configuration Preview'
-					)}
+					position="right"
+					label={window.languageHelper.translate('Configuration Preview')}
 					open={openTab === 'configPreview'}
 					icon={<VscJson />}
 					onClick={() => {
@@ -126,25 +112,18 @@ class RightSidebar extends React.Component<RightSidebarProps, unknown> {
 					shortCut={`${window.languageHelper.translate('Alt')}++`}
 				/>
 				<SidebarMenuItem
-					right
-					label={window.languageHelper.translate(
-						'Save as screenshot'
-					)}
+					position="right"
+					label={window.languageHelper.translate('Save as screenshot')}
 					open={false}
 					icon={<TbScreenShare />}
 					onClick={async () => {
-						const element = document.getElementById(
-							'main-editor-board-board'
-						);
+						const element = document.getElementById('main-editor-board-board');
 						if (element) {
 							const canvas = await html2canvas(element, {
 								backgroundColor: null,
 							});
 							const image = canvas.toDataURL('image/png', 1.0);
-							await window.electron.dialog.saveScreenShot(
-								`${config.name}.png`,
-								image
-							);
+							await window.electron.dialog.saveScreenShot(`${config.name}.png`, image);
 						}
 					}}
 				/>
@@ -156,18 +135,10 @@ class RightSidebar extends React.Component<RightSidebarProps, unknown> {
 		const { openTab } = this.props;
 		return (
 			<div className="flex flex-row h-full">
-				<div
-					className={`flex-grow ${
-						openTab
-							? 'border-r dark:border-muted-700 border-muted-400'
-							: ''
-					}`}
-				>
+				<div className={`flex-grow ${openTab ? 'border-r dark:border-muted-700 border-muted-400' : ''}`}>
 					{this.content()}
 				</div>
-				<div className="h-full flex flex-col py-1">
-					{this.tabSwitch(openTab)}
-				</div>
+				<div className="h-full flex flex-col py-1">{this.tabSwitch(openTab)}</div>
 			</div>
 		);
 	}

@@ -5,10 +5,7 @@ type ContextMenuItemV2Props = {
 	onClick?: () => void | null;
 };
 
-class ContextMenuItemV2 extends React.Component<
-	ContextMenuItemV2Props,
-	unknown
-> {
+class ContextMenuItemV2 extends React.Component<ContextMenuItemV2Props, unknown> {
 	constructor(props: ContextMenuItemV2Props) {
 		super(props);
 		this.handleClick = this.handleClick.bind(this);
@@ -32,9 +29,7 @@ class ContextMenuItemV2 extends React.Component<
 		return (
 			<button
 				type="button"
-				className={`px-2 py-1 text-left text-sm ${
-					onClick && 'hover:bg-muted/25'
-				}`}
+				className={`px-2 py-1 text-left text-sm ${onClick !== null ? 'hover:bg-muted/25' : ''}`}
 				onClick={this.handleClick}
 			>
 				{text}
@@ -44,9 +39,7 @@ class ContextMenuItemV2 extends React.Component<
 }
 
 export function ContextMenuDividerV2() {
-	return (
-		<div className="border-b dark:border-muted-600 border-muted-400 m-1" />
-	);
+	return <div className="border-b dark:border-muted-600 border-muted-400 m-1" />;
 }
 
 export default ContextMenuItemV2;

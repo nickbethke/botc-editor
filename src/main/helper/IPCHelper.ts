@@ -5,7 +5,7 @@ import * as os from 'os';
 import path, { ParsedPath } from 'path';
 import * as PartieConfigSchema from '../../schema/partieConfigSchema.json';
 import * as BoardConfigSchema from '../../schema/boardConfigSchema.json';
-import PresetsLoader, { BoardPreset, RiverPreset } from './PresetsLoader';
+import PresetsLoader, { BoardPreset, RiverPresetWithFile } from './PresetsLoader';
 import PartieConfigInterface from '../../renderer/components/interfaces/PartieConfigInterface';
 import BoardConfigInterface from '../../renderer/components/interfaces/BoardConfigInterface';
 import * as SettingsSchema from '../../schema/settings.schema.json';
@@ -64,24 +64,16 @@ class IPCHelper {
 	static handleFileOpen = async (
 		type = '',
 		window: BrowserWindow | null
-	): Promise<
-		| { parsedPath: ParsedPath; path: string; config: BoardConfigInterface }
-		| false
-	> => {
+	): Promise<{ parsedPath: ParsedPath; path: string; config: BoardConfigInterface } | false> => {
 		if (type === 'board') {
 			let currentCanceled;
 			let currentFilePaths;
 			if (window) {
-				const { canceled, filePaths } = await dialog.showOpenDialog(
-					window,
-					{
-						title: 'Board-Konfiguration auswählen',
-						properties: ['openFile'],
-						filters: [
-							{ name: 'Board-Konfig', extensions: ['json'] },
-						],
-					}
-				);
+				const { canceled, filePaths } = await dialog.showOpenDialog(window, {
+					title: 'Board-Konfiguration auswählen',
+					properties: ['openFile'],
+					filters: [{ name: 'Board-Konfig', extensions: ['json'] }],
+				});
 				currentCanceled = canceled;
 				currentFilePaths = filePaths;
 			} else {
@@ -96,9 +88,7 @@ class IPCHelper {
 			if (currentCanceled) {
 				return false;
 			}
-			const config = JSON.parse(
-				fs.readFileSync(currentFilePaths[0], { encoding: 'utf8' })
-			) as BoardConfigInterface;
+			const config = JSON.parse(fs.readFileSync(currentFilePaths[0], { encoding: 'utf8' })) as BoardConfigInterface;
 			return {
 				config,
 				parsedPath: path.parse(currentFilePaths[0]),
@@ -109,16 +99,11 @@ class IPCHelper {
 			let currentCanceled;
 			let currentFilePaths;
 			if (window) {
-				const { canceled, filePaths } = await dialog.showOpenDialog(
-					window,
-					{
-						title: 'Partie-Konfiguration auswählen',
-						properties: ['openFile'],
-						filters: [
-							{ name: 'Partie-Konfig', extensions: ['json'] },
-						],
-					}
-				);
+				const { canceled, filePaths } = await dialog.showOpenDialog(window, {
+					title: 'Partie-Konfiguration auswählen',
+					properties: ['openFile'],
+					filters: [{ name: 'Partie-Konfig', extensions: ['json'] }],
+				});
 				currentCanceled = canceled;
 				currentFilePaths = filePaths;
 			} else {
@@ -133,9 +118,7 @@ class IPCHelper {
 			if (currentCanceled) {
 				return false;
 			}
-			const config = JSON.parse(
-				fs.readFileSync(currentFilePaths[0], { encoding: 'utf8' })
-			) as BoardConfigInterface;
+			const config = JSON.parse(fs.readFileSync(currentFilePaths[0], { encoding: 'utf8' })) as BoardConfigInterface;
 			return {
 				config,
 				parsedPath: path.parse(currentFilePaths[0]),
@@ -146,17 +129,14 @@ class IPCHelper {
 			let currentCanceled;
 			let currentFilePaths;
 			if (window) {
-				const { canceled, filePaths } = await dialog.showOpenDialog(
-					window,
-					{
-						title: 'Konfiguration auswählen',
-						properties: ['openFile'],
-						filters: [
-							{ name: 'Partie-Konfig', extensions: ['json'] },
-							{ name: 'Board-Konfig', extensions: ['json'] },
-						],
-					}
-				);
+				const { canceled, filePaths } = await dialog.showOpenDialog(window, {
+					title: 'Konfiguration auswählen',
+					properties: ['openFile'],
+					filters: [
+						{ name: 'Partie-Konfig', extensions: ['json'] },
+						{ name: 'Board-Konfig', extensions: ['json'] },
+					],
+				});
 				currentCanceled = canceled;
 				currentFilePaths = filePaths;
 			} else {
@@ -174,9 +154,7 @@ class IPCHelper {
 			if (currentCanceled) {
 				return false;
 			}
-			const config = JSON.parse(
-				fs.readFileSync(currentFilePaths[0], { encoding: 'utf8' })
-			) as BoardConfigInterface;
+			const config = JSON.parse(fs.readFileSync(currentFilePaths[0], { encoding: 'utf8' })) as BoardConfigInterface;
 
 			return {
 				config,
@@ -187,21 +165,10 @@ class IPCHelper {
 		return false;
 	};
 
-	static closeApp = () => {
-		if (process.platform !== 'darwin') {
-			app.quit();
-		}
-	};
-
-	static jsonValidate = (
-		json: object,
-		type: 'board' | 'partie' = 'partie'
-	) => {
+	static jsonValidate = (json: object, type: 'board' | 'partie' = 'partie') => {
 		const ajv = new Ajv({ allErrors: true });
 		let validate;
-		let schema:
-			| JSONSchemaType<PartieConfigInterface>
-			| JSONSchemaType<BoardConfigInterface>;
+		let schema: JSONSchemaType<PartieConfigInterface> | JSONSchemaType<BoardConfigInterface>;
 		if (type === 'partie') {
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-ignore
@@ -267,13 +234,17 @@ class IPCHelper {
 	};
 
 	static loadPresets = (): {
-		rivers: Array<RiverPreset>;
+		rivers: Array<RiverPresetWithFile>;
 		boards: Array<BoardPreset>;
 	} => {
 		return {
 			rivers: PresetsLoader.getRiverPresets(),
 			boards: PresetsLoader.getBoardPresets(),
 		};
+	};
+
+	static loadRiverPresets = (): Array<RiverPresetWithFile> => {
+		return PresetsLoader.getRiverPresets();
 	};
 
 	static getOS = (): NodeJS.Platform => {
@@ -301,11 +272,7 @@ class IPCHelper {
 		return 'File does not exits';
 	}
 
-	static async saveScreenShotDialog(
-		file: string,
-		content: string,
-		window: BrowserWindow | null
-	) {
+	static async saveScreenShotDialog(file: string, content: string, window: BrowserWindow | null) {
 		let currentCanceled;
 		let currentFilePath;
 		if (window) {
@@ -368,9 +335,7 @@ class IPCHelper {
 
 	static getAssetPath(...paths: string[]): string {
 		return path.join(
-			app.isPackaged
-				? path.join(process.resourcesPath, 'assets')
-				: path.join(__dirname, '../../../assets'),
+			app.isPackaged ? path.join(process.resourcesPath, 'assets') : path.join(__dirname, '../../../assets'),
 			...paths
 		);
 	}
@@ -385,10 +350,7 @@ class IPCHelper {
 	} {
 		const settingsPath = IPCHelper.getAssetPath('/settings.json');
 		if (!fs.existsSync(settingsPath)) {
-			fs.writeFileSync(
-				settingsPath,
-				JSON.stringify(IPCHelper.defaultSettings, null, 4)
-			);
+			fs.writeFileSync(settingsPath, JSON.stringify(IPCHelper.defaultSettings, null, 4));
 			return {
 				os: IPCHelper.getOS(),
 				settings: IPCHelper.defaultSettings,
@@ -422,18 +384,19 @@ class IPCHelper {
 	static updateSettings(settings: SettingsInterface) {
 		const settingsPath = IPCHelper.getAssetPath('/settings.json');
 		if (!fs.existsSync(settingsPath)) {
-			fs.writeFileSync(
-				settingsPath,
-				JSON.stringify(
-					{ ...IPCHelper.defaultSettings, settings },
-					null,
-					4
-				)
-			);
+			fs.writeFileSync(settingsPath, JSON.stringify({ ...IPCHelper.defaultSettings, settings }, null, 4));
 			return { ...IPCHelper.defaultSettings, settings };
 		}
 		fs.writeFileSync(settingsPath, JSON.stringify(settings, null, 4));
 		return settings;
+	}
+
+	static savePreset(file: string, content: string) {
+		return PresetsLoader.saveRiverPreset(file, content);
+	}
+
+	static renamePreset(from: string, to: string) {
+		return PresetsLoader.renameRiverPreset(from, to);
 	}
 }
 

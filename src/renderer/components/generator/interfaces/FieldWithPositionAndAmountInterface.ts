@@ -1,7 +1,6 @@
 import FieldWithPositionInterface from './FieldWithPositionInterface';
 
-interface FieldWithPositionAndAmountInterface
-	extends FieldWithPositionInterface {
+interface FieldWithPositionAndAmountInterface extends FieldWithPositionInterface {
 	amount: number;
 }
 

@@ -39,16 +39,11 @@ class Popup extends React.Component<PopupProps, PopupStats> {
 			return null;
 		}
 		return (
-			<div
-				role="dialog"
-				className="absolute w-[100vw] h-[100vh] top-0 left-0 bg-background-800/75"
-			>
+			<div role="dialog" className="absolute w-[100vw] h-[100vh] top-0 left-0 bg-background-800/75">
 				<div>
 					<div className="absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]">
 						<div className="p-8 bg-accent-700 text-white">
-							<div className="text-center text-3xl mb-8">
-								{label}
-							</div>
+							<div className="text-center text-3xl mb-8">{label}</div>
 							<div className="mb-8">{content}</div>
 							{closeButton ? (
 								<div className="flex flex-row gap-8">

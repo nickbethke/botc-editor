@@ -21,8 +21,7 @@ if (process.env.NODE_ENV === 'production') {
 	sourceMapSupport.install();
 }
 
-const isDebug =
-	process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true';
+const isDebug = process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true';
 
 if (isDebug) {
 	require('electron-debug')();
@@ -55,7 +54,7 @@ const createWindow = async () => {
 	};
 
 	mainWindow = new BrowserWindow({
-		backgroundColor: 'hsl(233,89%,4%)',
+		backgroundColor: '#ffffff',
 		autoHideMenuBar: true,
 		show: false,
 		width: 1195,
@@ -71,9 +70,7 @@ const createWindow = async () => {
 		icon: getAssetPath('icon.png'),
 		webPreferences: {
 			// devTools: false,
-			preload: app.isPackaged
-				? path.join(__dirname, 'preload.js')
-				: path.join(__dirname, '../../.erb/dll/preload.js'),
+			preload: app.isPackaged ? path.join(__dirname, 'preload.js') : path.join(__dirname, '../../.erb/dll/preload.js'),
 		},
 	});
 
@@ -142,10 +139,18 @@ const registerHandlers = () => {
 	ipcMain.handle('validate:json', (event, ...args) => {
 		return IPCHelper.jsonValidate(args[0], args[1]);
 	});
-	ipcMain.handle('app-close', IPCHelper.closeApp);
+	ipcMain.handle('app-close', () => {
+		mainWindow = null;
+		if (process.platform !== 'darwin') {
+			app.quit();
+		}
+	});
 
 	ipcMain.handle('load:presets', () => {
 		return IPCHelper.loadPresets();
+	});
+	ipcMain.handle('load:riverPresets', () => {
+		return IPCHelper.loadRiverPresets();
 	});
 	ipcMain.handle('get:isLinux', () => {
 		return IPCHelper.getOS() === 'linux';
@@ -184,9 +189,7 @@ const registerHandlers = () => {
 	});
 
 	ipcMain.handle('file:openPresetDir', () => {
-		return IPCHelper.openDirectoryDirectly(
-			path.join(PresetsLoader.getAssetPath(), '/presets/')
-		);
+		return IPCHelper.openDirectoryDirectly(path.join(PresetsLoader.getAssetPath(), '/presets/'));
 	});
 	ipcMain.handle('clipboard:write', (event, ...args) => {
 		return IPCHelper.clipBoardWrite(args[0]);
@@ -202,8 +205,15 @@ const registerHandlers = () => {
 	ipcMain.handle('beep', () => {
 		return shell.beep();
 	});
+	ipcMain.handle('file:savePreset', (event, ...args) => {
+		return IPCHelper.savePreset(args[0], args[1]);
+	});
+	ipcMain.handle('file:renamePreset', (event, ...args) => {
+		return IPCHelper.renamePreset(args[0], args[1]);
+	});
 };
-app.whenReady()
+app
+	.whenReady()
 	.then(() => {
 		createWindow();
 		app.on('activate', () => {

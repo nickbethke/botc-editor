@@ -4,10 +4,7 @@ import { BoardPosition } from '../BoardGenerator';
 import Hole from '../fields/Hole';
 import River from '../fields/River';
 import BoardConfigInterface from '../../interfaces/BoardConfigInterface';
-import {
-	position2BoardPosition,
-	wallConfig2Map,
-} from '../interfaces/boardPosition';
+import { position2BoardPosition, wallConfig2Map } from '../interfaces/boardPosition';
 import directionHelper from './DirectionHelper';
 import StartField from '../fields/StartField';
 import Checkpoint from '../fields/Checkpoint';
@@ -69,10 +66,7 @@ class AStar {
 				explored.push(node);
 
 				// If this node reaches the goal, return the node
-				if (
-					node.state.x === this.goal.x &&
-					node.state.y === this.goal.y
-				) {
+				if (node.state.x === this.goal.x && node.state.y === this.goal.y) {
 					return explored;
 				}
 				// Generate the possible next steps from this node's state
@@ -87,18 +81,12 @@ class AStar {
 
 					// Check if this step has already been explored
 					const isExplored = explored.find((e) => {
-						return (
-							e.state.x === step.state.x &&
-							e.state.y === step.state.y
-						);
+						return e.state.x === step.state.x && e.state.y === step.state.y;
 					});
 
 					// avoid repeated nodes during the calculation of neighbors
 					const isFrontier = frontier.find((e) => {
-						return (
-							e.state.x === step.state.x &&
-							e.state.y === step.state.y
-						);
+						return e.state.x === step.state.x && e.state.y === step.state.y;
 					});
 
 					// If this step has not been explored
@@ -137,10 +125,7 @@ class AStar {
 			// If the current state has a neighbor to the left, add it to the array of next steps
 			const neighbor = { x: state.x - 1, y: state.y };
 			// consoleOutput.log("NEIGHBOR?", state, neighbor);
-			if (
-				!this.isObstacle(state.x - 1, state.y) &&
-				!this.isWallBetween(state, neighbor)
-			) {
+			if (!this.isObstacle(state.x - 1, state.y) && !this.isWallBetween(state, neighbor)) {
 				next.push({
 					state: { x: state.x - 1, y: state.y },
 					cost: 1,
@@ -151,10 +136,7 @@ class AStar {
 			// If the current state has a neighbor to the right, add it to the array of next steps
 			const neighbor = { x: state.x + 1, y: state.y };
 			// consoleOutput.log("NEIGHBOR?", state, neighbor);
-			if (
-				!this.isObstacle(state.x + 1, state.y) &&
-				!this.isWallBetween(state, neighbor)
-			) {
+			if (!this.isObstacle(state.x + 1, state.y) && !this.isWallBetween(state, neighbor)) {
 				next.push({
 					state: { x: state.x + 1, y: state.y },
 					cost: 1,
@@ -165,10 +147,7 @@ class AStar {
 			// If the current state has a neighbor above it, add it to the array of next steps
 			const neighbor = { x: state.x, y: state.y - 1 };
 			// consoleOutput.log("NEIGHBOR?", state, neighbor);
-			if (
-				!this.isObstacle(state.x, state.y - 1) &&
-				!this.isWallBetween(state, neighbor)
-			) {
+			if (!this.isObstacle(state.x, state.y - 1) && !this.isWallBetween(state, neighbor)) {
 				next.push({
 					state: { x: state.x, y: state.y - 1 },
 					cost: 1,
@@ -179,10 +158,7 @@ class AStar {
 			// If the current state has a neighbor below it, add it to the array of next steps
 			const neighbor = { x: state.x, y: state.y + 1 };
 			// consoleOutput.log("NEIGHBOR?", state, neighbor);
-			if (
-				!this.isObstacle(state.x, state.y + 1) &&
-				!this.isWallBetween(state, neighbor)
-			) {
+			if (!this.isObstacle(state.x, state.y + 1) && !this.isWallBetween(state, neighbor)) {
 				next.push({
 					state: { x: state.x, y: state.y + 1 },
 					cost: 1,
@@ -195,10 +171,7 @@ class AStar {
 	}
 
 	isObstacle(x: number, y: number): boolean {
-		return (
-			this.board[x][y] instanceof SauronsEye ||
-			this.board[x][y] instanceof Hole
-		);
+		return this.board[x][y] instanceof SauronsEye || this.board[x][y] instanceof Hole;
 	}
 
 	isWallBetween(position1: BoardPosition, position2: BoardPosition): boolean {
@@ -221,12 +194,7 @@ class AStar {
 		const { x: endX, y: endY } = end;
 
 		// Get the coordinates of all points on the path
-		const path: Array<[number, number]> = this.getPath(
-			startX,
-			startY,
-			endX,
-			endY
-		);
+		const path: Array<[number, number]> = this.getPath(startX, startY, endX, endY);
 
 		// get the points in the array that are within the list of obstacles
 
@@ -234,12 +202,7 @@ class AStar {
 
 		for (let i = 0; i < path.length; i += 1) {
 			const point = path[i];
-			if (
-				!(
-					this.board[point[0]][point[1]] instanceof SauronsEye ||
-					this.board[point[0]][point[1]] instanceof River
-				)
-			) {
+			if (!(this.board[point[0]][point[1]] instanceof SauronsEye || this.board[point[0]][point[1]] instanceof River)) {
 				interSections += 1;
 			}
 		}
@@ -313,12 +276,7 @@ class AStar {
 
 		for (let i = 1; i < startFieldLength; i += 1) {
 			const currStartField = startFields[i];
-			const aStar = new AStar(
-				commonStartField,
-				currStartField,
-				board,
-				walls
-			);
+			const aStar = new AStar(commonStartField, currStartField, board, walls);
 			const path = aStar.AStar();
 
 			if (path.length < 1) {
@@ -331,12 +289,7 @@ class AStar {
 
 		for (let i = 0; i < lembasFields.length; i += 1) {
 			const lembasField = lembasFields[i];
-			const aStar = new AStar(
-				lembasField.position,
-				commonStartField,
-				board,
-				walls
-			);
+			const aStar = new AStar(lembasField.position, commonStartField, board, walls);
 			const path = aStar.AStar();
 			if (path.length < 1) {
 				return {
@@ -390,12 +343,7 @@ class AStar {
 			for (let j = 0; j < checkpoints.length; j += 1) {
 				const checkpoint = checkpoints[j];
 
-				const aStar = new AStar(
-					currStartField,
-					checkpoint,
-					board,
-					walls
-				);
+				const aStar = new AStar(currStartField, checkpoint, board, walls);
 				const path = aStar.AStar();
 
 				if (path.length < 1) {
@@ -447,18 +395,12 @@ class AStar {
 		});
 
 		config.checkPoints.forEach((checkPoint, index) => {
-			const check = new Checkpoint(
-				position2BoardPosition(checkPoint),
-				index
-			);
+			const check = new Checkpoint(position2BoardPosition(checkPoint), index);
 			board[check.position.x][check.position.y] = check;
 		});
 
 		config.lembasFields.forEach((lembasField) => {
-			const lembas = new Lembas(
-				position2BoardPosition(lembasField.position),
-				lembasField.amount
-			);
+			const lembas = new Lembas(position2BoardPosition(lembasField.position), lembasField.amount);
 			board[lembas.position.x][lembas.position.y] = lembas;
 		});
 
@@ -492,13 +434,7 @@ class AStar {
 			};
 		});
 
-		return AStar.pathPossibleAll(
-			checkpoints,
-			startFields,
-			lembasFields,
-			board,
-			walls
-		);
+		return AStar.pathPossibleAll(checkpoints, startFields, lembasFields, board, walls);
 	}
 }
 

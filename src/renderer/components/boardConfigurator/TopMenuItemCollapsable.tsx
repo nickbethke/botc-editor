@@ -9,10 +9,7 @@ type TopMenuItemCollapsableState = {
 	open: boolean;
 };
 
-class TopMenuItemCollapsable extends React.Component<
-	TopMenuItemCollapsableProps,
-	TopMenuItemCollapsableState
-> {
+class TopMenuItemCollapsable extends React.Component<TopMenuItemCollapsableProps, TopMenuItemCollapsableState> {
 	constructor(props: TopMenuItemCollapsableProps) {
 		super(props);
 		this.state = { open: false };

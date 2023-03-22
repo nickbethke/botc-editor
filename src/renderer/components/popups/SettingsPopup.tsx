@@ -2,19 +2,14 @@ import React from 'react';
 import { SettingsInterface } from '../../../interfaces/SettingsInterface';
 import ConfirmPopupV2 from '../boardConfigurator/ConfirmPopupV2';
 import InputLabel from '../InputLabel';
-import TranslationHelper, {
-	AvailableLanguages,
-} from '../../helper/TranslationHelper';
+import TranslationHelper, { AvailableLanguages } from '../../helper/TranslationHelper';
 
 interface SettingsPopupProps {
 	settings: SettingsInterface;
 	onAbort: () => void;
 	onConfirm: (settings: SettingsInterface) => void;
 	position: { x: number; y: number };
-	onPositionChange: (
-		position: { x: number; y: number },
-		callback: () => void
-	) => void;
+	onPositionChange: (position: { x: number; y: number }, callback: () => void) => void;
 	onDimensionChange: (dimension: { width: number; height: number }) => void;
 	os: NodeJS.Platform;
 	topOffset?: boolean;
@@ -24,10 +19,7 @@ interface SettingsPopupStat {
 	settings: SettingsInterface;
 }
 
-class SettingsPopup extends React.Component<
-	SettingsPopupProps,
-	SettingsPopupStat
-> {
+class SettingsPopup extends React.Component<SettingsPopupProps, SettingsPopupStat> {
 	constructor(props: SettingsPopupProps) {
 		super(props);
 		this.state = { settings: props.settings };
@@ -40,15 +32,7 @@ class SettingsPopup extends React.Component<
 	}
 
 	render() {
-		const {
-			os,
-			position,
-			onPositionChange,
-			onDimensionChange,
-			onAbort,
-			onConfirm,
-			topOffset,
-		} = this.props;
+		const { os, position, onPositionChange, onDimensionChange, onAbort, onConfirm, topOffset } = this.props;
 		const { settings } = this.state;
 		return (
 			<ConfirmPopupV2
@@ -71,29 +55,18 @@ class SettingsPopup extends React.Component<
 						<p>{window.languageHelper.translate('Language')}</p>
 						<select
 							className="bg-transparent border-b-2 text-sm px-2 py-1 w-full"
-							value={TranslationHelper.stringToEnum(
-								settings.language
-							)}
+							value={TranslationHelper.stringToEnum(settings.language)}
 							onChange={(event) => {
 								this.setState({
 									settings: {
 										...settings,
-										language: AvailableLanguages[
-											Number.parseInt(
-												event.target.value,
-												10
-											)
-										] as 'de' | 'en',
+										language: AvailableLanguages[Number.parseInt(event.target.value, 10)] as 'de' | 'en',
 									},
 								});
 							}}
 						>
-							<option value={AvailableLanguages.de}>
-								{window.languageHelper.translate('German')}
-							</option>
-							<option value={AvailableLanguages.en}>
-								{window.languageHelper.translate('English')}
-							</option>
+							<option value={AvailableLanguages.de}>{window.languageHelper.translate('German')}</option>
+							<option value={AvailableLanguages.en}>{window.languageHelper.translate('English')}</option>
 						</select>
 					</div>
 					<div className="grid grid-cols-2 items-center gap-8">
@@ -112,9 +85,7 @@ class SettingsPopup extends React.Component<
 						/>
 					</div>
 					<div className="grid grid-cols-2 items-center gap-8">
-						<p>
-							{window.languageHelper.translate('Popups movable')}
-						</p>
+						<p>{window.languageHelper.translate('Popups movable')}</p>
 						<InputLabel
 							type="switch"
 							value={settings.popupsDraggable}

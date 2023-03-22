@@ -55,17 +55,11 @@ class InputValidator {
 			warning: { has: false, text: new Array<string>() },
 		};
 		if (this.args.type === InputValidatorType.TYPE_STRING) {
-			if (
-				this.args.options.longerThan &&
-				value.length > (this.args.options.longerThan.number || 0)
-			) {
+			if (this.args.options.longerThan && value.length > (this.args.options.longerThan.number || 0)) {
 				answer.valid.is = false;
 				answer.valid.text.push(this.args.options.longerThan.error);
 			}
-			if (
-				this.args.options.regex &&
-				!this.args.options.regex.expression.test(value)
-			) {
+			if (this.args.options.regex && !this.args.options.regex.expression.test(value)) {
 				answer.valid.is = false;
 				answer.valid.text.push(this.args.options.regex.error);
 			}
@@ -74,28 +68,15 @@ class InputValidator {
 				answer.valid.text.push(this.args.options.notEmpty.error);
 			}
 		} else if (this.args.type === InputValidatorType.TYPE_NUMBER) {
-			if (
-				this.args.options.ifBiggerThen &&
-				toNumber(value) > this.args.options.ifBiggerThen.number
-			) {
+			if (this.args.options.ifBiggerThen && toNumber(value) > this.args.options.ifBiggerThen.number) {
 				answer.warning.has = true;
 				answer.warning.text.push(this.args.options.ifBiggerThen.error);
 			}
 			if (this.args.options.ifSmallerThen) {
-				if (
-					!(
-						this.args.options.ifSmallerThen.except &&
-						toNumber(value) ===
-							this.args.options.ifSmallerThen.except
-					)
-				) {
-					if (
-						toNumber(value) < this.args.options.ifSmallerThen.number
-					) {
+				if (!(this.args.options.ifSmallerThen.except && toNumber(value) === this.args.options.ifSmallerThen.except)) {
+					if (toNumber(value) < this.args.options.ifSmallerThen.number) {
 						answer.warning.has = true;
-						answer.warning.text.push(
-							this.args.options.ifSmallerThen.error
-						);
+						answer.warning.text.push(this.args.options.ifSmallerThen.error);
 					}
 				}
 			}

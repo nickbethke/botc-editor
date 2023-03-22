@@ -11,10 +11,7 @@ type DblClickInputState = {
 	value: number;
 };
 
-class DblClickInput extends React.Component<
-	DblClickInputProps,
-	DblClickInputState
-> {
+class DblClickInput extends React.Component<DblClickInputProps, DblClickInputState> {
 	constructor(props: DblClickInputProps) {
 		super(props);
 		this.state = { open: false, value: props.value };

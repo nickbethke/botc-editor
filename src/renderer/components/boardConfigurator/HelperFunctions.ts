@@ -24,112 +24,68 @@ export type GetFieldTypeReturnValues =
 	| FieldsEnum.RIVER
 	| null;
 
-export function getFieldType(
-	position: BoardPosition,
-	config: BoardConfigInterface
-): GetFieldTypeReturnValues {
+export function getFieldType(position: BoardPosition, config: BoardConfigInterface): GetFieldTypeReturnValues {
 	const positionString = boardPosition2String(position);
 
 	if (position2String(config.eye.position) === positionString) {
 		return FieldsEnum.EYE;
 	}
-	if (
-		config.checkPoints.find(
-			(e) => position2String(e) === positionString
-		) !== undefined
-	) {
+	if (config.checkPoints.find((e) => position2String(e) === positionString) !== undefined) {
 		return FieldsEnum.CHECKPOINT;
 	}
-	if (
-		config.startFields.find(
-			(e) => position2String(e.position) === positionString
-		) !== undefined
-	) {
+	if (config.startFields.find((e) => position2String(e.position) === positionString) !== undefined) {
 		return FieldsEnum.START;
 	}
 
-	if (
-		config.lembasFields.find(
-			(e) => position2String(e.position) === positionString
-		) !== undefined
-	) {
+	if (config.lembasFields.find((e) => position2String(e.position) === positionString) !== undefined) {
 		return FieldsEnum.LEMBAS;
 	}
 
-	if (
-		config.riverFields.find(
-			(e) => position2String(e.position) === positionString
-		) !== undefined
-	) {
+	if (config.riverFields.find((e) => position2String(e.position) === positionString) !== undefined) {
 		return FieldsEnum.RIVER;
 	}
-	if (
-		config.holes.find((e) => position2String(e) === positionString) !==
-		undefined
-	) {
+	if (config.holes.find((e) => position2String(e) === positionString) !== undefined) {
 		return FieldsEnum.HOLE;
 	}
 
 	return null;
 }
 
-export function isDestinyMountain(
-	position: BoardPosition,
-	config: BoardConfigInterface
-): boolean {
-	const index = config.checkPoints.findIndex(
-		(p) => position2String(p) === boardPosition2String(position)
-	);
+export function isDestinyMountain(position: BoardPosition, config: BoardConfigInterface): boolean {
+	const index = config.checkPoints.findIndex((p) => position2String(p) === boardPosition2String(position));
 	return index === config.checkPoints.length - 1;
 }
 
-export function removeCheckpoint(
-	position: BoardPosition,
-	config: BoardConfigInterface
-): BoardConfigInterface {
+export function removeCheckpoint(position: BoardPosition, config: BoardConfigInterface): BoardConfigInterface {
 	const filteredCheckpointArray = config.checkPoints.filter(
 		(e) => position2String(e) !== boardPosition2String(position)
 	);
 	return { ...config, checkPoints: filteredCheckpointArray };
 }
 
-export function removeStartField(
-	position: BoardPosition,
-	config: BoardConfigInterface
-): BoardConfigInterface {
+export function removeStartField(position: BoardPosition, config: BoardConfigInterface): BoardConfigInterface {
 	const filteredStartFieldsArray = config.startFields.filter(
 		(e) => position2String(e.position) !== boardPosition2String(position)
 	);
 	return { ...config, startFields: filteredStartFieldsArray };
 }
 
-export function removeLembasField(
-	position: BoardPosition,
-	config: BoardConfigInterface
-): BoardConfigInterface {
+export function removeLembasField(position: BoardPosition, config: BoardConfigInterface): BoardConfigInterface {
 	const filteredLembasFieldsArray = config.lembasFields.filter(
 		(e) => position2String(e.position) !== boardPosition2String(position)
 	);
 	return { ...config, lembasFields: filteredLembasFieldsArray };
 }
 
-export function removeRiver(
-	position: BoardPosition,
-	config: BoardConfigInterface
-): BoardConfigInterface {
+export function removeRiver(position: BoardPosition, config: BoardConfigInterface): BoardConfigInterface {
 	const filteredRiverFieldsArray = config.riverFields.filter(
 		(e) => position2String(e.position) !== boardPosition2String(position)
 	);
 	return { ...config, riverFields: filteredRiverFieldsArray };
 }
 
-export function removeHole(
-	position: BoardPosition,
-	config: BoardConfigInterface
-): BoardConfigInterface {
-	const filteredHolesArray = config.holes.filter(
-		(e) => position2String(e) !== boardPosition2String(position)
-	);
+export function removeHole(position: BoardPosition, config: BoardConfigInterface): BoardConfigInterface {
+	const filteredHolesArray = config.holes.filter((e) => position2String(e) !== boardPosition2String(position));
 	return { ...config, holes: filteredHolesArray };
 }
 
@@ -138,9 +94,7 @@ export function removeWall(
 	config: BoardConfigInterface
 ): BoardConfigInterface {
 	const filteredWallArray = config.walls.filter(
-		(e) =>
-			wallPosition2String(e as [Position, Position]) !==
-			wallBoardPosition2String(position)
+		(e) => wallPosition2String(e as [Position, Position]) !== wallBoardPosition2String(position)
 	);
 	return {
 		...config,
@@ -186,10 +140,7 @@ function overrideField(
 	}
 }
 
-export function moveSauronsEye(
-	position: BoardPosition,
-	config: BoardConfigInterface
-): BoardConfigInterface {
+export function moveSauronsEye(position: BoardPosition, config: BoardConfigInterface): BoardConfigInterface {
 	const { override, config: newConfig } = overrideField(position, config);
 	if (override) {
 		return {
@@ -203,10 +154,7 @@ export function moveSauronsEye(
 	return config;
 }
 
-export function addCheckpoint(
-	position: BoardPosition,
-	config: BoardConfigInterface
-): BoardConfigInterface {
+export function addCheckpoint(position: BoardPosition, config: BoardConfigInterface): BoardConfigInterface {
 	const { override, config: newConfig } = overrideField(position, config);
 	if (override) {
 		const newCheckpointsArray = config.checkPoints;
@@ -216,10 +164,7 @@ export function addCheckpoint(
 	return config;
 }
 
-export function addStartField(
-	position: BoardPosition,
-	config: BoardConfigInterface
-): BoardConfigInterface {
+export function addStartField(position: BoardPosition, config: BoardConfigInterface): BoardConfigInterface {
 	const { override, config: newConfig } = overrideField(position, config);
 	if (override) {
 		const newStartFieldsArray = config.startFields;
@@ -232,10 +177,7 @@ export function addStartField(
 	return config;
 }
 
-export function addLembasField(
-	position: BoardPosition,
-	config: BoardConfigInterface
-): BoardConfigInterface {
+export function addLembasField(position: BoardPosition, config: BoardConfigInterface): BoardConfigInterface {
 	const { override, config: newConfig } = overrideField(position, config);
 	if (override) {
 		const newLembasFieldsArray = config.lembasFields;
@@ -248,10 +190,7 @@ export function addLembasField(
 	return config;
 }
 
-export function addRiver(
-	position: BoardPosition,
-	config: BoardConfigInterface
-): BoardConfigInterface {
+export function addRiver(position: BoardPosition, config: BoardConfigInterface): BoardConfigInterface {
 	const { override, config: newConfig } = overrideField(position, config);
 	if (override) {
 		const newRiverFieldsArray = config.riverFields;
@@ -264,10 +203,7 @@ export function addRiver(
 	return config;
 }
 
-export function addHole(
-	position: BoardPosition,
-	config: BoardConfigInterface
-): BoardConfigInterface {
+export function addHole(position: BoardPosition, config: BoardConfigInterface): BoardConfigInterface {
 	const { override, config: newConfig } = overrideField(position, config);
 	if (override) {
 		const newHolesArray = config.holes;
@@ -286,20 +222,14 @@ export function getDirectionFieldConfig(
 		return config.eye;
 	}
 	if (type === FieldsEnum.RIVER) {
-		const index = config.riverFields.findIndex(
-			(e) =>
-				position2String(e.position) === boardPosition2String(position)
-		);
+		const index = config.riverFields.findIndex((e) => position2String(e.position) === boardPosition2String(position));
 		if (index > -1 && config.riverFields[index]) {
 			return config.riverFields[index];
 		}
 		return null;
 	}
 	if (type === FieldsEnum.START) {
-		const index = config.startFields.findIndex(
-			(e) =>
-				position2String(e.position) === boardPosition2String(position)
-		);
+		const index = config.startFields.findIndex((e) => position2String(e.position) === boardPosition2String(position));
 		if (index > -1 && config.startFields[index]) {
 			return config.startFields[index];
 		}
@@ -317,13 +247,10 @@ export function updateStartFieldDirection(
 		return config;
 	}
 
-	const index = config.startFields.findIndex(
-		(e) => position2String(e.position) === boardPosition2String(position)
-	);
+	const index = config.startFields.findIndex((e) => position2String(e.position) === boardPosition2String(position));
 	if (index > -1) {
 		const newConfig = config;
-		newConfig.startFields[index].direction =
-			DirectionHelper.dirEnumToString(direction);
+		newConfig.startFields[index].direction = DirectionHelper.dirEnumToString(direction);
 		return newConfig;
 	}
 
@@ -339,13 +266,10 @@ export function updateRiverFieldDirection(
 		return config;
 	}
 
-	const index = config.riverFields.findIndex(
-		(e) => position2String(e.position) === boardPosition2String(position)
-	);
+	const index = config.riverFields.findIndex((e) => position2String(e.position) === boardPosition2String(position));
 	if (index > -1) {
 		const newConfig = config;
-		newConfig.riverFields[index].direction =
-			DirectionHelper.dirEnumToString(direction);
+		newConfig.riverFields[index].direction = DirectionHelper.dirEnumToString(direction);
 		return newConfig;
 	}
 
@@ -361,9 +285,7 @@ export function updateLembasFieldAmount(
 		return config;
 	}
 
-	const index = config.lembasFields.findIndex(
-		(e) => position2String(e.position) === boardPosition2String(position)
-	);
+	const index = config.lembasFields.findIndex((e) => position2String(e.position) === boardPosition2String(position));
 	if (index > -1) {
 		const newConfig = config;
 		newConfig.lembasFields[index].amount = amount;
@@ -373,13 +295,8 @@ export function updateLembasFieldAmount(
 	return config;
 }
 
-export function getLembasFieldConfig(
-	position: BoardPosition,
-	config: BoardConfigInterface
-): LembasField | null {
-	const index = config.lembasFields.findIndex(
-		(e) => position2String(e.position) === boardPosition2String(position)
-	);
+export function getLembasFieldConfig(position: BoardPosition, config: BoardConfigInterface): LembasField | null {
+	const index = config.lembasFields.findIndex((e) => position2String(e.position) === boardPosition2String(position));
 	if (index > -1 && config.lembasFields[index]) {
 		return config.lembasFields[index];
 	}

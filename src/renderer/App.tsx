@@ -11,15 +11,15 @@ import BoardGenerator from './components/generator/BoardGenerator';
 import PartieConfigInterface from './components/interfaces/PartieConfigInterface';
 import BoardConfigInterface from './components/interfaces/BoardConfigInterface';
 import sunImage from '../../assets/images/sun.gif';
-import TranslationHelper, {
-	AvailableLanguages,
-} from './helper/TranslationHelper';
+import bgImage from '../../assets/images/bg-color-2x-no-bg.png';
+import TranslationHelper, { AvailableLanguages } from './helper/TranslationHelper';
 import BoardConfiguratorV2 from './screens/BoardConfiguratorV2';
 import { TopMenuSeparator } from './components/boardConfigurator/TopMenuItem';
 import { SettingsInterface } from '../interfaces/SettingsInterface';
 import SettingsPopup from './components/popups/SettingsPopup';
 import RandomBoardStartValuesDialogV2 from './components/popups/RandomBoardStartValuesDialogV2';
 import PopupV2 from './components/boardConfigurator/PopupV2';
+import RiverPresetEditor from './screens/RiverPresetEditor';
 
 type AppPopups =
 	| 'boardEditorChoiceV2'
@@ -36,7 +36,8 @@ type AppScreens =
 	| 'partieConfigNewScreen'
 	| 'partieConfigLoadScreen'
 	| 'boardConfigV2LoadScreen'
-	| 'boardConfigV2NewScreen';
+	| 'boardConfigV2NewScreen'
+	| 'riverPresetEditor';
 
 type AppProps = {
 	os: NodeJS.Platform;
@@ -78,14 +79,19 @@ class App extends React.Component<AppProps, AppStates> {
 			errorMessage: null,
 			fullScreen: false,
 		};
-		this.handleOpenPartieEditorChoice =
-			this.handleOpenPartieEditorChoice.bind(this);
+		this.handleOpenPartieEditorChoice = this.handleOpenPartieEditorChoice.bind(this);
 		this.handleCloseApp = this.handleCloseApp.bind(this);
 		this.handleOpenValidator = this.handleOpenValidator.bind(this);
 		this.handleCloseChildScreen = this.handleCloseChildScreen.bind(this);
+	}
 
+	componentDidMount() {
+		const { settings } = this.props;
 		Mousetrap.bind(['command+b', 'ctrl+b'], () => {
 			this.setState({ openPopup: 'boardEditorChoiceV2' });
+		});
+		Mousetrap.bind(['command+p', 'ctrl+p'], () => {
+			this.setState({ openPopup: 'partieEditorChoice' });
 		});
 		Mousetrap.bind(['command+p', 'ctrl+p'], () => {
 			this.setState({ openPopup: 'partieEditorChoice' });
@@ -99,30 +105,28 @@ class App extends React.Component<AppProps, AppStates> {
 			}
 		});
 
-		Mousetrap.bind(
-			'up up down down left right left right b a enter',
-			() => {
-				const { surprise } = this.state;
-				this.setState({ surprise: !surprise });
-			}
-		);
-		if (props.settings.darkMode) {
+		Mousetrap.bind('up up down down left right left right b a enter', () => {
+			const { surprise } = this.state;
+			this.setState({ surprise: !surprise });
+		});
+		if (settings.darkMode) {
 			document.documentElement.classList.add('dark');
 		}
-		document.documentElement.setAttribute('lang', props.settings.language);
+		document.documentElement.setAttribute('lang', settings.language);
+		window.addEventListener('resize', () => {
+			this.setState({
+				popupPosition: {
+					x: window.innerWidth / 2,
+					y: window.innerHeight / 2,
+				},
+				fullScreen: !window.screenTop && !window.screenY,
+			});
+		});
 	}
 
-	componentDidUpdate(
-		prevProps: Readonly<AppProps>,
-		prevState: Readonly<AppStates>
-	) {
+	componentDidUpdate(prevProps: Readonly<AppProps>, prevState: Readonly<AppStates>) {
 		const { openPopup: prePopup, settings: preSettings } = prevState;
-		const {
-			openPopup: popup,
-			popupPosition,
-			popupDimension,
-			settings,
-		} = this.state;
+		const { openPopup: popup, popupPosition, popupDimension, settings } = this.state;
 
 		if (!isEqual(preSettings, settings)) {
 			if (settings.darkMode) {
@@ -197,6 +201,11 @@ class App extends React.Component<AppProps, AppStates> {
 		const newSettings = await window.electron.app.updateSettings(settings);
 		const lang = TranslationHelper.stringToEnum(newSettings.language);
 		await this.handleLanguageChange(lang);
+		if (settings.darkMode) {
+			document.documentElement.classList.add('dark');
+		} else {
+			document.documentElement.classList.remove('dark');
+		}
 		this.setState({ settings: newSettings });
 	};
 
@@ -205,7 +214,6 @@ class App extends React.Component<AppProps, AppStates> {
 	};
 
 	render = () => {
-		this.addEventListeners();
 		const { version } = this.state;
 		if (version === '') {
 			window.electron.app
@@ -229,6 +237,8 @@ class App extends React.Component<AppProps, AppStates> {
 			case 'boardConfigV2NewScreen':
 			case 'boardConfigV2LoadScreen':
 				return this.boardConfigV2Screen();
+			case 'riverPresetEditor':
+				return this.riverPresetEditor();
 			case 'boardConfigV2FromRandomScreen':
 				return this.boardConfigV2Screen(generator);
 			case 'validator':
@@ -270,56 +280,72 @@ class App extends React.Component<AppProps, AppStates> {
 		return null;
 	};
 
+	riverPresetEditor = () => {
+		const { settings } = this.state;
+		const { os } = this.props;
+		return (
+			<RiverPresetEditor
+				os={os}
+				onClose={this.handleCloseChildScreen}
+				settings={settings}
+				onSettingsUpdate={this.handleSettingsChange}
+			/>
+		);
+	};
+
 	boardConfigV2Screen = (generator: BoardGenerator | null = null) => {
 		const { openScreen, toLoad, settings } = this.state;
 		const { os } = this.props;
-		if (openScreen === 'boardConfigV2NewScreen') {
-			return (
-				<BoardConfiguratorV2
-					os={os}
-					onClose={this.handleCloseChildScreen}
-					settings={settings}
-					onSettingsUpdate={this.handleSettingsChange}
-				/>
-			);
-		}
-		if (openScreen === 'boardConfigV2LoadScreen') {
-			return (
-				<BoardConfiguratorV2
-					os={os}
-					onClose={this.handleCloseChildScreen}
-					config={
-						(
+		switch (openScreen) {
+			case 'boardConfigV2NewScreen':
+				return (
+					<BoardConfiguratorV2
+						os={os}
+						onClose={this.handleCloseChildScreen}
+						settings={settings}
+						onSettingsUpdate={this.handleSettingsChange}
+					/>
+				);
+			case 'boardConfigV2LoadScreen':
+				return (
+					<BoardConfiguratorV2
+						os={os}
+						onClose={this.handleCloseChildScreen}
+						config={
+							(
+								toLoad as {
+									parsedPath: ParsedPath;
+									path: string;
+									config: BoardConfigInterface;
+								}
+							).config
+						}
+						settings={settings}
+						onSettingsUpdate={this.handleSettingsChange}
+						file={
 							toLoad as {
 								parsedPath: ParsedPath;
 								path: string;
-								config: BoardConfigInterface;
 							}
-						).config
-					}
-					settings={settings}
-					onSettingsUpdate={this.handleSettingsChange}
-					file={
-						toLoad as {
-							parsedPath: ParsedPath;
-							path: string;
 						}
-					}
-				/>
-			);
+					/>
+				);
+			case 'boardConfigV2FromRandomScreen':
+				if (generator) {
+					return (
+						<BoardConfiguratorV2
+							os={os}
+							onClose={this.handleCloseChildScreen}
+							config={generator.boardJSON}
+							settings={settings}
+							onSettingsUpdate={this.handleSettingsChange}
+						/>
+					);
+				}
+				return null;
+			default:
+				return null;
 		}
-		if (openScreen === 'boardConfigV2FromRandomScreen' && generator) {
-			return (
-				<BoardConfiguratorV2
-					os={os}
-					onClose={this.handleCloseChildScreen}
-					config={generator.boardJSON}
-					settings={settings}
-					onSettingsUpdate={this.handleSettingsChange}
-				/>
-			);
-		}
-		return null;
 	};
 
 	validatorScreen = () => {
@@ -335,11 +361,7 @@ class App extends React.Component<AppProps, AppStates> {
 		const { os } = this.props;
 		return (
 			<PopupV2
-				title={
-					errorMessage
-						? errorMessage.title
-						: window.languageHelper.translate('Error')
-				}
+				title={errorMessage ? errorMessage.title : window.languageHelper.translate('Error')}
 				closeButtonText={window.languageHelper.translate('Close')}
 				onClose={() => {
 					this.setState({ openPopup: null });
@@ -359,105 +381,128 @@ class App extends React.Component<AppProps, AppStates> {
 		);
 	};
 
+	onLoadRiverPreset = () => {};
+
+	onBoardLoadConfig = async () => {
+		const boardJSON = await window.electron.dialog.openBoardConfig();
+		if (boardJSON) {
+			const validation = await window.electron.validate(boardJSON.config, 'board');
+			if (isBoolean(validation) && validation) {
+				this.setState({
+					openScreen: 'boardConfigV2LoadScreen',
+					toLoad: boardJSON,
+					generator: null,
+				});
+			} else {
+				this.setState({
+					errorMessage: {
+						title: window.languageHelper.translate('Board Configuration Validation Error'),
+						error: validation,
+					},
+					openPopup: 'error',
+				});
+			}
+		}
+	};
+
 	homeScreen() {
 		const { openPopup, version, surprise } = this.state;
+		const { os } = this.props;
 		const popup = this.popup(openPopup);
 		const tabIndex = openPopup !== null ? -1 : 0;
 		return (
-			<div className="text-white">
-				<div id="home" className={popup ? 'blur' : ''}>
-					<div id="homeScreenBG" className="relative">
-						<img
-							alt="surprise sun"
-							src={sunImage}
-							className={`${
-								surprise
-									? 'opacity-1 top-1/4'
-									: 'opacity-0 top-1/3'
-							} absolute left-1/2 transition transition-all duration-1000 w-16 2xl:w-32`}
-						/>
+			<div className="text-white bg-gradient-to-br dark:from-slate-900 dark:to-muted-800 from-slate-400 to-muted-500">
+				<div id="home" className={`${popup ? 'blur' : ''} flex flex-col`}>
+					{os === 'win32' ? (
+						<div className="dragger w-[100vw] h-8 bg-muted flex items-center px-2 text-sm">
+							{window.languageHelper.translate('Battle of the Centerländ - Editor')}
+						</div>
+					) : (
+						<div className="fixed top-0 left-0 dragger w-[100vw] h-8" />
+					)}
+					<div className="grid grid-cols-2 grow">
+						<div className="flex flex-col pb-8" style={{ height: window.innerHeight - (os === 'win32' ? 32 : 0) }}>
+							<div className="flex flex-col py-8 px-12 justify-between grow">
+								<div>
+									<div className="text-4xl 2xl:text-6xl">Battle of the Centerländ</div>
+									<div className="text-2xl 2xl:text-4xl tracking-widest">
+										{window.languageHelper.translate('Editor')}
+									</div>
+								</div>
+								<div className="flex flex-col gap-4 w-fit">
+									<button
+										tabIndex={tabIndex}
+										type="button"
+										className="text-2xl clickable"
+										onClick={this.handleOpenBoardEditorChoiceV2}
+									>
+										{window.languageHelper.translate('Board-Configurator')}
+									</button>
+									<button
+										tabIndex={tabIndex}
+										type="button"
+										className="text-2xl clickable"
+										onClick={this.handleOpenPartieEditorChoice}
+									>
+										{window.languageHelper.translate('Party-Configurator')}
+									</button>
+									<button
+										tabIndex={tabIndex}
+										type="button"
+										className="text-2xl clickable"
+										onClick={this.handleOpenValidator}
+									>
+										{window.languageHelper.translate('Validator')}
+									</button>
+									<TopMenuSeparator />
+									<button
+										tabIndex={tabIndex}
+										type="button"
+										className="text-2xl clickable"
+										onClick={this.handleOpenSettings}
+									>
+										{window.languageHelper.translate('Settings')}
+									</button>
+									<TopMenuSeparator />
+									<button
+										tabIndex={tabIndex}
+										type="button"
+										className="text-2xl clickable"
+										onClick={this.handleCloseApp}
+									>
+										{window.languageHelper.translate('Exit')}
+									</button>
+								</div>
+							</div>
+						</div>
+						<div className="relative">
+							<img
+								className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full"
+								src={bgImage}
+								alt={window.languageHelper.translate('Background image')}
+							/>
+							<img
+								alt="surprise sun"
+								src={sunImage}
+								className={`${
+									surprise ? 'opacity-1 top-1/4' : 'opacity-0 top-1/3'
+								} absolute left-1/2 transition transition-all duration-1000 w-16 2xl:w-32`}
+							/>
+						</div>
 					</div>
-					<div className="dragger absolute top-0 left-0 w-[100vw] h-8" />
-					<div className="h-[100vh] w-[50vw] flex flex-col">
-						<div className="flex flex-col py-8 px-12 justify-between grow">
-							<div>
-								<div className="text-4xl 2xl:text-6xl">
-									Battle of the Centerländ
-								</div>
-								<div className="text-2xl 2xl:text-4xl tracking-widest">
-									{window.languageHelper.translate('Editor')}
-								</div>
-							</div>
-							<div className="flex flex-col gap-4 w-fit">
-								<button
-									tabIndex={tabIndex}
-									type="button"
-									className="text-2xl clickable"
-									onClick={this.handleOpenBoardEditorChoiceV2}
-								>
-									{window.languageHelper.translate(
-										'Board-Configurator'
-									)}
-								</button>
-								<button
-									tabIndex={tabIndex}
-									type="button"
-									className="text-2xl clickable"
-									onClick={this.handleOpenPartieEditorChoice}
-								>
-									{window.languageHelper.translate(
-										'Party-Configurator'
-									)}
-								</button>
-								<button
-									tabIndex={tabIndex}
-									type="button"
-									className="text-2xl clickable"
-									onClick={this.handleOpenValidator}
-								>
-									{window.languageHelper.translate(
-										'Validator'
-									)}
-								</button>
-								<TopMenuSeparator />
-								<button
-									tabIndex={tabIndex}
-									type="button"
-									className="text-2xl clickable"
-									onClick={this.handleOpenSettings}
-								>
-									{window.languageHelper.translate(
-										'Settings'
-									)}
-								</button>
-								<TopMenuSeparator />
-								<button
-									tabIndex={tabIndex}
-									type="button"
-									className="text-2xl clickable"
-									onClick={this.handleCloseApp}
-								>
-									{window.languageHelper.translate('Exit')}
-								</button>
-							</div>
-						</div>
-						<div className="bg-white/10 p-2 w-full font-jetbrains flex flex-row items-center justify-end gap-2 text-[10px]">
-							<button
-								type="button"
-								onClick={async () => {
-									await window.electron.open.homepage();
-								}}
-							>
-								{window.languageHelper.translate('Website')}
-							</button>
-							|
-							<span>
-								{window.languageHelper.translate(
-									'Editor Version'
-								)}
-								: {version}
-							</span>
-						</div>
+					<div className="absolute bottom-0 left-0 z-10 bg-muted p-2 w-[100vw] font-jetbrains flex flex-row items-center justify-end gap-2 text-[10px]">
+						<button
+							type="button"
+							onClick={async () => {
+								await window.electron.open.homepage();
+							}}
+						>
+							{window.languageHelper.translate('Website')}
+						</button>
+						|
+						<span>
+							{window.languageHelper.translate('Editor Version')}: {version}
+						</span>
 					</div>
 				</div>
 				<div role="dialog" id="popup">
@@ -481,34 +526,7 @@ class App extends React.Component<AppProps, AppStates> {
 						onClose={() => {
 							this.setState({ openPopup: null });
 						}}
-						onLoadConfig={async () => {
-							const boardJSON =
-								await window.electron.dialog.openBoardConfig();
-							if (boardJSON) {
-								const validation =
-									await window.electron.validate(
-										boardJSON.config,
-										'board'
-									);
-								if (isBoolean(validation) && validation) {
-									this.setState({
-										openScreen: 'boardConfigV2LoadScreen',
-										toLoad: boardJSON,
-										generator: null,
-									});
-								} else {
-									this.setState({
-										errorMessage: {
-											title: window.languageHelper.translate(
-												'Board Configuration Validation Error'
-											),
-											error: validation,
-										},
-										openPopup: 'error',
-									});
-								}
-							}
-						}}
+						onLoadConfig={this.onBoardLoadConfig}
 						onNewConfig={() => {
 							this.setState({
 								openScreen: 'boardConfigV2NewScreen',
@@ -518,6 +536,12 @@ class App extends React.Component<AppProps, AppStates> {
 						onRandomConfig={() => {
 							this.setState({
 								openPopup: 'randomBoardV2StartValues',
+								generator: null,
+							});
+						}}
+						onOpenRiverPresetEditor={() => {
+							this.setState({
+								openScreen: 'riverPresetEditor',
 								generator: null,
 							});
 						}}
@@ -540,10 +564,7 @@ class App extends React.Component<AppProps, AppStates> {
 						settings={settings}
 						position={popupPosition}
 						onPositionChange={(position, callback) => {
-							this.setState(
-								{ popupPosition: position },
-								callback
-							);
+							this.setState({ popupPosition: position }, callback);
 						}}
 						onDimensionChange={(dimension) => {
 							this.setState({ popupDimension: dimension });
@@ -564,8 +585,7 @@ class App extends React.Component<AppProps, AppStates> {
 							});
 						}}
 						onLoadConfig={async () => {
-							const partieJSON =
-								await window.electron.dialog.openPartieConfig();
+							const partieJSON = await window.electron.dialog.openPartieConfig();
 							if (partieJSON) {
 								this.setState({
 									openScreen: 'partieConfigLoadScreen',
@@ -582,10 +602,7 @@ class App extends React.Component<AppProps, AppStates> {
 						settings={settings}
 						position={popupPosition}
 						onPositionChange={(position, callback) => {
-							this.setState(
-								{ popupPosition: position },
-								callback
-							);
+							this.setState({ popupPosition: position }, callback);
 						}}
 						onDimensionChange={(dimension) => {
 							this.setState({ popupDimension: dimension });
@@ -606,22 +623,6 @@ class App extends React.Component<AppProps, AppStates> {
 				break;
 		}
 		return popup;
-	}
-
-	private addEventListeners() {
-		window.addEventListener(
-			'resize',
-			() => {
-				this.setState({
-					popupPosition: {
-						x: window.innerWidth / 2,
-						y: window.innerHeight / 2,
-					},
-					fullScreen: !window.screenTop && !window.screenY,
-				});
-			},
-			{ once: true }
-		);
 	}
 }
 

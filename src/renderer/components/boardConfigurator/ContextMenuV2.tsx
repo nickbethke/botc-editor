@@ -10,7 +10,7 @@ function ContextMenuV2(props: {
 	const { position, children } = props;
 	return (
 		<div
-			className="fixed bg-muted-700 flex flex-col p-1 rounded"
+			className="fixed dark:bg-muted-700 bg-muted-600 flex flex-col p-1 rounded z-50"
 			style={{ top: `${position.y}px`, left: `${position.x}px` }}
 		>
 			{children}

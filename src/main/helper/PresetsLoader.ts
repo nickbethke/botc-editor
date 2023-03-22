@@ -1,48 +1,55 @@
 import fs from 'fs';
 import Ajv, { JSONSchemaType } from 'ajv';
-import path from 'path';
+import path, { ParsedPath } from 'path';
 import { app } from 'electron';
 import * as RiverPresetSchema from '../../schema/riverPreset.schema.json';
 import * as BoardPresetSchema from '../../schema/boardPreset.schema.json';
 
+export type RiverPresetDirection = 'NORTH' | 'SOUTH' | 'EAST' | 'WEST';
 export type RiverPreset = {
 	name: string;
-	file: string;
+	width: number;
+	height: number;
 	data: {
 		position: [number, number];
-		direction: 'NORTH' | 'SOUTH' | 'EAST' | 'WEST';
+		direction: RiverPresetDirection;
 	}[];
+};
+export type RiverPresetWithFile = RiverPreset & {
+	file: ParsedPath;
 };
 export type BoardPreset = {
 	name: string;
-	file: string;
+	width: number;
+	height: number;
 	data: object;
 };
 
 class PresetsLoader {
-	private static riverPresetFolder: string =
-		PresetsLoader.getAssetPath('presets/rivers/');
+	private static riverPresetFolder: string = PresetsLoader.getAssetPath('presets/rivers/');
 
-	private static boardPresetFolder: string =
-		PresetsLoader.getAssetPath('presets/boards/');
+	private static boardPresetFolder: string = PresetsLoader.getAssetPath('presets/boards/');
 
 	public static getRiverPresets() {
-		const riverPresets: Array<RiverPreset> = [];
+		const riverPresets: Array<RiverPresetWithFile> = [];
 		const files = fs.readdirSync(PresetsLoader.riverPresetFolder);
 		files.forEach((file) => {
-			const content = fs.readFileSync(
-				PresetsLoader.riverPresetFolder + file,
-				{
-					encoding: 'utf8',
-				}
-			);
+			const content = fs.readFileSync(PresetsLoader.riverPresetFolder + file, {
+				encoding: 'utf8',
+			});
 			const valid = PresetsLoader.validateFile('river', content);
 			if (valid) {
 				riverPresets.push({
 					...(JSON.parse(content) as RiverPreset),
-					file: PresetsLoader.riverPresetFolder + file,
+					file: path.parse(PresetsLoader.riverPresetFolder + file),
 				});
 			}
+		});
+		riverPresets.sort((a, b) => {
+			const textA = a.file.base.toUpperCase();
+			const textB = b.file.base.toUpperCase();
+			const elseE = textA > textB ? 1 : 0;
+			return textA < textB ? -1 : elseE;
 		});
 		return riverPresets;
 	}
@@ -51,17 +58,13 @@ class PresetsLoader {
 		const boardPresets: Array<BoardPreset> = [];
 		const files = fs.readdirSync(PresetsLoader.boardPresetFolder);
 		files.forEach((file) => {
-			const content = fs.readFileSync(
-				PresetsLoader.boardPresetFolder + file,
-				{
-					encoding: 'utf8',
-				}
-			);
+			const content = fs.readFileSync(PresetsLoader.boardPresetFolder + file, {
+				encoding: 'utf8',
+			});
 			const valid = PresetsLoader.validateFile('board', content);
 			if (valid) {
 				boardPresets.push({
 					...(JSON.parse(content) as BoardPreset),
-					file: PresetsLoader.boardPresetFolder + file,
 				});
 			}
 		});
@@ -97,11 +100,23 @@ class PresetsLoader {
 
 	static getAssetPath(...paths: string[]): string {
 		return path.join(
-			app.isPackaged
-				? path.join(process.resourcesPath, 'assets')
-				: path.join(__dirname, '../../../assets'),
+			app.isPackaged ? path.join(process.resourcesPath, 'assets') : path.join(__dirname, '../../../assets'),
 			...paths
 		);
+	}
+
+	static saveRiverPreset(file: string, content: string) {
+		return fs.writeFileSync(path.join(PresetsLoader.riverPresetFolder, file), content, {
+			encoding: 'utf8',
+		});
+	}
+
+	static async renameRiverPreset(from: string, to: string) {
+		await fs.renameSync(
+			path.join(PresetsLoader.riverPresetFolder, from),
+			path.join(PresetsLoader.riverPresetFolder, to)
+		);
+		return path.parse(path.join(PresetsLoader.riverPresetFolder, to));
 	}
 }
 

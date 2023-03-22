@@ -107,7 +107,7 @@
 		],
 		[
 			"as Preset",
-			"als Preset"
+			"als Vorlage"
 		],
 		[
 			"as Configuration",
@@ -135,7 +135,7 @@
 		],
 		[
 			"Open Presets Folder",
-			"Presets-Ordner öffnen"
+			"Vorlagen-Ordner öffnen"
 		],
 		[
 			"Settings",
@@ -167,7 +167,7 @@
 		],
 		[
 			"Presets",
-			"Presets"
+			"Vorlagen"
 		],
 		[
 			"Start",
@@ -402,7 +402,7 @@
 			"Editor"
 		],
 		[
-			"Startfields",
+			"Start fields",
 			"Startfelder"
 		],
 		[
@@ -423,7 +423,7 @@
 		],
 		[
 			"Preset",
-			"Preset"
+			"Vorlage"
 		],
 		[
 			"Zoom",
@@ -452,6 +452,66 @@
 		[
 			"Close Party Configurator",
 			"Partie-Konfigurator schließen"
+		],
+		[
+			"River-Preset Editor",
+			"Fluss-Vorlage Editor"
+		],
+		[
+			"River Preset",
+			"Fluss Vorlage"
+		],
+		[
+			"New River Preset",
+			"Neue Fluss Vorlage"
+		],
+		[
+			"Load River Preset",
+			"Fluss Vorlage laden"
+		],
+		[
+			"Unsaved Preset",
+			"Ungespeicherte Vorlage"
+		],
+		[
+			"Open River-Preset Editor",
+			"Fluss-Vorlagen Editor öffnen"
+		],
+		[
+			"New Preset",
+			"Neue Vorlage"
+		],
+		[
+			"Loading...",
+			"Lädt..."
+		],
+		[
+			"Rename",
+			"Umbenennen"
+		],
+		[
+			"Rename Preset",
+			"Vorlage umbenennen"
+		],
+		[
+			"Close River Preset",
+			"Fluss Vorlage schließen"
+		],
+		[
+			"Save and close",
+			"Speichern und Schließen"
+		],
+		[
+			"This file has not yet been saved. Do you want to save the current changes before closing?",
+			"Diese Datei hat noch ungespeicherte Änderungen. Wollen Sie sie aktuellen Veränderungen speichern vor dem Schließen?"
+		],
+		[
+			"There are still unsaved changes. Do you want to save changes before closing?",
+			"Es gibt noch ungespeicherte Änderungen. Wollen Sie die Änderungen speichern vor dem schließen?"
+		],
+		[
+			"Close River-Preset Editor",
+			"Fluss-Vorlage Editor schließen"
 		]
 	]
 }

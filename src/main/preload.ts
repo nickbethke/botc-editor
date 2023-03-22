@@ -2,7 +2,7 @@ import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 import { ParsedPath } from 'path';
 import BoardConfigInterface from '../renderer/components/interfaces/BoardConfigInterface';
 import PartieConfigInterface from '../renderer/components/interfaces/PartieConfigInterface';
-import { BoardPreset, RiverPreset } from './helper/PresetsLoader';
+import { BoardPreset, RiverPresetWithFile } from './helper/PresetsLoader';
 import { SettingsInterface } from '../interfaces/SettingsInterface';
 
 export type Channels = 'enter-full-screen' | 'leave-full-screen';
@@ -10,10 +10,7 @@ export type Channels = 'enter-full-screen' | 'leave-full-screen';
 const electronHandler = {
 	ipcRenderer: {
 		on(channel: Channels, func: (...args: unknown[]) => void) {
-			const subscription = (
-				_event: IpcRendererEvent,
-				...args: unknown[]
-			) => func(...args);
+			const subscription = (_event: IpcRendererEvent, ...args: unknown[]) => func(...args);
 			ipcRenderer.on(channel, subscription);
 
 			return () => {
@@ -100,9 +97,7 @@ const electronHandler = {
 		}> {
 			return ipcRenderer.invoke('get:prefetch');
 		},
-		updateSettings(
-			settings: SettingsInterface
-		): Promise<SettingsInterface> {
+		updateSettings(settings: SettingsInterface): Promise<SettingsInterface> {
 			return ipcRenderer.invoke('update:settings', settings);
 		},
 		beep(): Promise<void> {
@@ -111,10 +106,13 @@ const electronHandler = {
 	},
 	load: {
 		presets(): Promise<{
-			rivers: Array<RiverPreset>;
+			rivers: Array<RiverPresetWithFile>;
 			boards: Array<BoardPreset>;
 		}> {
 			return ipcRenderer.invoke('load:presets');
+		},
+		riverPresets(): Promise<Array<RiverPresetWithFile>> {
+			return ipcRenderer.invoke('load:riverPresets');
 		},
 	},
 	file: {
@@ -127,11 +125,17 @@ const electronHandler = {
 		save(file: string, content: string): Promise<true | string> {
 			return ipcRenderer.invoke('file:save', file, content);
 		},
+		savePreset(file: string, content: string): Promise<boolean> {
+			return ipcRenderer.invoke('file:savePreset', file, content);
+		},
 		remove(file: string): Promise<true | string> {
 			return ipcRenderer.invoke('file:remove', file);
 		},
 		getTranslation(lang: string): Promise<string> {
 			return ipcRenderer.invoke('file:getTranslation', lang);
+		},
+		renamePreset(from: string, to: string): Promise<ParsedPath> {
+			return ipcRenderer.invoke('file:renamePreset', from, to);
 		},
 	},
 	open: {

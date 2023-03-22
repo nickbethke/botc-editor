@@ -11,11 +11,14 @@ export interface LanguageSchema {
 class TranslationHelper {
 	private lang: AvailableLanguages;
 
+	public missingTranslations: Map<string, boolean>;
+
 	private loadedLanguage: Map<string, string>;
 
 	constructor(lang: AvailableLanguages) {
 		this.lang = lang;
 		this.loadedLanguage = new Map<string, string>();
+		this.missingTranslations = new Map();
 		this.setLanguageJSON();
 	}
 
@@ -23,6 +26,7 @@ class TranslationHelper {
 		if (this.loadedLanguage.has(str)) {
 			return this.loadedLanguage.get(str) || str;
 		}
+		this.missingTranslations.set(str, true);
 		return str;
 	}
 

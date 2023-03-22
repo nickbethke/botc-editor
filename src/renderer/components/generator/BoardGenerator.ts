@@ -1,3 +1,4 @@
+import { sample } from 'lodash';
 import FieldWithPositionInterface from './interfaces/FieldWithPositionInterface';
 import Grass from './fields/Grass';
 import BoardConfigInterface, {
@@ -123,17 +124,10 @@ class BoardGenerator {
 		}
 
 		// initializing the boardConfigurator array
-		this.board = BoardGenerator.generateBoardArray(
-			this.startValues.height,
-			this.startValues.width
-		);
+		this.board = BoardGenerator.generateBoardArray(this.startValues.height, this.startValues.width);
 
 		// initializing the new boardConfigurator
-		this.boardJSON = new Board(
-			this.startValues.name,
-			this.startValues.width,
-			this.startValues.height
-		);
+		this.boardJSON = new Board(this.startValues.name, this.startValues.width, this.startValues.height);
 
 		// generate saurons eye
 		this.genSauronsEye();
@@ -170,28 +164,20 @@ class BoardGenerator {
 		}
 	}
 
-	public static positionArrayToBoardPositionArray(
-		position: Position[]
-	): BoardPosition[] {
+	public static positionArrayToBoardPositionArray(position: Position[]): BoardPosition[] {
 		const boardPositions: BoardPosition[] = [];
 		for (let i = 0; i < position.length; i += 1) {
 			const positionItem = position[i];
-			boardPositions.push(
-				BoardGenerator.positionToBoardPosition(positionItem)
-			);
+			boardPositions.push(BoardGenerator.positionToBoardPosition(positionItem));
 		}
 		return boardPositions;
 	}
 
-	public static startFieldsArrayToBoardPositionArray(
-		position: PositionDirection[]
-	): BoardPosition[] {
+	public static startFieldsArrayToBoardPositionArray(position: PositionDirection[]): BoardPosition[] {
 		const boardPositions: BoardPosition[] = [];
 		for (let i = 0; i < position.length; i += 1) {
 			const positionItem = position[i];
-			boardPositions.push(
-				BoardGenerator.positionToBoardPosition(positionItem.position)
-			);
+			boardPositions.push(BoardGenerator.positionToBoardPosition(positionItem.position));
 		}
 		return boardPositions;
 	}
@@ -199,14 +185,11 @@ class BoardGenerator {
 	public static lembasFieldsArrayToBoardPositionArray(
 		position: LembasField[]
 	): { position: BoardPosition; amount: number }[] {
-		const boardPositions: { position: BoardPosition; amount: number }[] =
-			[];
+		const boardPositions: { position: BoardPosition; amount: number }[] = [];
 		for (let i = 0; i < position.length; i += 1) {
 			const positionItem = position[i];
 			boardPositions.push({
-				position: BoardGenerator.positionToBoardPosition(
-					positionItem.position
-				),
+				position: BoardGenerator.positionToBoardPosition(positionItem.position),
 				amount: positionItem.amount,
 			});
 		}
@@ -217,27 +200,19 @@ class BoardGenerator {
 		const map: Map<string, boolean> = new Map();
 		for (let i = 0; i < walls.length; i += 1) {
 			const wall = walls[i];
-			const s1 =
-				BoardGenerator.position2String(wall[0]) +
-				BoardGenerator.position2String(wall[1]);
-			const s2 =
-				BoardGenerator.position2String(wall[1]) +
-				BoardGenerator.position2String(wall[0]);
+			const s1 = BoardGenerator.position2String(wall[0]) + BoardGenerator.position2String(wall[1]);
+			const s2 = BoardGenerator.position2String(wall[1]) + BoardGenerator.position2String(wall[0]);
 			map.set(s1, true);
 			map.set(s2, true);
 		}
 		return map;
 	}
 
-	public static generateBoardArray(
-		height: number,
-		width: number
-	): Array<Array<FieldWithPositionInterface>> {
+	public static generateBoardArray(height: number, width: number): Array<Array<FieldWithPositionInterface>> {
 		const board = new Array<Array<FieldWithPositionInterface>>();
 
 		for (let x = 0; x < width; x += 1) {
-			const row: FieldWithPositionInterface[] =
-				new Array<FieldWithPositionInterface>();
+			const row: FieldWithPositionInterface[] = new Array<FieldWithPositionInterface>();
 			for (let y = 0; y < height; y += 1) {
 				row.push(new Grass({ x, y }));
 			}
@@ -249,10 +224,7 @@ class BoardGenerator {
 	private genSauronsEye() {
 		const position = this.getRandomPosition();
 		const direction = BoardGenerator.getRandomDirection();
-		this.board[position.x][position.y] = new SauronsEye(
-			position,
-			direction
-		);
+		this.board[position.x][position.y] = new SauronsEye(position, direction);
 		this.boardJSON.setEye(position, direction);
 	}
 
@@ -266,10 +238,7 @@ class BoardGenerator {
 	private genStartField() {
 		const position = this.getRandomPosition();
 		const direction = BoardGenerator.getRandomDirection();
-		this.board[position.x][position.y] = new StartField(
-			position,
-			direction
-		);
+		this.board[position.x][position.y] = new StartField(position, direction);
 		this.boardJSON.addStartField(position, direction);
 		this.startFields.push(position);
 	}
@@ -303,11 +272,7 @@ class BoardGenerator {
 		// generate random position
 		const position = this.getRandomPosition();
 		// check if position has already been tried
-		if (
-			this.holesTrys.get(
-				BoardGenerator.boardPosition2String(position)
-			) === undefined
-		) {
+		if (this.holesTrys.get(BoardGenerator.boardPosition2String(position)) === undefined) {
 			// check pathfinding, so all checkpoints are reachable from all start fields
 			const { result } = AStar.pathPossible(
 				this.checkpoints,
@@ -323,10 +288,7 @@ class BoardGenerator {
 				this.holesSet += 1;
 			}
 			// set tried hole position
-			this.holesTrys.set(
-				BoardGenerator.boardPosition2String(position),
-				true
-			);
+			this.holesTrys.set(BoardGenerator.boardPosition2String(position), true);
 		}
 	}
 
@@ -377,17 +339,11 @@ class BoardGenerator {
 	private genRiversComplex(riverCount: number) {
 		let made = 0;
 		while (made < riverCount) {
-			const toMake = BoardGenerator.getRandomInt(
-				2,
-				Math.min(this.startValues.height, this.startValues.width)
-			);
+			const toMake = BoardGenerator.getRandomInt(2, Math.min(this.startValues.height, this.startValues.width));
 			let startPosition = this.getRandomPosition();
 			let startDirection = BoardGenerator.getRandomDirection();
 
-			this.board[startPosition.x][startPosition.y] = new River(
-				startPosition,
-				startDirection
-			);
+			this.board[startPosition.x][startPosition.y] = new River(startPosition, startDirection);
 			this.boardJSON.addRiverField(startPosition, startDirection);
 			made += 1;
 
@@ -398,8 +354,7 @@ class BoardGenerator {
 						position: BoardPosition;
 						direction: Direction;
 					} | null = null;
-					const helpDirection =
-						DirectionHelper.dirEnumToString(startDirection);
+					const helpDirection = DirectionHelper.dirEnumToString(startDirection);
 					for (let i1 = 0; i1 < neighbors.length; i1 += 1) {
 						const neighbor = neighbors[i1];
 						const { direction } = neighbor;
@@ -413,36 +368,20 @@ class BoardGenerator {
 					} else {
 						startDirection = BoardGenerator.getRandomDirection();
 						if (
-							(DirectionHelper.dirEnumToString(startDirection) ===
-								'SOUTH' &&
-								helpDirection === 'NORTH') ||
-							(DirectionHelper.dirEnumToString(startDirection) ===
-								'NORTH' &&
-								helpDirection === 'SOUTH')
+							(DirectionHelper.dirEnumToString(startDirection) === 'SOUTH' && helpDirection === 'NORTH') ||
+							(DirectionHelper.dirEnumToString(startDirection) === 'NORTH' && helpDirection === 'SOUTH')
 						) {
-							startDirection = BoardGenerator.probably(50)
-								? DirectionEnum.EAST
-								: DirectionEnum.WEST;
+							startDirection = BoardGenerator.probably(50) ? DirectionEnum.EAST : DirectionEnum.WEST;
 						}
 						if (
-							(DirectionHelper.dirEnumToString(startDirection) ===
-								'EAST' &&
-								helpDirection === 'WEST') ||
-							(DirectionHelper.dirEnumToString(startDirection) ===
-								'WEST' &&
-								helpDirection === 'EAST')
+							(DirectionHelper.dirEnumToString(startDirection) === 'EAST' && helpDirection === 'WEST') ||
+							(DirectionHelper.dirEnumToString(startDirection) === 'WEST' && helpDirection === 'EAST')
 						) {
-							startDirection = BoardGenerator.probably(50)
-								? DirectionEnum.NORTH
-								: DirectionEnum.SOUTH;
+							startDirection = BoardGenerator.probably(50) ? DirectionEnum.NORTH : DirectionEnum.SOUTH;
 						}
 						startPosition = selected.position;
-						this.board[startPosition.x][startPosition.y] =
-							new River(startPosition, startDirection);
-						this.boardJSON.addRiverField(
-							startPosition,
-							startDirection
-						);
+						this.board[startPosition.x][startPosition.y] = new River(startPosition, startDirection);
+						this.boardJSON.addRiverField(startPosition, startDirection);
 						made += 1;
 						if (made >= riverCount) {
 							break;
@@ -458,9 +397,7 @@ class BoardGenerator {
 		}
 	}
 
-	public getRiverNeighbors(
-		position: BoardPosition
-	): Array<{ position: BoardPosition; direction: Direction }> {
+	public getRiverNeighbors(position: BoardPosition): Array<{ position: BoardPosition; direction: Direction }> {
 		const { x, y } = position;
 
 		const neighbors = new Array<{
@@ -469,36 +406,24 @@ class BoardGenerator {
 		}>();
 		// north
 		let currentPosition = { x, y: y - 1 };
-		if (
-			this.isPositionInBoard(currentPosition) &&
-			!(this.board[y - 1][x] instanceof River)
-		) {
+		if (this.isPositionInBoard(currentPosition) && !(this.board[y - 1][x] instanceof River)) {
 			neighbors.push({ position: currentPosition, direction: 'NORTH' });
 		}
 
 		// east
 		currentPosition = { x: x + 1, y };
-		if (
-			this.isPositionInBoard(currentPosition) &&
-			!(this.board[y][x + 1] instanceof River)
-		) {
+		if (this.isPositionInBoard(currentPosition) && !(this.board[y][x + 1] instanceof River)) {
 			neighbors.push({ position: currentPosition, direction: 'EAST' });
 		}
 		// south
 		currentPosition = { x, y: y + 1 };
-		if (
-			this.isPositionInBoard(currentPosition) &&
-			!(this.board[y + 1][x] instanceof River)
-		) {
+		if (this.isPositionInBoard(currentPosition) && !(this.board[y + 1][x] instanceof River)) {
 			neighbors.push({ position: currentPosition, direction: 'SOUTH' });
 		}
 
 		// west
 		currentPosition = { x: x - 1, y };
-		if (
-			this.isPositionInBoard(currentPosition) &&
-			!(this.board[y][x - 1] instanceof River)
-		) {
+		if (this.isPositionInBoard(currentPosition) && !(this.board[y][x - 1] instanceof River)) {
 			neighbors.push({ position: currentPosition, direction: 'WEST' });
 		}
 
@@ -508,18 +433,13 @@ class BoardGenerator {
 	private genWallsRandom() {
 		const x = this.startValues.width;
 		const y = this.startValues.height;
-		const wallsToSet = Math.floor(
-			((x - 1) * y + (y - 1) * x) * this.percentage
-		);
+		const wallsToSet = Math.floor(((x - 1) * y + (y - 1) * x) * this.percentage);
 		const alreadyTried: Array<string> = [];
 
 		this.wallMaxCall = ((x - 1) * y + (y - 1) * x) * 4;
 		this.wallCall = 0;
 		if (wallsToSet) {
-			while (
-				this.wallCall < this.wallMaxCall &&
-				this.walls < wallsToSet
-			) {
+			while (this.wallCall < this.wallMaxCall && this.walls < wallsToSet) {
 				this.genWallRandom(alreadyTried);
 				this.wallCall += 1;
 			}
@@ -530,8 +450,7 @@ class BoardGenerator {
 		const firstPosition = this.getRandomPosition(true);
 		const neighbors = this.getNeighbors(firstPosition);
 		if (neighbors.length) {
-			const secondPosition =
-				neighbors[BoardGenerator.getRandomInt(0, neighbors.length)];
+			const secondPosition = neighbors[BoardGenerator.getRandomInt(0, neighbors.length)];
 			if (
 				!(
 					this.getFieldFromPosition(firstPosition) instanceof River &&
@@ -540,24 +459,16 @@ class BoardGenerator {
 			) {
 				if (
 					!alreadyTried.includes(
-						firstPosition.x.toString() +
-							firstPosition.y.toString() +
-							secondPosition.x.toString() +
-							secondPosition.y
+						firstPosition.x.toString() + firstPosition.y.toString() + secondPosition.x.toString() + secondPosition.y
 					) &&
 					!alreadyTried.includes(
-						secondPosition.x.toString() +
-							secondPosition.y.toString() +
-							firstPosition.x.toString() +
-							firstPosition.y
+						secondPosition.x.toString() + secondPosition.y.toString() + firstPosition.x.toString() + firstPosition.y
 					)
 				) {
 					const s1 =
-						BoardGenerator.boardPosition2String(firstPosition) +
-						BoardGenerator.boardPosition2String(secondPosition);
+						BoardGenerator.boardPosition2String(firstPosition) + BoardGenerator.boardPosition2String(secondPosition);
 					const s2 =
-						BoardGenerator.boardPosition2String(secondPosition) +
-						BoardGenerator.boardPosition2String(firstPosition);
+						BoardGenerator.boardPosition2String(secondPosition) + BoardGenerator.boardPosition2String(firstPosition);
 					const wallsArrayCopy = [...this.wallMapArray];
 					this.wallMapArray.push([s1, true], [s2, true]);
 					const { result } = AStar.pathPossible(
@@ -582,9 +493,7 @@ class BoardGenerator {
 		}
 	}
 
-	private getFieldFromPosition(
-		position: BoardPosition
-	): FieldWithPositionInterface {
+	private getFieldFromPosition(position: BoardPosition): FieldWithPositionInterface {
 		return this.board[position.y][position.x];
 	}
 
@@ -633,18 +542,11 @@ class BoardGenerator {
 		for (let i = 0; i < neighbors.length; i += 1) {
 			const neighbor = neighbors[i];
 			if (
-				!(
-					this.getFieldFromPosition(position) instanceof River &&
-					this.getFieldFromPosition(neighbor) instanceof River
-				)
+				!(this.getFieldFromPosition(position) instanceof River && this.getFieldFromPosition(neighbor) instanceof River)
 			) {
 				if (BoardGenerator.probably(this.percentage * 100)) {
-					const s1 =
-						BoardGenerator.boardPosition2String(position) +
-						BoardGenerator.boardPosition2String(neighbor);
-					const s2 =
-						BoardGenerator.boardPosition2String(neighbor) +
-						BoardGenerator.boardPosition2String(position);
+					const s1 = BoardGenerator.boardPosition2String(position) + BoardGenerator.boardPosition2String(neighbor);
+					const s2 = BoardGenerator.boardPosition2String(neighbor) + BoardGenerator.boardPosition2String(position);
 					const wallsArrayCopy = [...this.wallMapArray];
 					this.wallMapArray.push([s1, true], [s2, true]);
 					const { result: pathPossible } = AStar.pathPossible(
@@ -754,37 +656,21 @@ class BoardGenerator {
 	}
 
 	static getRandomDirection(): DirectionEnum {
-		return BoardGenerator.getRandomEnum(DirectionEnum);
-	}
-
-	static getRandomEnum<T>(anEnum: T): T[keyof T] {
-		const enumValues = Object.keys(anEnum)
-			.map((n) => Number.parseInt(n, 10))
-			.filter((n) => !Number.isNaN(n)) as unknown as T[keyof T][];
-		const randomIndex = Math.floor(Math.random() * enumValues.length);
-		return enumValues[randomIndex];
+		return sample(Object.values(DirectionEnum)) as DirectionEnum;
 	}
 
 	private getRandomLembasAmount(): number {
 		return this.startValues.maxLembasAmountOnField <= 0
 			? 0
-			: BoardGenerator.getRandomIntInclusive(
-					0,
-					this.startValues.maxLembasAmountOnField
-			  );
+			: BoardGenerator.getRandomIntInclusive(0, this.startValues.maxLembasAmountOnField);
 	}
 
 	static getRandomIntInclusive(min: number, max: number) {
-		return Math.floor(
-			Math.random() * (Math.floor(max) - Math.ceil(min) + 1) +
-				Math.ceil(min)
-		); // The maximum is inclusive and the minimum is inclusive
+		return Math.floor(Math.random() * (Math.floor(max) - Math.ceil(min) + 1) + Math.ceil(min)); // The maximum is inclusive and the minimum is inclusive
 	}
 
 	static getRandomInt(min: number, max: number) {
-		return Math.floor(
-			Math.random() * (Math.floor(max) - Math.ceil(min)) + Math.ceil(min)
-		);
+		return Math.floor(Math.random() * (Math.floor(max) - Math.ceil(min)) + Math.ceil(min));
 	}
 
 	static boardPosition2String(postion: BoardPosition): string {
@@ -805,9 +691,7 @@ class BoardGenerator {
 		});
 	}
 
-	static checkpointsPositionArrayToCheckpointArray(
-		checkpointPositionArray: BoardPosition[]
-	): Checkpoint[] {
+	static checkpointsPositionArrayToCheckpointArray(checkpointPositionArray: BoardPosition[]): Checkpoint[] {
 		const checkpoints = [];
 		for (let i = 0; i < checkpointPositionArray.length; i += 1) {
 			const c = checkpointPositionArray[i];
@@ -856,11 +740,8 @@ class BoardGenerator {
 		return 'NORTH';
 	}
 
-	static jsonToBoard = (
-		json: BoardConfigInterface
-	): Array<Array<FieldWithPositionInterface>> => {
-		const board: Array<Array<FieldWithPositionInterface>> =
-			BoardGenerator.generateBoardArray(json.height, json.width);
+	static jsonToBoard = (json: BoardConfigInterface): Array<Array<FieldWithPositionInterface>> => {
+		const board: Array<Array<FieldWithPositionInterface>> = BoardGenerator.generateBoardArray(json.height, json.width);
 
 		board[json.eye.position[1]][json.eye.position[0]] = new SauronsEye(
 			BoardGenerator.positionToBoardPosition(json.eye.position),
@@ -869,12 +750,8 @@ class BoardGenerator {
 
 		for (let i = 0; i < json.startFields.length; i += 1) {
 			const startField = json.startFields[i];
-			const position = BoardGenerator.positionToBoardPosition(
-				startField.position
-			);
-			const d = BoardGenerator.directionToDirectionEnum(
-				startField.direction
-			);
+			const position = BoardGenerator.positionToBoardPosition(startField.position);
+			const d = BoardGenerator.directionToDirectionEnum(startField.direction);
 			board[position.x][position.y] = new StartField(position, d);
 		}
 
@@ -893,25 +770,16 @@ class BoardGenerator {
 		if (json.lembasFields) {
 			for (let i = 0; i < json.lembasFields.length; i += 1) {
 				const lembasField = json.lembasFields[i];
-				const position = BoardGenerator.positionToBoardPosition(
-					lembasField.position
-				);
-				board[position.x][position.y] = new Lembas(
-					position,
-					lembasField.amount
-				);
+				const position = BoardGenerator.positionToBoardPosition(lembasField.position);
+				board[position.x][position.y] = new Lembas(position, lembasField.amount);
 			}
 		}
 
 		if (json.riverFields) {
 			for (let i = 0; i < json.riverFields.length; i += 1) {
 				const riverField = json.riverFields[i];
-				const position = BoardGenerator.positionToBoardPosition(
-					riverField.position
-				);
-				const d = BoardGenerator.directionToDirectionEnum(
-					riverField.direction
-				);
+				const position = BoardGenerator.positionToBoardPosition(riverField.position);
+				const d = BoardGenerator.directionToDirectionEnum(riverField.direction);
 				board[position.x][position.y] = new River(position, d);
 			}
 		}
@@ -923,9 +791,7 @@ class BoardGenerator {
 		const r: Position[] = [];
 		for (let i = 0; i < array.length; i += 1) {
 			const checkpoint: Checkpoint = array[i];
-			r[checkpoint.order] = BoardGenerator.boardPositionToPosition(
-				checkpoint.position
-			);
+			r[checkpoint.order] = BoardGenerator.boardPositionToPosition(checkpoint.position);
 		}
 		return r;
 	}

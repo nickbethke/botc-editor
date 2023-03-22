@@ -34,3 +34,4 @@ npm-debug.log.*
 .github
 
 assets/settings.json
+assets/presets/rivers/*

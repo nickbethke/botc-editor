@@ -10,10 +10,7 @@ export type ConfirmPopupV2Props = {
 	onConfirm: () => void;
 	children: string | JSX.Element | JSX.Element[];
 	position: { x: number; y: number };
-	onPositionChange: (
-		position: { x: number; y: number },
-		callback: () => void
-	) => void;
+	onPositionChange: (position: { x: number; y: number }, callback: () => void) => void;
 	onDimensionChange: (dimension: { width: number; height: number }) => void;
 	os: NodeJS.Platform;
 	topOffset?: boolean;
@@ -26,10 +23,7 @@ type ConfirmPopupV2State = {
 	offClick: boolean;
 };
 
-class ConfirmPopupV2 extends React.Component<
-	ConfirmPopupV2Props,
-	ConfirmPopupV2State
-> {
+class ConfirmPopupV2 extends React.Component<ConfirmPopupV2Props, ConfirmPopupV2State> {
 	constructor(props: ConfirmPopupV2Props) {
 		super(props);
 		this.state = {
@@ -69,10 +63,7 @@ class ConfirmPopupV2 extends React.Component<
 		}
 	}
 
-	componentDidUpdate(
-		prevProps: Readonly<ConfirmPopupV2Props>,
-		prevState: Readonly<ConfirmPopupV2State>
-	) {
+	componentDidUpdate(prevProps: Readonly<ConfirmPopupV2Props>, prevState: Readonly<ConfirmPopupV2State>) {
 		const { offClick: preOffClick } = prevState;
 		const { offClick } = this.state;
 		if (offClick !== preOffClick && !preOffClick) {
@@ -109,9 +100,7 @@ class ConfirmPopupV2 extends React.Component<
 				className="w-[100vw] absolute left-0 bg-black/25 text-white"
 				style={{
 					top: os === 'win32' && topOffset ? 32 : 0,
-					height:
-						window.innerHeight -
-						(os === 'win32' && topOffset ? 32 : 0),
+					height: window.innerHeight - (os === 'win32' && topOffset ? 32 : 0),
 				}}
 				onClick={this.handleOffClick}
 			>
@@ -149,8 +138,7 @@ class ConfirmPopupV2 extends React.Component<
 							onMouseMove={(event) => {
 								const { isDragged, rel } = this.state;
 								const { settings } = this.props;
-								if (!isDragged || !settings.popupsDraggable)
-									return;
+								if (!isDragged || !settings.popupsDraggable) return;
 								onPositionChange(
 									{
 										x: event.pageX - rel.x,
@@ -178,20 +166,12 @@ class ConfirmPopupV2 extends React.Component<
 								e.preventDefault();
 							}}
 						>
-							<img
-								className="h-6"
-								src={destinyMountainImage}
-								alt={window.languageHelper.translate('Logo')}
-							/>
+							<img className="h-6" src={destinyMountainImage} alt={window.languageHelper.translate('Logo')} />
 							<span>{title}</span>
 						</div>
 						<div className="py-2 px-4 mb-2">{children}</div>
 						<div className="py-2 px-4 flex justify-end gap-4 items-center text-sm border-t dark:border-muted-700 border-muted-400">
-							<button
-								className="py-1 px-2 bg-accent-600 rounded hover:bg-accent-500"
-								type="button"
-								onClick={onConfirm}
-							>
+							<button className="py-1 px-2 bg-accent-600 rounded hover:bg-accent-500" type="button" onClick={onConfirm}>
 								{confirmButtonText}
 							</button>
 							<button
