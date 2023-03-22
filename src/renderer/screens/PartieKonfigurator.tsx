@@ -23,14 +23,10 @@ type PartieKonfiguratorProps = {
 type PartieKonfiguratorState = {
 	values: PartieConfigInterface;
 	popupLeave: boolean;
-
 	windowDimensions: {
 		width: number;
 		height: number;
 	};
-
-	popupPosition: { x: number; y: number };
-	popupDimension: { width: number; height: number };
 };
 
 // TODO: Translations
@@ -61,56 +57,7 @@ class PartieKonfigurator extends React.Component<PartieKonfiguratorProps, Partie
 				width: window.innerWidth,
 				height: window.innerHeight,
 			},
-			popupPosition: {
-				x: window.innerWidth / 2,
-				y: window.innerHeight / 2,
-			},
-			popupDimension: {
-				width: 0,
-				height: 0,
-			},
 		};
-	}
-
-	componentDidUpdate(prevProps: Readonly<PartieKonfiguratorProps>, prevState: Readonly<PartieKonfiguratorState>) {
-		const { popupLeave: prePopupLeave } = prevState;
-		const { popupPosition, popupDimension, windowDimensions, popupLeave } = this.state;
-		const { os } = this.props;
-		if (popupPosition.x < 0) {
-			this.setState({ popupPosition: { x: 0, y: popupPosition.y } });
-		}
-		if (popupPosition.y < (os === 'win32' ? 32 : 0)) {
-			this.setState({
-				popupPosition: {
-					x: popupPosition.x,
-					y: os === 'win32' ? 32 : 0,
-				},
-			});
-		}
-		if (popupPosition.x + popupDimension.width > windowDimensions.width) {
-			this.setState({
-				popupPosition: {
-					x: windowDimensions.width - popupDimension.width,
-					y: popupPosition.y,
-				},
-			});
-		}
-		if (popupPosition.y + popupDimension.height > windowDimensions.height) {
-			this.setState({
-				popupPosition: {
-					x: popupPosition.x,
-					y: windowDimensions.height - popupDimension.height,
-				},
-			});
-		}
-		if (prePopupLeave !== popupLeave) {
-			this.setState({
-				popupPosition: {
-					x: window.innerWidth / 2,
-					y: window.innerHeight / 2,
-				},
-			});
-		}
 	}
 
 	handleBackButton = () => {
@@ -148,7 +95,7 @@ class PartieKonfigurator extends React.Component<PartieKonfiguratorProps, Partie
 
 	render = () => {
 		let { values } = this.state;
-		const { popupLeave, popupPosition } = this.state;
+		const { popupLeave, windowDimensions } = this.state;
 		const { loadedValues, os, settings, onSettingsUpdate, fullScreen } = this.props;
 
 		if (loadedValues) {
@@ -164,13 +111,7 @@ class PartieKonfigurator extends React.Component<PartieKonfiguratorProps, Partie
 					onConfirm={this.backToHomeScreen}
 					onAbort={this.abortBackToHomeScreen}
 					settings={settings}
-					onPositionChange={(position, callback) => {
-						this.setState({ popupPosition: position }, callback);
-					}}
-					onDimensionChange={(dimension) => {
-						this.setState({ popupDimension: dimension });
-					}}
-					position={popupPosition}
+					windowDimensions={windowDimensions}
 					confirmButtonText={window.languageHelper.translate('Discard')}
 					os={os}
 					abortButtonText={window.languageHelper.translate('Cancel')}

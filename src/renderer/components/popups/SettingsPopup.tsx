@@ -8,9 +8,7 @@ interface SettingsPopupProps {
 	settings: SettingsInterface;
 	onAbort: () => void;
 	onConfirm: (settings: SettingsInterface) => void;
-	position: { x: number; y: number };
-	onPositionChange: (position: { x: number; y: number }, callback: () => void) => void;
-	onDimensionChange: (dimension: { width: number; height: number }) => void;
+	windowDimensions: { width: number; height: number };
 	os: NodeJS.Platform;
 	topOffset?: boolean;
 }
@@ -32,7 +30,7 @@ class SettingsPopup extends React.Component<SettingsPopupProps, SettingsPopupSta
 	}
 
 	render() {
-		const { os, position, onPositionChange, onDimensionChange, onAbort, onConfirm, topOffset } = this.props;
+		const { os, windowDimensions, onAbort, onConfirm, topOffset } = this.props;
 		const { settings } = this.state;
 		return (
 			<ConfirmPopupV2
@@ -43,9 +41,7 @@ class SettingsPopup extends React.Component<SettingsPopupProps, SettingsPopupSta
 				onConfirm={() => {
 					onConfirm(settings);
 				}}
-				position={position}
-				onPositionChange={onPositionChange}
-				onDimensionChange={onDimensionChange}
+				windowDimensions={windowDimensions}
 				os={os}
 				topOffset={topOffset}
 				settings={settings}

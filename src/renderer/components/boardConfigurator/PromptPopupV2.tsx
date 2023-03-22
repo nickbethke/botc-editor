@@ -10,9 +10,7 @@ export type PromptPopupV2Props = {
 	confirmButtonText: string;
 	onConfirm: (value: string) => void;
 	input: { type: 'text'; startValue: string };
-	position: { x: number; y: number };
-	onPositionChange: (position: { x: number; y: number }, callback: () => void) => void;
-	onDimensionChange: (dimension: { width: number; height: number }) => void;
+	windowDimensions: { width: number; height: number };
 	os: NodeJS.Platform;
 	topOffset?: boolean;
 	settings: SettingsInterface;
@@ -23,6 +21,8 @@ type PromptPopupV2State = {
 	visible: boolean;
 	offClick: boolean;
 	value: string;
+	position: { x: number; y: number };
+	dimension: { width: number; height: number };
 };
 
 class PromptPopupV2 extends React.Component<PromptPopupV2Props, PromptPopupV2State> {
@@ -34,6 +34,8 @@ class PromptPopupV2 extends React.Component<PromptPopupV2Props, PromptPopupV2Sta
 			visible: false,
 			offClick: false,
 			value: props.input.startValue,
+			position: { x: window.innerWidth / 2, y: window.innerHeight / 2 },
+			dimension: { width: 0, height: 0 },
 		};
 		this.handleOffClick = this.handleOffClick.bind(this);
 	}
@@ -45,35 +47,67 @@ class PromptPopupV2 extends React.Component<PromptPopupV2Props, PromptPopupV2Sta
 	}
 
 	componentDidMount() {
-		const popup = document.getElementById('popupV2');
-		const { onPositionChange, position, onDimensionChange } = this.props;
-		if (popup) {
-			onPositionChange(
-				{
-					x: position.x - popup.clientWidth / 2,
-					y: position.y - popup.clientHeight / 2,
-				},
-				() => {
-					setTimeout(() => {
-						this.setState({ visible: true });
-					}, 200);
-				}
-			);
-			onDimensionChange({
-				width: popup.clientWidth + 2,
-				height: popup.clientHeight + 2,
-			});
-		}
+		setTimeout(() => {
+			const popup = document.getElementById('popupV2');
+			const { position } = this.state;
+			if (popup) {
+				this.setState(
+					{
+						position: {
+							x: position.x - popup.clientWidth / 2,
+							y: position.y - popup.clientHeight / 2,
+						},
+						dimension: {
+							width: popup.clientWidth + 4,
+							height: popup.clientHeight + 4,
+						},
+					},
+					() => {
+						setTimeout(() => {
+							this.setState({ visible: true });
+						}, 200);
+					}
+				);
+			}
+		}, 200);
 	}
 
 	componentDidUpdate(prevProps: Readonly<PromptPopupV2Props>, prevState: Readonly<PromptPopupV2State>) {
 		const { offClick: preOffClick } = prevState;
-		const { offClick } = this.state;
+		const { offClick, position, dimension } = this.state;
+		const { os, windowDimensions } = this.props;
 		if (offClick !== preOffClick && !preOffClick) {
 			window.electron.app.beep().catch(() => {});
 			setTimeout(() => {
 				this.setState({ offClick: false });
 			}, 500);
+		}
+		if (position.x < 0) {
+			this.setState({ position: { x: 0, y: position.y } });
+		}
+		if (position.y < (os === 'win32' ? 32 : 0)) {
+			this.setState({
+				position: {
+					x: position.x,
+					y: os === 'win32' ? 32 : 0,
+				},
+			});
+		}
+		if (position.x + dimension.width > windowDimensions.width) {
+			this.setState({
+				position: {
+					x: windowDimensions.width - dimension.width,
+					y: position.y,
+				},
+			});
+		}
+		if (position.y + dimension.height > windowDimensions.height) {
+			this.setState({
+				position: {
+					x: position.x,
+					y: windowDimensions.height - dimension.height,
+				},
+			});
 		}
 	}
 
@@ -101,19 +135,8 @@ class PromptPopupV2 extends React.Component<PromptPopupV2Props, PromptPopupV2Sta
 	};
 
 	render() {
-		const {
-			confirmButtonText,
-			abortButtonText,
-			onConfirm,
-			onAbort,
-			input,
-			title,
-			position,
-			onPositionChange,
-			os,
-			topOffset,
-		} = this.props;
-		const { visible, offClick } = this.state;
+		const { confirmButtonText, abortButtonText, onConfirm, onAbort, input, title, os, topOffset } = this.props;
+		const { visible, offClick, position } = this.state;
 		return (
 			<div
 				role="presentation"
@@ -160,13 +183,12 @@ class PromptPopupV2 extends React.Component<PromptPopupV2Props, PromptPopupV2Sta
 								const { isDragged, rel } = this.state;
 								const { settings } = this.props;
 								if (!isDragged || !settings.popupsDraggable) return;
-								onPositionChange(
-									{
+								this.setState({
+									position: {
 										x: event.pageX - rel.x,
 										y: event.pageY - rel.y,
 									},
-									() => {}
-								);
+								});
 								event.stopPropagation();
 								event.preventDefault();
 							}}

@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import SortableList, { SortableItem, SortableKnob } from 'react-easy-sort';
-import { VscGripper } from 'react-icons/vsc';
 import { BoardPosition } from '../generator/interfaces/boardPosition';
 import { Position } from '../interfaces/BoardConfigInterface';
 
@@ -47,23 +46,19 @@ const CheckpointSortableV2 = (props: CheckpointSortableV2Props) => {
 
 	return (
 		<SortableList
-			lockAxis="y"
 			onSortEnd={onSortEnd}
 			className={`${
 				items.length > 0 && 'p-2 border dark:border-muted-700 border-muted-400'
-			} flex flex-col gap-2 text-[14px]`}
+			} grid grid-cols-2 gap-2 text-[14px]`}
 			draggedItemClassName="dragged text-white bg-muted"
 			customHolderRef={ref}
 		>
 			{items.map((item, index) => {
-				const checkpoint = item;
-				const x = checkpoint[0];
-				const y = checkpoint[1];
-				const order = index;
+				const [x, y] = item;
+				const order = index + 1;
 				const text = (
-					<div className="flex gap-2 items-center">
-						<span>{order + 1 < 10 ? `0${order + 1}` : order + 1}.</span>
-						<span>Checkpoint</span>
+					<div className="flex gap-2 items-center justify-around">
+						<span>{order < 10 ? `0${order}` : order}.</span>
 						<span>
 							[{x}, {y}]
 						</span>
@@ -79,8 +74,8 @@ const CheckpointSortableV2 = (props: CheckpointSortableV2Props) => {
 							}}
 						>
 							<SortableKnob>
-								<div className="text-white text-2xl cursor-grabbing">
-									<VscGripper />
+								<div className="text-white text-xl cursor-grabbing">
+									<div className={`${order === items.length ? 'isDestinyMountain' : 'isCheckpoint'} w-6 h-6`} />
 								</div>
 							</SortableKnob>
 							<span className="flex-grow">{text}</span>

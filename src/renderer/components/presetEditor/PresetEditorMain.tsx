@@ -204,7 +204,7 @@ class PresetEditorMain extends React.Component<PresetEditorMainProps, PresetEdit
 		const otherHeight = settings.darkMode ? 88 : 89;
 		const contentHeightStyle = windowDimensions.height - (os === 'win32' ? winHeight : otherHeight);
 		const preViewOpenMainStyle = previewFull ? { width: '0' } : { width: 'calc(100vw - 956px)' };
-		const preViewOpenClass = previewFull ? 'w-full' : 'w-[450px]';
+		const previewOpenClass = previewFull ? 'w-full' : 'w-[450px]';
 		return (
 			<div className="dark:bg-muted-700 h-full flex flex-col grow" style={{ maxWidth: 'calc(100vw - 400px)' }}>
 				<div
@@ -259,7 +259,9 @@ class PresetEditorMain extends React.Component<PresetEditorMainProps, PresetEdit
 					</div>
 					<div className="h-full flex flex-col">
 						<div
-							className="grow overflow-x-hidden col-span-2 flex justify-center items-center grow dark:bg-muted-700 bg-muted-500 transition transition-all"
+							className={`${
+								previewOpen && previewFull ? 'opacity-0' : 'opacity-100'
+							} grow overflow-x-hidden col-span-2 flex justify-center items-center grow dark:bg-muted-700 bg-muted-500 transition transition-all`}
 							style={previewOpen ? preViewOpenMainStyle : { width: 'calc(100vw - 506px)' }}
 						>
 							<div className="p-4 w-fit h-fit dark:bg-muted-800 bg-muted-600 rounded">
@@ -272,7 +274,11 @@ class PresetEditorMain extends React.Component<PresetEditorMainProps, PresetEdit
 								</div>
 							</div>
 						</div>
-						<div className="w-full dark:bg-muted-800 bg-muted-600 p-2">
+						<div
+							className={`${
+								previewOpen && previewFull ? 'hidden w-0' : 'display w-full'
+							} dark:bg-muted-800 bg-muted-600 p-2 transition transition-all`}
+						>
 							<InputLabel
 								type="text"
 								value={config ? config.name : ''}
@@ -285,7 +291,7 @@ class PresetEditorMain extends React.Component<PresetEditorMainProps, PresetEdit
 							/>
 						</div>
 					</div>
-					<div className={`transition transition-all overflow-x-hidden ${previewOpen ? preViewOpenClass : 'w-0'}`}>
+					<div className={`transition transition-all overflow-x-hidden ${previewOpen ? previewOpenClass : 'w-0'}`}>
 						<MonacoEditor
 							value={config ? JSON.stringify(config, null, 4) : ''}
 							width={previewFull ? window.innerWidth - 506 : 450}

@@ -7,9 +7,7 @@ export type PopupV2Props = {
 	closeButtonText: string;
 	onClose: () => void;
 	children: string | JSX.Element | JSX.Element[];
-	position: { x: number; y: number };
-	onPositionChange: (position: { x: number; y: number }, callback: () => void) => void;
-	onDimensionChange: (dimension: { width: number; height: number }) => void;
+	windowDimensions: { width: number; height: number };
 	os: NodeJS.Platform;
 	topOffset?: boolean;
 	settings: SettingsInterface;
@@ -18,6 +16,8 @@ type PopupV2State = {
 	isDragged: boolean;
 	rel: { x: number; y: number };
 	visible: boolean;
+	position: { x: number; y: number };
+	dimension: { width: number; height: number };
 };
 
 class PopupV2 extends React.Component<PopupV2Props, PopupV2State> {
@@ -27,6 +27,8 @@ class PopupV2 extends React.Component<PopupV2Props, PopupV2State> {
 			isDragged: false,
 			rel: { x: 0, y: 0 },
 			visible: false,
+			position: { x: window.innerWidth / 2, y: window.innerHeight / 2 },
+			dimension: { width: 0, height: 0 },
 		};
 		this.handleOffClick = this.handleOffClick.bind(this);
 	}
@@ -38,23 +40,59 @@ class PopupV2 extends React.Component<PopupV2Props, PopupV2State> {
 	}
 
 	componentDidMount() {
-		const popup = document.getElementById('popupV2Popup');
-		const { onPositionChange, position, onDimensionChange } = this.props;
-		if (popup) {
-			onPositionChange(
-				{
-					x: position.x - popup.clientWidth / 2,
-					y: position.y - popup.clientHeight / 2,
+		setTimeout(() => {
+			const popup = document.getElementById('popupV2Popup');
+			const { position } = this.state;
+			if (popup) {
+				this.setState(
+					{
+						position: {
+							x: position.x - popup.clientWidth / 2,
+							y: position.y - popup.clientHeight / 2,
+						},
+						dimension: {
+							width: popup.clientWidth + 4,
+							height: popup.clientHeight + 4,
+						},
+					},
+					() => {
+						setTimeout(() => {
+							this.setState({ visible: true });
+						}, 200);
+					}
+				);
+			}
+		}, 200);
+	}
+
+	componentDidUpdate() {
+		const { position, dimension } = this.state;
+		const { windowDimensions, os } = this.props;
+		if (position.x < 0) {
+			this.setState({ position: { x: 0, y: position.y } });
+		}
+		if (position.y < (os === 'win32' ? 32 : 0)) {
+			this.setState({
+				position: {
+					x: position.x,
+					y: os === 'win32' ? 32 : 0,
 				},
-				() => {
-					setTimeout(() => {
-						this.setState({ visible: true });
-					}, 200);
-				}
-			);
-			onDimensionChange({
-				width: popup.clientWidth + 2,
-				height: popup.clientHeight + 2,
+			});
+		}
+		if (position.x + dimension.width > windowDimensions.width) {
+			this.setState({
+				position: {
+					x: windowDimensions.width - dimension.width,
+					y: position.y,
+				},
+			});
+		}
+		if (position.y + dimension.height > windowDimensions.height) {
+			this.setState({
+				position: {
+					x: position.x,
+					y: windowDimensions.height - dimension.height,
+				},
 			});
 		}
 	}
@@ -65,8 +103,8 @@ class PopupV2 extends React.Component<PopupV2Props, PopupV2State> {
 	};
 
 	render() {
-		const { closeButtonText, onClose, children, title, position, onPositionChange, os, topOffset } = this.props;
-		const { visible } = this.state;
+		const { closeButtonText, onClose, children, title, os, topOffset } = this.props;
+		const { visible, position } = this.state;
 		return (
 			<div
 				role="presentation"
@@ -113,13 +151,12 @@ class PopupV2 extends React.Component<PopupV2Props, PopupV2State> {
 								const { isDragged, rel } = this.state;
 								const { settings } = this.props;
 								if (!isDragged || !settings.popupsDraggable) return;
-								onPositionChange(
-									{
+								this.setState({
+									position: {
 										x: event.pageX - rel.x,
 										y: event.pageY - rel.y,
 									},
-									() => {}
-								);
+								});
 								event.stopPropagation();
 								event.preventDefault();
 							}}

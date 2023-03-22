@@ -1,4 +1,5 @@
 import React from 'react';
+import { TailSpin } from 'react-loader-spinner';
 import InputLabel from '../InputLabel';
 import BoardGenerator from '../generator/BoardGenerator';
 import { SettingsInterface } from '../../../interfaces/SettingsInterface';
@@ -18,6 +19,7 @@ export type RandomBoardStartValuesDialogV2Stats = {
 	walls: boolean;
 	riverAlgorithm: RiverAlgorithm;
 	wallsAlgorithm: WallAlgorithm;
+	generating: boolean;
 };
 
 export type RandomBoardStartValuesV2 = {
@@ -39,9 +41,7 @@ export type RandomBoardStartValuesV2 = {
 type RandomBoardStartValuesDialogV2Props = {
 	onAbort: () => void;
 	onConfirm: (generator: BoardGenerator) => void;
-	position: { x: number; y: number };
-	onPositionChange: (position: { x: number; y: number }, callback: () => void) => void;
-	onDimensionChange: (dimension: { width: number; height: number }) => void;
+	windowDimensions: { width: number; height: number };
 	os: NodeJS.Platform;
 	topOffset?: boolean;
 	settings: SettingsInterface;
@@ -79,6 +79,7 @@ class RandomBoardStartValuesDialogV2 extends React.Component<
 			walls: false,
 			riverAlgorithm: 'default',
 			wallsAlgorithm: 'iterative',
+			generating: false,
 		};
 	}
 
@@ -140,39 +141,44 @@ class RandomBoardStartValuesDialogV2 extends React.Component<
 	};
 
 	generate = () => {
-		const {
-			height,
-			startFields,
-			lembasFields,
-			maxLembasAmountOnField,
-			lembasAmountExactMaximum,
-			riverAlgorithm,
-			rivers,
-			wallsAlgorithm,
-			walls,
-			holes,
-			checkpoints,
-			name,
-			width,
-		} = this.state;
-		const { onConfirm } = this.props;
-		const generationValues: RandomBoardStartValuesV2 = {
-			height,
-			startFields,
-			lembasFields,
-			maxLembasAmountOnField,
-			lembasAmountExactMaximum,
-			riverAlgorithm,
-			rivers,
-			wallsAlgorithm,
-			walls,
-			holes,
-			checkpoints,
-			name,
-			width,
-		};
-		const generator = new BoardGenerator(generationValues);
-		onConfirm(generator);
+		this.setState({ generating: true }, () => {
+			setTimeout(() => {
+				const {
+					height,
+					startFields,
+					lembasFields,
+					maxLembasAmountOnField,
+					lembasAmountExactMaximum,
+					riverAlgorithm,
+					rivers,
+					wallsAlgorithm,
+					walls,
+					holes,
+					checkpoints,
+					name,
+					width,
+				} = this.state;
+				const { onConfirm } = this.props;
+				const generationValues: RandomBoardStartValuesV2 = {
+					height,
+					startFields,
+					lembasFields,
+					maxLembasAmountOnField,
+					lembasAmountExactMaximum,
+					riverAlgorithm,
+					rivers,
+					wallsAlgorithm,
+					walls,
+					holes,
+					checkpoints,
+					name,
+					width,
+				};
+				const generator = new BoardGenerator(generationValues);
+				this.setState({ generating: false });
+				onConfirm(generator);
+			}, 1000);
+		});
 	};
 
 	render() {
@@ -190,21 +196,23 @@ class RandomBoardStartValuesDialogV2 extends React.Component<
 			wallsAlgorithm,
 			walls,
 			holes,
+			generating,
 		} = this.state;
-		const { onPositionChange, onDimensionChange, position, os, topOffset, onAbort, settings } = this.props;
+		const { windowDimensions, os, topOffset, onAbort, settings } = this.props;
 		return (
 			<ConfirmPopupV2
 				title={window.languageHelper.translate('Random Board - Start Values')}
 				abortButtonText={window.languageHelper.translate('Cancel')}
 				onAbort={onAbort}
-				confirmButtonText={window.languageHelper.translate('Generate')}
+				confirmButtonText={
+					generating ? <TailSpin height={16} width={16} color="#ffffff" /> : window.languageHelper.translate('Generate')
+				}
 				onConfirm={this.generate}
-				position={position}
-				onPositionChange={onPositionChange}
-				onDimensionChange={onDimensionChange}
+				windowDimensions={windowDimensions}
 				os={os}
 				topOffset={topOffset}
 				settings={settings}
+				maxWidth={1000}
 			>
 				<div className="grid grid-cols-2 gap-8">
 					<div className="col-span-2">

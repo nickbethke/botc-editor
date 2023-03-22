@@ -11,27 +11,6 @@
         },
         {
             "position": [
-                1,
-                0
-            ],
-            "direction": "WEST"
-        },
-        {
-            "position": [
-                2,
-                0
-            ],
-            "direction": "WEST"
-        },
-        {
-            "position": [
-                3,
-                0
-            ],
-            "direction": "WEST"
-        },
-        {
-            "position": [
                 0,
                 1
             ],
@@ -85,6 +64,27 @@
                 1
             ],
             "direction": "NORTH"
+        },
+        {
+            "position": [
+                3,
+                0
+            ],
+            "direction": "WEST"
+        },
+        {
+            "position": [
+                2,
+                0
+            ],
+            "direction": "WEST"
+        },
+        {
+            "position": [
+                1,
+                0
+            ],
+            "direction": "WEST"
         }
     ],
     "name": "4x4 Circle"

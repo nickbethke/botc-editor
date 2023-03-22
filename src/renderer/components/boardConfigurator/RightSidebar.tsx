@@ -3,10 +3,12 @@ import { VscCopy, VscJson, VscWarning } from 'react-icons/vsc';
 import _uniqueId from 'lodash/uniqueId';
 import { TbScreenShare } from 'react-icons/tb';
 import html2canvas from 'html2canvas';
+import MonacoEditor from 'react-monaco-editor';
 import SidebarMenuItem from './SidebarMenuItem';
 import BoardConfigInterface from '../interfaces/BoardConfigInterface';
 import Warning, { WarningsMap } from './Warning';
 import { BoardPosition } from '../generator/interfaces/boardPosition';
+import { SettingsInterface } from '../../../interfaces/SettingsInterface';
 
 type RightSidebarProps = {
 	tabChange: (tab: RightSidebarOpenTab) => void;
@@ -14,6 +16,12 @@ type RightSidebarProps = {
 	config: BoardConfigInterface;
 	warnings: WarningsMap;
 	onFieldSelect: (position: BoardPosition) => void;
+	windowDimensions: {
+		width: number;
+		height: number;
+	};
+	settings: SettingsInterface;
+	os: NodeJS.Platform;
 };
 
 export type RightSidebarOpenTab = 'warnings' | 'configPreview' | null;
@@ -55,7 +63,9 @@ class RightSidebar extends React.Component<RightSidebarProps, unknown> {
 	};
 
 	configPreview = () => {
-		const { config } = this.props;
+		const { config, windowDimensions, settings, os } = this.props;
+		const windowsHeight = settings.darkMode ? 119 : 120;
+		const notWindowsHeight = settings.darkMode ? 87 : 88;
 		return (
 			<div className="flex flex-col h-full w-full">
 				<div className="p-2 w-full border-b dark:border-muted-700 border-muted-400 flex justify-between items-center">
@@ -71,8 +81,14 @@ class RightSidebar extends React.Component<RightSidebarProps, unknown> {
 						{window.languageHelper.translate('Copy')}
 					</button>
 				</div>
-				<div className="flex-grow bg-muted-900/25 relative p-2 w-[347px] overflow-y-auto">
-					<pre className="h-full font-jetbrains user-select text-sm">{JSON.stringify(config, null, 4)}</pre>
+				<div className="flex-grow bg-muted-900/25 relative w-[347px] overflow-y-auto">
+					<MonacoEditor
+						value={JSON.stringify(config, null, 4)}
+						theme="vs-dark"
+						language="json"
+						width={347}
+						height={windowDimensions.height - (os === 'win32' ? windowsHeight : notWindowsHeight)}
+					/>
 				</div>
 			</div>
 		);
@@ -92,7 +108,7 @@ class RightSidebar extends React.Component<RightSidebarProps, unknown> {
 		return (
 			<>
 				<SidebarMenuItem
-					position="right"
+					position="left"
 					label={window.languageHelper.translate('Warnings')}
 					open={openTab === 'warnings'}
 					icon={<VscWarning className={warnings.size ? 'text-orange-400' : 'text-accent'} />}
@@ -102,7 +118,7 @@ class RightSidebar extends React.Component<RightSidebarProps, unknown> {
 					shortCut={`${window.languageHelper.translate('Alt')}+-`}
 				/>
 				<SidebarMenuItem
-					position="right"
+					position="left"
 					label={window.languageHelper.translate('Configuration Preview')}
 					open={openTab === 'configPreview'}
 					icon={<VscJson />}
@@ -112,7 +128,7 @@ class RightSidebar extends React.Component<RightSidebarProps, unknown> {
 					shortCut={`${window.languageHelper.translate('Alt')}++`}
 				/>
 				<SidebarMenuItem
-					position="right"
+					position="left"
 					label={window.languageHelper.translate('Save as screenshot')}
 					open={false}
 					icon={<TbScreenShare />}

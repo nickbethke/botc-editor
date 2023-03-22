@@ -30,8 +30,6 @@ export type RiverPresetEditorTools = null | 'delete';
 
 type RiverPresetEditorState = {
 	popup: PresetEditorPopupType;
-	popupPosition: { x: number; y: number };
-	popupDimension: { width: number; height: number };
 	windowDimensions: { width: number; height: number };
 	config: RiverPreset | null;
 	contextMenu: null | JSX.Element;
@@ -57,14 +55,6 @@ class RiverPresetEditor extends React.Component<RiverPresetEditorProps, RiverPre
 		super(props);
 		this.state = {
 			popup: null,
-			popupPosition: {
-				x: window.innerWidth / 2,
-				y: window.innerHeight / 2,
-			},
-			popupDimension: {
-				width: 0,
-				height: 0,
-			},
 			windowDimensions: {
 				width: window.innerWidth,
 				height: window.innerHeight,
@@ -117,52 +107,14 @@ class RiverPresetEditor extends React.Component<RiverPresetEditorProps, RiverPre
 		this.onFileUpdate();
 	}
 
-	componentDidUpdate(prevProps: Readonly<RiverPresetEditorProps>, prevState: Readonly<RiverPresetEditorState>) {
-		const { config, popupPosition, popupDimension, windowDimensions, popup } = this.state;
-		const { os } = this.props;
-		const { popup: prePopup } = prevState;
+	componentDidUpdate() {
+		const { config } = this.state;
 		if (config) {
 			const dimensionMax = getBoardMaxDimension(config);
 			if (config.height < dimensionMax.height || config.width < dimensionMax.width) {
 				this.setState({ config: { ...config, width: dimensionMax.width, height: dimensionMax.height } });
 			}
 		}
-		if (popupPosition.x < 0) {
-			this.setState({ popupPosition: { x: 0, y: popupPosition.y } });
-		}
-		if (popupPosition.y < (os === 'win32' ? 32 : 0)) {
-			this.setState({
-				popupPosition: {
-					x: popupPosition.x,
-					y: os === 'win32' ? 32 : 0,
-				},
-			});
-		}
-		if (popupPosition.x + popupDimension.width > windowDimensions.width) {
-			this.setState({
-				popupPosition: {
-					x: windowDimensions.width - popupDimension.width,
-					y: popupPosition.y,
-				},
-			});
-		}
-		if (popupPosition.y + popupDimension.height > windowDimensions.height) {
-			this.setState({
-				popupPosition: {
-					x: popupPosition.x,
-					y: windowDimensions.height - popupDimension.height,
-				},
-			});
-		}
-		if (popup !== prePopup) {
-			this.setState({
-				popupPosition: {
-					x: window.innerWidth / 2,
-					y: window.innerHeight / 2,
-				},
-			});
-		}
-		// if (config) if (preConfig?.data.length !== config.data.length || preConfig !== config) this.onPresetUpdate(config);
 	}
 
 	saveCurrentPreset = () => {
@@ -333,7 +285,7 @@ class RiverPresetEditor extends React.Component<RiverPresetEditorProps, RiverPre
 	};
 
 	onTopMenuAction = async (action: TopMenuActions) => {
-		const { editorCache, popupPosition, openTabsOrder } = this.state;
+		const { editorCache, openTabsOrder, windowDimensions } = this.state;
 		const { onClose, os, settings } = this.props;
 		switch (action) {
 			case TopMenuActions.NEW:
@@ -366,13 +318,7 @@ class RiverPresetEditor extends React.Component<RiverPresetEditorProps, RiverPre
 									this.setState({ editorCache, openTabsOrder, popup: null });
 									onClose();
 								}}
-								position={popupPosition}
-								onPositionChange={(position, callback) => {
-									this.setState({ popupPosition: position }, callback);
-								}}
-								onDimensionChange={(dimension) => {
-									this.setState({ popupDimension: dimension });
-								}}
+								windowDimensions={windowDimensions}
 								os={os}
 								settings={settings}
 							>
@@ -406,7 +352,6 @@ class RiverPresetEditor extends React.Component<RiverPresetEditorProps, RiverPre
 			files,
 			currentFile,
 			fileSep,
-			popupPosition,
 			currentTool,
 			lastSetDirection,
 			editorCache,
@@ -557,13 +502,7 @@ class RiverPresetEditor extends React.Component<RiverPresetEditorProps, RiverPre
 												}
 											}}
 											input={{ type: 'text', startValue: fullPath.name }}
-											position={popupPosition}
-											onPositionChange={(position, callback) => {
-												this.setState({ popupPosition: position }, callback);
-											}}
-											onDimensionChange={(dimension) => {
-												this.setState({ popupDimension: dimension });
-											}}
+											windowDimensions={windowDimensions}
 											os={os}
 											settings={settings}
 										/>
@@ -633,13 +572,7 @@ class RiverPresetEditor extends React.Component<RiverPresetEditorProps, RiverPre
 														this.setState({ popup: null });
 														this.onFileUpdate();
 													}}
-													position={popupPosition}
-													onPositionChange={(position, callback) => {
-														this.setState({ popupPosition: position }, callback);
-													}}
-													onDimensionChange={(dimension) => {
-														this.setState({ popupDimension: dimension });
-													}}
+													windowDimensions={windowDimensions}
 													os={os}
 													settings={settings}
 												>

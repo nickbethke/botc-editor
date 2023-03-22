@@ -29,6 +29,7 @@ import {
 } from './HelperFunctions';
 import DirectionHelper from '../generator/helper/DirectionHelper';
 import CheckpointSortableV2 from './CheckpointSortableV2';
+import { SettingsInterface } from '../../../interfaces/SettingsInterface';
 
 type LeftSidebarProps = {
 	toolChange: (tool: EditorToolType) => void;
@@ -39,6 +40,7 @@ type LeftSidebarProps = {
 	onConfigUpdate: (config: BoardConfigInterface) => void;
 	configType: LeftSidebarConfigType;
 	fieldInEdit: BoardPosition | null;
+	settings: SettingsInterface;
 };
 
 export type LeftSidebarOpenTab = 'presets' | 'settings' | 'checkpointOrder' | null;
@@ -218,13 +220,20 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 	};
 
 	checkpointOrder = () => {
-		const { config, onConfigUpdate } = this.props;
+		const { config, onConfigUpdate, settings } = this.props;
+		const darkModeHeight = settings.darkMode ? 'calc(100vh - 111px)' : 'calc(100vh - 112px)';
+
 		return (
 			<div className="flex flex-col">
 				<div className="p-2 border-b dark:border-muted-700 border-muted-400">
 					{window.languageHelper.translate('Checkpoint Order')}
 				</div>
-				<div className="p-4 flex flex-col gap-4">
+				<div
+					className="p-4 flex flex-col gap-4 overflow-y-auto"
+					style={{
+						maxHeight: darkModeHeight,
+					}}
+				>
 					<CheckpointSortableV2
 						checkpoints={config.checkPoints}
 						onUpdate={(checkpoints) => {

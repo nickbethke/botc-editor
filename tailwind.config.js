@@ -48,6 +48,11 @@ module.exports = {
 					900: '#0B0D0E',
 				},
 			},
+			transitionProperty: {
+				height: 'height',
+				spacing: 'margin, padding',
+				'font-size': 'font-size',
+			},
 		},
 	},
 	variants: {},

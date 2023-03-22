@@ -109,7 +109,7 @@ class BoardEditorChoice extends React.Component<BoardEditorChoiceProps, BoardEdi
 									<button
 										type="button"
 										className={`rounded px-4 py-2 dark:border-muted-700 border-muted-400 ${
-											view === 'default' ? 'dark:bg-accent-700 bg-accent-500' : 'dark:bg-muted-800 bg-muted-500'
+											view === 'default' ? 'dark:bg-accent-600 bg-accent-500' : 'dark:bg-muted-800 bg-muted-500'
 										}`}
 										onClick={() => {
 											this.setState({ view: 'default' });
@@ -120,7 +120,7 @@ class BoardEditorChoice extends React.Component<BoardEditorChoiceProps, BoardEdi
 									<button
 										type="button"
 										className={`rounded px-4 py-2 dark:border-muted-700 border-muted-400 ${
-											view === 'riverPreset' ? 'dark:bg-accent-700 bg-accent-500' : 'dark:bg-muted-800 bg-muted-500'
+											view === 'riverPreset' ? 'dark:bg-accent-600 bg-accent-500' : 'dark:bg-muted-800 bg-muted-500'
 										}`}
 										onClick={() => {
 											this.setState({ view: 'riverPreset' });

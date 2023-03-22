@@ -6,21 +6,22 @@ export type ConfirmPopupV2Props = {
 	title: string;
 	abortButtonText: string;
 	onAbort: () => void;
-	confirmButtonText: string;
+	confirmButtonText: string | JSX.Element;
 	onConfirm: () => void;
 	children: string | JSX.Element | JSX.Element[];
-	position: { x: number; y: number };
-	onPositionChange: (position: { x: number; y: number }, callback: () => void) => void;
-	onDimensionChange: (dimension: { width: number; height: number }) => void;
 	os: NodeJS.Platform;
 	topOffset?: boolean;
 	settings: SettingsInterface;
+	windowDimensions: { width: number; height: number };
+	maxWidth?: number | null;
 };
 type ConfirmPopupV2State = {
 	isDragged: boolean;
 	rel: { x: number; y: number };
 	visible: boolean;
 	offClick: boolean;
+	position: { x: number; y: number };
+	dimension: { width: number; height: number };
 };
 
 class ConfirmPopupV2 extends React.Component<ConfirmPopupV2Props, ConfirmPopupV2State> {
@@ -31,6 +32,8 @@ class ConfirmPopupV2 extends React.Component<ConfirmPopupV2Props, ConfirmPopupV2
 			rel: { x: 0, y: 0 },
 			visible: false,
 			offClick: false,
+			position: { x: window.innerWidth / 2, y: window.innerHeight / 2 },
+			dimension: { width: 0, height: 0 },
 		};
 		this.handleOffClick = this.handleOffClick.bind(this);
 	}
@@ -38,39 +41,73 @@ class ConfirmPopupV2 extends React.Component<ConfirmPopupV2Props, ConfirmPopupV2
 	static get defaultProps() {
 		return {
 			topOffset: false,
+			maxWidth: null,
 		};
 	}
 
 	componentDidMount() {
-		const popup = document.getElementById('popupV2');
-		const { onPositionChange, position, onDimensionChange } = this.props;
-		if (popup) {
-			onPositionChange(
-				{
-					x: position.x - popup.clientWidth / 2,
-					y: position.y - popup.clientHeight / 2,
-				},
-				() => {
-					setTimeout(() => {
-						this.setState({ visible: true });
-					}, 200);
-				}
-			);
-			onDimensionChange({
-				width: popup.clientWidth + 2,
-				height: popup.clientHeight + 2,
-			});
-		}
+		setTimeout(() => {
+			const popup = document.getElementById('popupV2');
+			const { position } = this.state;
+			if (popup) {
+				this.setState(
+					{
+						position: {
+							x: position.x - popup.clientWidth / 2,
+							y: position.y - popup.clientHeight / 2,
+						},
+						dimension: {
+							width: popup.clientWidth + 4,
+							height: popup.clientHeight + 4,
+						},
+					},
+					() => {
+						setTimeout(() => {
+							this.setState({ visible: true });
+						}, 200);
+					}
+				);
+			}
+		}, 200);
 	}
 
 	componentDidUpdate(prevProps: Readonly<ConfirmPopupV2Props>, prevState: Readonly<ConfirmPopupV2State>) {
 		const { offClick: preOffClick } = prevState;
-		const { offClick } = this.state;
+
+		const { offClick, position, dimension } = this.state;
+		const { windowDimensions, os } = this.props;
 		if (offClick !== preOffClick && !preOffClick) {
 			window.electron.app.beep().catch(() => {});
 			setTimeout(() => {
 				this.setState({ offClick: false });
 			}, 500);
+		}
+		if (position.x < 0) {
+			this.setState({ position: { x: 0, y: position.y } });
+		}
+		if (position.y < (os === 'win32' ? 32 : 0)) {
+			this.setState({
+				position: {
+					x: position.x,
+					y: os === 'win32' ? 32 : 0,
+				},
+			});
+		}
+		if (position.x + dimension.width > windowDimensions.width) {
+			this.setState({
+				position: {
+					x: windowDimensions.width - dimension.width,
+					y: position.y,
+				},
+			});
+		}
+		if (position.y + dimension.height > windowDimensions.height) {
+			this.setState({
+				position: {
+					x: position.x,
+					y: windowDimensions.height - dimension.height,
+				},
+			});
 		}
 	}
 
@@ -80,19 +117,9 @@ class ConfirmPopupV2 extends React.Component<ConfirmPopupV2Props, ConfirmPopupV2
 	};
 
 	render() {
-		const {
-			confirmButtonText,
-			abortButtonText,
-			onConfirm,
-			onAbort,
-			children,
-			title,
-			position,
-			onPositionChange,
-			os,
-			topOffset,
-		} = this.props;
-		const { visible, offClick } = this.state;
+		const { confirmButtonText, abortButtonText, onConfirm, onAbort, children, title, os, topOffset, maxWidth } =
+			this.props;
+		const { visible, offClick, position } = this.state;
 		return (
 			<div
 				role="presentation"
@@ -107,12 +134,13 @@ class ConfirmPopupV2 extends React.Component<ConfirmPopupV2Props, ConfirmPopupV2
 				<div
 					role="presentation"
 					id="popupV2"
-					className={`fixed origin-top-left z-50 max-w-[33.333vw] transition transition-opacity ${
-						visible ? 'opacity-1' : 'opacity-0'
-					} ${offClick && 'popup-warn'}`}
+					className={`fixed origin-top-left z-50 transition transition-opacity ${visible ? 'opacity-1' : 'opacity-0'} ${
+						offClick && 'popup-warn'
+					}`}
 					style={{
 						top: position.y,
 						left: position.x,
+						maxWidth: `${maxWidth}px` || '33.333vw',
 					}}
 				>
 					<div className="dark:bg-muted-800 bg-muted-600 rounded shadow-xl box-shadow-xl border dark:border-muted-700 border-muted-400">
@@ -139,13 +167,12 @@ class ConfirmPopupV2 extends React.Component<ConfirmPopupV2Props, ConfirmPopupV2
 								const { isDragged, rel } = this.state;
 								const { settings } = this.props;
 								if (!isDragged || !settings.popupsDraggable) return;
-								onPositionChange(
-									{
+								this.setState({
+									position: {
 										x: event.pageX - rel.x,
 										y: event.pageY - rel.y,
 									},
-									() => {}
-								);
+								});
 								event.stopPropagation();
 								event.preventDefault();
 							}}

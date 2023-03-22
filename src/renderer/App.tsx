@@ -67,10 +67,12 @@ type AppStates = {
 	version: string;
 	surprise: boolean;
 	settings: SettingsInterface;
-	popupPosition: { x: number; y: number };
-	popupDimension: { width: number; height: number };
 	errorMessage: { title: string; error: string } | null;
 	fullScreen: boolean;
+	windowDimensions: {
+		width: number;
+		height: number;
+	};
 };
 
 class App extends React.Component<AppProps, AppStates> {
@@ -84,16 +86,12 @@ class App extends React.Component<AppProps, AppStates> {
 			version: '',
 			surprise: false,
 			settings: props.settings,
-			popupPosition: {
-				x: window.innerWidth / 2,
-				y: window.innerHeight / 2,
-			},
-			popupDimension: {
-				width: 0,
-				height: 0,
-			},
 			errorMessage: null,
 			fullScreen: false,
+			windowDimensions: {
+				width: window.innerWidth,
+				height: window.innerHeight,
+			},
 		};
 		this.handleOpenPartieEditorChoice = this.handleOpenPartieEditorChoice.bind(this);
 		this.handleCloseApp = this.handleCloseApp.bind(this);
@@ -131,18 +129,18 @@ class App extends React.Component<AppProps, AppStates> {
 		document.documentElement.setAttribute('lang', settings.language);
 		window.addEventListener('resize', () => {
 			this.setState({
-				popupPosition: {
-					x: window.innerWidth / 2,
-					y: window.innerHeight / 2,
-				},
 				fullScreen: !window.screenTop && !window.screenY,
+				windowDimensions: {
+					width: window.innerWidth,
+					height: window.innerHeight,
+				},
 			});
 		});
 	}
 
 	componentDidUpdate(prevProps: Readonly<AppProps>, prevState: Readonly<AppStates>) {
-		const { openPopup: prePopup, settings: preSettings } = prevState;
-		const { openPopup: popup, popupPosition, popupDimension, settings } = this.state;
+		const { settings: preSettings } = prevState;
+		const { settings } = this.state;
 
 		if (!isEqual(preSettings, settings)) {
 			if (settings.darkMode) {
@@ -151,41 +149,6 @@ class App extends React.Component<AppProps, AppStates> {
 				document.documentElement.classList.remove('dark');
 			}
 			document.documentElement.setAttribute('lang', settings.language);
-		}
-		if (popup === null && prePopup !== popup) {
-			this.setState({
-				popupPosition: {
-					x: window.innerWidth / 2,
-					y: window.innerHeight / 2,
-				},
-			});
-		}
-		if (popupPosition.x < 0) {
-			this.setState({ popupPosition: { x: 0, y: popupPosition.y } });
-		}
-		if (popupPosition.y < 0) {
-			this.setState({
-				popupPosition: {
-					x: popupPosition.x,
-					y: 0,
-				},
-			});
-		}
-		if (popupPosition.x + popupDimension.width > window.innerWidth) {
-			this.setState({
-				popupPosition: {
-					x: window.innerWidth - popupDimension.width,
-					y: popupPosition.y,
-				},
-			});
-		}
-		if (popupPosition.y + popupDimension.height > window.innerHeight) {
-			this.setState({
-				popupPosition: {
-					x: popupPosition.x,
-					y: window.innerHeight - popupDimension.height,
-				},
-			});
 		}
 	}
 
@@ -373,7 +336,7 @@ class App extends React.Component<AppProps, AppStates> {
 	};
 
 	errorPopup = () => {
-		const { popupPosition, settings, errorMessage } = this.state;
+		const { settings, errorMessage, windowDimensions } = this.state;
 		const { os } = this.props;
 		return (
 			<PopupV2
@@ -382,13 +345,7 @@ class App extends React.Component<AppProps, AppStates> {
 				onClose={() => {
 					this.setState({ openPopup: null });
 				}}
-				position={popupPosition}
-				onPositionChange={(position, callback) => {
-					this.setState({ popupPosition: position }, callback);
-				}}
-				onDimensionChange={(dimension) => {
-					this.setState({ popupDimension: dimension });
-				}}
+				windowDimensions={windowDimensions}
 				os={os}
 				settings={settings}
 			>
@@ -396,8 +353,6 @@ class App extends React.Component<AppProps, AppStates> {
 			</PopupV2>
 		);
 	};
-
-	onLoadRiverPreset = () => {};
 
 	onBoardLoadConfig = async () => {
 		const boardJSON = await window.electron.dialog.openBoardConfig();
@@ -517,7 +472,7 @@ class App extends React.Component<AppProps, AppStates> {
 	}
 
 	private popup(openPopup: AppPopups) {
-		const { popupPosition, settings } = this.state;
+		const { settings, windowDimensions } = this.state;
 		const { os } = this.props;
 		let popup: JSX.Element | null;
 		switch (openPopup) {
@@ -566,13 +521,7 @@ class App extends React.Component<AppProps, AppStates> {
 							});
 						}}
 						settings={settings}
-						position={popupPosition}
-						onPositionChange={(position, callback) => {
-							this.setState({ popupPosition: position }, callback);
-						}}
-						onDimensionChange={(dimension) => {
-							this.setState({ popupDimension: dimension });
-						}}
+						windowDimensions={windowDimensions}
 						os={os}
 					/>
 				);
@@ -604,13 +553,6 @@ class App extends React.Component<AppProps, AppStates> {
 				popup = (
 					<SettingsPopup
 						settings={settings}
-						position={popupPosition}
-						onPositionChange={(position, callback) => {
-							this.setState({ popupPosition: position }, callback);
-						}}
-						onDimensionChange={(dimension) => {
-							this.setState({ popupDimension: dimension });
-						}}
 						os={os}
 						onAbort={() => {
 							this.setState({ openPopup: null });
@@ -619,6 +561,7 @@ class App extends React.Component<AppProps, AppStates> {
 							await this.handleSettingsChange(s);
 							this.setState({ openPopup: null });
 						}}
+						windowDimensions={windowDimensions}
 					/>
 				);
 				break;

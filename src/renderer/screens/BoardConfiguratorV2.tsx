@@ -64,8 +64,6 @@ type BoardConfiguratorV2State = {
 	};
 	sidebars: { left: number; right: number };
 	popup: EditorPopupType;
-	popupPosition: { x: number; y: number };
-	popupDimension: { width: number; height: number };
 	currentTool: EditorToolType;
 	sideBarTabLeft: LeftSidebarOpenTab;
 	sideBarTabLeftConfigType: LeftSidebarConfigType;
@@ -112,14 +110,6 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 				right: 52,
 			},
 			popup: null,
-			popupPosition: {
-				x: window.innerWidth / 2,
-				y: window.innerHeight / 2,
-			},
-			popupDimension: {
-				width: 0,
-				height: 0,
-			},
 			currentTool: null,
 			sideBarTabLeft: null,
 			sideBarTabLeftConfigType: 'global',
@@ -131,7 +121,6 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 			fileSaved: !!props.file,
 			warnings: this.checkWarnings(conf),
 		};
-		this.addEventListeners = this.addEventListeners.bind(this);
 		this.onTopMenuAction = this.onTopMenuAction.bind(this);
 		this.handleOnFieldOrWallClick = this.handleOnFieldOrWallClick.bind(this);
 		document.querySelector('html')?.classList.add('dark');
@@ -144,24 +133,130 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 		};
 	}
 
+	componentDidMount() {
+		Mousetrap.bind('alt+1', () => {
+			const { sideBarTabLeft } = this.state;
+			this.setState({
+				sideBarTabLeft: sideBarTabLeft === 'settings' ? null : 'settings',
+			});
+		});
+		Mousetrap.bind('alt+2', () => {
+			const { sideBarTabLeft } = this.state;
+			this.setState({
+				sideBarTabLeft: sideBarTabLeft === 'checkpointOrder' ? null : 'checkpointOrder',
+			});
+		});
+		Mousetrap.bind('alt+3', () => {
+			const { sideBarTabLeft } = this.state;
+			this.setState({
+				sideBarTabLeft: sideBarTabLeft === 'presets' ? null : 'presets',
+			});
+		});
+		Mousetrap.bind(['ctrl+0', 'alt+0'], () => {
+			this.setState({ currentTool: null });
+		});
+		Mousetrap.bind('ctrl+1', () => {
+			this.setState({ currentTool: FieldsEnum.START });
+		});
+		Mousetrap.bind('ctrl+2', () => {
+			this.setState({ currentTool: FieldsEnum.CHECKPOINT });
+		});
+		Mousetrap.bind('ctrl+3', () => {
+			this.setState({ currentTool: FieldsEnum.EYE });
+		});
+		Mousetrap.bind('ctrl+4', () => {
+			this.setState({ currentTool: FieldsEnum.LEMBAS });
+		});
+		Mousetrap.bind('ctrl+5', () => {
+			this.setState({ currentTool: FieldsEnum.RIVER });
+		});
+		Mousetrap.bind('ctrl+6', () => {
+			this.setState({ currentTool: FieldsEnum.HOLE });
+		});
+		Mousetrap.bind('ctrl+7', () => {
+			this.setState({ currentTool: FieldsEnum.WALL });
+		});
+		Mousetrap.bind(['ctrl+e'], () => {
+			this.setState({ currentTool: 'edit' });
+		});
+		Mousetrap.bind(['ctrl+d'], () => {
+			this.setState({ currentTool: 'delete' });
+		});
+		Mousetrap.bind('alt+-', () => {
+			const { sideBarTabRight } = this.state;
+			this.setState({
+				sideBarTabRight: sideBarTabRight === 'warnings' ? null : 'warnings',
+			});
+		});
+		Mousetrap.bind('alt++', () => {
+			const { sideBarTabRight } = this.state;
+			this.setState({
+				sideBarTabRight: sideBarTabRight === 'configPreview' ? null : 'configPreview',
+			});
+		});
+
+		Mousetrap.bind('ctrl+shift+d', () => {
+			const { settings, onSettingsUpdate } = this.props;
+			onSettingsUpdate({ ...settings, darkMode: !settings.darkMode });
+		});
+
+		Mousetrap.bind('ctrl+alt+s', () => {
+			this.setState({ popup: 'settings' });
+		});
+
+		Mousetrap.bind(['command+enter', 'ctrl+enter'], () => {
+			this.setState({ mainEditorZoom: 1 });
+		});
+		Mousetrap.bind(['command++', 'ctrl++'], () => {
+			this.zoomIn();
+		});
+		Mousetrap.bind(['command+-', 'ctrl+-'], () => {
+			this.zoomOut();
+		});
+		Mousetrap.bind(['command+s', 'ctrl+s'], () => {
+			this.saveConfig();
+		});
+		Mousetrap.bind(['command+o', 'ctrl+o'], () => {
+			this.openConfiguration();
+		});
+
+		const { fieldInEdit, config } = this.state;
+		if (fieldInEdit) {
+			Mousetrap.bind('up', () => {
+				if (fieldInEdit && fieldInEdit.y > 0) {
+					this.handleFieldEdit({ y: fieldInEdit.y - 1, x: fieldInEdit.x }, config);
+				}
+			});
+			Mousetrap.bind('down', () => {
+				if (fieldInEdit && fieldInEdit.y < config.height - 1) {
+					this.handleFieldEdit({ y: fieldInEdit.y + 1, x: fieldInEdit.x }, config);
+				}
+			});
+			Mousetrap.bind('left', () => {
+				if (fieldInEdit && fieldInEdit.x > 0) {
+					this.handleFieldEdit({ y: fieldInEdit.y, x: fieldInEdit.x - 1 }, config);
+				}
+			});
+			Mousetrap.bind('right', () => {
+				if (fieldInEdit && fieldInEdit.x < config.width - 1) {
+					this.handleFieldEdit({ y: fieldInEdit.y, x: fieldInEdit.x + 1 }, config);
+				}
+			});
+		}
+
+		window.addEventListener('resize', () => {
+			this.setState({
+				windowDimensions: {
+					width: window.innerWidth,
+					height: window.innerHeight,
+				},
+			});
+		});
+	}
+
 	componentDidUpdate(prevProps: Readonly<BoardConfiguratorV2Props>, prevState: Readonly<BoardConfiguratorV2State>) {
-		const {
-			sideBarTabLeft,
-			sidebars,
-			sideBarTabRight,
-			currentTool,
-			popupPosition,
-			windowDimensions,
-			popupDimension,
-			popup,
-		} = this.state;
-		const { os } = this.props;
-		const {
-			sideBarTabLeft: preSideBarTabLeft,
-			sideBarTabRight: preSideBarTabRight,
-			currentTool: preTool,
-			popup: prePopup,
-		} = prevState;
+		const { sideBarTabLeft, sidebars, sideBarTabRight, currentTool } = this.state;
+		const { sideBarTabLeft: preSideBarTabLeft, sideBarTabRight: preSideBarTabRight, currentTool: preTool } = prevState;
 		if (sideBarTabLeft === null && sidebars.left > 52) {
 			this.setState({ sidebars: { ...sidebars, left: 52 } });
 		}
@@ -178,41 +273,6 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 			this.setState({
 				sideBarTabLeftConfigType: 'global',
 				fieldInEdit: null,
-			});
-		}
-		if (popupPosition.x < 0) {
-			this.setState({ popupPosition: { x: 0, y: popupPosition.y } });
-		}
-		if (popupPosition.y < (os === 'win32' ? 32 : 0)) {
-			this.setState({
-				popupPosition: {
-					x: popupPosition.x,
-					y: os === 'win32' ? 32 : 0,
-				},
-			});
-		}
-		if (popupPosition.x + popupDimension.width > windowDimensions.width) {
-			this.setState({
-				popupPosition: {
-					x: windowDimensions.width - popupDimension.width,
-					y: popupPosition.y,
-				},
-			});
-		}
-		if (popupPosition.y + popupDimension.height > windowDimensions.height) {
-			this.setState({
-				popupPosition: {
-					x: popupPosition.x,
-					y: windowDimensions.height - popupDimension.height,
-				},
-			});
-		}
-		if (prePopup !== popup) {
-			this.setState({
-				popupPosition: {
-					x: window.innerWidth / 2,
-					y: window.innerHeight / 2,
-				},
 			});
 		}
 	}
@@ -522,7 +582,7 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 	};
 
 	popup = (): JSX.Element | null => {
-		const { popup, popupPosition } = this.state;
+		const { popup, windowDimensions } = this.state;
 		const { os, settings, onSettingsUpdate } = this.props;
 		switch (popup) {
 			case 'closeSaveCurrent':
@@ -538,13 +598,7 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 							const { onClose } = this.props;
 							onClose();
 						}}
-						position={popupPosition}
-						onPositionChange={(position, callback) => {
-							this.setState({ popupPosition: position }, callback);
-						}}
-						onDimensionChange={(dimension) => {
-							this.setState({ popupDimension: dimension });
-						}}
+						windowDimensions={windowDimensions}
 						os={os}
 						topOffset
 						settings={settings}
@@ -576,13 +630,7 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 								});
 							}
 						}}
-						position={popupPosition}
-						onPositionChange={(position, callback) => {
-							this.setState({ popupPosition: position }, callback);
-						}}
-						onDimensionChange={(dimension) => {
-							this.setState({ popupDimension: dimension });
-						}}
+						windowDimensions={windowDimensions}
 						os={os}
 						topOffset
 						settings={settings}
@@ -603,13 +651,7 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 							onSettingsUpdate(newSettings);
 							this.setState({ popup: null });
 						}}
-						position={popupPosition}
-						onPositionChange={(position, callback) => {
-							this.setState({ popupPosition: position }, callback);
-						}}
-						onDimensionChange={(dimension) => {
-							this.setState({ popupDimension: dimension });
-						}}
+						windowDimensions={windowDimensions}
 						os={os}
 						topOffset
 					/>
@@ -629,13 +671,7 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 								popup: null,
 							});
 						}}
-						position={popupPosition}
-						onPositionChange={(position, callback) => {
-							this.setState({ popupPosition: position }, callback);
-						}}
-						onDimensionChange={(dimension) => {
-							this.setState({ popupDimension: dimension });
-						}}
+						windowDimensions={windowDimensions}
 						os={os}
 						topOffset
 					/>
@@ -699,135 +735,6 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 		}
 	}
 
-	private async addEventListeners() {
-		Mousetrap.bind('alt+1', () => {
-			const { sideBarTabLeft } = this.state;
-			this.setState({
-				sideBarTabLeft: sideBarTabLeft === 'settings' ? null : 'settings',
-			});
-		});
-		Mousetrap.bind('alt+2', () => {
-			const { sideBarTabLeft } = this.state;
-			this.setState({
-				sideBarTabLeft: sideBarTabLeft === 'checkpointOrder' ? null : 'checkpointOrder',
-			});
-		});
-		Mousetrap.bind('alt+3', () => {
-			const { sideBarTabLeft } = this.state;
-			this.setState({
-				sideBarTabLeft: sideBarTabLeft === 'presets' ? null : 'presets',
-			});
-		});
-		Mousetrap.bind(['ctrl+0', 'alt+0'], () => {
-			this.setState({ currentTool: null });
-		});
-		Mousetrap.bind('ctrl+1', () => {
-			this.setState({ currentTool: FieldsEnum.START });
-		});
-		Mousetrap.bind('ctrl+2', () => {
-			this.setState({ currentTool: FieldsEnum.CHECKPOINT });
-		});
-		Mousetrap.bind('ctrl+3', () => {
-			this.setState({ currentTool: FieldsEnum.EYE });
-		});
-		Mousetrap.bind('ctrl+4', () => {
-			this.setState({ currentTool: FieldsEnum.LEMBAS });
-		});
-		Mousetrap.bind('ctrl+5', () => {
-			this.setState({ currentTool: FieldsEnum.RIVER });
-		});
-		Mousetrap.bind('ctrl+6', () => {
-			this.setState({ currentTool: FieldsEnum.HOLE });
-		});
-		Mousetrap.bind('ctrl+7', () => {
-			this.setState({ currentTool: FieldsEnum.WALL });
-		});
-		Mousetrap.bind(['ctrl+e'], () => {
-			this.setState({ currentTool: 'edit' });
-		});
-		Mousetrap.bind(['ctrl+d'], () => {
-			this.setState({ currentTool: 'delete' });
-		});
-		Mousetrap.bind('alt+-', () => {
-			const { sideBarTabRight } = this.state;
-			this.setState({
-				sideBarTabRight: sideBarTabRight === 'warnings' ? null : 'warnings',
-			});
-		});
-		Mousetrap.bind('alt++', () => {
-			const { sideBarTabRight } = this.state;
-			this.setState({
-				sideBarTabRight: sideBarTabRight === 'configPreview' ? null : 'configPreview',
-			});
-		});
-
-		Mousetrap.bind('ctrl+shift+d', () => {
-			const { settings, onSettingsUpdate } = this.props;
-			onSettingsUpdate({ ...settings, darkMode: !settings.darkMode });
-		});
-
-		Mousetrap.bind('ctrl+alt+s', () => {
-			this.setState({ popup: 'settings' });
-		});
-
-		Mousetrap.bind(['command+enter', 'ctrl+enter'], () => {
-			this.setState({ mainEditorZoom: 1 });
-		});
-		Mousetrap.bind(['command++', 'ctrl++'], () => {
-			this.zoomIn();
-		});
-		Mousetrap.bind(['command+-', 'ctrl+-'], () => {
-			this.zoomOut();
-		});
-		Mousetrap.bind(['command+s', 'ctrl+s'], () => {
-			this.saveConfig();
-		});
-		Mousetrap.bind(['command+o', 'ctrl+o'], () => {
-			this.openConfiguration();
-		});
-
-		const { fieldInEdit, config } = this.state;
-		if (fieldInEdit) {
-			Mousetrap.bind('up', () => {
-				if (fieldInEdit && fieldInEdit.y > 0) {
-					this.handleFieldEdit({ y: fieldInEdit.y - 1, x: fieldInEdit.x }, config);
-				}
-			});
-			Mousetrap.bind('down', () => {
-				if (fieldInEdit && fieldInEdit.y < config.height - 1) {
-					this.handleFieldEdit({ y: fieldInEdit.y + 1, x: fieldInEdit.x }, config);
-				}
-			});
-			Mousetrap.bind('left', () => {
-				if (fieldInEdit && fieldInEdit.x > 0) {
-					this.handleFieldEdit({ y: fieldInEdit.y, x: fieldInEdit.x - 1 }, config);
-				}
-			});
-			Mousetrap.bind('right', () => {
-				if (fieldInEdit && fieldInEdit.x < config.width - 1) {
-					this.handleFieldEdit({ y: fieldInEdit.y, x: fieldInEdit.x + 1 }, config);
-				}
-			});
-		}
-
-		window.addEventListener(
-			'resize',
-			() => {
-				this.setState({
-					windowDimensions: {
-						width: window.innerWidth,
-						height: window.innerHeight,
-					},
-					popupPosition: {
-						x: window.innerWidth / 2,
-						y: window.innerHeight / 2,
-					},
-				});
-			},
-			{ once: true }
-		);
-	}
-
 	private zoomIn() {
 		const { mainEditorZoom } = this.state;
 		if (mainEditorZoom >= 10) {
@@ -854,7 +761,6 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 			file,
 			warnings,
 		} = this.state;
-		this.addEventListeners().catch(() => {});
 		const topMenuHeight = this.getTopMenuHeight(settings.darkMode);
 		const mainHeight = windowDimensions.height - (os === 'win32' ? 32 + topMenuHeight : topMenuHeight);
 		const mainWidth = windowDimensions.width - (sidebars.left + sidebars.right);
@@ -915,6 +821,7 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 								}}
 								configType={sideBarTabLeftConfigType}
 								fieldInEdit={fieldInEdit}
+								settings={settings}
 							/>
 						</div>
 						<div
@@ -967,6 +874,9 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 								onFieldSelect={(position) => {
 									this.setState({ fieldInEdit: position });
 								}}
+								windowDimensions={windowDimensions}
+								settings={settings}
+								os={os}
 							/>
 						</div>
 					</div>
