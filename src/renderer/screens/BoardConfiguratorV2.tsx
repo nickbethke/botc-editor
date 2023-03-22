@@ -867,7 +867,9 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 						{file ? file.path : window.languageHelper.translate('Unsaved File')}
 						{fileSaved ? '' : ` *`}
 					</div>
-				) : null}
+				) : (
+					<div className="fixed top-0 right-0 dragger h-8" style={{ width: window.innerWidth - 285 }} />
+				)}
 				<div className={`${popup !== null && 'blur'} transition transition-[filter]`}>
 					<div
 						className={`dark:bg-muted-800 bg-muted-500 dark:border-0 border-t border-muted-400 px-1 ${

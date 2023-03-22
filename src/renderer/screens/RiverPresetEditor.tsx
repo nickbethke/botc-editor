@@ -421,7 +421,7 @@ class RiverPresetEditor extends React.Component<RiverPresetEditorProps, RiverPre
 						{window.languageHelper.translate('River-Preset Editor')}
 					</div>
 				) : (
-					<div className="fixed top-0 left-0 dragger w-[100vw] h-8" />
+					<div className="fixed top-0 right-0 dragger w-[83vw] h-8" style={{ width: window.innerWidth - 205 }} />
 				)}
 
 				<div
@@ -570,6 +570,7 @@ class RiverPresetEditor extends React.Component<RiverPresetEditorProps, RiverPre
 									),
 								});
 							}}
+							settings={settings}
 						/>
 						<PresetEditorMain
 							currentFile={currentFile}

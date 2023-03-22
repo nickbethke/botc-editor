@@ -7,6 +7,7 @@ import SidebarMenuItem from '../boardConfigurator/SidebarMenuItem';
 import ContextMenuV2 from '../boardConfigurator/ContextMenuV2';
 import ContextMenuItemV2, { ContextMenuDividerV2 } from '../boardConfigurator/ContextMenuItemV2';
 import { RiverPresetWithFile } from '../../../main/helper/PresetsLoader';
+import { SettingsInterface } from '../../../interfaces/SettingsInterface';
 
 type PresetEditSidebarProps = {
 	windowDimensions: { width: number; height: number };
@@ -15,6 +16,7 @@ type PresetEditSidebarProps = {
 	files: RiverPresetWithFile[];
 	fileSep: string;
 	isLoadingPresets: boolean;
+	settings: SettingsInterface;
 
 	onOpenFile: (preset: RiverPresetWithFile, file: string) => void;
 	onContextMenu: (contextMenu: JSX.Element | null) => void;
@@ -70,8 +72,10 @@ class PresetEditSidebar extends React.Component<PresetEditSidebarProps, unknown>
 	};
 
 	render() {
-		const { windowDimensions, os, onNewFile, isLoadingPresets } = this.props;
-		const winHeight = 120;
+		const { windowDimensions, os, onNewFile, isLoadingPresets, settings } = this.props;
+		const winHeight = settings.darkMode ? 120 : 121;
+		const otherHeight = settings.darkMode ? 88 : 89;
+		const contentHeightStyle = windowDimensions.height - (os === 'win32' ? winHeight : otherHeight);
 		return (
 			<div className="h-full max-w-[450px] w-[450px] flex flex-col">
 				<div className="border-y border-r dark:border-muted-700 border-muted-400 dark:bg-muted-800 flex w-full">
@@ -96,7 +100,7 @@ class PresetEditSidebar extends React.Component<PresetEditSidebarProps, unknown>
 				</div>
 				<div
 					className="flex flex-col gap-1 p-4 dark:bg-[#1e1e1e] bg-muted-700 text-white grow overflow-y-auto border-r dark:border-muted-700 border-muted-400"
-					style={{ height: windowDimensions.height - (os === 'win32' ? winHeight : 88) }}
+					style={{ height: contentHeightStyle }}
 				>
 					{isLoadingPresets ? (
 						<TailSpin wrapperClass="h-full flex items-center justify-center" height={40} width={40} color="#ffffff" />

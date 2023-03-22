@@ -200,7 +200,9 @@ class PresetEditorMain extends React.Component<PresetEditorMainProps, PresetEdit
 		} = this.props;
 		const { previewOpen, previewFull } = this.state;
 		const board = this.generateBoard();
-		const winHeight = 120;
+		const winHeight = settings.darkMode ? 120 : 121;
+		const otherHeight = settings.darkMode ? 88 : 89;
+		const contentHeightStyle = windowDimensions.height - (os === 'win32' ? winHeight : otherHeight);
 		const preViewOpenMainStyle = previewFull ? { width: '0' } : { width: 'calc(100vw - 956px)' };
 		const preViewOpenClass = previewFull ? 'w-full' : 'w-[450px]';
 		return (
@@ -211,7 +213,7 @@ class PresetEditorMain extends React.Component<PresetEditorMainProps, PresetEdit
 				>
 					{this.buildActiveFiles()}
 				</div>
-				<div className="flex w-full" style={{ height: windowDimensions.height - (os === 'win32' ? winHeight : 88) }}>
+				<div className="flex w-full" style={{ height: contentHeightStyle }}>
 					<div className="border-r dark:border-muted-700 border-muted-400 dark:bg-muted-800 flex flex-col">
 						<SidebarMenuItem
 							key={_uniqueId()}

@@ -21,6 +21,22 @@ import RandomBoardStartValuesDialogV2 from './components/popups/RandomBoardStart
 import PopupV2 from './components/boardConfigurator/PopupV2';
 import RiverPresetEditor from './screens/RiverPresetEditor';
 
+function HomeScreenButton(props: { text: string; onClick: () => void; tabIndex: number; last?: boolean }) {
+	const { onClick, tabIndex, text, last } = props;
+	return (
+		<span
+			role="presentation"
+			tabIndex={tabIndex}
+			className={`text-2xl cursor-pointer hover ${last ? 'last' : ''}`}
+			onClick={onClick}
+		>
+			{text}
+		</span>
+	);
+}
+
+HomeScreenButton.defaultProps = { last: false };
+
 type AppPopups =
 	| 'boardEditorChoiceV2'
 	| 'partieEditorChoice'
@@ -411,7 +427,7 @@ class App extends React.Component<AppProps, AppStates> {
 		const popup = this.popup(openPopup);
 		const tabIndex = openPopup !== null ? -1 : 0;
 		return (
-			<div className="text-white bg-gradient-to-br dark:from-slate-900 dark:to-muted-800 from-slate-400 to-muted-500">
+			<div className="text-white transition transition-all duration-500 dark:bg-gradient-to-br bg-gradient-to-bl dark:from-slate-900 dark:to-muted-800 from-slate-400 to-muted-500 overflow-hidden">
 				<div id="home" className={`${popup ? 'blur' : ''} flex flex-col`}>
 					{os === 'win32' ? (
 						<div className="dragger w-[100vw] h-8 bg-muted flex items-center px-2 text-sm">
@@ -429,65 +445,53 @@ class App extends React.Component<AppProps, AppStates> {
 										{window.languageHelper.translate('Editor')}
 									</div>
 								</div>
-								<div className="flex flex-col gap-4 w-fit">
-									<button
-										tabIndex={tabIndex}
-										type="button"
-										className="text-2xl clickable"
+								<div className="flex flex-col justify-start gap-4 w-fit text-left">
+									<HomeScreenButton
+										text={window.languageHelper.translate('Board-Configurator')}
 										onClick={this.handleOpenBoardEditorChoiceV2}
-									>
-										{window.languageHelper.translate('Board-Configurator')}
-									</button>
-									<button
 										tabIndex={tabIndex}
-										type="button"
-										className="text-2xl clickable"
+									/>
+									<HomeScreenButton
+										text={window.languageHelper.translate('Party-Configurator')}
 										onClick={this.handleOpenPartieEditorChoice}
-									>
-										{window.languageHelper.translate('Party-Configurator')}
-									</button>
-									<button
 										tabIndex={tabIndex}
-										type="button"
-										className="text-2xl clickable"
+									/>
+									<HomeScreenButton
+										text={window.languageHelper.translate('Validator')}
 										onClick={this.handleOpenValidator}
-									>
-										{window.languageHelper.translate('Validator')}
-									</button>
-									<TopMenuSeparator />
-									<button
 										tabIndex={tabIndex}
-										type="button"
-										className="text-2xl clickable"
+									/>
+									<TopMenuSeparator />
+									<HomeScreenButton
+										text={window.languageHelper.translate('Settings')}
 										onClick={this.handleOpenSettings}
-									>
-										{window.languageHelper.translate('Settings')}
-									</button>
-									<TopMenuSeparator />
-									<button
 										tabIndex={tabIndex}
-										type="button"
-										className="text-2xl clickable"
+									/>
+									<TopMenuSeparator />
+									<HomeScreenButton
+										text={window.languageHelper.translate('Exit')}
 										onClick={this.handleCloseApp}
-									>
-										{window.languageHelper.translate('Exit')}
-									</button>
+										tabIndex={tabIndex}
+										last
+									/>
 								</div>
 							</div>
 						</div>
 						<div className="relative">
-							<img
-								className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full"
-								src={bgImage}
-								alt={window.languageHelper.translate('Background image')}
-							/>
-							<img
-								alt="surprise sun"
-								src={sunImage}
-								className={`${
-									surprise ? 'opacity-1 top-1/4' : 'opacity-0 top-1/3'
-								} absolute left-1/2 transition transition-all duration-1000 w-16 2xl:w-32`}
-							/>
+							<div className="w-full absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+								<img
+									className="w-full home-bg"
+									src={bgImage}
+									alt={window.languageHelper.translate('Background image')}
+								/>
+								<img
+									alt="surprise sun"
+									src={sunImage}
+									className={`${
+										surprise ? 'opacity-1 top-1/4' : 'opacity-0 top-1/3'
+									} absolute left-1/2 transition transition-all duration-1000 w-16 2xl:w-32`}
+								/>
+							</div>
 						</div>
 					</div>
 					<div className="absolute bottom-0 left-0 z-10 bg-muted p-2 w-[100vw] font-jetbrains flex flex-row items-center justify-end gap-2 text-[10px]">
