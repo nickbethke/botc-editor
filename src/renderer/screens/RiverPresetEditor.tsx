@@ -420,8 +420,15 @@ class RiverPresetEditor extends React.Component<RiverPresetEditorProps, RiverPre
 					<div className="dragger w-[100vw] h-8 bg-muted flex items-center px-2 text-sm">
 						{window.languageHelper.translate('River-Preset Editor')}
 					</div>
-				) : null}
-				<div className="text-[14px] flex items-center dark:bg-muted-800 bg-muted-500 dark:border-0 border-t border-muted-400">
+				) : (
+					<div className="fixed top-0 left-0 dragger w-[100vw] h-8" />
+				)}
+
+				<div
+					className={`text-[14px] flex items-center dark:bg-muted-800 bg-muted-500 dark:border-0 border-t border-muted-400 ${
+						os === 'darwin' ? 'pl-20' : ''
+					}`}
+				>
 					<img className="h-6 ml-2 mr-4" src={destinyMountainImage} alt={window.languageHelper.translate('Logo')} />
 					<TopMenuItemCollapsable label={window.languageHelper.translate('File')}>
 						<TopMenuItem

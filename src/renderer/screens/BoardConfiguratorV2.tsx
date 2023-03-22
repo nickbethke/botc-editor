@@ -871,7 +871,7 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 				<div className={`${popup !== null && 'blur'} transition transition-[filter]`}>
 					<div
 						className={`dark:bg-muted-800 bg-muted-500 dark:border-0 border-t border-muted-400 px-1 ${
-							os === 'darwin' ? 'pl-24' : ''
+							os === 'darwin' ? 'pl-20' : ''
 						}`}
 						style={{ width: `${windowDimensions.width}px` }}
 					>

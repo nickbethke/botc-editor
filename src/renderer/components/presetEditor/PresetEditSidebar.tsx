@@ -71,7 +71,7 @@ class PresetEditSidebar extends React.Component<PresetEditSidebarProps, unknown>
 
 	render() {
 		const { windowDimensions, os, onNewFile, isLoadingPresets } = this.props;
-		const winHeight = 123;
+		const winHeight = 120;
 		return (
 			<div className="h-full max-w-[450px] w-[450px] flex flex-col">
 				<div className="border-y border-r dark:border-muted-700 border-muted-400 dark:bg-muted-800 flex w-full">
@@ -96,7 +96,7 @@ class PresetEditSidebar extends React.Component<PresetEditSidebarProps, unknown>
 				</div>
 				<div
 					className="flex flex-col gap-1 p-4 dark:bg-[#1e1e1e] bg-muted-700 text-white grow overflow-y-auto border-r dark:border-muted-700 border-muted-400"
-					style={{ height: windowDimensions.height - (os === 'win32' ? winHeight : 41) }}
+					style={{ height: windowDimensions.height - (os === 'win32' ? winHeight : 88) }}
 				>
 					{isLoadingPresets ? (
 						<TailSpin wrapperClass="h-full flex items-center justify-center" height={40} width={40} color="#ffffff" />
