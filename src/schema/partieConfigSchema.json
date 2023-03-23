@@ -1,6 +1,6 @@
 {
 	"$schema": "http://json-schema.org/draft-07/schema",
-	"title": "partieconfig schema",
+	"title": "Party configuration schema",
 	"type": "object",
 	"required": [
 		"startLembas",

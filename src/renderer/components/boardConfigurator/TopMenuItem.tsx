@@ -20,7 +20,7 @@ type TopMenuItemProps =
 	| {
 			type: 'none';
 			action?: null;
-			onAction: () => void;
+			onAction?: () => void;
 			label: string | JSX.Element | null;
 			className?: string;
 			icon?: null | JSX.Element;
@@ -32,11 +32,11 @@ function TopMenuItem(props: TopMenuItemProps) {
 	return (
 		<button
 			type="button"
-			className={`${
-				icon ? 'px-2' : 'pl-8 pr-2'
-			} ${className} py-1 dark:bg-muted-800 bg-muted-500 dark:hover:bg-muted-700 hover:bg-muted-400 transition transition-colors flex items-center gap-2`}
+			className={`${icon ? 'px-2' : 'pl-8 pr-2'} ${className} py-1 dark:bg-muted-800 bg-muted-500 ${
+				onAction ? 'dark:hover:bg-muted-700 hover:bg-muted-400' : ''
+			} transition transition-colors flex items-center gap-2`}
 			onClick={() => {
-				if (type === 'none') onAction();
+				if (type === 'none' && typeof onAction === 'function') onAction();
 				if (type === 'default') onAction(action);
 			}}
 		>

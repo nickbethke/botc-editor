@@ -398,6 +398,14 @@ class IPCHelper {
 	static renamePreset(from: string, to: string) {
 		return PresetsLoader.renameRiverPreset(from, to);
 	}
+
+	static getSchemaPartie() {
+		return PartieConfigSchema;
+	}
+
+	static getSchemaBoard() {
+		return BoardConfigSchema;
+	}
 }
 
 export default IPCHelper;

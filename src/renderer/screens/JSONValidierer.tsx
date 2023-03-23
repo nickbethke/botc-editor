@@ -1,35 +1,70 @@
 import React, { ReactElement } from 'react';
-import { BiChevronLeft } from 'react-icons/bi';
 import MonacoEditor, { monaco } from 'react-monaco-editor';
 import Mousetrap from 'mousetrap';
 import { DefinedError } from 'ajv';
 import { ParsedPath } from 'path';
-import { VscFile, VscNewFile, VscSave } from 'react-icons/vsc';
+import { VscColorMode, VscFolder, VscNewFile, VscSave, VscVersions } from 'react-icons/vsc';
 import { ProgressBar } from 'react-loader-spinner';
-import ConfirmPopup from '../components/popups/ConfirmPopup';
+import _uniqueId from 'lodash/uniqueId';
 import BoardConfigValidator from '../helper/BoardConfigValidator';
 import BoardConfigInterface from '../components/interfaces/BoardConfigInterface';
-import Popup from '../components/popups/Popup';
 import PartieConfigValidator from '../helper/PartieConfigValidator';
 import PartieConfigInterface from '../components/interfaces/PartieConfigInterface';
+import { SettingsInterface } from '../../interfaces/SettingsInterface';
+import TopMenuItem, { TopMenuSeparator } from '../components/boardConfigurator/TopMenuItem';
+import SelectComponent from '../components/Select';
+import destinyMountainImage from '../../../assets/textures/schicksalsberg.png';
+import TopMenuItemCollapsable from '../components/boardConfigurator/TopMenuItemCollapsable';
+import PopupV2 from '../components/boardConfigurator/PopupV2';
+import ConfirmPopupV2 from '../components/boardConfigurator/ConfirmPopupV2';
+import FilePathComponent from '../components/FilePathComponent';
 import KeyCode = monaco.KeyCode;
 import KeyMod = monaco.KeyMod;
 
+window.electron.schemas
+	.partie()
+	.then((partieSchema) => {
+		return monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
+			validate: true,
+			schemas: [
+				{
+					uri: 'http://myserver/bar-schema.json',
+					fileMatch: ['*'],
+					schema: partieSchema,
+				},
+			],
+		});
+	})
+	.catch(() => {});
+
 type JSONValidatorProps = {
 	onClose: () => void;
+	os: NodeJS.Platform;
+	settings: SettingsInterface;
+	onSettingsUpdated: (settings: SettingsInterface) => void;
 };
 type JSONValidatorState = {
 	popup: JSX.Element | null;
 	code: string;
 	codeError: string;
 	type: 'board' | 'partie';
-	window: { width: number; height: number };
 	consoleOutput: string[];
 	currentFile: { parsed: ParsedPath; path: string } | null;
 	fileHasBeenEdited: boolean;
+	windowDimensions: {
+		width: number;
+		height: number;
+	};
 };
 
 class JSONValidierer extends React.Component<JSONValidatorProps, JSONValidatorState> {
+	private static numberAddZero = (number: number): string => {
+		if (number < 10) {
+			return `0${number}`;
+		}
+		return `${number}`;
+	};
+
 	constructor(props: JSONValidatorProps) {
 		super(props);
 
@@ -46,12 +81,17 @@ class JSONValidierer extends React.Component<JSONValidatorProps, JSONValidatorSt
 			codeError: '',
 			popup: null,
 			type: 'partie',
-			window: { width: window.innerWidth, height: window.innerHeight },
 			consoleOutput: [],
 			currentFile: null,
 			fileHasBeenEdited: false,
+			windowDimensions: {
+				width: window.innerWidth,
+				height: window.innerHeight,
+			},
 		};
+	}
 
+	componentDidMount() {
 		Mousetrap.bind(['command+s', 'ctrl+s'], () => {
 			this.saveFile().catch(() => {});
 		});
@@ -75,19 +115,69 @@ class JSONValidierer extends React.Component<JSONValidatorProps, JSONValidatorSt
 				this.openFile().catch(() => {});
 			},
 		});
-
 		window.addEventListener('resize', () => {
 			this.setState({
-				window: {
+				windowDimensions: {
 					width: window.innerWidth,
 					height: window.innerHeight,
 				},
 			});
 		});
+		this.onChange('{}').catch(() => {});
+	}
+
+	componentDidUpdate(prevProps: Readonly<JSONValidatorProps>, prevState: Readonly<JSONValidatorState>) {
+		const { type } = this.state;
+		const { type: preType } = prevState;
+		if (type !== preType) {
+			if (type === 'board') {
+				window.electron.schemas
+					.board()
+					.then((partieSchema) => {
+						return monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
+							validate: true,
+							schemas: [
+								{
+									uri: '#',
+									fileMatch: ['*'],
+									schema: partieSchema,
+								},
+							],
+						});
+					})
+					.catch(() => {});
+			} else {
+				window.electron.schemas
+					.partie()
+					.then((partieSchema) => {
+						return monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
+							validate: true,
+							schemas: [
+								{
+									uri: '#',
+									fileMatch: ['*'],
+									schema: partieSchema,
+								},
+							],
+						});
+					})
+					.catch(() => {});
+			}
+		}
+		const { code } = this.state;
+		if (code === '{' || code === '}' || code === '') {
+			this.setState({ code: '{}' });
+		}
 	}
 
 	handleBackButton = () => {
-		this.setState({ popup: this.leavePopup() });
+		const { fileHasBeenEdited } = this.state;
+		if (fileHasBeenEdited) {
+			this.setState({ popup: this.leavePopup() });
+		} else {
+			const { onClose } = this.props;
+			onClose();
+		}
 	};
 
 	backToHomeScreen = () => {
@@ -146,72 +236,89 @@ class JSONValidierer extends React.Component<JSONValidatorProps, JSONValidatorSt
 	};
 
 	leavePopup = (): JSX.Element => {
+		const { windowDimensions } = this.state;
+		const { settings, os } = this.props;
 		return (
-			<ConfirmPopup
-				label={window.languageHelper.translate('Leave Validator?')}
+			<ConfirmPopupV2
+				title={window.languageHelper.translate('Close Validator')}
 				onConfirm={this.backToHomeScreen}
 				onAbort={this.abortBackToHomeScreen}
-				confirmText={window.languageHelper.translate('OK')}
-				abortText={window.languageHelper.translate('Cancel')}
-			/>
+				confirmButtonText={window.languageHelper.translate('OK')}
+				abortButtonText={window.languageHelper.translate('Cancel')}
+				windowDimensions={windowDimensions}
+				os={os}
+				settings={settings}
+			>
+				{window.languageHelper.translate('There are unsaved changes. Are you sure you want to leave?')}
+			</ConfirmPopupV2>
 		);
 	};
 
 	newFileSavePreviousPopup = (): JSX.Element => {
-		const { currentFile } = this.state;
-		if (currentFile) {
-			return (
-				<ConfirmPopup
-					label={window.languageHelper.translateVars('Save {0}?', [currentFile.parsed.base])}
-					onConfirm={() => {
-						this.saveFile()
-							.then(() => {
-								this.setState({
-									popup: null,
-									currentFile: null,
-									fileHasBeenEdited: false,
-									code: '{}',
-								});
-								return false;
-							})
-							.catch(() => {});
-					}}
-					onAbort={() => {
-						this.setState({
-							popup: null,
-							currentFile: null,
-							fileHasBeenEdited: false,
-							code: '{}',
-						});
-					}}
-					confirmText={window.languageHelper.translate('Save')}
-					abortText={window.languageHelper.translate('Discard')}
-				/>
-			);
-		}
-		return <div />;
+		const { windowDimensions } = this.state;
+		const { settings, os } = this.props;
+		return (
+			<ConfirmPopupV2
+				title={window.languageHelper.translate('Save Config')}
+				onConfirm={() => {
+					this.saveFile()
+						.then(() => {
+							this.setState({
+								popup: null,
+								currentFile: null,
+								fileHasBeenEdited: false,
+								code: '{}',
+							});
+							return false;
+						})
+						.catch(() => {});
+				}}
+				onAbort={() => {
+					this.setState({
+						popup: null,
+						currentFile: null,
+						fileHasBeenEdited: false,
+						code: '{}',
+					});
+				}}
+				confirmButtonText={window.languageHelper.translate('Save')}
+				abortButtonText={window.languageHelper.translate('Discard')}
+				settings={settings}
+				os={os}
+				windowDimensions={windowDimensions}
+			>
+				{window.languageHelper.translate('There are unsaved changes. Are you sure you want to discard these changes?')}
+			</ConfirmPopupV2>
+		);
 	};
 
 	loadingPopup = (label?: string): JSX.Element => {
+		const { windowDimensions } = this.state;
+		const { settings, os } = this.props;
 		return (
-			<Popup
-				label={label || window.languageHelper.translate('Open Configuration')}
-				content={
-					<ProgressBar
-						wrapperClass="text-center mx-auto justify-center"
-						borderColor="#ffffff"
-						barColor="#71C294"
-						width="80"
-					/>
-				}
-				closeButton={false}
-			/>
+			<PopupV2
+				title={label || window.languageHelper.translate('Open Configuration')}
+				windowDimensions={windowDimensions}
+				os={os}
+				settings={settings}
+				onClose={() => {
+					this.setState({ popup: null });
+				}}
+				closeButtonText={window.languageHelper.translate('Close')}
+			>
+				<ProgressBar
+					wrapperClass="text-center mx-auto justify-center"
+					borderColor="#ffffff"
+					barColor="#71C294"
+					width="80"
+				/>
+			</PopupV2>
 		);
 	};
 
 	openNewFile = () => {
-		const { currentFile, fileHasBeenEdited } = this.state;
-		if (currentFile && fileHasBeenEdited) {
+		const { fileHasBeenEdited } = this.state;
+		if (fileHasBeenEdited) {
 			this.setState({ popup: this.newFileSavePreviousPopup() });
 		} else {
 			this.setState(
@@ -298,8 +405,8 @@ class JSONValidierer extends React.Component<JSONValidatorProps, JSONValidatorSt
 		this.setState({ fileHasBeenEdited: false, popup: null });
 	};
 
-	changeType = async (e: React.ChangeEvent<HTMLSelectElement>) => {
-		switch (e.target.value) {
+	changeType = (value: string) => {
+		switch (value) {
 			case 'board':
 				this.setState({ type: 'board' }, async () => {
 					const { code } = this.state;
@@ -316,85 +423,110 @@ class JSONValidierer extends React.Component<JSONValidatorProps, JSONValidatorSt
 	};
 
 	render = () => {
-		const { popup, type, code, codeError, window: cWindow, consoleOutput, currentFile, fileHasBeenEdited } = this.state;
+		const { popup, type, code, codeError, windowDimensions, consoleOutput, currentFile, fileHasBeenEdited } =
+			this.state;
+		const { os, settings, onSettingsUpdated } = this.props;
 		const errorMsg = this.genErrorMsg(codeError);
 
 		return (
-			<div className="dark:bg-muted-800 bg-muted-500">
-				<div className="dragger absolute top-0 left-0 w-[100vw] h-8" />
-				<div className="flex flex-col h-[100vh]">
-					<div className="text-white w-[100vw]">
-						<div className="m-8 flex flex-col gap-8 justify-start">
-							<div className="flex flex-row justify-start gap-8">
-								<BiChevronLeft
-									className="text-4xl border border-gray-600 cursor-pointer hover:bg-accent-500"
-									onClick={this.handleBackButton}
-								/>
-								<div className="text-4xl">{window.languageHelper.translate('Validator')}</div>
-							</div>
-						</div>
+			<div className="dark:bg-muted-800 bg-muted-500 text-white h-[100vh] w-[100vw]">
+				{os === 'win32' ? (
+					<div className="dragger w-[100vw] h-8 bg-muted flex items-center px-2 text-sm">
+						{window.languageHelper.translate('Validator')}
+						{` - `}
+						{currentFile ? currentFile.parsed.base : window.languageHelper.translate('Unsaved Configuration')}
+						{fileHasBeenEdited ? ' *' : ''}
 					</div>
-					<div className="flex text-white bg-background-900 border-y border-gray-600 font-lato overflow-hidden">
-						<button
-							type="button"
-							className="bg-accent-500/25 hover:bg-accent-500 text-lg p-2 flex flex-row justify-center items-center gap-2 border-r border-gray-600"
-							onClick={this.openNewFile}
-						>
-							<VscNewFile /> {window.languageHelper.translate('New')}
-						</button>
-						{currentFile ? (
-							<div className={currentFile ? 'border-r border-gray-600 h-full' : ''}>
-								<span
-									className="text-lg p-2 h-full font-jetbrains flex flex-row justify-center items-center"
-									title={currentFile?.path}
-								>
-									{currentFile?.parsed.base}
+				) : (
+					<div className="fixed top-0 right-0 dragger h-8 w-[100vw]" />
+				)}
+				<div className="flex flex-col w-full" style={{ height: windowDimensions.height - (os === 'win32' ? 32 : 0) }}>
+					<div
+						className={`flex text-white items-center  dark:border-0 border-t border-muted-400 ${
+							os !== 'win32' ? 'pl-20' : ''
+						} `}
+					>
+						<img className="h-6 ml-2 mr-4" src={destinyMountainImage} alt={window.languageHelper.translate('Logo')} />
+						<TopMenuItemCollapsable label={window.languageHelper.translate('Validator')}>
+							<TopMenuItem
+								type="none"
+								onAction={this.openNewFile}
+								label={window.languageHelper.translate('New')}
+								icon={<VscNewFile />}
+							/>
+							<TopMenuItem
+								type="none"
+								onAction={this.openFile}
+								label={window.languageHelper.translate('Open')}
+								icon={<VscFolder />}
+							/>
+							<TopMenuSeparator />
+							<TopMenuItem
+								type="none"
+								onAction={this.saveFile}
+								label={`${
+									currentFile ? window.languageHelper.translate('Save') : window.languageHelper.translate('Save as')
+								}...`}
+								icon={<VscSave />}
+							/>
+							<TopMenuSeparator />
+							<TopMenuItem
+								type="none"
+								onAction={this.handleBackButton}
+								label={window.languageHelper.translate('Close')}
+							/>
+						</TopMenuItemCollapsable>
+						<div className="flex items-center">
+							<SelectComponent
+								value={type}
+								onChange={this.changeType}
+								options={[
+									{
+										value: 'partie',
+										text: window.languageHelper.translate('Party Configuration'),
+									},
+									{ value: 'board', text: window.languageHelper.translate('Board Configuration') },
+								]}
+							/>
+							{currentFile ? (
+								<FilePathComponent os={os} file={currentFile.parsed} edited={fileHasBeenEdited} />
+							) : (
+								<span className="italic">
+									{window.languageHelper.translate('Unsaved Configuration')}
 									{fileHasBeenEdited ? ' *' : ''}
 								</span>
-							</div>
-						) : null}
-						<button
-							type="button"
-							className="bg-accent-500/25 hover:bg-accent-500 text-lg p-2 flex flex-row justify-center items-center gap-2 border-r border-gray-600"
-							onClick={this.openFile}
-						>
-							<VscFile /> {window.languageHelper.translate('Open')}
-						</button>
-						<button
-							type="button"
-							className="bg-accent-500/25 hover:bg-accent-500 text-lg p-2 flex flex-row justify-center items-center gap-2 border-r border-gray-600"
-							onClick={this.saveFile}
-						>
-							<VscSave /> {window.languageHelper.translate('Save')}
-						</button>
-						<p className="bg-accent-500/10 h-full text-lg p-2 flex flex-row justify-center items-center gap-2">
-							{window.languageHelper.translate('Type')}
-						</p>
-						<div className="border-r border-gray-600">
-							<select
-								className="bg-accent-500/25 hover:bg-accent-500 text-lg p-2 flex flex-row justify-center items-center gap-2 border-r-4 border-transparent"
-								onChange={this.changeType}
-								value={type}
-							>
-								<option className="rounded-none" value="partie">
-									{window.languageHelper.translate('Party Configuration')}
-								</option>
-								<option className="rounded-none" value="board">
-									{window.languageHelper.translate('Board Configuration')}
-								</option>
-							</select>
+							)}
 						</div>
-						<div className="border-l border-gray-600 ml-auto h-full text-sm p-2 flex flex-row justify-center items-center gap-2">
-							{window.languageHelper.translate('Version')}: 1.2.1
+						<div className="ml-auto flex items-center">
+							<TopMenuItem
+								type="none"
+								onAction={() => {
+									onSettingsUpdated({ ...settings, darkMode: !settings.darkMode });
+								}}
+								label={null}
+								icon={
+									<VscColorMode
+										title={window.languageHelper.translate('Dark Mode')}
+										className={`${
+											settings.darkMode ? '' : 'rotate-180'
+										} transition transition-all transform-gpu text-lg`}
+									/>
+								}
+							/>
+							<TopMenuItem
+								type="none"
+								label={`${window.languageHelper.translate('Version')}: 1.0.1`}
+								icon={<VscVersions />}
+							/>
 						</div>
 					</div>
 					<div className="grow relative h-full">
-						<div className="bg-[#30344F]">
+						<div>
 							<MonacoEditor
 								value={code}
 								language="json"
-								height={cWindow.height - (149 + 280)}
-								width={cWindow.width}
+								height={windowDimensions.height - (settings.darkMode ? 372 : 373)}
+								width={windowDimensions.width}
 								theme="vs-dark"
 								onChange={async (value) => {
 									await this.onChange(value);
@@ -403,23 +535,25 @@ class JSONValidierer extends React.Component<JSONValidatorProps, JSONValidatorSt
 							/>
 						</div>
 						<div className="grid xl:grid-cols-4 grid-cols-2">
-							<div className="w-full h-[280px] max-h-[280px] flex flex-col font-jetbrains border-r border-gray-600 xl:col-span-3">
-								<div className="text-white flex flex-col justify-center border-b border-gray-600 p-2">
-									<div className="text-xl pl-4">{window.languageHelper.translate('JSON-Validation')}</div>
+							<div className="w-full h-[300px] max-h-[300px] flex flex-col border-r border-gray-600 xl:col-span-3">
+								<div className="text-white flex flex-col justify-center border-b border-gray-600 p-1">
+									<div className="pl-4">{window.languageHelper.translate('JSON-Validation')}</div>
 								</div>
 								<div className="w-full bg-white/10 text-white overflow-auto grow">
-									<div className="h-full max-h-full pl-2 user-select">{errorMsg}</div>
+									<div className="h-full max-h-full pl-2 user-select font-jetbrains">{errorMsg}</div>
 								</div>
 							</div>
-							<div className="w-full h-[280px] max-h-[280px] flex flex-col font-jetbrains">
-								<div className="text-white flex flex-col justify-center border-b border-gray-600 p-2">
-									<div className="text-xl pl-4">{window.languageHelper.translate('Errors')}</div>
+							<div className="w-full h-[300px] max-h-[300px] flex flex-col">
+								<div className="text-white flex flex-col justify-center border-b border-gray-600 p-1">
+									<div className="pl-4">{window.languageHelper.translate('Errors')}</div>
 								</div>
 								<div className="w-full text-white overflow-auto grow bg-white/10">
 									<div className="h-full max-h-full pl-6 pt-2">
 										<pre className="user-select">
 											{consoleOutput.map((error) => (
-												<p className="text-red-500">{error}</p>
+												<p key={_uniqueId('console-output-')} className="text-red-500">
+													{error}
+												</p>
 											))}
 										</pre>
 									</div>
@@ -447,15 +581,10 @@ class JSONValidierer extends React.Component<JSONValidatorProps, JSONValidatorSt
 			try {
 				let i = 0;
 				JSON.parse(codeError).forEach((e: DefinedError) => {
-					const instancePath =
-						e.instancePath !== '' ? <p className="font-black text-red-500 pt-1">{`${e.instancePath}`}&nbsp;</p> : null;
 					errorMsg[i] = (
-						<div className="flex fex-cols" key={i}>
-							<p className="mr-2 pr-2 border-r pt-1 no-user-select">{i + 1 < 10 ? `0${i + 1}` : i + 1}</p>
-							<p className="font-black pt-1">{`${e.keyword.toUpperCase()}:`}&nbsp;</p>
-							{instancePath}
-							<p className="pt-1">{e.message}</p>
-						</div>
+						<pre>
+							{JSONValidierer.numberAddZero(i + 1)} | {JSON.stringify(e)}
+						</pre>
 					);
 					i += 1;
 				});

@@ -24,6 +24,14 @@ const electronHandler = {
 	validate: (json: object, type: 'partie' | 'board') => {
 		return ipcRenderer.invoke('validate:json', json, type);
 	},
+	schemas: {
+		partie: () => {
+			return ipcRenderer.invoke('schemas:partie');
+		},
+		board: () => {
+			return ipcRenderer.invoke('schemas:board');
+		},
+	},
 	dialog: {
 		openConfig: (): Promise<
 			| {

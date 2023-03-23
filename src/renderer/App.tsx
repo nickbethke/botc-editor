@@ -328,9 +328,17 @@ class App extends React.Component<AppProps, AppStates> {
 	};
 
 	validatorScreen = () => {
-		const { openScreen } = this.state;
+		const { openScreen, settings } = this.state;
+		const { os } = this.props;
 		if (openScreen === 'validator') {
-			return <JSONValidierer onClose={this.handleCloseChildScreen} />;
+			return (
+				<JSONValidierer
+					onClose={this.handleCloseChildScreen}
+					settings={settings}
+					os={os}
+					onSettingsUpdated={this.handleSettingsChange}
+				/>
+			);
 		}
 		return null;
 	};

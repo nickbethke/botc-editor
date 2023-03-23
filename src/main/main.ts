@@ -211,6 +211,12 @@ const registerHandlers = () => {
 	ipcMain.handle('file:renamePreset', (event, ...args) => {
 		return IPCHelper.renamePreset(args[0], args[1]);
 	});
+	ipcMain.handle('schemas:partie', () => {
+		return IPCHelper.getSchemaPartie();
+	});
+	ipcMain.handle('schemas:board', () => {
+		return IPCHelper.getSchemaBoard();
+	});
 };
 app
 	.whenReady()
