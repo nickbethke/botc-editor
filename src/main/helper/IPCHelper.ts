@@ -10,6 +10,7 @@ import PartieConfigInterface from '../../renderer/components/interfaces/PartieCo
 import BoardConfigInterface from '../../renderer/components/interfaces/BoardConfigInterface';
 import * as SettingsSchema from '../../schema/settings.schema.json';
 import { SettingsInterface } from '../../interfaces/SettingsInterface';
+import { getAppDataPath } from './functions';
 
 class IPCHelper {
 	static readonly defaultSettings: SettingsInterface = {
@@ -348,7 +349,7 @@ class IPCHelper {
 		os: NodeJS.Platform;
 		settings: SettingsInterface;
 	} {
-		const settingsPath = IPCHelper.getAssetPath('/settings.json');
+		const settingsPath = getAppDataPath('/settings.json');
 		if (!fs.existsSync(settingsPath)) {
 			fs.writeFileSync(settingsPath, JSON.stringify(IPCHelper.defaultSettings, null, 4));
 			return {
@@ -382,7 +383,7 @@ class IPCHelper {
 	}
 
 	static updateSettings(settings: SettingsInterface) {
-		const settingsPath = IPCHelper.getAssetPath('/settings.json');
+		const settingsPath = getAppDataPath('/settings.json');
 		if (!fs.existsSync(settingsPath)) {
 			fs.writeFileSync(settingsPath, JSON.stringify({ ...IPCHelper.defaultSettings, settings }, null, 4));
 			return { ...IPCHelper.defaultSettings, settings };

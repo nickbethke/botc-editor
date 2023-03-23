@@ -33,4 +33,6 @@ npm-debug.log.*
 
 .github
 
-assets/settings.json
+appData
+appData/presets/**/*
+appData/settings.json
