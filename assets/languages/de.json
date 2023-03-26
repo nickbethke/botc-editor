@@ -411,7 +411,7 @@
 		],
 		[
 			"The current game board state is not playable because there are not enough checkpoints.",
-			"[Der aktuelle Spielbrett Zustand ist nicht spielbar, da zu wenig Kontrollpunkte vorhanden sind.]"
+			"Der aktuelle Spielbrett Zustand ist nicht spielbar, da zu wenig Kontrollpunkte vorhanden sind."
 		],
 		[
 			"Maximum {0}",

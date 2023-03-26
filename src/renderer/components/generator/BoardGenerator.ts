@@ -1,4 +1,3 @@
-import { sample } from 'lodash';
 import FieldWithPositionInterface from './interfaces/FieldWithPositionInterface';
 import Grass from './fields/Grass';
 import BoardConfigInterface, {
@@ -655,8 +654,13 @@ class BoardGenerator {
 		return this.board[position.x][position.y] instanceof Grass;
 	}
 
+	static randomEnumKey(): string {
+		const keys = Object.keys(DirectionEnum).filter((k) => !(Math.abs(Number.parseInt(k, 10)) + 1));
+		return keys[Math.floor(Math.random() * keys.length)];
+	}
+
 	static getRandomDirection(): DirectionEnum {
-		return sample(Object.values(DirectionEnum)) as DirectionEnum;
+		return DirectionHelper.string2DirEnum(BoardGenerator.randomEnumKey());
 	}
 
 	private getRandomLembasAmount(): number {
@@ -674,11 +678,11 @@ class BoardGenerator {
 	}
 
 	static boardPosition2String(postion: BoardPosition): string {
-		return postion.x.toString() + postion.y.toString();
+		return `${postion.x.toString()}|${postion.y.toString()}`;
 	}
 
 	static position2String(postion: Position): string {
-		return postion[0].toString() + postion[1].toString();
+		return `${postion[0].toString()}|${postion[1].toString()}`;
 	}
 
 	static firstLetter(string: string): string {

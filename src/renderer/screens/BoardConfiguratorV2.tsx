@@ -2,6 +2,7 @@ import React from 'react';
 import Mousetrap from 'mousetrap';
 import { ParsedPath } from 'path';
 import _uniqueId from 'lodash/uniqueId';
+import { monaco } from 'react-monaco-editor';
 import TopMenu, { TopMenuActions } from '../components/boardConfigurator/TopMenu';
 import BoardConfigInterface from '../components/interfaces/BoardConfigInterface';
 import LeftSidebar, { LeftSidebarConfigType, LeftSidebarOpenTab } from '../components/boardConfigurator/LeftSidebar';
@@ -36,6 +37,22 @@ import SettingsPopup from '../components/popups/SettingsPopup';
 import RandomBoardStartValuesDialogV2 from '../components/popups/RandomBoardStartValuesDialogV2';
 import AStar from '../components/generator/helper/AStar';
 import { Warnings, WarningsMap } from '../components/boardConfigurator/Warning';
+
+window.electron.schemas
+	.board()
+	.then((boardSchema) => {
+		return monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
+			validate: false,
+			schemas: [
+				{
+					uri: '#',
+					fileMatch: ['*'],
+					schema: boardSchema,
+				},
+			],
+		});
+	})
+	.catch(() => {});
 
 export type EditorToolType = FieldsEnum | 'delete' | 'edit' | null;
 type EditorPopupType =
@@ -472,7 +489,7 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 				content: window.languageHelper.translate(
 					'The current game board state is not playable because there are not enough starting spaces.'
 				),
-				helper: [window.languageHelper.translateVars('Minimum {0}', ['1'])],
+				helper: [window.languageHelper.translateVars('Minimum {0}', ['2'])],
 			});
 		} else if (handledConfig.startFields.length > 6) {
 			newWarnings.set(_uniqueId('warning-'), {
@@ -485,14 +502,14 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 			});
 		}
 
-		if (handledConfig.checkPoints.length < 1) {
+		if (handledConfig.checkPoints.length < 2) {
 			newWarnings.set(_uniqueId('warning-'), {
 				type: Warnings.configurationInvalid,
 				title: window.languageHelper.translate('Checkpoints'),
 				content: window.languageHelper.translate(
 					'The current game board state is not playable because there are not enough checkpoints.'
 				),
-				helper: [window.languageHelper.translateVars('Minimum {0}', ['1'])],
+				helper: [window.languageHelper.translateVars('Minimum {0}', ['2'])],
 			});
 		}
 
@@ -500,6 +517,27 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 	};
 
 	onConfigUpdate = (newConfig: BoardConfigInterface) => {
+		const newWidth = newConfig.width;
+		const newHeight = newConfig.height;
+		const { config } = this.state;
+		const { width, height } = config;
+		if (width !== newWidth || height !== newHeight) {
+			newConfig.startFields = newConfig.startFields.filter(
+				(field) => field.position[0] < newWidth && field.position[1] < newHeight
+			);
+			newConfig.checkPoints = newConfig.checkPoints.filter((field) => field[0] < newWidth && field[1] < newHeight);
+			newConfig.walls = newConfig.walls.filter(
+				(field) =>
+					field[0][0] < newWidth && field[0][1] < newHeight && field[1][0] < newWidth && field[1][1] < newHeight
+			);
+			newConfig.lembasFields = newConfig.lembasFields.filter(
+				(field) => field.position[0] < newWidth && field.position[1] < newHeight
+			);
+			newConfig.riverFields = newConfig.riverFields.filter(
+				(field) => field.position[0] < newWidth && field.position[1] < newHeight
+			);
+			newConfig.holes = newConfig.holes.filter((field) => field[0] < newWidth && field[1] < newHeight);
+		}
 		this.setState({
 			warnings: this.checkWarnings(newConfig),
 			config: newConfig,

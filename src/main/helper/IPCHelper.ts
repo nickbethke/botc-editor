@@ -407,6 +407,10 @@ class IPCHelper {
 	static getSchemaBoard() {
 		return BoardConfigSchema;
 	}
+
+	static openPresetDir() {
+		IPCHelper.openDirectoryDirectly(path.join(getAppDataPath(), '/presets/'));
+	}
 }
 
 export default IPCHelper;

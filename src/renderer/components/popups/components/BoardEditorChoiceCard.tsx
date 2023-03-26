@@ -59,7 +59,7 @@ class BoardEditorChoiceCard extends React.Component<BoardEditorChoiceCardProps, 
 				</div>
 				<div className="z-20 absolute top-0 left-0 h-full w-full">
 					<div
-						className={`transition-all absolute bottom-0 text-center w-full ${
+						className={`transition-all absolute bottom-0 text-center w-full font-flicker tracking-widest ${
 							hover ? 'bg-accent-500 p-6 text-2xl' : 'bg-background-800/50 p-4 text-xl'
 						}`}
 					>

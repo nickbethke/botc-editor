@@ -12,7 +12,6 @@ import path from 'path';
 import { app, BrowserWindow, ipcMain, shell } from 'electron';
 import { resolveHtmlPath } from './util';
 import IPCHelper from './helper/IPCHelper';
-import PresetsLoader from './helper/PresetsLoader';
 
 let mainWindow: BrowserWindow | null = null;
 
@@ -189,7 +188,7 @@ const registerHandlers = () => {
 	});
 
 	ipcMain.handle('file:openPresetDir', () => {
-		return IPCHelper.openDirectoryDirectly(path.join(PresetsLoader.getAssetPath(), '/presets/'));
+		return IPCHelper.openPresetDir();
 	});
 	ipcMain.handle('clipboard:write', (event, ...args) => {
 		return IPCHelper.clipBoardWrite(args[0]);

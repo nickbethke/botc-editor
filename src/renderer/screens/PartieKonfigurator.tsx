@@ -1,8 +1,8 @@
 import React from 'react';
 import { BiChevronLeft } from 'react-icons/bi';
 import { VscColorMode } from 'react-icons/vsc';
-import backgroundImage from '../../../assets/images/bg-color-III.jpg';
-import backgroundImageDark from '../../../assets/images/bg-color-II.jpg';
+import backgroundImage from '../../../assets/images/damn_nice_background_color.png';
+import backgroundImageDark from '../../../assets/images/damn_nice_background.png';
 import InputLabel from '../components/InputLabel';
 import Notification from '../components/Notification';
 import Error from '../components/Error';

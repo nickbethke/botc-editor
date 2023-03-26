@@ -98,7 +98,7 @@ class BoardEditorChoice extends React.Component<BoardEditorChoiceProps, BoardEdi
 					<div className="absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]">
 						<div className="flex flex-col gap-8">
 							<div className="flex gap-4 items-center justify-center">
-								<div className="text-center text-3xl">
+								<div className="text-center text-3xl font-flicker tracking-widest">
 									{view === 'default'
 										? window.languageHelper.translate('Board-Configurator')
 										: window.languageHelper.translate('River-Preset Editor')}

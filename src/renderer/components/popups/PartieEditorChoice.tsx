@@ -37,7 +37,9 @@ class PartieEditorChoice extends React.Component<PartieEditorChoiceProps, unknow
 				<div role="presentation" className="w-[100vw] h-[100vh] bg-background-800/50" onClick={this.handlePopupClose} />
 				<div>
 					<div className="absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]">
-						<div className="text-center text-3xl mb-8">{window.languageHelper.translate('Party Configuration')}</div>
+						<div className="text-center text-3xl mb-8 font-flicker tracking-widest">
+							{window.languageHelper.translate('Party Configuration')}
+						</div>
 						<div className="relative flex gap-8 w-[80vw] xl:w-[70vw] 2xl:w-[60vw]  mx-auto">
 							<PartieEditorChoiceCard
 								text={window.languageHelper.translate('New Party Configuration')}

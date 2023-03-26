@@ -190,7 +190,8 @@ class JSONValidierer extends React.Component<JSONValidatorProps, JSONValidatorSt
 	};
 
 	onChange = async (newValue: string) => {
-		const { type } = this.state;
+		const { type, consoleOutput } = this.state;
+		this.setState({ consoleOutput: [] });
 		try {
 			const valid = await window.electron.validate(JSON.parse(newValue), type);
 			if (typeof valid === 'string') {
@@ -203,31 +204,31 @@ class JSONValidierer extends React.Component<JSONValidatorProps, JSONValidatorSt
 				});
 			}
 		} catch (error) {
-			if (error instanceof Error) this.setState({ consoleOutput: [...[`${error.message}`]] });
+			if (error instanceof Error) this.setState({ consoleOutput: [...consoleOutput, `${error.message}`] });
 		}
 		let validator;
 		if (type === 'board') {
 			try {
 				validator = new BoardConfigValidator(JSON.parse(newValue) as BoardConfigInterface);
 				this.setState({
-					consoleOutput: [...validator.errors],
+					consoleOutput: validator.errors,
 				});
 			} catch (error) {
 				if (error instanceof Error)
 					this.setState({
-						consoleOutput: [...[`${error.message}`]],
+						consoleOutput: [...consoleOutput, `${error.message}`],
 					});
 			}
 		} else {
 			try {
 				validator = new PartieConfigValidator(JSON.parse(newValue) as PartieConfigInterface);
 				this.setState({
-					consoleOutput: [...validator.errors],
+					consoleOutput: validator.errors,
 				});
 			} catch (error) {
 				if (error instanceof Error) {
 					this.setState({
-						consoleOutput: [...[`${error.message}`]],
+						consoleOutput: [...consoleOutput, `${error.message}`],
 					});
 				}
 			}
@@ -540,7 +541,7 @@ class JSONValidierer extends React.Component<JSONValidatorProps, JSONValidatorSt
 									<div className="pl-4">{window.languageHelper.translate('JSON-Validation')}</div>
 								</div>
 								<div className="w-full bg-white/10 text-white overflow-auto grow">
-									<div className="h-full max-h-full pl-2 user-select font-jetbrains">{errorMsg}</div>
+									<div className="h-full max-h-full pl-2 font-jetbrains text-sm">{errorMsg}</div>
 								</div>
 							</div>
 							<div className="w-full h-[300px] max-h-[300px] flex flex-col">
@@ -580,12 +581,15 @@ class JSONValidierer extends React.Component<JSONValidatorProps, JSONValidatorSt
 		} else {
 			try {
 				let i = 0;
-				JSON.parse(codeError).forEach((e: DefinedError) => {
+				const errors = JSON.parse(codeError);
+				errors.forEach((e: DefinedError) => {
 					errorMsg[i] = (
-						<pre>
-							{JSONValidierer.numberAddZero(i + 1)} | {JSON.stringify(e)}
-						</pre>
+						<div key={_uniqueId()} className={`flex gap-2 ${i < errors.length - 1 ? 'border-b' : ''}`}>
+							<pre className="border-r pr-2">{JSONValidierer.numberAddZero(i + 1)}</pre>
+							<pre className="user-select">{JSON.stringify(e, null, 4)}</pre>
+						</div>
 					);
+
 					i += 1;
 				});
 			} catch (error) {

@@ -399,16 +399,16 @@ class App extends React.Component<AppProps, AppStates> {
 					) : (
 						<div className="fixed top-0 left-0 dragger w-[100vw] h-8" />
 					)}
-					<div className="grid grid-cols-2 grow">
+					<div className="grid grid-cols-2 grow font-flicker">
 						<div className="flex flex-col pb-8" style={{ height: window.innerHeight - (os === 'win32' ? 32 : 0) }}>
 							<div className="flex flex-col py-8 px-12 justify-between grow">
 								<div>
-									<div className="text-4xl 2xl:text-6xl">Battle of the Centerländ</div>
-									<div className="text-2xl 2xl:text-4xl tracking-widest">
+									<div className="text-4xl xl:text-6xl 2xl:text-8xl">Battle of the Centerländ</div>
+									<div className="text-2xl xl:text-4xl 2xl:text-6xl tracking-widest">
 										{window.languageHelper.translate('Editor')}
 									</div>
 								</div>
-								<div className="flex flex-col justify-start gap-4 w-fit text-left">
+								<div className="flex flex-col justify-start gap-4 w-fit text-left tracking-widest">
 									<HomeScreenButton
 										text={window.languageHelper.translate('Board-Configurator')}
 										onClick={this.handleOpenBoardEditorChoiceV2}

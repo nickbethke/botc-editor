@@ -231,3 +231,8 @@ describe('errors', () => {
 		}).toThrowError();
 	});
 });
+describe('Enums', () => {
+	test('Random DirectionEnum', () => {
+		expect(DirectionEnum).toStrictEqual(DirectionEnum);
+	});
+});

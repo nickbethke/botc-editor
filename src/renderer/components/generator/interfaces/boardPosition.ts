@@ -18,19 +18,19 @@ export function wallBoardPosition2WallPosition(position: [BoardPosition, BoardPo
 }
 
 export function boardPosition2String(postion: BoardPosition): string {
-	return postion.x.toString() + postion.y.toString();
+	return `${postion.x.toString()}|${postion.y.toString()}`;
 }
 
 export function position2String(postion: Position): string {
-	return postion[0].toString() + postion[1].toString();
+	return `${postion[0].toString()}|${postion[1].toString()}`;
 }
 
 export function wallBoardPosition2String(position: [BoardPosition, BoardPosition]): string {
-	return boardPosition2String(position[0]) + boardPosition2String(position[1]);
+	return `${boardPosition2String(position[0])}|${boardPosition2String(position[1])}`;
 }
 
 export function wallPosition2String(position: [Position, Position]): string {
-	return position2String(position[0]) + position2String(position[1]);
+	return `${position2String(position[0])}|${position2String(position[1])}`;
 }
 
 /**

@@ -194,7 +194,7 @@ class ConfirmPopupV2 extends React.Component<ConfirmPopupV2Props, ConfirmPopupV2
 							}}
 						>
 							<img className="h-6" src={destinyMountainImage} alt={window.languageHelper.translate('Logo')} />
-							<span>{title}</span>
+							<span className="font-flicker tracking-widest">{title}</span>
 						</div>
 						<div className="py-2 px-4 mb-2">{children}</div>
 						<div className="py-2 px-4 flex justify-end gap-4 items-center text-sm border-t dark:border-muted-700 border-muted-400">

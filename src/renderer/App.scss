@@ -3,18 +3,8 @@
 @tailwind utilities;
 
 @layer base {
-	@font-face {
-		font-family: 'Salsa';
-		font-style: normal;
-		font-weight: 400;
-		src: url('/assets/fonts/salsa/salsa-v17-latin-regular.eot'); /* IE9 Compat Modes */
-		src: local(''), url('/assets/fonts/salsa/salsa-v17-latin-regular.eot?#iefix') format('embedded-opentype'),
-			/* IE6-IE8 */ url('/assets/fonts/salsa/salsa-v17-latin-regular.woff2') format('woff2'),
-			/* Super Modern Browsers */ url('/assets/fonts/salsa/salsa-v17-latin-regular.woff') format('woff'),
-			/* Modern Browsers */ url('/assets/fonts/salsa/salsa-v17-latin-regular.ttf') format('truetype'),
-			/* Safari, Android, iOS */ url('/assets/fonts/salsa/salsa-v17-latin-regular.svg#Salsa') format('svg'); /* Legacy iOS */
-	}
-
+	@import url('https://fonts.cdnfonts.com/css/vcr-osd-mono');
+	@import url('https://fonts.cdnfonts.com/css/flicker-2');
 	/* lato-100 - latin */
 	@font-face {
 		font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
@@ -168,6 +158,14 @@
 		-webkit-font-feature-settings: 'liga' 0, 'calt' 0;
 		font-feature-settings: 'liga' 0, 'calt' 0;
 		letter-spacing: 0;
+	}
+
+	.font-VCR-OSD-Mono {
+		font-family: 'VCR OSD Mono', sans-serif;
+	}
+
+	.font-flicker {
+		font-family: 'Flicker', sans-serif;
 	}
 }
 

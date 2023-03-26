@@ -23,6 +23,21 @@ class DirectionHelper {
 				return DirectionEnum.NORTH;
 		}
 	}
+
+	static string2DirEnum(directionString: string): DirectionEnum {
+		switch (directionString) {
+			case 'NORTH':
+				return DirectionEnum.NORTH;
+			case 'EAST':
+				return DirectionEnum.EAST;
+			case 'SOUTH':
+				return DirectionEnum.SOUTH;
+			case 'WEST':
+				return DirectionEnum.WEST;
+			default:
+				return DirectionEnum.NORTH;
+		}
+	}
 }
 
 export default DirectionHelper;

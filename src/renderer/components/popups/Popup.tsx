@@ -43,7 +43,7 @@ class Popup extends React.Component<PopupProps, PopupStats> {
 				<div>
 					<div className="absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]">
 						<div className="p-8 bg-accent-700 text-white">
-							<div className="text-center text-3xl mb-8">{label}</div>
+							<div className="text-center text-3xl mb-8 font-flicker tracking-widest">{label}</div>
 							<div className="mb-8">{content}</div>
 							{closeButton ? (
 								<div className="flex flex-row gap-8">

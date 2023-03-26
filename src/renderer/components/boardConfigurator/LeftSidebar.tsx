@@ -190,7 +190,7 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 						type="range"
 						label={window.languageHelper.translate('Board Width')}
 						value={config.width}
-						min={2}
+						min={Math.max(config.eye.position[0] + 1, 2)}
 						max={20}
 						onChange={(width) => {
 							const newConfig = {
@@ -204,7 +204,7 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 						type="range"
 						label={window.languageHelper.translate('Board Height')}
 						value={config.height}
-						min={2}
+						min={Math.max(config.eye.position[1] + 1, 2)}
 						max={20}
 						onChange={(height) => {
 							const newConfig = {

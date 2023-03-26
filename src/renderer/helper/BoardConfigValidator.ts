@@ -11,6 +11,26 @@ class BoardConfigValidator {
 	constructor(boardConfig: BoardConfigInterface) {
 		this.config = boardConfig;
 		this.json = JSON.parse(JSON.stringify(boardConfig));
+
+		if (!this.config.name) {
+			this.errors.push(`Board name is not defined`);
+		}
+		if (!this.config.width) {
+			this.errors.push(`Board width is not defined`);
+		}
+		if (!this.config.height) {
+			this.errors.push(`Board height is not defined`);
+		}
+		if (!this.config.eye) {
+			this.errors.push(`Board eye is not defined`);
+		}
+		if (!this.config.checkPoints || this.config.checkPoints.length > 2) {
+			this.errors.push(`Check points are to less (minimum 2) or not defined`);
+		}
+		if (!this.config.startFields || this.config.startFields.length < 2) {
+			this.errors.push(`Start fields are to less (minimum 2) or not defined`);
+		}
+
 		const doubleOccupancy = this.checkDoubleOccupancy();
 		if (doubleOccupancy) {
 			this.errors.push(`Double occupancy on field [${doubleOccupancy[0]}, ${doubleOccupancy[1]}]`);
@@ -26,20 +46,26 @@ class BoardConfigValidator {
 
 	private checkDoubleOccupancy(): false | Position {
 		const occupiedMap = new Map<string, boolean>();
-		occupiedMap.set(BoardGenerator.position2String(this.config.eye.position), true);
-		for (let i = 0; i < this.config.startFields.length; i += 1) {
-			const startField = this.config.startFields[i];
-			if (occupiedMap.has(BoardGenerator.position2String(startField.position))) {
-				return startField.position;
-			}
-			occupiedMap.set(BoardGenerator.position2String(startField.position), true);
+		if (this.config.eye) {
+			occupiedMap.set(BoardGenerator.position2String(this.config.eye.position), true);
 		}
-		for (let i = 0; i < this.config.checkPoints.length; i += 1) {
-			const checkpoint = this.config.checkPoints[i];
-			if (occupiedMap.has(BoardGenerator.position2String(checkpoint))) {
-				return checkpoint;
+		if (this.config.startFields) {
+			for (let i = 0; i < this.config.startFields.length; i += 1) {
+				const startField = this.config.startFields[i];
+				if (occupiedMap.has(BoardGenerator.position2String(startField.position))) {
+					return startField.position;
+				}
+				occupiedMap.set(BoardGenerator.position2String(startField.position), true);
 			}
-			occupiedMap.set(BoardGenerator.position2String(checkpoint), true);
+		}
+		if (this.config.checkPoints) {
+			for (let i = 0; i < this.config.checkPoints.length; i += 1) {
+				const checkpoint = this.config.checkPoints[i];
+				if (occupiedMap.has(BoardGenerator.position2String(checkpoint))) {
+					return checkpoint;
+				}
+				occupiedMap.set(BoardGenerator.position2String(checkpoint), true);
+			}
 		}
 		if (this.config.lembasFields) {
 			for (let i = 0; i < this.config.lembasFields.length; i += 1) {
@@ -64,14 +90,20 @@ class BoardConfigValidator {
 
 	private checkDimensions(): false | Position {
 		let maxDimensions = { x: 0, y: 0 };
-		maxDimensions = BoardConfigValidator.getMaxDimension(maxDimensions, this.config.eye.position);
-		for (let i = 0; i < this.config.startFields.length; i += 1) {
-			const startField = this.config.startFields[i];
-			maxDimensions = BoardConfigValidator.getMaxDimension(maxDimensions, startField.position);
+		if (this.config.eye) {
+			maxDimensions = BoardConfigValidator.getMaxDimension(maxDimensions, this.config.eye.position);
 		}
-		for (let i = 0; i < this.config.checkPoints.length; i += 1) {
-			const checkpoint = this.config.checkPoints[i];
-			maxDimensions = BoardConfigValidator.getMaxDimension(maxDimensions, checkpoint);
+		if (this.config.startFields) {
+			for (let i = 0; i < this.config.startFields.length; i += 1) {
+				const startField = this.config.startFields[i];
+				maxDimensions = BoardConfigValidator.getMaxDimension(maxDimensions, startField.position);
+			}
+		}
+		if (this.config.checkPoints) {
+			for (let i = 0; i < this.config.checkPoints.length; i += 1) {
+				const checkpoint = this.config.checkPoints[i];
+				maxDimensions = BoardConfigValidator.getMaxDimension(maxDimensions, checkpoint);
+			}
 		}
 		if (this.config.lembasFields) {
 			for (let i = 0; i < this.config.lembasFields.length; i += 1) {
