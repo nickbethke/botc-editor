@@ -8,6 +8,9 @@ import BoardConfigInterface from '../interfaces/BoardConfigInterface';
 import InputLabel from '../InputLabel';
 import { getDirectionArrow } from '../presetEditor/RiverFieldPreset';
 
+/**
+ * The properties for the river preset component.
+ */
 type AddRiverPresetConfirmPopupProps = {
 	onCancel: () => void;
 	onConfirm: (position: BoardPosition, adjustBoardSize: boolean) => void;
@@ -17,10 +20,16 @@ type AddRiverPresetConfirmPopupProps = {
 	windowDimensions: { width: number; height: number };
 	configuration: BoardConfigInterface;
 };
+/**
+ * The state types for the river preset component.
+ */
 type AddRiverPresetConfirmPopupState = {
 	position: BoardPosition;
 	adjustBoardSize: boolean;
 };
+/**
+ * The river preset component.
+ */
 export default class AddRiverPresetConfirmPopup extends Component<
 	AddRiverPresetConfirmPopupProps,
 	AddRiverPresetConfirmPopupState
@@ -39,6 +48,9 @@ export default class AddRiverPresetConfirmPopup extends Component<
 		};
 	}
 
+	/**
+	 * Builds the board for the preset preview.
+	 */
 	buildBoard = () => {
 		const { configuration, preset } = this.props;
 		const { position, adjustBoardSize } = this.state;

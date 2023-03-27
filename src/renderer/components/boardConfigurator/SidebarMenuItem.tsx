@@ -1,6 +1,9 @@
 import _uniqueId from 'lodash/uniqueId';
 import React from 'react';
 
+/**
+ * The sidebar menu item properties
+ */
 type SidebarMenuItemProps = {
 	label: string;
 	open: boolean;
@@ -9,10 +12,16 @@ type SidebarMenuItemProps = {
 	shortCut?: string;
 	position?: 'top' | 'bottom' | 'left' | 'right';
 };
+/**
+ * The sidebar menu item state properties
+ */
 type SidebarMenuItemState = {
 	hover: boolean;
 };
 
+/**
+ * The sidebar menu item component
+ */
 class SidebarMenuItem extends React.Component<SidebarMenuItemProps, SidebarMenuItemState> {
 	static get defaultProps() {
 		return {

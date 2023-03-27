@@ -15,6 +15,9 @@ import BoardConfigInterface, {
 import { FieldsEnum } from '../generator/BoardGenerator';
 import DirectionHelper from '../generator/helper/DirectionHelper';
 
+/**
+ * The getFieldType return value type
+ */
 export type GetFieldTypeReturnValues =
 	| FieldsEnum.START
 	| FieldsEnum.CHECKPOINT
@@ -24,6 +27,11 @@ export type GetFieldTypeReturnValues =
 	| FieldsEnum.RIVER
 	| null;
 
+/**
+ * Get the field type of the position from the board config
+ * @param position
+ * @param config
+ */
 export function getFieldType(position: BoardPosition, config: BoardConfigInterface): GetFieldTypeReturnValues {
 	const positionString = boardPosition2String(position);
 
@@ -51,11 +59,21 @@ export function getFieldType(position: BoardPosition, config: BoardConfigInterfa
 	return null;
 }
 
+/**
+ * check if the position is the destiny mountain
+ * @param position
+ * @param config
+ */
 export function isDestinyMountain(position: BoardPosition, config: BoardConfigInterface): boolean {
 	const index = config.checkPoints.findIndex((p) => position2String(p) === boardPosition2String(position));
 	return index === config.checkPoints.length - 1;
 }
 
+/**
+ * remove a checkpoint with the position from the board config
+ * @param position
+ * @param config
+ */
 export function removeCheckpoint(position: BoardPosition, config: BoardConfigInterface): BoardConfigInterface {
 	const filteredCheckpointArray = config.checkPoints.filter((e) => {
 		return position2String(e) !== boardPosition2String(position);
@@ -63,6 +81,11 @@ export function removeCheckpoint(position: BoardPosition, config: BoardConfigInt
 	return { ...config, checkPoints: filteredCheckpointArray };
 }
 
+/**
+ * remove a start field with the position from the board config
+ * @param position
+ * @param config
+ */
 export function removeStartField(position: BoardPosition, config: BoardConfigInterface): BoardConfigInterface {
 	const filteredStartFieldsArray = config.startFields.filter((e) => {
 		return position2String(e.position) !== boardPosition2String(position);
@@ -70,6 +93,11 @@ export function removeStartField(position: BoardPosition, config: BoardConfigInt
 	return { ...config, startFields: filteredStartFieldsArray };
 }
 
+/**
+ * remove a lembas field with the position from the board config
+ * @param position
+ * @param config
+ */
 export function removeLembasField(position: BoardPosition, config: BoardConfigInterface): BoardConfigInterface {
 	const filteredLembasFieldsArray = config.lembasFields.filter((e) => {
 		return position2String(e.position) !== boardPosition2String(position);
@@ -77,6 +105,11 @@ export function removeLembasField(position: BoardPosition, config: BoardConfigIn
 	return { ...config, lembasFields: filteredLembasFieldsArray };
 }
 
+/**
+ * remove a river field with the position from the board config
+ * @param position
+ * @param config
+ */
 export function removeRiver(position: BoardPosition, config: BoardConfigInterface): BoardConfigInterface {
 	const filteredRiverFieldsArray = config.riverFields.filter((e) => {
 		return position2String(e.position) !== boardPosition2String(position);
@@ -84,11 +117,21 @@ export function removeRiver(position: BoardPosition, config: BoardConfigInterfac
 	return { ...config, riverFields: filteredRiverFieldsArray };
 }
 
+/**
+ * remove a hole field with the position from the board config
+ * @param position
+ * @param config
+ */
 export function removeHole(position: BoardPosition, config: BoardConfigInterface): BoardConfigInterface {
 	const filteredHolesArray = config.holes.filter((e) => position2String(e) !== boardPosition2String(position));
 	return { ...config, holes: filteredHolesArray };
 }
 
+/**
+ * remove a wall with the position from the board config
+ * @param position
+ * @param config
+ */
 export function removeWall(
 	position: [BoardPosition, BoardPosition],
 	config: BoardConfigInterface
@@ -102,6 +145,11 @@ export function removeWall(
 	};
 }
 
+/**
+ * overrides a field with the position from the board config
+ * @param position
+ * @param config
+ */
 function overrideField(
 	position: BoardPosition,
 	config: BoardConfigInterface
@@ -140,6 +188,11 @@ function overrideField(
 	}
 }
 
+/**
+ * moves saurons eyes to a new position
+ * @param position
+ * @param config
+ */
 export function moveSauronsEye(position: BoardPosition, config: BoardConfigInterface): BoardConfigInterface {
 	const { override, config: newConfig } = overrideField(position, config);
 	if (override) {
@@ -154,6 +207,11 @@ export function moveSauronsEye(position: BoardPosition, config: BoardConfigInter
 	return config;
 }
 
+/**
+ * adds a checkpoint to the board config
+ * @param position
+ * @param config
+ */
 export function addCheckpoint(position: BoardPosition, config: BoardConfigInterface): BoardConfigInterface {
 	const { override, config: newConfig } = overrideField(position, config);
 	if (override) {
@@ -164,6 +222,11 @@ export function addCheckpoint(position: BoardPosition, config: BoardConfigInterf
 	return config;
 }
 
+/**
+ * adds a start field to the board config
+ * @param position
+ * @param config
+ */
 export function addStartField(position: BoardPosition, config: BoardConfigInterface): BoardConfigInterface {
 	const { override, config: newConfig } = overrideField(position, config);
 	if (override) {
@@ -177,6 +240,11 @@ export function addStartField(position: BoardPosition, config: BoardConfigInterf
 	return config;
 }
 
+/**
+ * adds a lembas field to the board config
+ * @param position
+ * @param config
+ */
 export function addLembasField(position: BoardPosition, config: BoardConfigInterface): BoardConfigInterface {
 	const { override, config: newConfig } = overrideField(position, config);
 	if (override) {
@@ -190,6 +258,11 @@ export function addLembasField(position: BoardPosition, config: BoardConfigInter
 	return config;
 }
 
+/**
+ * adds a river field to the board config
+ * @param position
+ * @param config
+ */
 export function addRiver(position: BoardPosition, config: BoardConfigInterface): BoardConfigInterface {
 	const { override, config: newConfig } = overrideField(position, config);
 	if (override) {
@@ -203,6 +276,11 @@ export function addRiver(position: BoardPosition, config: BoardConfigInterface):
 	return config;
 }
 
+/**
+ * adds a hole field to the board config
+ * @param position
+ * @param config
+ */
 export function addHole(position: BoardPosition, config: BoardConfigInterface): BoardConfigInterface {
 	const { override, config: newConfig } = overrideField(position, config);
 	if (override) {
@@ -213,6 +291,11 @@ export function addHole(position: BoardPosition, config: BoardConfigInterface): 
 	return config;
 }
 
+/**
+ * gets the direction of a field in the board if it has a direction
+ * @param position
+ * @param config
+ */
 export function getDirectionFieldConfig(
 	position: BoardPosition,
 	config: BoardConfigInterface
@@ -238,6 +321,12 @@ export function getDirectionFieldConfig(
 	return null;
 }
 
+/**
+ * updates the direction of a start field in the board config
+ * @param config
+ * @param position
+ * @param direction
+ */
 export function updateStartFieldDirection(
 	config: BoardConfigInterface,
 	position: BoardPosition,
@@ -257,6 +346,12 @@ export function updateStartFieldDirection(
 	return config;
 }
 
+/**
+ * updates the direction of a river field in the board config
+ * @param config
+ * @param position
+ * @param direction
+ */
 export function updateRiverFieldDirection(
 	config: BoardConfigInterface,
 	position: BoardPosition,
@@ -276,6 +371,12 @@ export function updateRiverFieldDirection(
 	return config;
 }
 
+/**
+ * updates the amount of a lembas field in the board config
+ * @param config
+ * @param position
+ * @param amount
+ */
 export function updateLembasFieldAmount(
 	config: BoardConfigInterface,
 	position: BoardPosition,
@@ -295,6 +396,11 @@ export function updateLembasFieldAmount(
 	return config;
 }
 
+/**
+ * gets a lembas field by its position from the board config
+ * @param position
+ * @param config
+ */
 export function getLembasFieldConfig(position: BoardPosition, config: BoardConfigInterface): LembasField | null {
 	const index = config.lembasFields.findIndex((e) => position2String(e.position) === boardPosition2String(position));
 	if (index > -1 && config.lembasFields[index]) {

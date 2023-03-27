@@ -2,6 +2,9 @@ import React, { MouseEventHandler } from 'react';
 import destinyMountainImage from '../../../../assets/textures/schicksalsberg.png';
 import { SettingsInterface } from '../../../interfaces/SettingsInterface';
 
+/**
+ * THe popup component properties
+ */
 export type PopupV2Props = {
 	title: string;
 	closeButtonText: string;
@@ -12,6 +15,9 @@ export type PopupV2Props = {
 	topOffset?: boolean;
 	settings: SettingsInterface;
 };
+/**
+ * The popup component state properties
+ */
 type PopupV2State = {
 	isDragged: boolean;
 	rel: { x: number; y: number };
@@ -20,6 +26,9 @@ type PopupV2State = {
 	dimension: { width: number; height: number };
 };
 
+/**
+ * The popup component
+ */
 class PopupV2 extends React.Component<PopupV2Props, PopupV2State> {
 	constructor(props: PopupV2Props) {
 		super(props);
@@ -33,12 +42,18 @@ class PopupV2 extends React.Component<PopupV2Props, PopupV2State> {
 		this.handleOffClick = this.handleOffClick.bind(this);
 	}
 
+	/**
+	 * The popup component default properties
+	 */
 	static get defaultProps() {
 		return {
 			topOffset: false,
 		};
 	}
 
+	/**
+	 * Fires when the component did mount
+	 */
 	componentDidMount() {
 		setTimeout(() => {
 			const popup = document.getElementById('popupV2Popup');
@@ -65,6 +80,9 @@ class PopupV2 extends React.Component<PopupV2Props, PopupV2State> {
 		}, 200);
 	}
 
+	/**
+	 * Fires when the component has been updated
+	 */
 	componentDidUpdate() {
 		const { position, dimension } = this.state;
 		const { windowDimensions, os } = this.props;
@@ -97,11 +115,17 @@ class PopupV2 extends React.Component<PopupV2Props, PopupV2State> {
 		}
 	}
 
+	/**
+	 * Handles offClick events
+	 */
 	handleOffClick: MouseEventHandler<HTMLDivElement> = () => {
 		const { onClose } = this.props;
 		onClose();
 	};
 
+	/**
+	 * Renders the popup component
+	 */
 	render() {
 		const { closeButtonText, onClose, children, title, os, topOffset } = this.props;
 		const { visible, position } = this.state;

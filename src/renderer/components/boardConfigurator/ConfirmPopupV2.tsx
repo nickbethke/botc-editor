@@ -2,6 +2,9 @@ import React, { MouseEventHandler } from 'react';
 import destinyMountainImage from '../../../../assets/textures/schicksalsberg.png';
 import { SettingsInterface } from '../../../interfaces/SettingsInterface';
 
+/**
+ * The properties of the confirmation popup.
+ */
 export type ConfirmPopupV2Props = {
 	title: string;
 	abortButtonText: string;
@@ -15,6 +18,9 @@ export type ConfirmPopupV2Props = {
 	windowDimensions: { width: number; height: number };
 	maxWidth?: number | null;
 };
+/**
+ * The state properties of the confirmation popup.
+ */
 type ConfirmPopupV2State = {
 	isDragged: boolean;
 	rel: { x: number; y: number };
@@ -24,6 +30,9 @@ type ConfirmPopupV2State = {
 	dimension: { width: number; height: number };
 };
 
+/**
+ * The confirmation popup component.
+ */
 class ConfirmPopupV2 extends React.Component<ConfirmPopupV2Props, ConfirmPopupV2State> {
 	constructor(props: ConfirmPopupV2Props) {
 		super(props);
@@ -38,6 +47,9 @@ class ConfirmPopupV2 extends React.Component<ConfirmPopupV2Props, ConfirmPopupV2
 		this.handleOffClick = this.handleOffClick.bind(this);
 	}
 
+	/**
+	 * Confirmation popup default properties.
+	 */
 	static get defaultProps() {
 		return {
 			topOffset: false,
@@ -45,6 +57,9 @@ class ConfirmPopupV2 extends React.Component<ConfirmPopupV2Props, ConfirmPopupV2
 		};
 	}
 
+	/**
+	 * Function called when the component did mount.
+	 */
 	componentDidMount() {
 		setTimeout(() => {
 			const popup = document.getElementById('popupV2');
@@ -71,6 +86,11 @@ class ConfirmPopupV2 extends React.Component<ConfirmPopupV2Props, ConfirmPopupV2
 		}, 200);
 	}
 
+	/**
+	 * Function called when the component was updated.
+	 * @param prevProps
+	 * @param prevState
+	 */
 	componentDidUpdate(prevProps: Readonly<ConfirmPopupV2Props>, prevState: Readonly<ConfirmPopupV2State>) {
 		const { offClick: preOffClick, dimension: preDimension } = prevState;
 		const popup = document.getElementById('popupV2');
@@ -121,11 +141,18 @@ class ConfirmPopupV2 extends React.Component<ConfirmPopupV2Props, ConfirmPopupV2
 		}
 	}
 
+	/**
+	 * Handles off-clicks of the popup.
+	 * @param e
+	 */
 	handleOffClick: MouseEventHandler<HTMLDivElement> = (e) => {
 		const trigger = document.querySelector('#popupV2-container');
 		if (trigger && trigger === e.target) this.setState({ offClick: true });
 	};
 
+	/**
+	 * Renders the component.
+	 */
 	render() {
 		const { confirmButtonText, abortButtonText, onConfirm, onAbort, children, title, os, topOffset, maxWidth } =
 			this.props;

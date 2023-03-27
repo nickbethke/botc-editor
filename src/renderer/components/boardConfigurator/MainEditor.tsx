@@ -16,16 +16,24 @@ import DirectionHelper from '../generator/helper/DirectionHelper';
 import ContextMenuV2 from './ContextMenuV2';
 import ContextMenuItemV2, { ContextMenuDividerV2 } from './ContextMenuItemV2';
 
+/**
+ * The field type onClick arguments
+ */
 interface FieldTypeOnClickArgs {
 	wall: [BoardPosition, BoardPosition];
 	field: BoardPosition;
 }
 
+/**
+ * The field type onClick callback type
+ */
 export type FieldTypeOnClick = <K extends keyof FieldTypeOnClickArgs>(
 	type: K,
 	position: FieldTypeOnClickArgs[K]
 ) => void;
-
+/**
+ * The wall helper component properties
+ */
 type WallHelperProps = {
 	position: [BoardPosition, BoardPosition];
 	direction?: 'horizontal' | 'vertical';
@@ -35,12 +43,21 @@ type WallHelperProps = {
 	onContextMenu: (contextMenu: JSX.Element | null) => void;
 };
 
+/**
+ * The wall helper component
+ * @param props
+ * @constructor
+ */
 function WallHelper(props: WallHelperProps) {
 	const { direction, onClick, position, editorTool, isWall, onContextMenu } = props;
 	const active = editorTool === 'delete' || editorTool === FieldsEnum.WALL;
 	const inactiveClass = 'bg-muted-700 hover:bg-muted-600 hover:cursor-pointer';
 	const activeClass = 'bg-accent/40 hover:bg-accent/75 shadow-lg';
 
+	/**
+	 * Handle the context menu event
+	 * @param event
+	 */
 	const handleWallContextMenu: React.MouseEventHandler<HTMLDivElement> = (event) => {
 		onContextMenu(
 			<ContextMenuV2 position={{ x: event.clientX, y: event.clientY }}>
@@ -78,11 +95,16 @@ function WallHelper(props: WallHelperProps) {
 	);
 }
 
+/**
+ * The wall helper component default properties
+ */
 WallHelper.defaultProps = {
 	direction: 'vertical',
 	isWall: false,
 };
-
+/**
+ * The field helper component properties
+ */
 type FieldHelperProps = {
 	position: BoardPosition;
 	onClick: FieldTypeOnClick;
@@ -93,7 +115,9 @@ type FieldHelperProps = {
 	onContextMenu: (contextMenu: JSX.Element | null) => void;
 	onChangeToEdit: (position: BoardPosition) => void;
 };
-
+/**
+ * The direction arrows array
+ */
 export const DirectionArrows: JSX.Element[] = [
 	<VscArrowUp strokeWidth={2} />,
 	<VscArrowRight strokeWidth={2} />,
@@ -101,6 +125,11 @@ export const DirectionArrows: JSX.Element[] = [
 	<VscArrowLeft strokeWidth={2} />,
 ];
 
+/**
+ * The field helper component
+ * @param props
+ * @constructor
+ */
 function FieldHelper(props: FieldHelperProps) {
 	const { position, onClick, editorTool, type, inEdit, attribute, onContextMenu } = props;
 	const active = editorTool && (editorTool === 'edit' || (editorTool !== FieldsEnum.WALL && type !== FieldsEnum.EYE));
@@ -109,6 +138,9 @@ function FieldHelper(props: FieldHelperProps) {
 	const inEditClass = `${activeClass} border-red-400`;
 	const editableFieldTypes = [FieldsEnum.EYE, FieldsEnum.START, FieldsEnum.RIVER, FieldsEnum.LEMBAS];
 	const editable = type !== null ? editableFieldTypes.includes(type) : false;
+	/**
+	 * Return the field type css class
+	 */
 	const getClassFromFieldEnum = (): string => {
 		switch (type) {
 			case FieldsEnum.EYE:
@@ -150,6 +182,10 @@ function FieldHelper(props: FieldHelperProps) {
 			break;
 		default:
 	}
+	/**
+	 * Returns the context menu
+	 * @param event
+	 */
 	const getContextMenu = (event: React.MouseEvent<HTMLDivElement>) => {
 		const { onChangeToEdit } = props;
 		if (editable) {
@@ -219,6 +255,9 @@ function FieldHelper(props: FieldHelperProps) {
 	);
 }
 
+/**
+ * The main editor component properties
+ */
 type MainEditorProps = {
 	config: BoardConfigInterface;
 	zoom: number;
@@ -234,10 +273,16 @@ type MainEditorProps = {
 	fileSaved: boolean;
 	fileSep: string;
 };
+/**
+ * The main editor component state properties
+ */
 type MainEditorState = {
 	contextMenu: JSX.Element | null;
 };
 
+/**
+ * The board configurator main editor component
+ */
 class MainEditor extends React.Component<MainEditorProps, MainEditorState> {
 	constructor(props: MainEditorProps) {
 		super(props);
@@ -247,6 +292,10 @@ class MainEditor extends React.Component<MainEditorProps, MainEditorState> {
 		this.handleZoom = this.handleZoom.bind(this);
 	}
 
+	/**
+	 * Handle the context menu event
+	 * @param contextMenu
+	 */
 	onContextMenu = (contextMenu: JSX.Element | null) => {
 		this.setState({ contextMenu });
 		if (contextMenu) {
@@ -262,6 +311,10 @@ class MainEditor extends React.Component<MainEditorProps, MainEditorState> {
 		}
 	};
 
+	/**
+	 * Builds the board
+	 * @param config
+	 */
 	buildBoard = (config: BoardConfigInterface) => {
 		const { onFieldOrWallClick, editorTool, fieldInEdit, onChangeToEdit } = this.props;
 		const wallMap = wallConfig2Map(config.walls);
@@ -383,6 +436,10 @@ class MainEditor extends React.Component<MainEditorProps, MainEditorState> {
 		return board;
 	};
 
+	/**
+	 * Handles the zoom event
+	 * @param event
+	 */
 	handleZoom: React.WheelEventHandler<HTMLDivElement> = (event) => {
 		const { onZoom, zoom } = this.props;
 		if (event.ctrlKey) {
@@ -402,6 +459,9 @@ class MainEditor extends React.Component<MainEditorProps, MainEditorState> {
 		}
 	};
 
+	/**
+	 * Renders the main editor
+	 */
 	render() {
 		const { config, zoom, file, fileSaved, fileSep } = this.props;
 

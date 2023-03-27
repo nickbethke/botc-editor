@@ -1,12 +1,22 @@
 import React from 'react';
 
-function ContextMenuV2(props: {
+/**
+ * The context menu component properties
+ */
+type ContextMenuV2Props = {
 	position: {
 		y: number;
 		x: number;
 	};
 	children: string | JSX.Element | JSX.Element[] | null;
-}) {
+};
+
+/**
+ * The context menu component
+ * @param props
+ * @constructor
+ */
+function ContextMenuV2(props: ContextMenuV2Props) {
 	const { position, children } = props;
 	return (
 		<div

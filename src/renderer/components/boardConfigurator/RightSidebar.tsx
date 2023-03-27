@@ -10,6 +10,9 @@ import Warning, { WarningsMap } from './Warning';
 import { BoardPosition } from '../generator/interfaces/boardPosition';
 import { SettingsInterface } from '../../../interfaces/SettingsInterface';
 
+/**
+ * The board configuration right sidebar component properties
+ */
 type RightSidebarProps = {
 	tabChange: (tab: RightSidebarOpenTab) => void;
 	openTab: RightSidebarOpenTab;
@@ -24,11 +27,32 @@ type RightSidebarProps = {
 	settings: SettingsInterface;
 	os: NodeJS.Platform;
 };
-
+/**
+ * The board configuration right sidebar open tab type
+ */
 export type RightSidebarOpenTab = 'warnings' | 'configPreview' | null;
 
+/**
+ * The board configuration right sidebar component
+ */
 class RightSidebar extends React.Component<RightSidebarProps, unknown> {
-	content = () => {
+	/**
+	 * Handles the tab change
+	 * @param openTab
+	 */
+	handleOpenTabChange(openTab: RightSidebarOpenTab) {
+		const { tabChange, openTab: currentOpenTab } = this.props;
+		if (currentOpenTab === openTab) {
+			tabChange(null);
+		} else {
+			tabChange(openTab);
+		}
+	}
+
+	/**
+	 * Determines the content of the right sidebar
+	 */
+	content() {
 		const { openTab } = this.props;
 		switch (openTab) {
 			case 'warnings':
@@ -38,9 +62,12 @@ class RightSidebar extends React.Component<RightSidebarProps, unknown> {
 			default:
 				return null;
 		}
-	};
+	}
 
-	notifications = () => {
+	/**
+	 * Renders the notifications
+	 */
+	notifications() {
 		const { warnings, onFieldSelect, onRemoveWall } = this.props;
 		return (
 			<div className="flex flex-col h-full">
@@ -67,9 +94,12 @@ class RightSidebar extends React.Component<RightSidebarProps, unknown> {
 				</div>
 			</div>
 		);
-	};
+	}
 
-	configPreview = () => {
+	/**
+	 * Renders the configuration preview
+	 */
+	configPreview() {
 		const { config, windowDimensions, settings, os } = this.props;
 		const windowsHeight = settings.darkMode ? 119 : 120;
 		const notWindowsHeight = settings.darkMode ? 87 : 88;
@@ -99,18 +129,13 @@ class RightSidebar extends React.Component<RightSidebarProps, unknown> {
 				</div>
 			</div>
 		);
-	};
+	}
 
-	handleOpenTabChange = (openTab: RightSidebarOpenTab) => {
-		const { tabChange, openTab: currentOpenTab } = this.props;
-		if (currentOpenTab === openTab) {
-			tabChange(null);
-		} else {
-			tabChange(openTab);
-		}
-	};
-
-	private tabSwitch(openTab: RightSidebarOpenTab) {
+	/**
+	 * Renders the right sidebar tab switch
+	 * @param openTab
+	 */
+	tabSwitch(openTab: RightSidebarOpenTab) {
 		const { warnings, config } = this.props;
 		return (
 			<>
@@ -154,6 +179,9 @@ class RightSidebar extends React.Component<RightSidebarProps, unknown> {
 		);
 	}
 
+	/**
+	 * Renders the right sidebar
+	 */
 	render() {
 		const { openTab } = this.props;
 		return (

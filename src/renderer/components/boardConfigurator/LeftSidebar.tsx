@@ -33,6 +33,9 @@ import { SettingsInterface } from '../../../interfaces/SettingsInterface';
 import { BoardPresetWithFile, RiverPresetWithFile } from '../../../main/helper/PresetsLoader';
 import PresetView from './PresetView';
 
+/**
+ * The board configurator left sidebar properties
+ */
 type LeftSidebarProps = {
 	toolChange: (tool: EditorToolType) => void;
 	tabChange: (tab: LeftSidebarOpenTab) => void;
@@ -47,11 +50,22 @@ type LeftSidebarProps = {
 	boardPresets: Array<BoardPresetWithFile>;
 	onAddRiverPresetToBoard: (newRiverPreset: RiverPresetWithFile) => void;
 };
-
+/**
+ * The board configurator left sidebar open tab type
+ */
 export type LeftSidebarOpenTab = 'presets' | 'settings' | 'checkpointOrder' | null;
+/**
+ * The board configurator left sidebar config type
+ */
 export type LeftSidebarConfigType = 'global' | 'amount' | 'direction';
 
+/**
+ * The board configurator left sidebar component
+ */
 class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
+	/**
+	 * Determines what content to display in the left sidebar
+	 */
 	content = () => {
 		const { openTab } = this.props;
 		switch (openTab) {
@@ -66,6 +80,9 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 		}
 	};
 
+	/**
+	 * Determines what settings content to display in the left sidebar
+	 */
 	settings = () => {
 		const { configType } = this.props;
 		switch (configType) {
@@ -90,6 +107,9 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 		}
 	};
 
+	/**
+	 * Renders the direction settings content
+	 */
 	settingsDirection = () => {
 		const { config, fieldInEdit } = this.props;
 		if (fieldInEdit) {
@@ -120,6 +140,10 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 		return null;
 	};
 
+	/**
+	 * Handle direction change
+	 * @param event
+	 */
 	onDirectionChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
 		const { config, onConfigUpdate, fieldInEdit } = this.props;
 		if (fieldInEdit) {
@@ -144,6 +168,9 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 		}
 	};
 
+	/**
+	 * Renders the amount settings content
+	 */
 	settingsAmount = () => {
 		const { config, onConfigUpdate, fieldInEdit } = this.props;
 		if (fieldInEdit) {
@@ -171,6 +198,9 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 		return null;
 	};
 
+	/**
+	 * Renders the global settings content
+	 */
 	settingsGlobal = () => {
 		const { config, onConfigUpdate } = this.props;
 		return (
@@ -224,6 +254,9 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 		);
 	};
 
+	/**
+	 * Renders the checkpoint order content
+	 */
 	checkpointOrder = () => {
 		const { config, onConfigUpdate, settings } = this.props;
 		const darkModeHeight = settings.darkMode ? 'calc(100vh - 111px)' : 'calc(100vh - 112px)';
@@ -254,6 +287,9 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 		);
 	};
 
+	/**
+	 * Renders the presets content
+	 */
 	presets = () => {
 		const { riverPresets, boardPresets, onAddRiverPresetToBoard } = this.props;
 		return (
@@ -272,11 +308,19 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 		);
 	};
 
+	/**
+	 * Handle the current tool changes
+	 * @param currentTool
+	 */
 	handleCurrentToolChange = (currentTool: EditorToolType) => {
 		const { toolChange } = this.props;
 		toolChange(currentTool);
 	};
 
+	/**
+	 * Handle the current tab changes
+	 * @param openTab
+	 */
 	handleOpenTabChange = (openTab: LeftSidebarOpenTab) => {
 		const { tabChange, openTab: currentOpenTab } = this.props;
 		if (currentOpenTab === openTab) {
@@ -286,6 +330,11 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 		}
 	};
 
+	/**
+	 * Renders the left sidebar tool selection
+	 * @param currentTool
+	 * @private
+	 */
 	private toolSelection(currentTool: EditorToolType) {
 		return (
 			<>
@@ -386,6 +435,11 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 		);
 	}
 
+	/**
+	 * Renders the left sidebar tab switch
+	 * @param openTab
+	 * @private
+	 */
 	private tabSwitch(openTab: LeftSidebarOpenTab) {
 		return (
 			<>
@@ -420,6 +474,9 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 		);
 	}
 
+	/**
+	 * Renders the left sidebar
+	 */
 	render() {
 		const { currentTool, openTab } = this.props;
 		return (

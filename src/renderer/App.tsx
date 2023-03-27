@@ -75,6 +75,9 @@ type AppStates = {
 	};
 };
 
+/**
+ * App component
+ */
 class App extends React.Component<AppProps, AppStates> {
 	constructor(props: AppProps) {
 		super(props);

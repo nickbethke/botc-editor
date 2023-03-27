@@ -1,10 +1,16 @@
 import React from 'react';
 
+/**
+ * The context menu item properties
+ */
 type ContextMenuItemV2Props = {
 	text: string | JSX.Element;
 	onClick?: () => void | null | Promise<void>;
 };
 
+/**
+ * The context menu item component
+ */
 class ContextMenuItemV2 extends React.Component<ContextMenuItemV2Props, unknown> {
 	constructor(props: ContextMenuItemV2Props) {
 		super(props);
@@ -17,6 +23,9 @@ class ContextMenuItemV2 extends React.Component<ContextMenuItemV2Props, unknown>
 		};
 	}
 
+	/**
+	 * Handles the click event
+	 */
 	handleClick = () => {
 		const { onClick } = this.props;
 		if (onClick) {
@@ -24,6 +33,9 @@ class ContextMenuItemV2 extends React.Component<ContextMenuItemV2Props, unknown>
 		}
 	};
 
+	/**
+	 * Renders the component
+	 */
 	render() {
 		const { text, onClick } = this.props;
 		return (
@@ -38,6 +50,10 @@ class ContextMenuItemV2 extends React.Component<ContextMenuItemV2Props, unknown>
 	}
 }
 
+/**
+ * The context menu divider component
+ * @constructor
+ */
 export function ContextMenuDividerV2() {
 	return <div className="border-b dark:border-muted-600 border-muted-400 m-1" />;
 }

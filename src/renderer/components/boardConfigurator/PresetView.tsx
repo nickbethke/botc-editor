@@ -6,17 +6,25 @@ import { getDirectionArrow } from '../presetEditor/RiverFieldPreset';
 import ContextMenuV2 from './ContextMenuV2';
 import ContextMenuItemV2 from './ContextMenuItemV2';
 
+/**
+ * The preset view component properties
+ */
 type PresetViewProps = {
 	riverPresets: Array<RiverPresetWithFile>;
 	boardPresets: Array<BoardPresetWithFile>;
 	onAddRiverPresetToBoard: (newRiverPreset: RiverPresetWithFile) => void;
 };
+/**
+ * The preset view component state properties
+ */
 type PresetViewState = {
 	open: 'riverPresets' | 'boardPresets';
 	activePreset: string | null;
 	contextMenu: JSX.Element | null;
 };
-
+/**
+ * The preset view component
+ */
 export default class PresetView extends Component<PresetViewProps, PresetViewState> {
 	constructor(props: PresetViewProps) {
 		super(props);
@@ -27,6 +35,9 @@ export default class PresetView extends Component<PresetViewProps, PresetViewSta
 		};
 	}
 
+	/**
+	 * Fires when the component is mounted
+	 */
 	componentDidMount() {
 		window.addEventListener('click', () => {
 			this.setState({
@@ -35,6 +46,10 @@ export default class PresetView extends Component<PresetViewProps, PresetViewSta
 		});
 	}
 
+	/**
+	 * Renders the preset preview
+	 * @param riverPreset
+	 */
 	previewRiverPreset = (riverPreset: RiverPresetWithFile | undefined) => {
 		if (riverPreset) {
 			const board: JSX.Element[][] = [];
@@ -92,6 +107,9 @@ export default class PresetView extends Component<PresetViewProps, PresetViewSta
 		return null;
 	};
 
+	/**
+	 * Renders the preset view component
+	 */
 	render() {
 		const { riverPresets, boardPresets } = this.props;
 		const { open, activePreset, contextMenu } = this.state;

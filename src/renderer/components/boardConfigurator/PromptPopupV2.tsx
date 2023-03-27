@@ -3,6 +3,9 @@ import destinyMountainImage from '../../../../assets/textures/schicksalsberg.png
 import { SettingsInterface } from '../../../interfaces/SettingsInterface';
 import InputLabel from '../InputLabel';
 
+/**
+ * The prompt popup component properties
+ */
 export type PromptPopupV2Props = {
 	title: string;
 	abortButtonText: string;
@@ -15,6 +18,9 @@ export type PromptPopupV2Props = {
 	topOffset?: boolean;
 	settings: SettingsInterface;
 };
+/**
+ * The prompt popup component state properties
+ */
 type PromptPopupV2State = {
 	isDragged: boolean;
 	rel: { x: number; y: number };
@@ -25,6 +31,9 @@ type PromptPopupV2State = {
 	dimension: { width: number; height: number };
 };
 
+/**
+ * The prompt popup component
+ */
 class PromptPopupV2 extends React.Component<PromptPopupV2Props, PromptPopupV2State> {
 	constructor(props: PromptPopupV2Props) {
 		super(props);
@@ -40,12 +49,18 @@ class PromptPopupV2 extends React.Component<PromptPopupV2Props, PromptPopupV2Sta
 		this.handleOffClick = this.handleOffClick.bind(this);
 	}
 
+	/**
+	 * The prompt popup component default properties
+	 */
 	static get defaultProps() {
 		return {
 			topOffset: false,
 		};
 	}
 
+	/**
+	 * Fires when the component is mounted
+	 */
 	componentDidMount() {
 		setTimeout(() => {
 			const popup = document.getElementById('popupV2');
@@ -72,6 +87,11 @@ class PromptPopupV2 extends React.Component<PromptPopupV2Props, PromptPopupV2Sta
 		}, 200);
 	}
 
+	/**
+	 * Fires when the component is updated
+	 * @param prevProps
+	 * @param prevState
+	 */
 	componentDidUpdate(prevProps: Readonly<PromptPopupV2Props>, prevState: Readonly<PromptPopupV2State>) {
 		const { offClick: preOffClick } = prevState;
 		const { offClick, position, dimension } = this.state;
@@ -111,11 +131,18 @@ class PromptPopupV2 extends React.Component<PromptPopupV2Props, PromptPopupV2Sta
 		}
 	}
 
+	/**
+	 * Handles offClick events
+	 * @param e
+	 */
 	handleOffClick: MouseEventHandler<HTMLDivElement> = (e) => {
 		const trigger = document.querySelector('#popupV2-container');
 		if (trigger && trigger === e.target) this.setState({ offClick: true });
 	};
 
+	/**
+	 * Renders the text input
+	 */
 	textInput = () => {
 		const { value } = this.state;
 		const { onConfirm } = this.props;
@@ -134,6 +161,9 @@ class PromptPopupV2 extends React.Component<PromptPopupV2Props, PromptPopupV2Sta
 		);
 	};
 
+	/**
+	 * Renders the prompt popup component
+	 */
 	render() {
 		const { confirmButtonText, abortButtonText, onConfirm, onAbort, input, title, os, topOffset } = this.props;
 		const { visible, offClick, position } = this.state;
