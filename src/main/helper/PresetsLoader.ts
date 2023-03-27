@@ -25,6 +25,9 @@ export type BoardPreset = {
 	height: number;
 	data: object;
 };
+export type BoardPresetWithFile = BoardPreset & {
+	file: ParsedPath;
+};
 
 class PresetsLoader {
 	private static riverPresetFolder: string = getAppDataPath('presets/rivers/');
@@ -69,7 +72,7 @@ class PresetsLoader {
 	}
 
 	public static getBoardPresets() {
-		const boardPresets: Array<BoardPreset> = [];
+		const boardPresets: Array<BoardPresetWithFile> = [];
 		PresetsLoader.generateFolders();
 		const files = fs.readdirSync(PresetsLoader.boardPresetFolder);
 
@@ -81,8 +84,15 @@ class PresetsLoader {
 			if (valid) {
 				boardPresets.push({
 					...(JSON.parse(content) as BoardPreset),
+					file: path.parse(PresetsLoader.boardPresetFolder + file),
 				});
 			}
+		});
+		boardPresets.sort((a, b) => {
+			const textA = a.file.base.toUpperCase();
+			const textB = b.file.base.toUpperCase();
+			const elseE = textA > textB ? 1 : 0;
+			return textA < textB ? -1 : elseE;
 		});
 		return boardPresets;
 	}

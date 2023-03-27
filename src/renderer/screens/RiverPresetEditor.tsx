@@ -172,6 +172,16 @@ class RiverPresetEditor extends React.Component<RiverPresetEditorProps, RiverPre
 					newConfig = removeRiver(remove, newConfig);
 				});
 				editorCache.updatePreset(currentFile, newConfig, setAsEdited);
+
+				let minWidth = 1;
+				let minHeight = 1;
+				newConfig.data.forEach((river) => {
+					minWidth = Math.min(minWidth, river.position[0]);
+					minHeight = Math.min(minHeight, river.position[1]);
+				});
+				newConfig.width = minWidth;
+				newConfig.height = minHeight;
+
 				this.setState({
 					config: newConfig,
 					editorCache,

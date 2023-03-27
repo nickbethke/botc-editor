@@ -2,7 +2,7 @@ import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 import { ParsedPath } from 'path';
 import BoardConfigInterface from '../renderer/components/interfaces/BoardConfigInterface';
 import PartieConfigInterface from '../renderer/components/interfaces/PartieConfigInterface';
-import { BoardPreset, RiverPresetWithFile } from './helper/PresetsLoader';
+import { RiverPresetWithFile } from './helper/PresetsLoader';
 import { SettingsInterface } from '../interfaces/SettingsInterface';
 
 export type Channels = 'enter-full-screen' | 'leave-full-screen';
@@ -93,9 +93,6 @@ const electronHandler = {
 		close() {
 			return ipcRenderer.invoke('app-close');
 		},
-		getOS() {
-			return ipcRenderer.invoke('get:os');
-		},
 		getVersion() {
 			return ipcRenderer.invoke('get:version');
 		},
@@ -113,14 +110,11 @@ const electronHandler = {
 		},
 	},
 	load: {
-		presets(): Promise<{
-			rivers: Array<RiverPresetWithFile>;
-			boards: Array<BoardPreset>;
-		}> {
-			return ipcRenderer.invoke('load:presets');
-		},
 		riverPresets(): Promise<Array<RiverPresetWithFile>> {
 			return ipcRenderer.invoke('load:riverPresets');
+		},
+		boardPresets(): Promise<Array<RiverPresetWithFile>> {
+			return ipcRenderer.invoke('load:boardPresets');
 		},
 	},
 	file: {

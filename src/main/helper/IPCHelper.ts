@@ -5,7 +5,7 @@ import * as os from 'os';
 import path, { ParsedPath } from 'path';
 import * as PartieConfigSchema from '../../schema/partieConfigSchema.json';
 import * as BoardConfigSchema from '../../schema/boardConfigSchema.json';
-import PresetsLoader, { BoardPreset, RiverPresetWithFile } from './PresetsLoader';
+import PresetsLoader, { BoardPresetWithFile, RiverPresetWithFile } from './PresetsLoader';
 import PartieConfigInterface from '../../renderer/components/interfaces/PartieConfigInterface';
 import BoardConfigInterface from '../../renderer/components/interfaces/BoardConfigInterface';
 import * as SettingsSchema from '../../schema/settings.schema.json';
@@ -236,7 +236,7 @@ class IPCHelper {
 
 	static loadPresets = (): {
 		rivers: Array<RiverPresetWithFile>;
-		boards: Array<BoardPreset>;
+		boards: Array<BoardPresetWithFile>;
 	} => {
 		return {
 			rivers: PresetsLoader.getRiverPresets(),
@@ -246,6 +246,10 @@ class IPCHelper {
 
 	static loadRiverPresets = (): Array<RiverPresetWithFile> => {
 		return PresetsLoader.getRiverPresets();
+	};
+
+	static loadBoardPresets = (): Array<BoardPresetWithFile> => {
+		return PresetsLoader.getBoardPresets();
 	};
 
 	static getOS = (): NodeJS.Platform => {

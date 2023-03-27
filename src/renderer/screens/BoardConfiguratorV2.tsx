@@ -37,6 +37,7 @@ import SettingsPopup from '../components/popups/SettingsPopup';
 import RandomBoardStartValuesDialogV2 from '../components/popups/RandomBoardStartValuesDialogV2';
 import AStar from '../components/generator/helper/AStar';
 import { Warnings, WarningsMap } from '../components/boardConfigurator/Warning';
+import { BoardPresetWithFile, RiverPresetWithFile } from '../../main/helper/PresetsLoader';
 
 window.electron.schemas
 	.board()
@@ -94,6 +95,8 @@ type BoardConfiguratorV2State = {
 	} | null;
 	fileSaved: boolean;
 	warnings: WarningsMap;
+	riverPresets: Array<RiverPresetWithFile>;
+	boardPresets: Array<BoardPresetWithFile>;
 };
 
 class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, BoardConfiguratorV2State> {
@@ -137,6 +140,8 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 			file: props.file || null,
 			fileSaved: !!props.file,
 			warnings: this.checkWarnings(conf),
+			riverPresets: [],
+			boardPresets: [],
 		};
 		this.onTopMenuAction = this.onTopMenuAction.bind(this);
 		this.handleOnFieldOrWallClick = this.handleOnFieldOrWallClick.bind(this);
@@ -269,6 +274,16 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 				},
 			});
 		});
+
+		window.electron.load
+			.riverPresets()
+			.then((riverPresets) => {
+				this.setState({
+					riverPresets,
+				});
+				return null;
+			})
+			.catch(() => {});
 	}
 
 	componentDidUpdate(prevProps: Readonly<BoardConfiguratorV2Props>, prevState: Readonly<BoardConfiguratorV2State>) {
@@ -798,6 +813,8 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 			fileSaved,
 			file,
 			warnings,
+			riverPresets,
+			boardPresets,
 		} = this.state;
 		const topMenuHeight = this.getTopMenuHeight(settings.darkMode);
 		const mainHeight = windowDimensions.height - (os === 'win32' ? 32 + topMenuHeight : topMenuHeight);
@@ -857,6 +874,8 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 								tabChange={(tab) => {
 									this.setState({ sideBarTabLeft: tab });
 								}}
+								riverPresets={riverPresets}
+								boardPresets={boardPresets}
 								configType={sideBarTabLeftConfigType}
 								fieldInEdit={fieldInEdit}
 								settings={settings}

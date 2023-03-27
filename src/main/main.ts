@@ -151,6 +151,9 @@ const registerHandlers = () => {
 	ipcMain.handle('load:riverPresets', () => {
 		return IPCHelper.loadRiverPresets();
 	});
+	ipcMain.handle('load:boardPresets', () => {
+		return IPCHelper.loadBoardPresets();
+	});
 	ipcMain.handle('get:isLinux', () => {
 		return IPCHelper.getOS() === 'linux';
 	});

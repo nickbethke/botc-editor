@@ -30,6 +30,8 @@ import {
 import DirectionHelper from '../generator/helper/DirectionHelper';
 import CheckpointSortableV2 from './CheckpointSortableV2';
 import { SettingsInterface } from '../../../interfaces/SettingsInterface';
+import { BoardPresetWithFile, RiverPresetWithFile } from '../../../main/helper/PresetsLoader';
+import PresetView from './PresetView';
 
 type LeftSidebarProps = {
 	toolChange: (tool: EditorToolType) => void;
@@ -41,6 +43,8 @@ type LeftSidebarProps = {
 	configType: LeftSidebarConfigType;
 	fieldInEdit: BoardPosition | null;
 	settings: SettingsInterface;
+	riverPresets: Array<RiverPresetWithFile>;
+	boardPresets: Array<BoardPresetWithFile>;
 };
 
 export type LeftSidebarOpenTab = 'presets' | 'settings' | 'checkpointOrder' | null;
@@ -250,10 +254,14 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 	};
 
 	presets = () => {
+		const { riverPresets, boardPresets } = this.props;
 		return (
 			<div className="flex flex-col">
 				<div className="p-2 border-b dark:border-muted-700 border-muted-400">
 					{window.languageHelper.translate('Presets')}
+				</div>
+				<div className="overflow-y-auto">
+					<PresetView riverPresets={riverPresets} boardPresets={boardPresets} />
 				</div>
 			</div>
 		);
