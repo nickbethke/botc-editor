@@ -5,6 +5,7 @@ import { app } from 'electron';
 import * as RiverPresetSchema from '../../schema/riverPreset.schema.json';
 import * as BoardPresetSchema from '../../schema/boardPreset.schema.json';
 import { getAppDataPath } from './functions';
+import { Position } from '../../renderer/components/interfaces/BoardConfigInterface';
 
 export type RiverPresetDirection = 'NORTH' | 'SOUTH' | 'EAST' | 'WEST';
 export type RiverPreset = {
@@ -12,7 +13,7 @@ export type RiverPreset = {
 	width: number;
 	height: number;
 	data: {
-		position: [number, number];
+		position: Position;
 		direction: RiverPresetDirection;
 	}[];
 };

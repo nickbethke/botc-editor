@@ -57,30 +57,30 @@ export function isDestinyMountain(position: BoardPosition, config: BoardConfigIn
 }
 
 export function removeCheckpoint(position: BoardPosition, config: BoardConfigInterface): BoardConfigInterface {
-	const filteredCheckpointArray = config.checkPoints.filter(
-		(e) => position2String(e) !== boardPosition2String(position)
-	);
+	const filteredCheckpointArray = config.checkPoints.filter((e) => {
+		return position2String(e) !== boardPosition2String(position);
+	});
 	return { ...config, checkPoints: filteredCheckpointArray };
 }
 
 export function removeStartField(position: BoardPosition, config: BoardConfigInterface): BoardConfigInterface {
-	const filteredStartFieldsArray = config.startFields.filter(
-		(e) => position2String(e.position) !== boardPosition2String(position)
-	);
+	const filteredStartFieldsArray = config.startFields.filter((e) => {
+		return position2String(e.position) !== boardPosition2String(position);
+	});
 	return { ...config, startFields: filteredStartFieldsArray };
 }
 
 export function removeLembasField(position: BoardPosition, config: BoardConfigInterface): BoardConfigInterface {
-	const filteredLembasFieldsArray = config.lembasFields.filter(
-		(e) => position2String(e.position) !== boardPosition2String(position)
-	);
+	const filteredLembasFieldsArray = config.lembasFields.filter((e) => {
+		return position2String(e.position) !== boardPosition2String(position);
+	});
 	return { ...config, lembasFields: filteredLembasFieldsArray };
 }
 
 export function removeRiver(position: BoardPosition, config: BoardConfigInterface): BoardConfigInterface {
-	const filteredRiverFieldsArray = config.riverFields.filter(
-		(e) => position2String(e.position) !== boardPosition2String(position)
-	);
+	const filteredRiverFieldsArray = config.riverFields.filter((e) => {
+		return position2String(e.position) !== boardPosition2String(position);
+	});
 	return { ...config, riverFields: filteredRiverFieldsArray };
 }
 

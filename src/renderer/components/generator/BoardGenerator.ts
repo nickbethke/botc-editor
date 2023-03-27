@@ -161,6 +161,24 @@ class BoardGenerator {
 				this.genWallsRandom();
 			}
 		}
+
+		// remove walls between rivers
+		this.boardJSON.walls.forEach((wall) => {
+			const [x, y] = wall[0];
+			const [x1, y1] = wall[1];
+			if (
+				BoardGenerator.isRiver({ x, y }, this.boardJSON) &&
+				BoardGenerator.isRiver(
+					{
+						x: x1,
+						y: y1,
+					},
+					this.boardJSON
+				)
+			) {
+				this.boardJSON.removeWall(wall);
+			}
+		});
 	}
 
 	public static positionArrayToBoardPositionArray(position: Position[]): BoardPosition[] {
@@ -330,8 +348,10 @@ class BoardGenerator {
 		for (let i = 0; i < riverCount; i += 1) {
 			const position = this.getRandomPosition();
 			const direction = BoardGenerator.getRandomDirection();
-			this.board[position.x][position.y] = new River(position, direction);
-			this.boardJSON.addRiverField(position, direction);
+			if (this.getRiverNeighbors(position).length > 2) {
+				this.board[position.x][position.y] = new River(position, direction);
+				this.boardJSON.addRiverField(position, direction);
+			}
 		}
 	}
 
@@ -341,57 +361,57 @@ class BoardGenerator {
 			const toMake = BoardGenerator.getRandomInt(2, Math.min(this.startValues.height, this.startValues.width));
 			let startPosition = this.getRandomPosition();
 			let startDirection = BoardGenerator.getRandomDirection();
-
-			this.board[startPosition.x][startPosition.y] = new River(startPosition, startDirection);
-			this.boardJSON.addRiverField(startPosition, startDirection);
-			made += 1;
-
-			for (let i = 1; i < toMake; i += 1) {
-				const neighbors = this.getRiverNeighbors(startPosition);
-				if (neighbors.length > 0) {
-					let selected: {
-						position: BoardPosition;
-						direction: Direction;
-					} | null = null;
-					const helpDirection = DirectionHelper.dirEnumToString(startDirection);
-					for (let i1 = 0; i1 < neighbors.length; i1 += 1) {
-						const neighbor = neighbors[i1];
-						const { direction } = neighbor;
-						if (direction === helpDirection) {
-							selected = neighbor;
+			if (this.getRiverNeighbors(startPosition).length < 3) {
+				this.board[startPosition.x][startPosition.y] = new River(startPosition, startDirection);
+				this.boardJSON.addRiverField(startPosition, startDirection);
+				made += 1;
+				for (let i = 1; i < toMake; i += 1) {
+					const neighbors = this.getRiverNeighbors(startPosition);
+					if (neighbors.length > 0) {
+						let selected: {
+							position: BoardPosition;
+							direction: Direction;
+						} | null = null;
+						const helpDirection = DirectionHelper.dirEnumToString(startDirection);
+						for (let i1 = 0; i1 < neighbors.length; i1 += 1) {
+							const neighbor = neighbors[i1];
+							const { direction } = neighbor;
+							if (direction === helpDirection) {
+								selected = neighbor;
+								break;
+							}
+						}
+						if (selected !== null) {
+							startDirection = BoardGenerator.getRandomDirection();
+							if (
+								(DirectionHelper.dirEnumToString(startDirection) === 'SOUTH' && helpDirection === 'NORTH') ||
+								(DirectionHelper.dirEnumToString(startDirection) === 'NORTH' && helpDirection === 'SOUTH')
+							) {
+								startDirection = BoardGenerator.probably(50) ? DirectionEnum.EAST : DirectionEnum.WEST;
+							}
+							if (
+								(DirectionHelper.dirEnumToString(startDirection) === 'EAST' && helpDirection === 'WEST') ||
+								(DirectionHelper.dirEnumToString(startDirection) === 'WEST' && helpDirection === 'EAST')
+							) {
+								startDirection = BoardGenerator.probably(50) ? DirectionEnum.NORTH : DirectionEnum.SOUTH;
+							}
+							startPosition = selected.position;
+							this.board[startPosition.x][startPosition.y] = new River(startPosition, startDirection);
+							this.boardJSON.addRiverField(startPosition, startDirection);
+							made += 1;
+							if (made >= riverCount) {
+								break;
+							}
+						} else {
 							break;
 						}
-					}
-					if (selected === null) {
-						break;
 					} else {
-						startDirection = BoardGenerator.getRandomDirection();
-						if (
-							(DirectionHelper.dirEnumToString(startDirection) === 'SOUTH' && helpDirection === 'NORTH') ||
-							(DirectionHelper.dirEnumToString(startDirection) === 'NORTH' && helpDirection === 'SOUTH')
-						) {
-							startDirection = BoardGenerator.probably(50) ? DirectionEnum.EAST : DirectionEnum.WEST;
-						}
-						if (
-							(DirectionHelper.dirEnumToString(startDirection) === 'EAST' && helpDirection === 'WEST') ||
-							(DirectionHelper.dirEnumToString(startDirection) === 'WEST' && helpDirection === 'EAST')
-						) {
-							startDirection = BoardGenerator.probably(50) ? DirectionEnum.NORTH : DirectionEnum.SOUTH;
-						}
-						startPosition = selected.position;
-						this.board[startPosition.x][startPosition.y] = new River(startPosition, startDirection);
-						this.boardJSON.addRiverField(startPosition, startDirection);
-						made += 1;
-						if (made >= riverCount) {
-							break;
-						}
+						break;
 					}
-				} else {
-					break;
 				}
-			}
-			if (!this.boardHasFreeField()) {
-				made = riverCount;
+				if (!this.boardHasFreeField()) {
+					made = riverCount;
+				}
 			}
 		}
 	}
@@ -802,6 +822,13 @@ class BoardGenerator {
 
 	public wallCount(): number {
 		return this.walls;
+	}
+
+	static isRiver(position: BoardPosition, config: BoardConfigInterface) {
+		return (
+			config.riverFields.filter((field) => field.position[0] === position.x && field.position[1] === position.y)
+				.length > 0
+		);
 	}
 }
 

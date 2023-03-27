@@ -5,7 +5,7 @@ import { TbScreenShare } from 'react-icons/tb';
 import html2canvas from 'html2canvas';
 import MonacoEditor from 'react-monaco-editor';
 import SidebarMenuItem from './SidebarMenuItem';
-import BoardConfigInterface from '../interfaces/BoardConfigInterface';
+import BoardConfigInterface, { Position } from '../interfaces/BoardConfigInterface';
 import Warning, { WarningsMap } from './Warning';
 import { BoardPosition } from '../generator/interfaces/boardPosition';
 import { SettingsInterface } from '../../../interfaces/SettingsInterface';
@@ -16,6 +16,7 @@ type RightSidebarProps = {
 	config: BoardConfigInterface;
 	warnings: WarningsMap;
 	onFieldSelect: (position: BoardPosition) => void;
+	onRemoveWall: (position: Position[]) => void;
 	windowDimensions: {
 		width: number;
 		height: number;
@@ -40,7 +41,7 @@ class RightSidebar extends React.Component<RightSidebarProps, unknown> {
 	};
 
 	notifications = () => {
-		const { warnings, onFieldSelect } = this.props;
+		const { warnings, onFieldSelect, onRemoveWall } = this.props;
 		return (
 			<div className="flex flex-col h-full">
 				<div className="p-2 border-b dark:border-muted-700 border-muted-400">
@@ -55,6 +56,12 @@ class RightSidebar extends React.Component<RightSidebarProps, unknown> {
 							helper={value[1].helper}
 							fields={value[1].fields}
 							onFieldSelect={onFieldSelect}
+							removeWall={value[1].removeWall || null}
+							onRemoveWall={(removeWall) => {
+								if (value[1].removeWall) {
+									onRemoveWall(removeWall);
+								}
+							}}
 						/>
 					))}
 				</div>

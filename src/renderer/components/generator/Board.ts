@@ -115,6 +115,17 @@ class Board implements BoardConfigInterface {
 		this.walls.push(position);
 	}
 
+	public removeWall(position: Position[]) {
+		this.walls = this.walls.filter((wall) => {
+			return (
+				wall[0][0] !== position[0][0] &&
+				wall[0][1] !== position[0][1] &&
+				wall[1][0] !== position[1][0] &&
+				wall[1][1] !== position[1][1]
+			);
+		});
+	}
+
 	/**
 	 * generate a random valid boardConfigurator via the BoardGeneration class
 	 * @param startValues?

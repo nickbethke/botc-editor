@@ -72,7 +72,17 @@ class ConfirmPopupV2 extends React.Component<ConfirmPopupV2Props, ConfirmPopupV2
 	}
 
 	componentDidUpdate(prevProps: Readonly<ConfirmPopupV2Props>, prevState: Readonly<ConfirmPopupV2State>) {
-		const { offClick: preOffClick } = prevState;
+		const { offClick: preOffClick, dimension: preDimension } = prevState;
+		const popup = document.getElementById('popupV2');
+		if (popup) {
+			const dimension = {
+				width: popup.clientWidth + 4,
+				height: popup.clientHeight + 4,
+			};
+			if (dimension.width !== preDimension.width || dimension.height !== preDimension.height) {
+				this.setState({ dimension });
+			}
+		}
 
 		const { offClick, position, dimension } = this.state;
 		const { windowDimensions, os } = this.props;

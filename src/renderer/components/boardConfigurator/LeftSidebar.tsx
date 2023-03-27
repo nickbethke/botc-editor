@@ -45,6 +45,7 @@ type LeftSidebarProps = {
 	settings: SettingsInterface;
 	riverPresets: Array<RiverPresetWithFile>;
 	boardPresets: Array<BoardPresetWithFile>;
+	onAddRiverPresetToBoard: (newRiverPreset: RiverPresetWithFile) => void;
 };
 
 export type LeftSidebarOpenTab = 'presets' | 'settings' | 'checkpointOrder' | null;
@@ -254,14 +255,18 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 	};
 
 	presets = () => {
-		const { riverPresets, boardPresets } = this.props;
+		const { riverPresets, boardPresets, onAddRiverPresetToBoard } = this.props;
 		return (
 			<div className="flex flex-col">
 				<div className="p-2 border-b dark:border-muted-700 border-muted-400">
 					{window.languageHelper.translate('Presets')}
 				</div>
 				<div className="overflow-y-auto">
-					<PresetView riverPresets={riverPresets} boardPresets={boardPresets} />
+					<PresetView
+						riverPresets={riverPresets}
+						boardPresets={boardPresets}
+						onAddRiverPresetToBoard={onAddRiverPresetToBoard}
+					/>
 				</div>
 			</div>
 		);

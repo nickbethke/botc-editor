@@ -70,7 +70,7 @@ class RandomBoardStartValuesDialogV2 extends React.Component<
 			width: 2,
 			height: 2,
 			startFields: 2,
-			checkpoints: 1,
+			checkpoints: 2,
 			lembasFields: 0,
 			lembasAmountExactMaximum: true,
 			maxLembasAmountOnField: 3,
@@ -274,7 +274,7 @@ class RandomBoardStartValuesDialogV2 extends React.Component<
 								});
 							}}
 							type="range"
-							min={1}
+							min={2}
 							max={32}
 						/>
 					</div>

@@ -4,9 +4,9 @@ import { ParsedPath } from 'path';
 import _uniqueId from 'lodash/uniqueId';
 import { monaco } from 'react-monaco-editor';
 import TopMenu, { TopMenuActions } from '../components/boardConfigurator/TopMenu';
-import BoardConfigInterface from '../components/interfaces/BoardConfigInterface';
+import BoardConfigInterface, { PositionDirection } from '../components/interfaces/BoardConfigInterface';
 import LeftSidebar, { LeftSidebarConfigType, LeftSidebarOpenTab } from '../components/boardConfigurator/LeftSidebar';
-import { FieldsEnum } from '../components/generator/BoardGenerator';
+import BoardGenerator, { FieldsEnum } from '../components/generator/BoardGenerator';
 import RightSidebar, { RightSidebarOpenTab } from '../components/boardConfigurator/RightSidebar';
 import MainEditor, { FieldTypeOnClick } from '../components/boardConfigurator/MainEditor';
 import {
@@ -38,6 +38,7 @@ import RandomBoardStartValuesDialogV2 from '../components/popups/RandomBoardStar
 import AStar from '../components/generator/helper/AStar';
 import { Warnings, WarningsMap } from '../components/boardConfigurator/Warning';
 import { BoardPresetWithFile, RiverPresetWithFile } from '../../main/helper/PresetsLoader';
+import AddRiverPresetConfirmPopup from '../components/boardConfigurator/AddRiverPresetConfirmPopup';
 
 window.electron.schemas
 	.board()
@@ -55,14 +56,15 @@ window.electron.schemas
 	})
 	.catch(() => {});
 
-export type EditorToolType = FieldsEnum | 'delete' | 'edit' | null;
+export type EditorToolType = FieldsEnum | 'delete' | 'edit' | 'riverPreset' | null;
 type EditorPopupType =
 	| null
 	| 'newFileSaveCurrent'
 	| 'closeSaveCurrent'
 	| 'settings'
 	| 'newFromRandom'
-	| 'newRandomFileSaveCurrent';
+	| 'newRandomFileSaveCurrent'
+	| 'addRiverPreset';
 
 type BoardConfiguratorV2Props = {
 	os: NodeJS.Platform;
@@ -97,6 +99,7 @@ type BoardConfiguratorV2State = {
 	warnings: WarningsMap;
 	riverPresets: Array<RiverPresetWithFile>;
 	boardPresets: Array<BoardPresetWithFile>;
+	newRiverPreset: RiverPresetWithFile | null;
 };
 
 class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, BoardConfiguratorV2State> {
@@ -142,6 +145,7 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 			warnings: this.checkWarnings(conf),
 			riverPresets: [],
 			boardPresets: [],
+			newRiverPreset: null,
 		};
 		this.onTopMenuAction = this.onTopMenuAction.bind(this);
 		this.handleOnFieldOrWallClick = this.handleOnFieldOrWallClick.bind(this);
@@ -241,30 +245,6 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 		Mousetrap.bind(['command+o', 'ctrl+o'], () => {
 			this.openConfiguration();
 		});
-
-		const { fieldInEdit, config } = this.state;
-		if (fieldInEdit) {
-			Mousetrap.bind('up', () => {
-				if (fieldInEdit && fieldInEdit.y > 0) {
-					this.handleFieldEdit({ y: fieldInEdit.y - 1, x: fieldInEdit.x }, config);
-				}
-			});
-			Mousetrap.bind('down', () => {
-				if (fieldInEdit && fieldInEdit.y < config.height - 1) {
-					this.handleFieldEdit({ y: fieldInEdit.y + 1, x: fieldInEdit.x }, config);
-				}
-			});
-			Mousetrap.bind('left', () => {
-				if (fieldInEdit && fieldInEdit.x > 0) {
-					this.handleFieldEdit({ y: fieldInEdit.y, x: fieldInEdit.x - 1 }, config);
-				}
-			});
-			Mousetrap.bind('right', () => {
-				if (fieldInEdit && fieldInEdit.x < config.width - 1) {
-					this.handleFieldEdit({ y: fieldInEdit.y, x: fieldInEdit.x + 1 }, config);
-				}
-			});
-		}
 
 		window.addEventListener('resize', () => {
 			this.setState({
@@ -465,7 +445,7 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 	}
 
 	checkWarnings = (startConfig?: BoardConfigInterface): WarningsMap => {
-		let handledConfig;
+		let handledConfig: BoardConfigInterface;
 		if (startConfig) {
 			handledConfig = startConfig;
 		} else {
@@ -527,6 +507,31 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 				helper: [window.languageHelper.translateVars('Minimum {0}', ['2'])],
 			});
 		}
+
+		handledConfig.walls.forEach((wall) => {
+			const [x, y] = wall[0];
+			const [x1, y1] = wall[1];
+			if (
+				BoardGenerator.isRiver({ x, y }, handledConfig) &&
+				BoardGenerator.isRiver(
+					{
+						x: x1,
+						y: y1,
+					},
+					handledConfig
+				)
+			) {
+				newWarnings.set(_uniqueId('warning-'), {
+					type: Warnings.configurationInvalid,
+					title: window.languageHelper.translate('Wall'),
+					content: window.languageHelper.translate(
+						'The current game board state is not playable because there is a wall between two rivers.'
+					),
+					helper: [`${x}:${y}`, `${x1}:${y1}`],
+					removeWall: wall,
+				});
+			}
+		});
 
 		return newWarnings;
 	};
@@ -635,107 +640,182 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 	};
 
 	popup = (): JSX.Element | null => {
-		const { popup, windowDimensions } = this.state;
+		const { popup, windowDimensions, newRiverPreset, config } = this.state;
 		const { os, settings, onSettingsUpdate } = this.props;
-		switch (popup) {
-			case 'closeSaveCurrent':
-				return (
-					<ConfirmPopupV2
-						title={window.languageHelper.translate('Close Board Configurator')}
-						abortButtonText={window.languageHelper.translate('Cancel')}
-						onAbort={() => {
-							this.setState({ popup: null });
-						}}
-						confirmButtonText={window.languageHelper.translate('Discard')}
-						onConfirm={() => {
-							const { onClose } = this.props;
-							onClose();
-						}}
-						windowDimensions={windowDimensions}
-						os={os}
-						topOffset
-						settings={settings}
-					>
-						{window.languageHelper.translate(
-							'The current file has not yet been saved. Do you want to discard the current changes?'
-						)}
-					</ConfirmPopupV2>
-				);
-			case 'newFileSaveCurrent':
-			case 'newRandomFileSaveCurrent':
-				return (
-					<ConfirmPopupV2
-						title={window.languageHelper.translate('New Config')}
-						abortButtonText={window.languageHelper.translate('Cancel')}
-						onAbort={() => {
-							this.setState({ popup: null });
-						}}
-						confirmButtonText={window.languageHelper.translate('Discard')}
-						onConfirm={() => {
-							if (popup === 'newRandomFileSaveCurrent') {
-								this.setState({ popup: 'newFromRandom' });
-							} else {
-								this.onConfigUpdate(BoardConfiguratorV2.defaultBoard);
-								this.setState({
-									popup: null,
-									file: null,
-									fileSaved: true,
-								});
-							}
-						}}
-						windowDimensions={windowDimensions}
-						os={os}
-						topOffset
-						settings={settings}
-					>
-						{window.languageHelper.translate(
-							'The current file has not yet been saved. Do you want to discard the current changes?'
-						)}
-					</ConfirmPopupV2>
-				);
-			case 'settings':
-				return (
-					<SettingsPopup
-						settings={settings}
-						onAbort={() => {
-							this.setState({ popup: null });
-						}}
-						onConfirm={(newSettings) => {
-							onSettingsUpdate(newSettings);
-							this.setState({ popup: null });
-						}}
-						windowDimensions={windowDimensions}
-						os={os}
-						topOffset
-					/>
-				);
-			case 'newFromRandom':
-				return (
-					<RandomBoardStartValuesDialogV2
-						onAbort={() => {
-							this.setState({ popup: null });
-						}}
-						settings={settings}
-						onConfirm={(generator) => {
-							this.onConfigUpdate(generator.boardJSON);
+		if (popup === 'closeSaveCurrent') {
+			return (
+				<ConfirmPopupV2
+					title={window.languageHelper.translate('Close Board Configurator')}
+					abortButtonText={window.languageHelper.translate('Cancel')}
+					onAbort={() => {
+						this.setState({ popup: null });
+					}}
+					confirmButtonText={window.languageHelper.translate('Discard')}
+					onConfirm={() => {
+						const { onClose } = this.props;
+						onClose();
+					}}
+					windowDimensions={windowDimensions}
+					os={os}
+					topOffset
+					settings={settings}
+				>
+					{window.languageHelper.translate(
+						'The current file has not yet been saved. Do you want to discard the current changes?'
+					)}
+				</ConfirmPopupV2>
+			);
+		}
+		if (popup === 'newFileSaveCurrent' || popup === 'newRandomFileSaveCurrent') {
+			return (
+				<ConfirmPopupV2
+					title={window.languageHelper.translate('New Config')}
+					abortButtonText={window.languageHelper.translate('Cancel')}
+					onAbort={() => {
+						this.setState({ popup: null });
+					}}
+					confirmButtonText={window.languageHelper.translate('Discard')}
+					onConfirm={() => {
+						if (popup === 'newRandomFileSaveCurrent') {
+							this.setState({ popup: 'newFromRandom' });
+						} else {
+							this.onConfigUpdate(BoardConfiguratorV2.defaultBoard);
 							this.setState({
+								popup: null,
 								file: null,
-								fileSaved: false,
+								fileSaved: true,
+							});
+						}
+					}}
+					windowDimensions={windowDimensions}
+					os={os}
+					topOffset
+					settings={settings}
+				>
+					{window.languageHelper.translate(
+						'The current file has not yet been saved. Do you want to discard the current changes?'
+					)}
+				</ConfirmPopupV2>
+			);
+		}
+		if (popup === 'settings') {
+			return (
+				<SettingsPopup
+					settings={settings}
+					onAbort={() => {
+						this.setState({ popup: null });
+					}}
+					onConfirm={(newSettings) => {
+						onSettingsUpdate(newSettings);
+						this.setState({ popup: null });
+					}}
+					windowDimensions={windowDimensions}
+					os={os}
+					topOffset
+				/>
+			);
+		}
+		if (popup === 'newFromRandom') {
+			return (
+				<RandomBoardStartValuesDialogV2
+					onAbort={() => {
+						this.setState({ popup: null });
+					}}
+					settings={settings}
+					onConfirm={(generator) => {
+						this.onConfigUpdate(generator.boardJSON);
+						this.setState({
+							file: null,
+							fileSaved: false,
+							popup: null,
+						});
+					}}
+					windowDimensions={windowDimensions}
+					os={os}
+					topOffset
+				/>
+			);
+		}
+		if (popup === 'addRiverPreset') {
+			if (newRiverPreset && config) {
+				return (
+					<AddRiverPresetConfirmPopup
+						preset={newRiverPreset}
+						onCancel={() => {
+							this.setState({ popup: null, newRiverPreset: null });
+						}}
+						onConfirm={(position, adjustBoardSize) => {
+							this.setState({
+								newRiverPreset: null,
+								config: this.addRiverPreset(config, newRiverPreset, position, adjustBoardSize),
 								popup: null,
 							});
 						}}
-						windowDimensions={windowDimensions}
 						os={os}
-						topOffset
+						settings={settings}
+						windowDimensions={windowDimensions}
+						configuration={config}
 					/>
 				);
-			default:
-				return null;
+			}
+			return null;
 		}
+		return null;
 	};
 
 	getTopMenuHeight = (darkMode: boolean) => {
 		return darkMode ? 37 : 38;
+	};
+
+	onAddRiverPresetToBoard = (newRiverPreset: RiverPresetWithFile) => {
+		this.setState({
+			popup: 'addRiverPreset',
+			newRiverPreset,
+		});
+	};
+
+	addRiverPreset = (
+		config: BoardConfigInterface,
+		newRiverPreset: RiverPresetWithFile,
+		position: BoardPosition,
+		adjustBoardSize: boolean
+	): BoardConfigInterface => {
+		let newConfig = config;
+		let newRivers = newRiverPreset.data.map((river) => {
+			return {
+				...river,
+				position: [river.position[0] + position.x, river.position[1] + position.y],
+			};
+		}) as PositionDirection[];
+		let newWidth = config.width;
+		let newHeight = config.height;
+		if (!adjustBoardSize) {
+			newRivers = newRivers.filter((river) => river.position[0] < config.width && river.position[1] < config.height);
+		} else {
+			newRivers.forEach((river) => {
+				newWidth = Math.max(newWidth, river.position[0] + 1);
+				newHeight = Math.max(newHeight, river.position[1] + 1);
+			});
+		}
+		newRivers.forEach((river) => {
+			newConfig = removeCheckpoint(BoardGenerator.positionToBoardPosition(river.position), newConfig);
+			newConfig = removeRiver(BoardGenerator.positionToBoardPosition(river.position), newConfig);
+			newConfig = removeHole(BoardGenerator.positionToBoardPosition(river.position), newConfig);
+			newConfig = removeLembasField(BoardGenerator.positionToBoardPosition(river.position), newConfig);
+			newConfig = removeStartField(BoardGenerator.positionToBoardPosition(river.position), newConfig);
+		});
+
+		newRivers = newRivers.filter((river) => river.position[0] < newWidth && river.position[1] < newHeight);
+		newRivers = newRivers.filter(
+			(river) => river.position[0] !== config.eye.position[0] && river.position[1] !== config.eye.position[1]
+		);
+
+		return {
+			...newConfig,
+			riverFields: [...newConfig.riverFields, ...newRivers],
+			width: newWidth,
+			height: newHeight,
+		};
 	};
 
 	private openConfiguration() {
@@ -879,6 +959,9 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 								configType={sideBarTabLeftConfigType}
 								fieldInEdit={fieldInEdit}
 								settings={settings}
+								onAddRiverPresetToBoard={(newRiverPreset) => {
+									this.onAddRiverPresetToBoard(newRiverPreset);
+								}}
 							/>
 						</div>
 						<div
@@ -934,6 +1017,25 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 								windowDimensions={windowDimensions}
 								settings={settings}
 								os={os}
+								onRemoveWall={(wall) => {
+									this.onConfigUpdate(
+										removeWall(
+											[
+												{
+													x: wall[0][0],
+													y: wall[0][1],
+												},
+												{ x: wall[1][0], y: wall[1][1] },
+											],
+											config
+										)
+									);
+									if (fileSaved) {
+										this.setState({
+											fileSaved: false,
+										});
+									}
+								}}
 							/>
 						</div>
 					</div>

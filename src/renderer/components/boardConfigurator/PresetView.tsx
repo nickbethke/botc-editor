@@ -1,15 +1,20 @@
 import { Component } from 'react';
 import _uniqueId from 'lodash/uniqueId';
+import { VscAdd } from 'react-icons/vsc';
 import { BoardPresetWithFile, RiverPresetWithFile } from '../../../main/helper/PresetsLoader';
 import { getDirectionArrow } from '../presetEditor/RiverFieldPreset';
+import ContextMenuV2 from './ContextMenuV2';
+import ContextMenuItemV2 from './ContextMenuItemV2';
 
 type PresetViewProps = {
 	riverPresets: Array<RiverPresetWithFile>;
 	boardPresets: Array<BoardPresetWithFile>;
+	onAddRiverPresetToBoard: (newRiverPreset: RiverPresetWithFile) => void;
 };
 type PresetViewState = {
 	open: 'riverPresets' | 'boardPresets';
 	activePreset: string | null;
+	contextMenu: JSX.Element | null;
 };
 
 export default class PresetView extends Component<PresetViewProps, PresetViewState> {
@@ -18,7 +23,16 @@ export default class PresetView extends Component<PresetViewProps, PresetViewSta
 		this.state = {
 			open: 'riverPresets',
 			activePreset: null,
+			contextMenu: null,
 		};
+	}
+
+	componentDidMount() {
+		window.addEventListener('click', () => {
+			this.setState({
+				contextMenu: null,
+			});
+		});
 	}
 
 	previewRiverPreset = (riverPreset: RiverPresetWithFile | undefined) => {
@@ -31,6 +45,7 @@ export default class PresetView extends Component<PresetViewProps, PresetViewSta
 					const isRiver = river.length > 0;
 					row.push(
 						<div
+							key={_uniqueId()}
 							className={`w-3.5 h-3.5 ${
 								isRiver ? 'isRiver' : 'bg-white/5'
 							} border border dark:border-muted-700 border-muted-400 text-[10px] flex justify-center items-center`}
@@ -42,19 +57,34 @@ export default class PresetView extends Component<PresetViewProps, PresetViewSta
 				board.push(row);
 			}
 			return (
-				<div className="flex flex-col justify-center items-center">
-					<div className="flex flex-col items-center justify-center text-[12px]">
-						<p>{riverPreset.name}</p>
+				<div className="flex flex-col h-full">
+					<div className="grow flex flex-col justify-center items-center">
+						<div className="flex flex-col items-center justify-center text-[12px]">
+							<p>{riverPreset.name}</p>
+						</div>
+						<div className="flex" draggable>
+							{board.map((row) => (
+								<div className="flex flex-col">{row.map((cell) => cell)}</div>
+							))}
+						</div>
+						<div className="flex flex-col items-center justify-center text-[12px]">
+							<p>
+								{riverPreset.width}x{riverPreset.height}
+							</p>
+						</div>
 					</div>
-					<div className="flex">
-						{board.map((row) => (
-							<div className="flex flex-col">{row.map((cell) => cell)}</div>
-						))}
-					</div>
-					<div className="flex flex-col items-center justify-center text-[12px]">
-						<p>
-							{riverPreset.width}x{riverPreset.height}
-						</p>
+					<div className="flex items-center justify-center text-sm">
+						<button
+							className="dark:bg-muted-800 bg-muted-400 px-2 py-1 rounded flex gap-2 items-center"
+							type="button"
+							onClick={() => {
+								const { onAddRiverPresetToBoard } = this.props;
+								onAddRiverPresetToBoard(riverPreset);
+							}}
+						>
+							<VscAdd />
+							<p className="whitespace-nowrap">{window.languageHelper.translate('Add to board')}</p>
+						</button>
 					</div>
 				</div>
 			);
@@ -64,7 +94,7 @@ export default class PresetView extends Component<PresetViewProps, PresetViewSta
 
 	render() {
 		const { riverPresets, boardPresets } = this.props;
-		const { open, activePreset } = this.state;
+		const { open, activePreset, contextMenu } = this.state;
 		return (
 			<div>
 				<div className="flex justify-around items-center border-b dark:border-muted-700 border-muted-400 preset-view-switch">
@@ -86,9 +116,9 @@ export default class PresetView extends Component<PresetViewProps, PresetViewSta
 					</button>
 				</div>
 				<div
-					className={`flex justify-center dark:bg-muted-700 transition transition-all ${
+					className={`flex justify-center dark:bg-muted-700 bg-muted-500 transition transition-all overflow-hidden ${
 						activePreset
-							? 'h-fit opacity-100 m-2 border dark:border-muted-700 border-muted-400 p-2'
+							? 'h-[364px] opacity-100 m-2 border dark:border-muted-700 border-muted-400 p-2'
 							: 'opacity-0 h-0 p-0 m-0'
 					}`}
 				>
@@ -104,10 +134,12 @@ export default class PresetView extends Component<PresetViewProps, PresetViewSta
 					{open === 'riverPresets' ? (
 						<>
 							{riverPresets.map((preset) => (
-								<button
-									type="button"
+								<div
+									role="presentation"
 									key={_uniqueId()}
-									className={`p-2 flex flex-col w-full ${activePreset === preset.file.base ? 'bg-white/10' : ''}`}
+									className={`p-2 flex flex-col w-full hover:cursor-pointer ${
+										activePreset === preset.file.base ? 'bg-white/10 shadow' : ' hover:bg-white/5'
+									}`}
 									onClick={() => {
 										if (activePreset === preset.file.base) {
 											this.setState({ activePreset: null });
@@ -115,10 +147,24 @@ export default class PresetView extends Component<PresetViewProps, PresetViewSta
 											this.setState({ activePreset: preset.file.base });
 										}
 									}}
+									onContextMenu={(event) => {
+										this.setState({
+											contextMenu: (
+												<ContextMenuV2 position={{ x: event.clientX, y: event.clientY }}>
+													<ContextMenuItemV2
+														text={`${window.languageHelper.translate('Open preset')}...`}
+														onClick={async () => {
+															await window.electron.file.openExternal(`${preset.file.dir}/${preset.file.base}`);
+														}}
+													/>
+												</ContextMenuV2>
+											),
+										});
+									}}
 								>
 									<p className={activePreset === preset.file.base ? 'text-accent-300' : ''}>{preset.name}</p>
 									<p className="text-[10px] text-white/50">{preset.file.base}</p>
-								</button>
+								</div>
 							))}
 						</>
 					) : (
@@ -139,6 +185,7 @@ export default class PresetView extends Component<PresetViewProps, PresetViewSta
 						</>
 					)}
 				</div>
+				{contextMenu}
 			</div>
 		);
 	}

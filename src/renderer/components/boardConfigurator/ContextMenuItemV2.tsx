@@ -2,7 +2,7 @@ import React from 'react';
 
 type ContextMenuItemV2Props = {
 	text: string | JSX.Element;
-	onClick?: () => void | null;
+	onClick?: () => void | null | Promise<void>;
 };
 
 class ContextMenuItemV2 extends React.Component<ContextMenuItemV2Props, unknown> {
