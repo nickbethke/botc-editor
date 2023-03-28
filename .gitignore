@@ -36,3 +36,8 @@ npm-debug.log.*
 appData
 appData/presets/**/*
 appData/settings.json
+
+/docs/
+/docs/botc-editor-documentation/
+/docs/main/
+/docs/renderer/
