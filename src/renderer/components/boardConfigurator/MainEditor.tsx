@@ -164,18 +164,18 @@ function FieldHelper(props: FieldHelperProps) {
 	let text = null;
 	switch (type) {
 		case FieldsEnum.START:
-			text = DirectionArrows[DirectionHelper.stringToDirEnum(attribute as Direction)];
+			text = DirectionArrows[DirectionHelper.directionToDirEnum(attribute as Direction)];
 			break;
 		case FieldsEnum.CHECKPOINT:
 		case FieldsEnum.DESTINY_MOUNTAIN:
 			text = ((attribute as number) + 1).toString();
 			break;
 		case FieldsEnum.EYE:
-			text = DirectionArrows[DirectionHelper.stringToDirEnum(attribute as Direction)];
+			text = DirectionArrows[DirectionHelper.directionToDirEnum(attribute as Direction)];
 			inactiveClass = 'bg-muted/25 hover:cursor-not-allowed';
 			break;
 		case FieldsEnum.RIVER:
-			text = DirectionArrows[DirectionHelper.stringToDirEnum(attribute as Direction)];
+			text = DirectionArrows[DirectionHelper.directionToDirEnum(attribute as Direction)];
 			break;
 		case FieldsEnum.LEMBAS:
 			text = attribute === 0 ? '0' : (attribute as number).toString();

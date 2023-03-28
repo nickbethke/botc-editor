@@ -29,7 +29,9 @@
 		"start:preload": "cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.preload.dev.ts",
 		"start:renderer": "cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true webpack serve --config ./.erb/configs/webpack.config.renderer.dev.ts",
 		"test": "jest",
-		"doc": "documentation build ./src/** --parse-extension ts -f html -o docs"
+		"doc:all": "yarn doc:main && yarn doc:renderer",
+		"doc:main": "documentation build ./src/main/** --parse-extension ts -f html -o docs/main --sort-order alpha",
+		"doc:renderer": "documentation build ./src/renderer/** --parse-extension ts -f html -o docs/renderer --sort-order alpha"
 	},
 	"lint-staged": {
 		"*.{js,jsx,ts,tsx}": [

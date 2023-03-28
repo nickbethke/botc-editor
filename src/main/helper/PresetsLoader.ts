@@ -1,13 +1,18 @@
 import fs from 'fs';
 import Ajv, { JSONSchemaType } from 'ajv';
 import path, { ParsedPath } from 'path';
-import { app } from 'electron';
 import * as RiverPresetSchema from '../../schema/riverPreset.schema.json';
 import * as BoardPresetSchema from '../../schema/boardPreset.schema.json';
 import { getAppDataPath } from './functions';
 import { Position } from '../../renderer/components/interfaces/BoardConfigInterface';
 
+/**
+ * River preset directions
+ */
 export type RiverPresetDirection = 'NORTH' | 'SOUTH' | 'EAST' | 'WEST';
+/**
+ * The river preset scheme
+ */
 export type RiverPreset = {
 	name: string;
 	width: number;
@@ -17,24 +22,48 @@ export type RiverPreset = {
 		direction: RiverPresetDirection;
 	}[];
 };
+/**
+ * The river preset schema with file property
+ */
 export type RiverPresetWithFile = RiverPreset & {
 	file: ParsedPath;
 };
+/**
+ * The board preset schema
+ */
 export type BoardPreset = {
 	name: string;
 	width: number;
 	height: number;
 	data: object;
 };
+/**
+ * The board preset schema with file property
+ */
 export type BoardPresetWithFile = BoardPreset & {
 	file: ParsedPath;
 };
 
+/**
+ * The preset loader class
+ */
 class PresetsLoader {
+	/**
+	 * The river presets app data path
+	 * @private
+	 */
 	private static riverPresetFolder: string = getAppDataPath('presets/rivers/');
 
+	/**
+	 * The board presets app data path
+	 * @private
+	 */
 	private static boardPresetFolder: string = getAppDataPath('presets/boards/');
 
+	/**
+	 * Generates the required folder structure
+	 * @private
+	 */
 	private static generateFolders() {
 		if (!fs.existsSync(getAppDataPath('presets/'))) {
 			fs.mkdirSync(getAppDataPath('presets'));
@@ -47,6 +76,9 @@ class PresetsLoader {
 		}
 	}
 
+	/**
+	 * Loads the river presets
+	 */
 	public static getRiverPresets() {
 		const riverPresets: Array<RiverPresetWithFile> = [];
 		PresetsLoader.generateFolders();
@@ -72,6 +104,9 @@ class PresetsLoader {
 		return riverPresets;
 	}
 
+	/**
+	 * Loads the board presets
+	 */
 	public static getBoardPresets() {
 		const boardPresets: Array<BoardPresetWithFile> = [];
 		PresetsLoader.generateFolders();
@@ -98,6 +133,11 @@ class PresetsLoader {
 		return boardPresets;
 	}
 
+	/**
+	 * Validates the file content
+	 * @param type Whether it is a river or a board preset
+	 * @param content The content to validate
+	 */
 	static validateFile(type: 'river' | 'board', content: string) {
 		const ajv = new Ajv({ allErrors: true });
 		if (type === 'river') {
@@ -125,20 +165,24 @@ class PresetsLoader {
 		return false;
 	}
 
-	static getAssetPath(...paths: string[]): string {
-		return path.join(
-			app.isPackaged ? path.join(process.resourcesPath, 'assets') : path.join(__dirname, '../../../assets'),
-			...paths
-		);
-	}
-
+	/**
+	 * Saves a river preset to file
+	 * @param file the path to the preset file
+	 * @param content the content of the preset
+	 */
 	static saveRiverPreset(file: string, content: string) {
 		return fs.writeFileSync(path.join(PresetsLoader.riverPresetFolder, file), content, {
 			encoding: 'utf8',
 		});
 	}
 
-	static async renameRiverPreset(from: string, to: string) {
+	/**
+	 * Renames a river preset
+	 * @param from original preset name
+	 * @param to new preset name
+	 * @return the new preset file path
+	 */
+	static async renameRiverPreset(from: string, to: string): Promise<ParsedPath> {
 		await fs.renameSync(
 			path.join(PresetsLoader.riverPresetFolder, from),
 			path.join(PresetsLoader.riverPresetFolder, to)

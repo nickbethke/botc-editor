@@ -2,6 +2,10 @@ import { app } from 'electron';
 import path from 'path';
 import fs from 'fs';
 
+/**
+ * Generates an absolute path to the app's data path with the paths.
+ * @param paths
+ */
 export function getAppDataPath(...paths: string[]): string {
 	const appDataPath = app.isPackaged
 		? path.join(app.getPath('appData'), 'botc-editor/')

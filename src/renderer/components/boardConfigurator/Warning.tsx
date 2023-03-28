@@ -4,11 +4,16 @@ import { VscTrash } from 'react-icons/vsc';
 import { BoardPosition } from '../generator/interfaces/boardPosition';
 import { Position } from '../interfaces/BoardConfigInterface';
 
+/**
+ * The board configurator warnings type
+ */
 export enum Warnings {
 	pathImpossible,
 	configurationInvalid,
 }
-
+/**
+ * The board configurator warnings map
+ */
 export type WarningsMap = Map<
 	string,
 	{
@@ -20,7 +25,9 @@ export type WarningsMap = Map<
 		removeWall?: Position[];
 	}
 >;
-
+/**
+ * The board configurator warnings component properties
+ */
 export type WarningProps = {
 	title: string;
 	content: string;
@@ -31,6 +38,11 @@ export type WarningProps = {
 	onRemoveWall: (position: Position[]) => void;
 };
 
+/**
+ * The board configurator warnings component
+ * @param props
+ * @constructor
+ */
 function Warning(props: WarningProps) {
 	const { title, content, helper, fields, onFieldSelect, removeWall, onRemoveWall } = props;
 	return (
@@ -83,6 +95,9 @@ function Warning(props: WarningProps) {
 	);
 }
 
+/**
+ * The board configurator warnings component default properties
+ */
 Warning.defaultProps = {
 	helper: null,
 	fields: null,

@@ -1,12 +1,9 @@
 import React from 'react';
 import { TopMenuActions } from './TopMenu';
 
-const defaultProps = {
-	className: '',
-	icon: null,
-	shortCut: null,
-	type: 'default',
-};
+/**
+ * The top menu item component properties
+ */
 type TopMenuItemProps =
 	| {
 			type: 'default';
@@ -27,6 +24,11 @@ type TopMenuItemProps =
 			shortCut?: string;
 	  };
 
+/**
+ * The top menu item component
+ * @param props
+ * @constructor
+ */
 function TopMenuItem(props: TopMenuItemProps) {
 	const { onAction, action, label, className, icon, shortCut, type } = props;
 	return (
@@ -49,9 +51,22 @@ function TopMenuItem(props: TopMenuItemProps) {
 	);
 }
 
+/**
+ * The top menu item component default properties
+ */
+TopMenuItem.defaultProps = {
+	className: '',
+	icon: null,
+	shortCut: null,
+	type: 'default',
+};
+
+/**
+ * The top menu separator component
+ * @constructor
+ */
 export function TopMenuSeparator() {
 	return <hr className="dark:border-muted-600 border-muted-300 my-2" />;
 }
 
-TopMenuItem.defaultProps = defaultProps;
 export default TopMenuItem;

@@ -7,6 +7,9 @@ import BoardConfigInterface, {
 } from '../interfaces/BoardConfigInterface';
 import DirectionHelper from './helper/DirectionHelper';
 
+/**
+ * The board class with the properties of a board configuration and helper functions.
+ */
 class Board implements BoardConfigInterface {
 	checkPoints: Position[] = [];
 
@@ -28,12 +31,6 @@ class Board implements BoardConfigInterface {
 
 	width: number;
 
-	/**
-	 * Board Class - attributes equal to Board-Config JSON Format
-	 * @param name
-	 * @param width
-	 * @param height
-	 */
 	constructor(name: string, width: number, height: number) {
 		this.width = width;
 		this.height = height;
@@ -115,6 +112,10 @@ class Board implements BoardConfigInterface {
 		this.walls.push(position);
 	}
 
+	/**
+	 * Remove a wall from the configuration
+	 * @param position
+	 */
 	public removeWall(position: Position[]) {
 		this.walls = this.walls.filter((wall) => {
 			return (

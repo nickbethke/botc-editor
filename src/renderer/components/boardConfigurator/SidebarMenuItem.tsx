@@ -38,6 +38,9 @@ class SidebarMenuItem extends React.Component<SidebarMenuItemProps, SidebarMenuI
 		this.handleOnHoverEnd = this.handleOnHoverEnd.bind(this);
 	}
 
+	/**
+	 * Handle the hover event
+	 */
 	handleOnHover = () => {
 		const { hover } = this.state;
 		if (!hover) {
@@ -52,6 +55,9 @@ class SidebarMenuItem extends React.Component<SidebarMenuItemProps, SidebarMenuI
 		}
 	};
 
+	/**
+	 * Handle the hover end event
+	 */
 	handleOnHoverEnd = () => {
 		const { hover } = this.state;
 		if (hover) {
@@ -59,6 +65,9 @@ class SidebarMenuItem extends React.Component<SidebarMenuItemProps, SidebarMenuI
 		}
 	};
 
+	/**
+	 * Generates the position css class
+	 */
 	positionClassName = () => {
 		const { position } = this.props;
 		switch (position) {
@@ -75,6 +84,9 @@ class SidebarMenuItem extends React.Component<SidebarMenuItemProps, SidebarMenuI
 		}
 	};
 
+	/**
+	 * Renders the sidebar menu item
+	 */
 	render() {
 		const { label, open, icon, onClick, shortCut, position } = this.props;
 		const { hover } = this.state;
@@ -117,6 +129,10 @@ class SidebarMenuItem extends React.Component<SidebarMenuItemProps, SidebarMenuI
 	}
 }
 
+/**
+ * The sidebar menu item separator component
+ * @constructor
+ */
 export function SidebarMenuItemSeparator() {
 	return (
 		<hr

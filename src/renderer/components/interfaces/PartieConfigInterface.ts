@@ -1,3 +1,6 @@
+/**
+ * The party configuration type
+ */
 interface PartieConfigInterface {
 	startLembas: number;
 	shotLembas: number;

@@ -5,6 +5,9 @@ import TopMenuItemCollapsable from './TopMenuItemCollapsable';
 import destinyMountainImage from '../../../../assets/textures/schicksalsberg.png';
 import TopMenuSubItemCollapsable from './TopMenuSubItemCollapsable';
 
+/**
+ * The board configurator top menu actions
+ */
 export enum TopMenuActions {
 	NEW,
 	NEW_FROM_RANDOM,
@@ -21,11 +24,19 @@ export enum TopMenuActions {
 	ZOOM_OUT,
 }
 
+/**
+ * The board configurator top menu component properties
+ */
 type TopMenuProps = {
 	onAction: (action: TopMenuActions) => void;
 	darkMode: boolean;
 };
 
+/**
+ * The board configurator top menu component
+ * @param props
+ * @constructor
+ */
 function TopMenu(props: TopMenuProps) {
 	const { onAction, darkMode } = props;
 	return (

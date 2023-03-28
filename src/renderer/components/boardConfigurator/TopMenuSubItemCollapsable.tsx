@@ -1,14 +1,22 @@
 import React from 'react';
 import { VscChevronRight } from 'react-icons/vsc';
 
+/**
+ * The board configuration top menu subitem collapsable component properties
+ */
 type TopMenuSubItemCollapsableProps = {
 	label: string;
 	children: string | JSX.Element | JSX.Element[];
 };
+/**
+ * The board configuration top menu subitem collapsable component state properties
+ */
 type TopMenuSubItemCollapsableState = {
 	open: boolean;
 };
-
+/**
+ * The board configuration top menu subitem collapsable component
+ */
 class TopMenuSubItemCollapsable extends React.Component<
 	TopMenuSubItemCollapsableProps,
 	TopMenuSubItemCollapsableState
@@ -18,6 +26,9 @@ class TopMenuSubItemCollapsable extends React.Component<
 		this.state = { open: false };
 	}
 
+	/**
+	 * Renders the component
+	 */
 	render() {
 		const { label, children } = this.props;
 		const { open } = this.state;

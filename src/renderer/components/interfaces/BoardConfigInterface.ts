@@ -1,3 +1,6 @@
+/**
+ * The board configuration type interface
+ */
 interface BoardConfigInterface {
 	checkPoints: Array<Position>;
 	eye: PositionDirection;
@@ -11,13 +14,22 @@ interface BoardConfigInterface {
 	width: number;
 }
 
+/**
+ * The position with direction interface
+ */
 export interface PositionDirection {
 	direction: Direction;
 	position: Position;
 }
 
+/**
+ * The direction type
+ */
 export type Direction = 'NORTH' | 'EAST' | 'SOUTH' | 'WEST';
 
+/**
+ * The direction enum
+ */
 export enum DirectionEnum {
 	'NORTH',
 	'EAST',
@@ -25,11 +37,17 @@ export enum DirectionEnum {
 	'WEST',
 }
 
+/**
+ * The lembas field type
+ */
 export interface LembasField {
 	amount: number;
 	position: Position;
 }
 
+/**
+ * The position type
+ */
 export type Position = [number, number];
 
 export default BoardConfigInterface;

@@ -1,5 +1,8 @@
 import { Direction, DirectionEnum } from '../../interfaces/BoardConfigInterface';
 
+/**
+ * The direction helper class.
+ */
 class DirectionHelper {
 	/**
 	 * Converting a direction enum value to its correlating string
@@ -9,7 +12,11 @@ class DirectionHelper {
 		return DirectionEnum[direction] as Direction;
 	}
 
-	static stringToDirEnum(directionString: Direction): DirectionEnum {
+	/**
+	 * Converting a direction to its correlating enum value
+	 * @param directionString
+	 */
+	static directionToDirEnum(directionString: Direction): DirectionEnum {
 		switch (directionString) {
 			case 'NORTH':
 				return DirectionEnum.NORTH;
@@ -24,6 +31,10 @@ class DirectionHelper {
 		}
 	}
 
+	/**
+	 * Converting a direction string to its correlating enum value
+	 * @param directionString
+	 */
 	static string2DirEnum(directionString: string): DirectionEnum {
 		switch (directionString) {
 			case 'NORTH':

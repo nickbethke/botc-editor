@@ -12,13 +12,24 @@ import * as SettingsSchema from '../../schema/settings.schema.json';
 import { SettingsInterface } from '../../interfaces/SettingsInterface';
 import { getAppDataPath } from './functions';
 
+/**
+ * The ipc helper class.
+ */
 class IPCHelper {
+	/**
+	 * The default app settings
+	 */
 	static readonly defaultSettings: SettingsInterface = {
 		darkMode: true,
 		language: 'de',
 		popupsDraggable: true,
 	};
 
+	/**
+	 * Saves a party configuration to a file by displaying a save dialog.
+	 * @param json The party configuration to save.
+	 * @param window
+	 */
 	static handleSavePartieConfig = async (
 		json: string,
 		window: BrowserWindow | null
@@ -349,6 +360,9 @@ class IPCHelper {
 		clipboard.writeText(text);
 	}
 
+	/**
+	 * Prefetches the needed resources for the current platform and the settings
+	 */
 	static prefetch(): {
 		os: NodeJS.Platform;
 		settings: SettingsInterface;

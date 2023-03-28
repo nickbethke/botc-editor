@@ -18,15 +18,31 @@ export type AStarElement = {
 };
 
 /**
- * A-Star PathFinding Class
+ * A-Star PathFinding Class for the board generator
  */
 class AStar {
+	/**
+	 * The start position of the A-Star
+	 * @private
+	 */
 	private readonly start: BoardPosition;
 
+	/**
+	 * The end position of the A-Star
+	 * @private
+	 */
 	private readonly goal: BoardPosition;
 
+	/**
+	 * The virtual board
+	 * @private
+	 */
 	private readonly board: Array<Array<FieldWithPositionInterface>>;
 
+	/**
+	 * The walls map
+	 * @private
+	 */
 	private readonly walls: Map<string, boolean>;
 
 	constructor(
@@ -382,14 +398,14 @@ class AStar {
 
 		const eye = new SauronsEye(
 			position2BoardPosition(config.eye.position),
-			directionHelper.stringToDirEnum(config.eye.direction)
+			directionHelper.directionToDirEnum(config.eye.direction)
 		);
 		board[eye.position.x][eye.position.y] = eye;
 
 		config.startFields.forEach((startField) => {
 			const start = new StartField(
 				position2BoardPosition(startField.position),
-				directionHelper.stringToDirEnum(startField.direction)
+				directionHelper.directionToDirEnum(startField.direction)
 			);
 			board[start.position.x][start.position.y] = start;
 		});
@@ -407,7 +423,7 @@ class AStar {
 		config.riverFields.forEach((riverField) => {
 			const river = new River(
 				position2BoardPosition(riverField.position),
-				directionHelper.stringToDirEnum(riverField.direction)
+				directionHelper.directionToDirEnum(riverField.direction)
 			);
 			board[river.position.x][river.position.y] = river;
 		});

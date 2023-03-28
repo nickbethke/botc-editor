@@ -75,36 +75,91 @@ export type BoardPosition = {
 	y: number;
 };
 
+/**
+ * The board generation algorithm class
+ */
 class BoardGenerator {
-	private readonly percentage: number = 0.2;
+	/**
+	 * The percentage to calculate how many walls should be generated
+	 * @private
+	 */
+	private readonly wallPercentage: number = 0.2;
 
+	/**
+	 * The virtual board
+	 */
 	readonly board: Array<Array<FieldWithPositionInterface>>;
 
+	/**
+	 * The start values for the generation
+	 */
 	readonly startValues: RandomBoardStartValues;
 
+	/**
+	 * The generated board as board configuration json object
+	 */
 	readonly boardJSON: Board;
 
+	/**
+	 * The amount of walls that had been generated
+	 * @private
+	 */
 	private walls = 0;
 
+	/**
+	 * The wall map array for checking, where a wall had been generated
+	 * @private
+	 */
 	private wallMapArray: Array<[string, boolean]>;
 
+	/**
+	 * The checkpoints array
+	 */
 	readonly checkpoints: BoardPosition[];
 
+	/**
+	 * The start field array
+	 * @private
+	 */
 	private readonly startFields: BoardPosition[];
 
+	/**
+	 * The amount how many times the wall generation algorithm has been applied, to prevent infinite loops
+	 * @private
+	 */
 	private wallCall: number | undefined;
 
+	/**
+	 * The maximum number of times the wall generation algorithm will be applied, to prevent infinite loops
+	 * @private
+	 */
 	private wallMaxCall: number | undefined;
 
+	/**
+	 * The amount of holes that have been generated
+	 * @private
+	 */
 	private holesSet: number;
 
+	/**
+	 * The holes try array, to check where the algorithm is tried to generate holes
+	 * @private
+	 */
 	private holesTrys: Map<string, boolean> | undefined;
 
+	/**
+	 * The lembas fields array
+	 * @private
+	 */
 	private readonly lembasFields: Array<{
 		position: BoardPosition;
 		amount: number;
 	}>;
 
+	/**
+	 * The constructor of the class, that initializes all values and starts the generation process
+	 * @param startValues
+	 */
 	constructor(startValues?: RandomBoardStartValues) {
 		this.holesSet = 0;
 
@@ -181,6 +236,10 @@ class BoardGenerator {
 		});
 	}
 
+	/**
+	 * Generate a boardPosition array from a position array
+	 * @param position
+	 */
 	public static positionArrayToBoardPositionArray(position: Position[]): BoardPosition[] {
 		const boardPositions: BoardPosition[] = [];
 		for (let i = 0; i < position.length; i += 1) {
@@ -190,7 +249,11 @@ class BoardGenerator {
 		return boardPositions;
 	}
 
-	public static startFieldsArrayToBoardPositionArray(position: PositionDirection[]): BoardPosition[] {
+	/**
+	 * Generate a boardPosition array from a positionDirection array
+	 * @param position
+	 */
+	public static positionDirectionArrayToBoardPositionArray(position: PositionDirection[]): BoardPosition[] {
 		const boardPositions: BoardPosition[] = [];
 		for (let i = 0; i < position.length; i += 1) {
 			const positionItem = position[i];
@@ -199,6 +262,10 @@ class BoardGenerator {
 		return boardPositions;
 	}
 
+	/**
+	 * Generate a boardPosition array from a lembas fields array
+	 * @param position
+	 */
 	public static lembasFieldsArrayToBoardPositionArray(
 		position: LembasField[]
 	): { position: BoardPosition; amount: number }[] {
@@ -213,6 +280,10 @@ class BoardGenerator {
 		return boardPositions;
 	}
 
+	/**
+	 * Generates a wall map from a wall array
+	 * @param walls
+	 */
 	public static genWallMap(walls: Position[][]): Map<string, boolean> {
 		const map: Map<string, boolean> = new Map();
 		for (let i = 0; i < walls.length; i += 1) {
@@ -225,6 +296,11 @@ class BoardGenerator {
 		return map;
 	}
 
+	/**
+	 * Generates the initial virtual board
+	 * @param height Height of the virtual board
+	 * @param width Width of the virtual board
+	 */
 	public static generateBoardArray(height: number, width: number): Array<Array<FieldWithPositionInterface>> {
 		const board = new Array<Array<FieldWithPositionInterface>>();
 
@@ -452,7 +528,7 @@ class BoardGenerator {
 	private genWallsRandom() {
 		const x = this.startValues.width;
 		const y = this.startValues.height;
-		const wallsToSet = Math.floor(((x - 1) * y + (y - 1) * x) * this.percentage);
+		const wallsToSet = Math.floor(((x - 1) * y + (y - 1) * x) * this.wallPercentage);
 		const alreadyTried: Array<string> = [];
 
 		this.wallMaxCall = ((x - 1) * y + (y - 1) * x) * 4;
@@ -563,7 +639,7 @@ class BoardGenerator {
 			if (
 				!(this.getFieldFromPosition(position) instanceof River && this.getFieldFromPosition(neighbor) instanceof River)
 			) {
-				if (BoardGenerator.probably(this.percentage * 100)) {
+				if (BoardGenerator.probably(this.wallPercentage * 100)) {
 					const s1 = BoardGenerator.boardPosition2String(position) + BoardGenerator.boardPosition2String(neighbor);
 					const s2 = BoardGenerator.boardPosition2String(neighbor) + BoardGenerator.boardPosition2String(position);
 					const wallsArrayCopy = [...this.wallMapArray];

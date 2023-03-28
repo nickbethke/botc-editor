@@ -123,7 +123,7 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 						<select
 							id="select-direction"
 							className="bg-transparent border-b-2 text-lg px-4 py-2 w-full"
-							value={DirectionHelper.stringToDirEnum(directionField?.direction || 'NORTH')}
+							value={DirectionHelper.directionToDirEnum(directionField?.direction || 'NORTH')}
 							onChange={(event) => {
 								this.onDirectionChange(event);
 							}}
