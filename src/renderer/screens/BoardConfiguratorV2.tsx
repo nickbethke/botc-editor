@@ -17,6 +17,7 @@ import {
 	wallBoardPosition2String,
 	wallBoardPosition2WallPosition,
 	wallConfig2Map,
+	wallPosition2String,
 } from '../components/generator/interfaces/boardPosition';
 import {
 	addCheckpoint,
@@ -312,19 +313,19 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 			case FieldsEnum.EYE:
 				break;
 			case FieldsEnum.CHECKPOINT:
-				this.onConfigUpdate(removeCheckpoint(position, config));
+				this.updateConfiguration(removeCheckpoint(position, config));
 				break;
 			case FieldsEnum.START:
-				this.onConfigUpdate(removeStartField(position, config));
+				this.updateConfiguration(removeStartField(position, config));
 				break;
 			case FieldsEnum.LEMBAS:
-				this.onConfigUpdate(removeLembasField(position, config));
+				this.updateConfiguration(removeLembasField(position, config));
 				break;
 			case FieldsEnum.RIVER:
-				this.onConfigUpdate(removeRiver(position, config));
+				this.updateConfiguration(removeRiver(position, config));
 				break;
 			case FieldsEnum.HOLE:
-				this.onConfigUpdate(removeHole(position, config));
+				this.updateConfiguration(removeHole(position, config));
 				break;
 			default:
 				break;
@@ -397,22 +398,22 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 	private handleFieldPlacing(position: BoardPosition, config: BoardConfigInterface, currentTool: FieldsEnum) {
 		switch (currentTool) {
 			case FieldsEnum.EYE:
-				this.onConfigUpdate(moveSauronsEye(position, config));
+				this.updateConfiguration(moveSauronsEye(position, config));
 				break;
 			case FieldsEnum.CHECKPOINT:
-				this.onConfigUpdate(addCheckpoint(position, config));
+				this.updateConfiguration(addCheckpoint(position, config));
 				break;
 			case FieldsEnum.START:
-				this.onConfigUpdate(addStartField(position, config));
+				this.updateConfiguration(addStartField(position, config));
 				break;
 			case FieldsEnum.LEMBAS:
-				this.onConfigUpdate(addLembasField(position, config));
+				this.updateConfiguration(addLembasField(position, config));
 				break;
 			case FieldsEnum.RIVER:
-				this.onConfigUpdate(addRiver(position, config));
+				this.updateConfiguration(addRiver(position, config));
 				break;
 			case FieldsEnum.HOLE:
-				this.onConfigUpdate(addHole(position, config));
+				this.updateConfiguration(addHole(position, config));
 				break;
 			default:
 				break;
@@ -428,17 +429,17 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 		const wallMap = wallConfig2Map(config.walls);
 		if (currentTool === FieldsEnum.WALL) {
 			if (!wallMap.get(positionString)) {
-				this.onConfigUpdate({
+				this.updateConfiguration({
 					...config,
 					walls: [...config.walls, wallBoardPosition2WallPosition(position)],
 				});
 			}
 			if (wallMap.get(positionString)) {
-				this.onConfigUpdate(removeWall(position, config));
+				this.updateConfiguration(removeWall(position, config));
 			}
 		}
 		if (currentTool === 'delete' && !!wallMap.get(positionString)) {
-			this.onConfigUpdate(removeWall(position, config));
+			this.updateConfiguration(removeWall(position, config));
 		}
 	}
 
@@ -506,6 +507,28 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 			});
 		}
 
+		const occupiedWallsMap = new Set<string>();
+		if (handledConfig.walls) {
+			for (let i = 0; i < handledConfig.walls.length; i += 1) {
+				const wallArray = handledConfig.walls[i];
+				const [x, y] = wallArray[0];
+				const [x1, y1] = wallArray[1];
+				const string = wallPosition2String([wallArray[0], wallArray[1]]);
+				if (occupiedWallsMap.has(string)) {
+					newWarnings.set(_uniqueId('warning-'), {
+						type: Warnings.configurationInvalid,
+						title: window.languageHelper.translate('Wall'),
+						content: window.languageHelper.translate(
+							'The current game board state is not playable because there is a wall set on another wall.'
+						),
+						helper: [`${x}:${y}`, `${x1}:${y1}`],
+						removeWall: wallArray,
+					});
+				}
+				occupiedWallsMap.add(string);
+			}
+		}
+
 		handledConfig.walls.forEach((wall) => {
 			const [x, y] = wall[0];
 			const [x1, y1] = wall[1];
@@ -536,7 +559,7 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 		occupiedFields.add(position2String(handledConfig.eye.position));
 
 		handledConfig.startFields.forEach((field) => {
-			const { occupiedFields: oFields, warnings } = this.checkPositionDirectionOccupation(
+			const { occupiedFields: oFields, warnings } = this.checkFieldOccupation(
 				field.position,
 				handledConfig,
 				occupiedFields,
@@ -548,7 +571,7 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 		});
 
 		handledConfig.checkPoints.forEach((field) => {
-			const { occupiedFields: oFields, warnings } = this.checkPositionDirectionOccupation(
+			const { occupiedFields: oFields, warnings } = this.checkFieldOccupation(
 				field,
 				handledConfig,
 				occupiedFields,
@@ -560,7 +583,7 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 		});
 
 		handledConfig.lembasFields.forEach((field) => {
-			const { occupiedFields: oFields, warnings } = this.checkPositionDirectionOccupation(
+			const { occupiedFields: oFields, warnings } = this.checkFieldOccupation(
 				field.position,
 				handledConfig,
 				occupiedFields,
@@ -572,7 +595,7 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 		});
 
 		handledConfig.riverFields.forEach((field) => {
-			const { occupiedFields: oFields, warnings } = this.checkPositionDirectionOccupation(
+			const { occupiedFields: oFields, warnings } = this.checkFieldOccupation(
 				field.position,
 				handledConfig,
 				occupiedFields,
@@ -584,7 +607,7 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 		});
 
 		handledConfig.holes.forEach((field) => {
-			const { occupiedFields: oFields, warnings } = this.checkPositionDirectionOccupation(
+			const { occupiedFields: oFields, warnings } = this.checkFieldOccupation(
 				field,
 				handledConfig,
 				occupiedFields,
@@ -598,13 +621,13 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 		return newWarnings;
 	};
 
-	checkPositionDirectionOccupation = (
+	checkFieldOccupation = (
 		position: Position,
 		config: BoardConfigInterface,
 		occupiedFields: Set<string>,
 		warnings: WarningsMap,
 		type: FieldsEnum
-	) => {
+	): { occupiedFields: Set<string>; warnings: WarningsMap } => {
 		const string = position2String(position);
 		if (occupiedFields.has(string)) {
 			warnings.set(_uniqueId('warning-'), {
@@ -622,33 +645,42 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 		return { occupiedFields, warnings };
 	};
 
-	onConfigUpdate = (newConfig: BoardConfigInterface) => {
+	updateConfiguration = (newConfig: BoardConfigInterface) => {
 		const newWidth = newConfig.width;
 		const newHeight = newConfig.height;
 		const { config } = this.state;
 		const { width, height } = config;
+		let updatedConfiguration = newConfig;
 		if (width !== newWidth || height !== newHeight) {
-			newConfig.startFields = newConfig.startFields.filter(
-				(field) => field.position[0] < newWidth && field.position[1] < newHeight
-			);
-			newConfig.checkPoints = newConfig.checkPoints.filter((field) => field[0] < newWidth && field[1] < newHeight);
-			newConfig.walls = newConfig.walls.filter(
-				(field) =>
-					field[0][0] < newWidth && field[0][1] < newHeight && field[1][0] < newWidth && field[1][1] < newHeight
-			);
-			newConfig.lembasFields = newConfig.lembasFields.filter(
-				(field) => field.position[0] < newWidth && field.position[1] < newHeight
-			);
-			newConfig.riverFields = newConfig.riverFields.filter(
-				(field) => field.position[0] < newWidth && field.position[1] < newHeight
-			);
-			newConfig.holes = newConfig.holes.filter((field) => field[0] < newWidth && field[1] < newHeight);
+			updatedConfiguration = this.updateConfigurationDimensions(newWidth, newHeight, newConfig);
 		}
 		this.setState({
 			warnings: this.checkWarnings(newConfig),
-			config: newConfig,
+			config: updatedConfiguration,
 			fileSaved: false,
 		});
+	};
+
+	updateConfigurationDimensions = (
+		newWidth: number,
+		newHeight: number,
+		newConfig: BoardConfigInterface
+	): BoardConfigInterface => {
+		newConfig.startFields = newConfig.startFields.filter(
+			(field) => field.position[0] < newWidth && field.position[1] < newHeight
+		);
+		newConfig.checkPoints = newConfig.checkPoints.filter((field) => field[0] < newWidth && field[1] < newHeight);
+		newConfig.walls = newConfig.walls.filter(
+			(field) => field[0][0] < newWidth && field[0][1] < newHeight && field[1][0] < newWidth && field[1][1] < newHeight
+		);
+		newConfig.lembasFields = newConfig.lembasFields.filter(
+			(field) => field.position[0] < newWidth && field.position[1] < newHeight
+		);
+		newConfig.riverFields = newConfig.riverFields.filter(
+			(field) => field.position[0] < newWidth && field.position[1] < newHeight
+		);
+		newConfig.holes = newConfig.holes.filter((field) => field[0] < newWidth && field[1] < newHeight);
+		return newConfig;
 	};
 
 	onTopMenuAction = async (action: TopMenuActions) => {
@@ -659,7 +691,7 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 				if (!fileSaved) {
 					this.setState({ popup: 'newFileSaveCurrent' });
 				} else {
-					this.onConfigUpdate(BoardConfiguratorV2.defaultBoard);
+					this.updateConfiguration(BoardConfiguratorV2.defaultBoard);
 					this.setState({
 						file: null,
 						fileSaved: true,
@@ -766,7 +798,7 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 						if (popup === 'newRandomFileSaveCurrent') {
 							this.setState({ popup: 'newFromRandom' });
 						} else {
-							this.onConfigUpdate(BoardConfiguratorV2.defaultBoard);
+							this.updateConfiguration(BoardConfiguratorV2.defaultBoard);
 							this.setState({
 								popup: null,
 								file: null,
@@ -810,7 +842,7 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 					}}
 					settings={settings}
 					onConfirm={(generator) => {
-						this.onConfigUpdate(generator.boardJSON);
+						this.updateConfiguration(generator.boardJSON);
 						this.setState({
 							file: null,
 							fileSaved: false,
@@ -910,7 +942,7 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 			.openBoardConfig()
 			.then((loadedConfig) => {
 				if (loadedConfig) {
-					this.onConfigUpdate(loadedConfig.config);
+					this.updateConfiguration(loadedConfig.config);
 					this.setState({
 						file: loadedConfig,
 						fileSaved: true,
@@ -1024,7 +1056,7 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 							<LeftSidebar
 								config={config}
 								onConfigUpdate={(newConfig) => {
-									this.onConfigUpdate(newConfig);
+									this.updateConfiguration(newConfig);
 								}}
 								openTab={sideBarTabLeft}
 								currentTool={currentTool}
@@ -1105,7 +1137,7 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 								settings={settings}
 								os={os}
 								onRemoveWall={(wall) => {
-									this.onConfigUpdate(
+									this.updateConfiguration(
 										removeWall(
 											[
 												{
@@ -1127,19 +1159,19 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 									switch (fieldPosition.type) {
 										case FieldsEnum.CHECKPOINT:
 										case FieldsEnum.DESTINY_MOUNTAIN:
-											this.onConfigUpdate(removeCheckpoint(fieldPosition.position, config));
+											this.updateConfiguration(removeCheckpoint(fieldPosition.position, config));
 											break;
 										case FieldsEnum.LEMBAS:
-											this.onConfigUpdate(removeLembasField(fieldPosition.position, config));
+											this.updateConfiguration(removeLembasField(fieldPosition.position, config));
 											break;
 										case FieldsEnum.RIVER:
-											this.onConfigUpdate(removeRiver(fieldPosition.position, config));
+											this.updateConfiguration(removeRiver(fieldPosition.position, config));
 											break;
 										case FieldsEnum.START:
-											this.onConfigUpdate(removeStartField(fieldPosition.position, config));
+											this.updateConfiguration(removeStartField(fieldPosition.position, config));
 											break;
 										case FieldsEnum.HOLE:
-											this.onConfigUpdate(removeHole(fieldPosition.position, config));
+											this.updateConfiguration(removeHole(fieldPosition.position, config));
 											break;
 										default:
 											break;

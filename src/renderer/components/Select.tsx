@@ -23,12 +23,23 @@ class SelectComponent extends Component<SelectComponentProps, SelectComponentSta
 		};
 	}
 
+	componentDidMount() {
+		document.addEventListener('click', (ev) => {
+			const { isOpen } = this.state;
+			if (ev.target instanceof HTMLElement) {
+				if (isOpen && !document.getElementById('custom-select-botc')?.contains(ev.target)) {
+					this.setState({ isOpen: false });
+				}
+			}
+		});
+	}
+
 	render() {
 		const { onChange } = this.props;
 		const { value, options, isOpen } = this.state;
 		const currentValue = options.find((option) => option.value === value);
 		return (
-			<div className="relative">
+			<div className="relative" id="custom-select-botc">
 				<div className="flex gap-1 px-2 items-center">
 					<button type="button" className="px-2 py-1 font-medium" onClick={() => this.setState({ isOpen: !isOpen })}>
 						{currentValue?.text}

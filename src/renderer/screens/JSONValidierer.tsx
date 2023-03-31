@@ -21,22 +21,6 @@ import FilePathComponent from '../components/FilePathComponent';
 import KeyCode = monaco.KeyCode;
 import KeyMod = monaco.KeyMod;
 
-window.electron.schemas
-	.partie()
-	.then((partieSchema) => {
-		return monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
-			validate: true,
-			schemas: [
-				{
-					uri: 'http://myserver/bar-schema.json',
-					fileMatch: ['*'],
-					schema: partieSchema,
-				},
-			],
-		});
-	})
-	.catch(() => {});
-
 type JSONValidatorProps = {
 	onClose: () => void;
 	os: NodeJS.Platform;
@@ -67,6 +51,22 @@ class JSONValidierer extends React.Component<JSONValidatorProps, JSONValidatorSt
 
 	constructor(props: JSONValidatorProps) {
 		super(props);
+
+		window.electron.schemas
+			.partie()
+			.then((partieSchema) => {
+				return monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
+					validate: true,
+					schemas: [
+						{
+							uri: '#',
+							fileMatch: ['*'],
+							schema: partieSchema,
+						},
+					],
+				});
+			})
+			.catch(() => {});
 
 		this.handleBackButton = this.handleBackButton.bind(this);
 		this.backToHomeScreen = this.backToHomeScreen.bind(this);
@@ -516,7 +516,7 @@ class JSONValidierer extends React.Component<JSONValidatorProps, JSONValidatorSt
 							/>
 							<TopMenuItem
 								type="none"
-								label={`${window.languageHelper.translate('Version')}: 1.0.1`}
+								label={`${window.languageHelper.translate('Version')}: 1.1.2`}
 								icon={<VscVersions />}
 							/>
 						</div>

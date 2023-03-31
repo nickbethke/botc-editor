@@ -1,5 +1,6 @@
 import BoardConfigInterface, { Position } from '../components/interfaces/BoardConfigInterface';
 import BoardGenerator from '../components/generator/BoardGenerator';
+import { wallPosition2String } from '../components/generator/interfaces/boardPosition';
 
 class BoardConfigValidator {
 	private readonly json: JSON;
@@ -24,7 +25,7 @@ class BoardConfigValidator {
 		if (!this.config.eye) {
 			this.errors.push(`Board eye is not defined`);
 		}
-		if (!this.config.checkPoints || this.config.checkPoints.length > 2) {
+		if (!this.config.checkPoints || this.config.checkPoints.length < 2) {
 			this.errors.push(`Check points are to less (minimum 2) or not defined`);
 		}
 		if (!this.config.startFields || this.config.startFields.length < 2) {
@@ -35,6 +36,12 @@ class BoardConfigValidator {
 		if (doubleOccupancy) {
 			this.errors.push(`Double occupancy on field [${doubleOccupancy[0]}, ${doubleOccupancy[1]}]`);
 		}
+		const wallDoubleOccupancy = this.wallDoubleOccupancy();
+		if (wallDoubleOccupancy) {
+			this.errors.push(
+				`Double occupancy on a wall position [${wallDoubleOccupancy[0][0]}, ${wallDoubleOccupancy[0][1]}] [${wallDoubleOccupancy[1][0]}, ${wallDoubleOccupancy[1][1]}]`
+			);
+		}
 		const dimensions = this.checkDimensions();
 		if (dimensions) {
 			this.errors.push(
@@ -44,10 +51,25 @@ class BoardConfigValidator {
 		}
 	}
 
+	private wallDoubleOccupancy(): false | [Position, Position] {
+		const occupiedWallsMap = new Set<string>();
+		if (this.config.walls) {
+			for (let i = 0; i < this.config.walls.length; i += 1) {
+				const wallArray = this.config.walls[i];
+				const string = wallPosition2String([wallArray[0], wallArray[1]]);
+				if (occupiedWallsMap.has(string)) {
+					return [wallArray[0], wallArray[1]];
+				}
+				occupiedWallsMap.add(string);
+			}
+		}
+		return false;
+	}
+
 	private checkDoubleOccupancy(): false | Position {
-		const occupiedMap = new Map<string, boolean>();
+		const occupiedMap = new Set<string>();
 		if (this.config.eye) {
-			occupiedMap.set(BoardGenerator.position2String(this.config.eye.position), true);
+			occupiedMap.add(BoardGenerator.position2String(this.config.eye.position));
 		}
 		if (this.config.startFields) {
 			for (let i = 0; i < this.config.startFields.length; i += 1) {
@@ -55,7 +77,7 @@ class BoardConfigValidator {
 				if (occupiedMap.has(BoardGenerator.position2String(startField.position))) {
 					return startField.position;
 				}
-				occupiedMap.set(BoardGenerator.position2String(startField.position), true);
+				occupiedMap.add(BoardGenerator.position2String(startField.position));
 			}
 		}
 		if (this.config.checkPoints) {
@@ -64,7 +86,7 @@ class BoardConfigValidator {
 				if (occupiedMap.has(BoardGenerator.position2String(checkpoint))) {
 					return checkpoint;
 				}
-				occupiedMap.set(BoardGenerator.position2String(checkpoint), true);
+				occupiedMap.add(BoardGenerator.position2String(checkpoint));
 			}
 		}
 		if (this.config.lembasFields) {
@@ -73,7 +95,7 @@ class BoardConfigValidator {
 				if (occupiedMap.has(BoardGenerator.position2String(lembasField.position))) {
 					return lembasField.position;
 				}
-				occupiedMap.set(BoardGenerator.position2String(lembasField.position), true);
+				occupiedMap.add(BoardGenerator.position2String(lembasField.position));
 			}
 		}
 		if (this.config.holes) {
@@ -82,9 +104,19 @@ class BoardConfigValidator {
 				if (occupiedMap.has(BoardGenerator.position2String(hole))) {
 					return hole;
 				}
-				occupiedMap.set(BoardGenerator.position2String(hole), true);
+				occupiedMap.add(BoardGenerator.position2String(hole));
 			}
 		}
+		if (this.config.riverFields) {
+			for (let i = 0; i < this.config.riverFields.length; i += 1) {
+				const riverField = this.config.riverFields[i];
+				if (occupiedMap.has(BoardGenerator.position2String(riverField.position))) {
+					return riverField.position;
+				}
+				occupiedMap.add(BoardGenerator.position2String(riverField.position));
+			}
+		}
+
 		return false;
 	}
 
