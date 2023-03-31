@@ -4,7 +4,7 @@ import { ParsedPath } from 'path';
 import _uniqueId from 'lodash/uniqueId';
 import { monaco } from 'react-monaco-editor';
 import TopMenu, { TopMenuActions } from '../components/boardConfigurator/TopMenu';
-import BoardConfigInterface, { PositionDirection } from '../components/interfaces/BoardConfigInterface';
+import BoardConfigInterface, { Position, PositionDirection } from '../components/interfaces/BoardConfigInterface';
 import LeftSidebar, { LeftSidebarConfigType, LeftSidebarOpenTab } from '../components/boardConfigurator/LeftSidebar';
 import BoardGenerator, { FieldsEnum } from '../components/generator/BoardGenerator';
 import RightSidebar, { RightSidebarOpenTab } from '../components/boardConfigurator/RightSidebar';
@@ -12,6 +12,8 @@ import MainEditor, { FieldTypeOnClick } from '../components/boardConfigurator/Ma
 import {
 	BoardPosition,
 	boardPosition2String,
+	position2BoardPosition,
+	position2String,
 	wallBoardPosition2String,
 	wallBoardPosition2WallPosition,
 	wallConfig2Map,
@@ -105,7 +107,7 @@ type BoardConfiguratorV2State = {
 class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, BoardConfiguratorV2State> {
 	static defaultBoard: BoardConfigInterface = {
 		height: 2,
-		width: 2,
+		width: 3,
 		name: 'Default Board',
 		checkPoints: [],
 		startFields: [],
@@ -116,10 +118,6 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 		walls: [],
 	};
 
-	// TODO: Update on Size change
-	// TODO: random
-	// TODO: Loading
-	// TODO: Warnings
 	constructor(props: BoardConfiguratorV2Props) {
 		super(props);
 		const conf = props.config || BoardConfiguratorV2.defaultBoard;
@@ -452,7 +450,7 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 			const { config } = this.state;
 			handledConfig = config;
 		}
-		const newWarnings: WarningsMap = new Map();
+		let newWarnings: WarningsMap = new Map();
 		const { result, errors } = AStar.checkBoardConfig(handledConfig);
 		if (!result) {
 			for (let i = 0; i < errors.length; i += 1) {
@@ -533,7 +531,95 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 			}
 		});
 
+		let occupiedFields = new Set<string>();
+
+		occupiedFields.add(position2String(handledConfig.eye.position));
+
+		handledConfig.startFields.forEach((field) => {
+			const { occupiedFields: oFields, warnings } = this.checkPositionDirectionOccupation(
+				field.position,
+				handledConfig,
+				occupiedFields,
+				newWarnings,
+				FieldsEnum.START
+			);
+			occupiedFields = oFields;
+			newWarnings = warnings;
+		});
+
+		handledConfig.checkPoints.forEach((field) => {
+			const { occupiedFields: oFields, warnings } = this.checkPositionDirectionOccupation(
+				field,
+				handledConfig,
+				occupiedFields,
+				newWarnings,
+				FieldsEnum.CHECKPOINT
+			);
+			occupiedFields = oFields;
+			newWarnings = warnings;
+		});
+
+		handledConfig.lembasFields.forEach((field) => {
+			const { occupiedFields: oFields, warnings } = this.checkPositionDirectionOccupation(
+				field.position,
+				handledConfig,
+				occupiedFields,
+				newWarnings,
+				FieldsEnum.LEMBAS
+			);
+			occupiedFields = oFields;
+			newWarnings = warnings;
+		});
+
+		handledConfig.riverFields.forEach((field) => {
+			const { occupiedFields: oFields, warnings } = this.checkPositionDirectionOccupation(
+				field.position,
+				handledConfig,
+				occupiedFields,
+				newWarnings,
+				FieldsEnum.RIVER
+			);
+			occupiedFields = oFields;
+			newWarnings = warnings;
+		});
+
+		handledConfig.holes.forEach((field) => {
+			const { occupiedFields: oFields, warnings } = this.checkPositionDirectionOccupation(
+				field,
+				handledConfig,
+				occupiedFields,
+				newWarnings,
+				FieldsEnum.HOLE
+			);
+			occupiedFields = oFields;
+			newWarnings = warnings;
+		});
+
 		return newWarnings;
+	};
+
+	checkPositionDirectionOccupation = (
+		position: Position,
+		config: BoardConfigInterface,
+		occupiedFields: Set<string>,
+		warnings: WarningsMap,
+		type: FieldsEnum
+	) => {
+		const string = position2String(position);
+		if (occupiedFields.has(string)) {
+			warnings.set(_uniqueId('warning-'), {
+				type: Warnings.configurationInvalid,
+				title: window.languageHelper.translate('Occupation'),
+				content: window.languageHelper.translate(
+					'The current game board state is not valid, due to a field has the same position as another field.'
+				),
+				helper: [`${position[0]}:${position[1]}`],
+				removeField: { position: position2BoardPosition(position), type },
+			});
+		} else {
+			occupiedFields.add(string);
+		}
+		return { occupiedFields, warnings };
 	};
 
 	onConfigUpdate = (newConfig: BoardConfigInterface) => {
@@ -561,6 +647,7 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 		this.setState({
 			warnings: this.checkWarnings(newConfig),
 			config: newConfig,
+			fileSaved: false,
 		});
 	};
 
@@ -911,7 +998,7 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 				) : (
 					<div className="fixed top-0 right-0 dragger h-8" style={{ width: window.innerWidth - 285 }} />
 				)}
-				<div className={`${popup !== null && 'blur'} transition transition-[filter]`}>
+				<div className={`${popup !== null && 'blur'} transition`}>
 					<div
 						className={`dark:bg-muted-800 bg-muted-500 dark:border-0 border-t border-muted-400 px-1 ${
 							os === 'darwin' ? 'pl-20' : ''
@@ -1034,6 +1121,28 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 										this.setState({
 											fileSaved: false,
 										});
+									}
+								}}
+								onRemoveField={(fieldPosition) => {
+									switch (fieldPosition.type) {
+										case FieldsEnum.CHECKPOINT:
+										case FieldsEnum.DESTINY_MOUNTAIN:
+											this.onConfigUpdate(removeCheckpoint(fieldPosition.position, config));
+											break;
+										case FieldsEnum.LEMBAS:
+											this.onConfigUpdate(removeLembasField(fieldPosition.position, config));
+											break;
+										case FieldsEnum.RIVER:
+											this.onConfigUpdate(removeRiver(fieldPosition.position, config));
+											break;
+										case FieldsEnum.START:
+											this.onConfigUpdate(removeStartField(fieldPosition.position, config));
+											break;
+										case FieldsEnum.HOLE:
+											this.onConfigUpdate(removeHole(fieldPosition.position, config));
+											break;
+										default:
+											break;
 									}
 								}}
 							/>

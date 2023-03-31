@@ -3,6 +3,7 @@ import _uniqueId from 'lodash/uniqueId';
 import { VscTrash } from 'react-icons/vsc';
 import { BoardPosition } from '../generator/interfaces/boardPosition';
 import { Position } from '../interfaces/BoardConfigInterface';
+import { FieldsEnum } from '../generator/BoardGenerator';
 
 /**
  * The board configurator warnings type
@@ -11,6 +12,7 @@ export enum Warnings {
 	pathImpossible,
 	configurationInvalid,
 }
+
 /**
  * The board configurator warnings map
  */
@@ -23,6 +25,7 @@ export type WarningsMap = Map<
 		helper?: string[];
 		fields?: BoardPosition[];
 		removeWall?: Position[];
+		removeField?: { position: BoardPosition; type: FieldsEnum };
 	}
 >;
 /**
@@ -36,6 +39,8 @@ export type WarningProps = {
 	onFieldSelect: (position: BoardPosition) => void;
 	removeWall?: Position[] | null;
 	onRemoveWall: (position: Position[]) => void;
+	removeField?: { position: BoardPosition; type: FieldsEnum } | null;
+	onRemoveField: (field: { position: BoardPosition; type: FieldsEnum }) => void;
 };
 
 /**
@@ -44,7 +49,28 @@ export type WarningProps = {
  * @constructor
  */
 function Warning(props: WarningProps) {
-	const { title, content, helper, fields, onFieldSelect, removeWall, onRemoveWall } = props;
+	const { title, content, helper, fields, onFieldSelect, removeWall, onRemoveWall, removeField, onRemoveField } = props;
+
+	const fieldEnumToString = (fieldEnum: FieldsEnum) => {
+		switch (fieldEnum) {
+			case FieldsEnum.EYE:
+				return 'field';
+			case FieldsEnum.CHECKPOINT:
+			case FieldsEnum.DESTINY_MOUNTAIN:
+				return 'checkpoint';
+			case FieldsEnum.LEMBAS:
+				return 'lembas';
+			case FieldsEnum.RIVER:
+				return 'river';
+			case FieldsEnum.START:
+				return 'start';
+			case FieldsEnum.HOLE:
+				return 'hole';
+			default:
+				return '';
+		}
+	};
+
 	return (
 		<div className="m-2 text-sm border dark:border-muted-700 border-muted-400 rounded flex flex-col dark:bg-muted-800 bg-muted-600">
 			<div className="border-b dark:border-muted-700 border-muted-400 px-2 py-1">{title}</div>
@@ -91,6 +117,21 @@ function Warning(props: WarningProps) {
 					</div>
 				</div>
 			) : null}
+			{removeField ? (
+				<div className="flex gap-2 px-2 py-1 mb-2">
+					<div
+						role="presentation"
+						key={_uniqueId('warning-remove-field-')}
+						className="px-2 py-1 rounded dark:bg-muted-700 bg-muted-400 text-[12px] hover:cursor-pointer flex items-center justify-center gap-2"
+						onClick={() => {
+							onRemoveField(removeField);
+						}}
+					>
+						<VscTrash />{' '}
+						{window.languageHelper.translateVars('Remove {0} field', [fieldEnumToString(removeField.type)])}{' '}
+					</div>
+				</div>
+			) : null}
 		</div>
 	);
 }
@@ -102,5 +143,6 @@ Warning.defaultProps = {
 	helper: null,
 	fields: null,
 	removeWall: null,
+	removeField: null,
 };
 export default Warning;

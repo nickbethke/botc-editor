@@ -67,7 +67,7 @@ class RandomBoardStartValuesDialogV2 extends React.Component<
 		super(props);
 		this.state = {
 			name: 'THE CENTERLÄND',
-			width: 2,
+			width: 3,
 			height: 2,
 			startFields: 2,
 			checkpoints: 2,

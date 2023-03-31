@@ -75,6 +75,7 @@ export type BoardPosition = {
 	y: number;
 };
 
+// TODO: Flüsse und andere Felder werden an Stellen gesetzt, wo schon ein anderes Feld ist...
 /**
  * The board generation algorithm class
  */
@@ -405,7 +406,7 @@ class BoardGenerator {
 
 	private genRivers() {
 		const freeSpacesCount = this.getFreeFieldsCount();
-		let riverFieldCount = Math.floor(freeSpacesCount / 5);
+		let riverFieldCount = Math.floor(freeSpacesCount / 4);
 
 		// on max=1, riverFieldCount could be bigger than 1
 		if (riverFieldCount > freeSpacesCount) {
@@ -424,7 +425,7 @@ class BoardGenerator {
 		for (let i = 0; i < riverCount; i += 1) {
 			const position = this.getRandomPosition();
 			const direction = BoardGenerator.getRandomDirection();
-			if (this.getRiverNeighbors(position).length > 2) {
+			if (this.getRiverNeighbors(position).length > 2 && this.board[position.x][position.y] instanceof Grass) {
 				this.board[position.x][position.y] = new River(position, direction);
 				this.boardJSON.addRiverField(position, direction);
 			}
@@ -437,7 +438,10 @@ class BoardGenerator {
 			const toMake = BoardGenerator.getRandomInt(2, Math.min(this.startValues.height, this.startValues.width));
 			let startPosition = this.getRandomPosition();
 			let startDirection = BoardGenerator.getRandomDirection();
-			if (this.getRiverNeighbors(startPosition).length < 3) {
+			if (
+				this.getRiverNeighbors(startPosition).length < 3 &&
+				this.board[startPosition.x][startPosition.y] instanceof Grass
+			) {
 				this.board[startPosition.x][startPosition.y] = new River(startPosition, startDirection);
 				this.boardJSON.addRiverField(startPosition, startDirection);
 				made += 1;
@@ -472,9 +476,11 @@ class BoardGenerator {
 								startDirection = BoardGenerator.probably(50) ? DirectionEnum.NORTH : DirectionEnum.SOUTH;
 							}
 							startPosition = selected.position;
-							this.board[startPosition.x][startPosition.y] = new River(startPosition, startDirection);
-							this.boardJSON.addRiverField(startPosition, startDirection);
-							made += 1;
+							if (this.board[startPosition.x][startPosition.y] instanceof Grass) {
+								this.board[startPosition.x][startPosition.y] = new River(startPosition, startDirection);
+								this.boardJSON.addRiverField(startPosition, startDirection);
+								made += 1;
+							}
 							if (made >= riverCount) {
 								break;
 							}
@@ -501,24 +507,24 @@ class BoardGenerator {
 		}>();
 		// north
 		let currentPosition = { x, y: y - 1 };
-		if (this.isPositionInBoard(currentPosition) && !(this.board[y - 1][x] instanceof River)) {
+		if (this.isPositionInBoard(currentPosition) && this.board[y - 1][x] instanceof Grass) {
 			neighbors.push({ position: currentPosition, direction: 'NORTH' });
 		}
 
 		// east
 		currentPosition = { x: x + 1, y };
-		if (this.isPositionInBoard(currentPosition) && !(this.board[y][x + 1] instanceof River)) {
+		if (this.isPositionInBoard(currentPosition) && this.board[y][x + 1] instanceof Grass) {
 			neighbors.push({ position: currentPosition, direction: 'EAST' });
 		}
 		// south
 		currentPosition = { x, y: y + 1 };
-		if (this.isPositionInBoard(currentPosition) && !(this.board[y + 1][x] instanceof River)) {
+		if (this.isPositionInBoard(currentPosition) && this.board[y + 1][x] instanceof Grass) {
 			neighbors.push({ position: currentPosition, direction: 'SOUTH' });
 		}
 
 		// west
 		currentPosition = { x: x - 1, y };
-		if (this.isPositionInBoard(currentPosition) && !(this.board[y][x - 1] instanceof River)) {
+		if (this.isPositionInBoard(currentPosition) && this.board[y][x - 1] instanceof Grass) {
 			neighbors.push({ position: currentPosition, direction: 'WEST' });
 		}
 
@@ -911,7 +917,6 @@ class BoardGenerator {
 export default BoardGenerator;
 
 export enum FieldsEnum {
-	GRASS,
 	START,
 	CHECKPOINT,
 	EYE,

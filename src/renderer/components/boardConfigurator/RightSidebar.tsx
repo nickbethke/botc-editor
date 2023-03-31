@@ -9,6 +9,7 @@ import BoardConfigInterface, { Position } from '../interfaces/BoardConfigInterfa
 import Warning, { WarningsMap } from './Warning';
 import { BoardPosition } from '../generator/interfaces/boardPosition';
 import { SettingsInterface } from '../../../interfaces/SettingsInterface';
+import { FieldsEnum } from '../generator/BoardGenerator';
 
 /**
  * The board configuration right sidebar component properties
@@ -20,6 +21,7 @@ type RightSidebarProps = {
 	warnings: WarningsMap;
 	onFieldSelect: (position: BoardPosition) => void;
 	onRemoveWall: (position: Position[]) => void;
+	onRemoveField: (field: { position: BoardPosition; type: FieldsEnum }) => void;
 	windowDimensions: {
 		width: number;
 		height: number;
@@ -68,7 +70,7 @@ class RightSidebar extends React.Component<RightSidebarProps, unknown> {
 	 * Renders the notifications
 	 */
 	notifications() {
-		const { warnings, onFieldSelect, onRemoveWall } = this.props;
+		const { warnings, onFieldSelect, onRemoveWall, onRemoveField } = this.props;
 		return (
 			<div className="flex flex-col h-full">
 				<div className="p-2 border-b dark:border-muted-700 border-muted-400">
@@ -84,9 +86,15 @@ class RightSidebar extends React.Component<RightSidebarProps, unknown> {
 							fields={value[1].fields}
 							onFieldSelect={onFieldSelect}
 							removeWall={value[1].removeWall || null}
+							removeField={value[1].removeField || null}
 							onRemoveWall={(removeWall) => {
 								if (value[1].removeWall) {
 									onRemoveWall(removeWall);
+								}
+							}}
+							onRemoveField={(removeField) => {
+								if (value[1].removeField) {
+									onRemoveField(removeField);
 								}
 							}}
 						/>

@@ -330,7 +330,7 @@ class MainEditor extends React.Component<MainEditorProps, MainEditorState> {
 					>
 						{x}
 					</div>
-					<div className="h-4 w-4 flex items-center" />
+					<div key={_uniqueId()} className="h-4 w-4 flex items-center" />
 				</>
 			);
 		}
