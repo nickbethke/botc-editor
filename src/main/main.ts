@@ -66,6 +66,9 @@ const createWindow = async () => {
 			symbolColor: '#ffffff',
 			height: 32,
 		},
+		trafficLightPosition:{
+			x: 10, y:11
+		},
 		icon: getAssetPath('icon.png'),
 		webPreferences: {
 			// devTools: false,
