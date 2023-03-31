@@ -4,7 +4,7 @@
 		"battle of the centerländ",
 		"editor"
 	],
-	"license": "D-FSL-1.0",
+	"license": "UNLICENSED",
 	"author": {
 		"name": "Team 11 - Sopra WiSe22/23 SoSe23"
 	},
@@ -237,15 +237,20 @@
 			]
 		},
 		"win": {
-			"target": [
-				"nsis",
+            "target": [
+                "nsis",
+				"nsis-web",
+                "portable",
 				"msi",
 				"zip"
-			]
+            ]
 		},
 		"linux": {
 			"target": [
-				"AppImage"
+				"AppImage",
+				"snap",
+				"rpm",
+				"deb"
 			],
 			"category": "Utility"
 		},

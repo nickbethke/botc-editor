@@ -73,7 +73,7 @@ const createWindow = async () => {
 		},
 	});
 
-	await mainWindow.loadURL(resolveHtmlPath('index.html'));
+	mainWindow.loadURL(resolveHtmlPath('index.html'));
 
 	mainWindow.on('ready-to-show', () => {
 		if (!mainWindow) {
@@ -107,13 +107,6 @@ const createWindow = async () => {
  * Add event listeners...
  */
 
-app.on('window-all-closed', () => {
-	// Respect the OSX convention of having the application in memory even
-	// after all windows have been closed
-	if (process.platform !== 'darwin') {
-		app.quit();
-	}
-});
 const registerHandlers = () => {
 	ipcMain.handle('dialog:openBoardConfig', async () => {
 		return IPCHelper.handleFileOpen('board', mainWindow);
@@ -220,6 +213,25 @@ const registerHandlers = () => {
 		return IPCHelper.getSchemaBoard();
 	});
 };
+
+const gotTheLock = app.requestSingleInstanceLock();
+if (!gotTheLock) {
+	app.quit();
+} else {
+	app.on('second-instance', () => {
+		// Someone tried to run a second instance, we should focus our window.
+		if (mainWindow) {
+			if (mainWindow.isMinimized()) mainWindow.restore();
+			mainWindow.focus();
+		}
+	});
+}
+
+app.on('window-all-closed', () => {
+	if (process.platform !== 'darwin') {
+		app.quit();
+	}
+});
 app
 	.whenReady()
 	.then(() => {
