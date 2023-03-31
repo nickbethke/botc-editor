@@ -350,13 +350,8 @@ class IPCHelper {
 	}
 
 	static getAssetPath(...paths: string[]): string {
-		if (!fs.existsSync(path.join(app.getPath('documents'), 'botc-editor/assets'))) {
-			fs.mkdirSync(path.join(app.getPath('documents'), 'botc-editor/assets'));
-		}
 		return path.join(
-			app.isPackaged
-				? path.join(app.getPath('documents'), 'botc-editor/assets')
-				: path.join(__dirname, '../../../assets'),
+			app.isPackaged ? path.join(process.resourcesPath, 'assets') : path.join(__dirname, '../../../assets'),
 			...paths
 		);
 	}
