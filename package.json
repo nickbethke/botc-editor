@@ -111,6 +111,7 @@
 		"monaco-editor": "^0.34.1",
 		"mousetrap": "^1.6.5",
 		"path-browserify": "^1.0.1",
+		"postcss": "^8.4.21",
 		"react": "^18.2.0",
 		"react-ace": "^10.1.0",
 		"react-dom": "^18.2.0",
@@ -154,7 +155,7 @@
 		"electron-builder": "^23.3.3",
 		"electron-devtools-installer": "^3.2.0",
 		"electronmon": "^2.0.2",
-		"eslint": "^8.22.0",
+		"eslint": "^8.37.0",
 		"eslint-config-airbnb-base": "^15.0.0",
 		"eslint-config-erb": "^4.0.3",
 		"eslint-import-resolver-typescript": "^3.4.1",
@@ -183,7 +184,7 @@
 		"sass": "^1.54.4",
 		"sass-loader": "^13.0.2",
 		"style-loader": "^3.3.1",
-		"tailwindcss": "^3.2.4",
+		"tailwindcss": "^3.3.1",
 		"terser-webpack-plugin": "^5.3.5",
 		"ts-jest": "^28.0.8",
 		"ts-loader": "^9.3.1",
@@ -237,12 +238,12 @@
 			]
 		},
 		"win": {
-            "target": [
-                "nsis",
-                "portable",
+			"target": [
+				"nsis",
+				"portable",
 				"msi",
 				"zip"
-            ]
+			]
 		},
 		"linux": {
 			"target": [

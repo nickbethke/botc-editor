@@ -1,4 +1,4 @@
-Copyright (C) 2023 Team 12 - Sopra WiSe 2022/23 SoSe 2023 Universität Ulm.
+Copyright (C) 2023 Team 11 - Sopra WiSe 2022/23 SoSe 2023 Universität Ulm.
 
 Dieses Programm kann durch jedermann gemäß den
 Bestimmungen der Deutschen Freien Software Lizenz

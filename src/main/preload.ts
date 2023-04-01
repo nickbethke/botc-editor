@@ -21,7 +21,7 @@ const electronHandler = {
 			ipcRenderer.once(channel, (_event, ...args) => func(...args));
 		},
 	},
-	validate: (json: object, type: 'partie' | 'board') => {
+	validate: (json: object, type: 'partie' | 'board'): Promise<boolean | string> => {
 		return ipcRenderer.invoke('validate:json', json, type);
 	},
 	schemas: {

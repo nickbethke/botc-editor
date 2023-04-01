@@ -1,6 +1,7 @@
 import React from 'react';
 import { BiChevronLeft } from 'react-icons/bi';
 import { VscColorMode } from 'react-icons/vsc';
+import { isBoolean } from 'lodash';
 import backgroundImage from '../../../assets/images/damn_nice_background_color.png';
 import backgroundImageDark from '../../../assets/images/damn_nice_background.png';
 import InputLabel from '../components/InputLabel';
@@ -30,7 +31,7 @@ type PartieKonfiguratorState = {
 };
 
 // TODO: Translations
-class PartieKonfigurator extends React.Component<PartieKonfiguratorProps, PartieKonfiguratorState> {
+class PartyConfigurator extends React.Component<PartieKonfiguratorProps, PartieKonfiguratorState> {
 	private default: PartieConfigInterface = {
 		maxRounds: 0,
 		reviveRounds: 0,
@@ -60,6 +61,42 @@ class PartieKonfigurator extends React.Component<PartieKonfiguratorProps, Partie
 		};
 	}
 
+	componentDidMount() {
+		const { loadedValues } = this.props;
+		if (loadedValues && this.predictIfConfigurationIsPartyConfiguration(loadedValues)) {
+			const values = { ...this.default, ...loadedValues };
+			window.electron
+				.validate(loadedValues, 'partie')
+				.then((valid) => {
+					if (isBoolean(valid) && valid) {
+						this.setState({ values });
+						this.notification = <Notification label={window.languageHelper.translate('Loaded successfully')} />;
+						return null;
+					}
+					this.notification = <Error label={window.languageHelper.translate('Failed to load file!')} />;
+					return null;
+				})
+				.catch(() => {});
+		} else {
+			this.notification = (
+				<Error label={window.languageHelper.translate('The loaded file is not a party configuration.')} />
+			);
+		}
+	}
+
+	predictIfConfigurationIsPartyConfiguration = (configuration: object) => {
+		return (
+			'maxRounds' in configuration ||
+			'reviveRounds' in configuration ||
+			'serverIngameDelay' in configuration ||
+			'riverMoveCount' in configuration ||
+			'cardSelectionTimeout' in configuration ||
+			'characterChoiceTimeout' in configuration ||
+			'shotLembas' in configuration ||
+			'startLembas' in configuration
+		);
+	};
+
 	handleBackButton = () => {
 		this.setState({ popupLeave: true });
 	};
@@ -83,7 +120,8 @@ class PartieKonfigurator extends React.Component<PartieKonfiguratorProps, Partie
 
 	openLoadPartieConfig = async () => {
 		const partieJSON = await window.electron.dialog.openPartieConfig();
-		if (partieJSON) {
+		const valid = await window.electron.validate(partieJSON as object, 'partie');
+		if (partieJSON && valid === true) {
 			this.setState({
 				values: { ...partieJSON.config },
 			});
@@ -94,15 +132,10 @@ class PartieKonfigurator extends React.Component<PartieKonfiguratorProps, Partie
 	};
 
 	render = () => {
-		let { values } = this.state;
+		const { values } = this.state;
 		const { popupLeave, windowDimensions } = this.state;
-		const { loadedValues, os, settings, onSettingsUpdate, fullScreen } = this.props;
+		const { os, settings, onSettingsUpdate, fullScreen } = this.props;
 
-		if (loadedValues) {
-			values = { ...this.default, ...loadedValues };
-			this.setState({ values });
-			this.notification = <Notification label="Erfolgreich geladen" />;
-		}
 		let popupLeaveR = null;
 		if (popupLeave) {
 			popupLeaveR = (
@@ -363,4 +396,4 @@ class PartieKonfigurator extends React.Component<PartieKonfiguratorProps, Partie
 	};
 }
 
-export default PartieKonfigurator;
+export default PartyConfigurator;

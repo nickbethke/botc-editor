@@ -5,7 +5,7 @@ import { isBoolean, isEqual } from 'lodash';
 import { ParsedPath } from 'path';
 import BoardEditorChoice from './components/popups/BoardEditorChoice';
 import PartieEditorChoice from './components/popups/PartieEditorChoice';
-import PartieKonfigurator from './screens/PartieKonfigurator';
+import PartyConfigurator from './screens/PartyConfigurator';
 import JSONValidierer from './screens/JSONValidierer';
 import BoardGenerator from './components/generator/BoardGenerator';
 import PartieConfigInterface from './components/interfaces/PartieConfigInterface';
@@ -235,7 +235,7 @@ class App extends React.Component<AppProps, AppStates> {
 		const { os } = this.props;
 		if (openScreen === 'partieConfigNewScreen') {
 			return (
-				<PartieKonfigurator
+				<PartyConfigurator
 					onClose={this.handleCloseChildScreen}
 					loadedValues={null}
 					settings={settings}
@@ -249,7 +249,7 @@ class App extends React.Component<AppProps, AppStates> {
 			const { toLoad } = this.state;
 			this.setState({ toLoad: null });
 			return (
-				<PartieKonfigurator
+				<PartyConfigurator
 					settings={settings}
 					os={os}
 					onClose={this.handleCloseChildScreen}
@@ -379,7 +379,7 @@ class App extends React.Component<AppProps, AppStates> {
 				this.setState({
 					errorMessage: {
 						title: window.languageHelper.translate('Board Configuration Validation Error'),
-						error: validation,
+						error: validation.toString(),
 					},
 					openPopup: 'error',
 				});
@@ -393,7 +393,7 @@ class App extends React.Component<AppProps, AppStates> {
 		const popup = this.popup(openPopup);
 		const tabIndex = openPopup !== null ? -1 : 0;
 		return (
-			<div className="text-white transition transition-all duration-500 dark:bg-gradient-to-br bg-gradient-to-bl dark:from-slate-900 dark:to-muted-800 from-slate-400 to-muted-500 overflow-hidden">
+			<div className="text-white transition duration-500 dark:bg-gradient-to-br bg-gradient-to-bl dark:from-slate-900 dark:to-muted-800 from-slate-400 to-muted-500 overflow-hidden">
 				<div id="home" className={`${popup ? 'blur' : ''} flex flex-col`}>
 					{os === 'win32' ? (
 						<div className="dragger w-[100vw] h-8 bg-muted flex items-center px-2 text-sm">
@@ -455,21 +455,12 @@ class App extends React.Component<AppProps, AppStates> {
 									src={sunImage}
 									className={`${
 										surprise ? 'opacity-1 top-1/4' : 'opacity-0 top-1/3'
-									} absolute left-1/2 transition transition-all duration-1000 w-16 2xl:w-32`}
+									} absolute left-1/2 transition duration-1000 w-16 2xl:w-32`}
 								/>
 							</div>
 						</div>
 					</div>
 					<div className="absolute bottom-0 left-0 z-10 bg-muted p-2 w-[100vw] font-jetbrains flex flex-row items-center justify-end gap-2 text-[10px]">
-						<button
-							type="button"
-							onClick={async () => {
-								await window.electron.open.homepage();
-							}}
-						>
-							{window.languageHelper.translate('Website')}
-						</button>
-						|
 						<span>
 							{window.languageHelper.translate('Editor Version')}: {version}
 						</span>

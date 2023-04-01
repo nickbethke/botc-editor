@@ -74,9 +74,26 @@ class IPCHelper {
 	};
 
 	static handleFileOpen = async (
-		type = '',
+		type: '' | 'board' | 'partie' = '',
 		window: BrowserWindow | null
-	): Promise<{ parsedPath: ParsedPath; path: string; config: BoardConfigInterface } | false> => {
+	): Promise<
+		| {
+				parsedPath: ParsedPath;
+				path: string;
+				config: PartieConfigInterface;
+		  }
+		| {
+				parsedPath: ParsedPath;
+				path: string;
+				config: BoardConfigInterface;
+		  }
+		| {
+				parsedPath: ParsedPath;
+				path: string;
+				config: never;
+		  }
+		| false
+	> => {
 		if (type === 'board') {
 			let currentCanceled;
 			let currentFilePaths;
@@ -84,7 +101,7 @@ class IPCHelper {
 				const { canceled, filePaths } = await dialog.showOpenDialog(window, {
 					title: 'Board-Konfiguration auswählen',
 					properties: ['openFile'],
-					filters: [{ name: 'Board-Konfig', extensions: ['json'] }],
+					filters: [{ name: 'Board-Konfiguration', extensions: ['json'] }],
 				});
 				currentCanceled = canceled;
 				currentFilePaths = filePaths;
@@ -92,7 +109,7 @@ class IPCHelper {
 				const { canceled, filePaths } = await dialog.showOpenDialog({
 					title: 'Board-Konfiguration auswählen',
 					properties: ['openFile'],
-					filters: [{ name: 'Board-Konfig', extensions: ['json'] }],
+					filters: [{ name: 'Board-Konfiguration', extensions: ['json'] }],
 				});
 				currentCanceled = canceled;
 				currentFilePaths = filePaths;
@@ -114,7 +131,7 @@ class IPCHelper {
 				const { canceled, filePaths } = await dialog.showOpenDialog(window, {
 					title: 'Partie-Konfiguration auswählen',
 					properties: ['openFile'],
-					filters: [{ name: 'Partie-Konfig', extensions: ['json'] }],
+					filters: [{ name: 'Partie-Konfiguration', extensions: ['json'] }],
 				});
 				currentCanceled = canceled;
 				currentFilePaths = filePaths;
@@ -122,7 +139,7 @@ class IPCHelper {
 				const { canceled, filePaths } = await dialog.showOpenDialog({
 					title: 'Partie-Konfiguration auswählen',
 					properties: ['openFile'],
-					filters: [{ name: 'Partie-Konfig', extensions: ['json'] }],
+					filters: [{ name: 'Partie-Konfiguration', extensions: ['json'] }],
 				});
 				currentCanceled = canceled;
 				currentFilePaths = filePaths;
@@ -130,7 +147,7 @@ class IPCHelper {
 			if (currentCanceled) {
 				return false;
 			}
-			const config = JSON.parse(fs.readFileSync(currentFilePaths[0], { encoding: 'utf8' })) as BoardConfigInterface;
+			const config = JSON.parse(fs.readFileSync(currentFilePaths[0], { encoding: 'utf8' })) as PartieConfigInterface;
 			return {
 				config,
 				parsedPath: path.parse(currentFilePaths[0]),
@@ -166,7 +183,7 @@ class IPCHelper {
 			if (currentCanceled) {
 				return false;
 			}
-			const config = JSON.parse(fs.readFileSync(currentFilePaths[0], { encoding: 'utf8' })) as BoardConfigInterface;
+			const config = JSON.parse(fs.readFileSync(currentFilePaths[0], { encoding: 'utf8' }));
 
 			return {
 				config,
