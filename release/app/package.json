@@ -4,7 +4,8 @@
 	"description": "Editor for the Battle of the Centerländ game",
 	"license": "UNLICENSED",
 	"author": {
-		"name": "Team 11 - Sopra WiSe22/23 SoSe23"
+		"name": "Team 11 - Sopra WiSe22/23 SoSe23",
+		"email": "info@uni-ulm.de"
 	},
 	"main": "./dist/main/main.js",
 	"scripts": {

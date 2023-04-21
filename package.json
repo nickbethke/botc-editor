@@ -6,7 +6,8 @@
 	],
 	"license": "UNLICENSED",
 	"author": {
-		"name": "Team 11 - Sopra WiSe22/23 SoSe23"
+		"name": "Team 11 - Sopra WiSe22/23 SoSe23",
+		"email": "info@uni-ulm.de"
 	},
 	"contributors": [
 		{
@@ -14,6 +15,7 @@
 			"email": "nick.bethke@uni-ulm.de"
 		}
 	],
+	"homepage": "https://uni-ulm.de",
 	"main": "./src/main/main.ts",
 	"scripts": {
 		"build": "concurrently \"npm run build:main\" \"npm run build:renderer\"",
@@ -245,11 +247,10 @@
 		"linux": {
 			"target": [
 				"AppImage",
-				"snap",
-				"rpm",
-				"deb"
+				"zip"
 			],
-			"category": "Utility"
+			"category": "Utility",
+			"maintainer": "Team 11 - Sopra WiSe22/23 SoSe23"
 		},
 		"directories": {
 			"app": "release/app",
