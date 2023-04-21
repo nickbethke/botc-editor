@@ -336,6 +336,7 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 	 * @private
 	 */
 	private toolSelection(currentTool: EditorToolType) {
+		const { config } = this.props;
 		return (
 			<>
 				<SidebarMenuItem
@@ -375,6 +376,7 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 						this.handleCurrentToolChange(FieldsEnum.START);
 					}}
 					shortCut={`${window.translationHelper.translate('Ctrl')}+1`}
+					disabled={config.startFields.length >= 6}
 				/>
 				<SidebarMenuItem
 					label={window.translationHelper.translate('Checkpoint')}

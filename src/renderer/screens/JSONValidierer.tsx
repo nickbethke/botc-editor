@@ -42,6 +42,10 @@ type JSONValidatorState = {
 };
 
 class JSONValidierer extends React.Component<JSONValidatorProps, JSONValidatorState> {
+	/**
+	 * Add a zero to a number if it is smaller than 10
+	 * @param number
+	 */
 	private static numberAddZero = (number: number): string => {
 		if (number < 10) {
 			return `0${number}`;

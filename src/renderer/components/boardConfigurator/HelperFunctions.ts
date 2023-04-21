@@ -28,9 +28,9 @@ export type GetFieldTypeReturnValues =
 	| null;
 
 /**
- * Get the field type of the position from the board config
- * @param position
- * @param config
+ * get the field type of the position
+ * @param position the position to check
+ * @param config the board config
  */
 export function getFieldType(position: BoardPosition, config: BoardConfigInterface): GetFieldTypeReturnValues {
 	const positionString = boardPosition2String(position);
@@ -60,9 +60,9 @@ export function getFieldType(position: BoardPosition, config: BoardConfigInterfa
 }
 
 /**
- * check if the position is the destiny mountain
- * @param position
- * @param config
+ * determine if the position is the destiny mountain
+ * @param position the position to check
+ * @param config the board config
  */
 export function isDestinyMountain(position: BoardPosition, config: BoardConfigInterface): boolean {
 	const index = config.checkPoints.findIndex((p) => position2String(p) === boardPosition2String(position));
@@ -71,20 +71,20 @@ export function isDestinyMountain(position: BoardPosition, config: BoardConfigIn
 
 /**
  * remove a checkpoint with the position from the board config
- * @param position
- * @param config
+ * @param position the position to remove
+ * @param config the board config
  */
 export function removeCheckpoint(position: BoardPosition, config: BoardConfigInterface): BoardConfigInterface {
 	const filteredCheckpointArray = config.checkPoints.filter((e) => {
-		return e[0] !== position.x && e[1] !== position.y;
+		return position2String(e) !== boardPosition2String(position);
 	});
 	return { ...config, checkPoints: filteredCheckpointArray };
 }
 
 /**
  * remove a start field with the position from the board config
- * @param position
- * @param config
+ * @param position the position to remove
+ * @param config the board config
  */
 export function removeStartField(position: BoardPosition, config: BoardConfigInterface): BoardConfigInterface {
 	const filteredStartFieldsArray = config.startFields.filter((e) => {
@@ -95,8 +95,8 @@ export function removeStartField(position: BoardPosition, config: BoardConfigInt
 
 /**
  * remove a lembas field with the position from the board config
- * @param position
- * @param config
+ * @param position the position to remove
+ * @param config the board config
  */
 export function removeLembasField(position: BoardPosition, config: BoardConfigInterface): BoardConfigInterface {
 	const filteredLembasFieldsArray = config.lembasFields.filter((e) => {
@@ -390,4 +390,13 @@ export function getLembasFieldConfig(position: BoardPosition, config: BoardConfi
 		return config.lembasFields[index];
 	}
 	return null;
+}
+
+/**
+ * gets a checkpoint field index by its position from the board config
+ * @param position
+ * @param config
+ */
+export function getCheckpointIndexConfig(position: BoardPosition, config: BoardConfigInterface): number | null {
+	return config.checkPoints.findIndex((e) => position2String(e) === boardPosition2String(position));
 }

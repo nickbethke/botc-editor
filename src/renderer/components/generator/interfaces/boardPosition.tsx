@@ -31,6 +31,7 @@ export function boardPosition2Position(position: BoardPosition): Position {
 export function wallBoardPosition2WallPosition(position: [BoardPosition, BoardPosition]): [Position, Position] {
 	return [boardPosition2Position(position[0]), boardPosition2Position(position[1])];
 }
+
 /**
  * Generates a unique string from a board position according to a specific format "x|y"
  */
@@ -51,14 +52,24 @@ export function position2String(postion: Position): string {
  * @param position
  */
 export function wallBoardPosition2String(position: [BoardPosition, BoardPosition]): string {
-	return `${boardPosition2String(position[0])}|${boardPosition2String(position[1])}`;
+	return `${boardPosition2String(position[0])}::${boardPosition2String(position[1])}`;
 }
+
+/**
+ * Generates a unique string from a wall board position according to a specific format "x0|y0|x1|y1"
+ * @param position1
+ * @param position2
+ */
+export function wallBoardPositions2String(position1: BoardPosition, position2: BoardPosition): string {
+	return `${boardPosition2String(position1)}::${boardPosition2String(position2)}`;
+}
+
 /**
  * Generates a unique string from a wall position according to a specific format "x0|y0|x1|y1"
  * @param position
  */
 export function wallPosition2String(position: [Position, Position]): string {
-	return `${position2String(position[0])}|${position2String(position[1])}`;
+	return `${position2String(position[0])}::${position2String(position[1])}`;
 }
 
 /**

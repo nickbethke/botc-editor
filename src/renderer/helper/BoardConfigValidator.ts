@@ -51,6 +51,10 @@ class BoardConfigValidator {
 		}
 	}
 
+	/**
+	 * Check if a wall is double occupied
+	 * @private
+	 */
 	private wallDoubleOccupancy(): false | [Position, Position] {
 		const occupiedWallsMap = new Set<string>();
 		if (this.config.walls) {
@@ -66,6 +70,10 @@ class BoardConfigValidator {
 		return false;
 	}
 
+	/**
+	 * Check if a field is double occupied
+	 * @private
+	 */
 	private checkDoubleOccupancy(): false | Position {
 		const occupiedMap = new Set<string>();
 		if (this.config.eye) {
@@ -120,6 +128,10 @@ class BoardConfigValidator {
 		return false;
 	}
 
+	/**
+	 * Check if the board dimensions are big enough
+	 * @private
+	 */
 	private checkDimensions(): false | Position {
 		let maxDimensions = { x: 0, y: 0 };
 		if (this.config.eye) {
@@ -163,6 +175,12 @@ class BoardConfigValidator {
 		return false;
 	}
 
+	/**
+	 * Calculate the max dimensions of the board and the given position
+	 * @param maxDimensions
+	 * @param position
+	 * @private
+	 */
 	private static getMaxDimension(
 		maxDimensions: { x: number; y: number },
 		position: Position

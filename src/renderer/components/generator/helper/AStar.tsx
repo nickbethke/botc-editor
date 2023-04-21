@@ -4,7 +4,7 @@ import { BoardPosition } from '../BoardGenerator';
 import Hole from '../fields/Hole';
 import River from '../fields/River';
 import BoardConfigInterface from '../../interfaces/BoardConfigInterface';
-import { position2BoardPosition, wallConfig2Map } from '../interfaces/boardPosition';
+import { position2BoardPosition, wallBoardPositions2String, wallConfig2Map } from '../interfaces/boardPosition';
 import directionHelper from './DirectionHelper';
 import StartField from '../fields/StartField';
 import Checkpoint from '../fields/Checkpoint';
@@ -191,17 +191,9 @@ class AStar {
 	}
 
 	isWallBetween(position1: BoardPosition, position2: BoardPosition): boolean {
-		const x1 = position1.x;
-		const x2 = position2.x;
-		const y1 = position1.y;
-		const y2 = position2.y;
-		const s1 = [x1, y1].join('') + [x2, y2].join('');
-		const s2 = [x2, y2].join('') + [x1, y1].join('');
-
-		if (this.walls.get(s1) === true) {
-			return true;
-		}
-		return this.walls.get(s2) === true;
+		const s1 = wallBoardPositions2String(position1, position2);
+		const s2 = wallBoardPositions2String(position2, position1);
+		return this.walls.get(s1) === true || this.walls.get(s2) === true;
 	}
 
 	pathIntersectsObstacle(start: BoardPosition, end: BoardPosition) {
@@ -449,7 +441,6 @@ class AStar {
 				amount: e.amount,
 			};
 		});
-
 		return AStar.pathPossibleAll(checkpoints, startFields, lembasFields, board, walls);
 	}
 }

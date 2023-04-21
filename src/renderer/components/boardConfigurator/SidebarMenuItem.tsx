@@ -11,6 +11,7 @@ type SidebarMenuItemProps = {
 	onClick: () => void;
 	shortCut?: string;
 	position?: 'top' | 'bottom' | 'left' | 'right';
+	disabled?: boolean;
 };
 /**
  * The sidebar menu item state properties
@@ -28,6 +29,7 @@ class SidebarMenuItem extends React.Component<SidebarMenuItemProps, SidebarMenuI
 			shortCut: null,
 			position: 'right',
 			icon: null,
+			disabled: false,
 		};
 	}
 
@@ -88,7 +90,7 @@ class SidebarMenuItem extends React.Component<SidebarMenuItemProps, SidebarMenuI
 	 * Renders the sidebar menu item
 	 */
 	render() {
-		const { label, open, icon, onClick, shortCut, position } = this.props;
+		const { label, open, icon, onClick, shortCut, position, disabled } = this.props;
 		const { hover } = this.state;
 		const key = _uniqueId('sidebar-menu-item-');
 
@@ -98,14 +100,15 @@ class SidebarMenuItem extends React.Component<SidebarMenuItemProps, SidebarMenuI
 			<button
 				key={key}
 				type="button"
-				className={`relative my-1 mx-2 rounded-lg p-2 transition transition-colors ${icon ? 'text-xl' : ''} ${
+				className={`relative my-1 mx-2 rounded-lg p-2 transition-colors ${icon ? 'text-xl' : ''} ${
 					open ? 'bg-white/20' : 'hover:bg-white/10'
-				}`}
+				} ${disabled ? 'opacity-50 cursor-not-allowed' : ''}}`}
 				onClick={onClick}
 				onFocus={this.handleOnHover}
 				onMouseEnter={this.handleOnHover}
 				onBlur={this.handleOnHoverEnd}
 				onMouseLeave={this.handleOnHoverEnd}
+				disabled={disabled}
 			>
 				{icon ?? label}
 				{icon ? (

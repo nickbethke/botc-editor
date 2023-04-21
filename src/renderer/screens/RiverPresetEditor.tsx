@@ -150,7 +150,7 @@ class RiverPresetEditor extends React.Component<RiverPresetEditorProps, RiverPre
 		}
 	};
 
-	private addRiver = (neighbor: BoardPosition) => {
+	addRiver = (neighbor: BoardPosition) => {
 		const { config, lastSetDirection } = this.state;
 		if (config) {
 			const { data } = config;
@@ -221,7 +221,7 @@ class RiverPresetEditor extends React.Component<RiverPresetEditorProps, RiverPre
 			.catch(() => {});
 	};
 
-	private openFile = (preset: RiverPresetWithFile, file: string) => {
+	openFile = (preset: RiverPresetWithFile, file: string) => {
 		const { editorCache, openTabsOrder } = this.state;
 		const configClone = structuredClone(preset);
 		if (!editorCache.fileExists(file)) {
@@ -236,7 +236,7 @@ class RiverPresetEditor extends React.Component<RiverPresetEditorProps, RiverPre
 		});
 	};
 
-	private switchTab = (file: string) => {
+	switchTab = (file: string) => {
 		const { editorCache, currentFile } = this.state;
 		const next = editorCache.getFile(file);
 		if (next && currentFile !== file) {
@@ -441,7 +441,7 @@ class RiverPresetEditor extends React.Component<RiverPresetEditorProps, RiverPre
 						/>
 					</div>
 				</div>
-				<div className={`${popup !== null ? 'blur' : ''} transition transition-[filter]`}>
+				<div className={`${popup !== null ? 'blur' : ''} transition-[filter]`}>
 					<div className="flex w-[100vw] h-full grow">
 						<PresetEditSidebar
 							windowDimensions={windowDimensions}

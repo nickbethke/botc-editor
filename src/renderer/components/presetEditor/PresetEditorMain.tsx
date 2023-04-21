@@ -237,6 +237,9 @@ class PresetEditorMain extends React.Component<PresetEditorMainProps, PresetEdit
 							open={false}
 							icon={getDirectionArrow(lastSetDirection)}
 							onClick={() => {
+								if (currentTool === 'delete') {
+									onToolChange(null);
+								}
 								switch (lastSetDirection) {
 									case 'NORTH':
 										onLastSetDirectionChange('EAST');

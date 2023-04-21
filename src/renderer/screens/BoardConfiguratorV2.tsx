@@ -443,6 +443,10 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 		}
 	}
 
+	/**
+	 * Checks the current board configuration for warnings
+	 * @param startConfig - optional board configuration to check
+	 */
 	checkWarnings = (startConfig?: BoardConfigInterface): WarningsMap => {
 		let handledConfig: BoardConfigInterface;
 		if (startConfig) {
@@ -621,6 +625,14 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 		return newWarnings;
 	};
 
+	/**
+	 * Checks if a field is already occupied
+	 * @param position
+	 * @param config
+	 * @param occupiedFields
+	 * @param warnings
+	 * @param type
+	 */
 	checkFieldOccupation = (
 		position: Position,
 		config: BoardConfigInterface,
@@ -653,15 +665,24 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 		});
 	};
 
+	/**
+	 * Updates the configuration
+	 * @param newConfig
+	 */
 	updateConfiguration = (newConfig: BoardConfigInterface) => {
 		const newWidth = newConfig.width;
 		const newHeight = newConfig.height;
-		const { config } = this.state;
+		const { config, currentTool } = this.state;
 		const { width, height } = config;
 		let updatedConfiguration = newConfig;
 		if (width !== newWidth || height !== newHeight) {
 			updatedConfiguration = this.updateConfigurationDimensions(newWidth, newHeight, newConfig);
 		}
+
+		if (updatedConfiguration.startFields.length >= 6 && currentTool === FieldsEnum.START) {
+			this.setState({ currentTool: null });
+		}
+
 		this.setState({
 			warnings: this.checkWarnings(newConfig),
 			config: updatedConfiguration,
@@ -669,6 +690,12 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 		});
 	};
 
+	/**
+	 * Updates the configuration dimensions
+	 * @param newWidth
+	 * @param newHeight
+	 * @param newConfig
+	 */
 	updateConfigurationDimensions = (
 		newWidth: number,
 		newHeight: number,
@@ -872,9 +899,9 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 							this.setState({ popup: null, newRiverPreset: null });
 						}}
 						onConfirm={(position, adjustBoardSize) => {
+							this.updateConfiguration(this.addRiverPreset(config, newRiverPreset, position, adjustBoardSize));
 							this.setState({
 								newRiverPreset: null,
-								config: this.addRiverPreset(config, newRiverPreset, position, adjustBoardSize),
 								popup: null,
 							});
 						}}
@@ -901,6 +928,13 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 		});
 	};
 
+	/**
+	 * Adds a river preset to the board
+	 * @param config The current board configuration
+	 * @param newRiverPreset The river preset to add
+	 * @param position The position to add the river preset to
+	 * @param adjustBoardSize Whether the board size should be adjusted to fit the river preset
+	 */
 	addRiverPreset = (
 		config: BoardConfigInterface,
 		newRiverPreset: RiverPresetWithFile,
@@ -917,13 +951,16 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 		let newWidth = config.width;
 		let newHeight = config.height;
 		if (!adjustBoardSize) {
+			// remove all rivers that are outside the board
 			newRivers = newRivers.filter((river) => river.position[0] < config.width && river.position[1] < config.height);
 		} else {
+			// adjust board size
 			newRivers.forEach((river) => {
 				newWidth = Math.max(newWidth, river.position[0] + 1);
 				newHeight = Math.max(newHeight, river.position[1] + 1);
 			});
 		}
+		// remove all fields that are on the new rivers
 		newRivers.forEach((river) => {
 			newConfig = removeCheckpoint(BoardGenerator.positionToBoardPosition(river.position), newConfig);
 			newConfig = removeRiver(BoardGenerator.positionToBoardPosition(river.position), newConfig);
@@ -932,11 +969,12 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 			newConfig = removeStartField(BoardGenerator.positionToBoardPosition(river.position), newConfig);
 		});
 
+		// remove rivers that are outside the board
 		newRivers = newRivers.filter((river) => river.position[0] < newWidth && river.position[1] < newHeight);
+		// remove rivers that are on the eye
 		newRivers = newRivers.filter(
-			(river) => river.position[0] !== config.eye.position[0] && river.position[1] !== config.eye.position[1]
+			(river) => !(river.position[0] === config.eye.position[0] && river.position[1] === config.eye.position[1])
 		);
-
 		return {
 			...newConfig,
 			riverFields: [...newConfig.riverFields, ...newRivers],
@@ -945,33 +983,7 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 		};
 	};
 
-	private openConfiguration() {
-		window.electron.dialog
-			.openBoardConfig()
-			.then((loadedConfig) => {
-				if (loadedConfig) {
-					this.initLoadedConfiguration(loadedConfig.config);
-					this.setState({
-						file: loadedConfig,
-						fileSaved: true,
-					});
-					return null;
-				}
-				return new Error('Config not loadable');
-			})
-			.catch(() => {});
-	}
-
-	private zoomOut() {
-		const { mainEditorZoom } = this.state;
-		if (mainEditorZoom <= 0.1) {
-			this.setState({ mainEditorZoom: 0.1 });
-			return;
-		}
-		this.setState({ mainEditorZoom: mainEditorZoom - 0.1 });
-	}
-
-	private saveConfig() {
+	saveConfig = () => {
 		const { file, fileSaved, config } = this.state;
 		if (!fileSaved) {
 			if (file) {
@@ -993,6 +1005,32 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 					.catch(() => {});
 			}
 		}
+	};
+
+	private zoomOut() {
+		const { mainEditorZoom } = this.state;
+		if (mainEditorZoom <= 0.1) {
+			this.setState({ mainEditorZoom: 0.1 });
+			return;
+		}
+		this.setState({ mainEditorZoom: mainEditorZoom - 0.1 });
+	}
+
+	openConfiguration() {
+		window.electron.dialog
+			.openBoardConfig()
+			.then((loadedConfig) => {
+				if (loadedConfig) {
+					this.initLoadedConfiguration(loadedConfig.config);
+					this.setState({
+						file: loadedConfig,
+						fileSaved: true,
+					});
+					return null;
+				}
+				return new Error('Config not loadable');
+			})
+			.catch(() => {});
 	}
 
 	private zoomIn() {

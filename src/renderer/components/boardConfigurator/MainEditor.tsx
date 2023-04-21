@@ -11,7 +11,13 @@ import {
 } from '../generator/interfaces/boardPosition';
 import { EditorToolType } from '../../screens/BoardConfiguratorV2';
 import { FieldsEnum } from '../generator/BoardGenerator';
-import { getDirectionFieldConfig, getFieldType, getLembasFieldConfig, isDestinyMountain } from './HelperFunctions';
+import {
+	getCheckpointIndexConfig,
+	getDirectionFieldConfig,
+	getFieldType,
+	getLembasFieldConfig,
+	isDestinyMountain,
+} from './HelperFunctions';
 import DirectionHelper from '../generator/helper/DirectionHelper';
 import ContextMenuV2 from './ContextMenuV2';
 import ContextMenuItemV2, { ContextMenuDividerV2 } from './ContextMenuItemV2';
@@ -356,6 +362,9 @@ class MainEditor extends React.Component<MainEditorProps, MainEditorState> {
 				switch (type) {
 					case FieldsEnum.EYE:
 						attribute = config.eye.direction;
+						break;
+					case FieldsEnum.CHECKPOINT:
+						attribute = getCheckpointIndexConfig(fieldPosition, config) || 0;
 						break;
 					case FieldsEnum.START:
 					case FieldsEnum.RIVER:
