@@ -76,7 +76,7 @@ export function isDestinyMountain(position: BoardPosition, config: BoardConfigIn
  */
 export function removeCheckpoint(position: BoardPosition, config: BoardConfigInterface): BoardConfigInterface {
 	const filteredCheckpointArray = config.checkPoints.filter((e) => {
-		return position2String(e) !== boardPosition2String(position);
+		return e[0] !== position.x && e[1] !== position.y;
 	});
 	return { ...config, checkPoints: filteredCheckpointArray };
 }
@@ -184,7 +184,7 @@ function overrideField(
 				override: true,
 			};
 		default:
-			return { config, override: true };
+			return { config, override: false };
 	}
 }
 
@@ -194,17 +194,14 @@ function overrideField(
  * @param config
  */
 export function moveSauronsEye(position: BoardPosition, config: BoardConfigInterface): BoardConfigInterface {
-	const { override, config: newConfig } = overrideField(position, config);
-	if (override) {
-		return {
-			...newConfig,
-			eye: {
-				position: boardPosition2Position(position),
-				direction: 'NORTH',
-			},
-		};
-	}
-	return config;
+	const { config: newConfig } = overrideField(position, config);
+	return {
+		...newConfig,
+		eye: {
+			position: boardPosition2Position(position),
+			direction: 'NORTH',
+		},
+	};
 }
 
 /**
@@ -213,13 +210,10 @@ export function moveSauronsEye(position: BoardPosition, config: BoardConfigInter
  * @param config
  */
 export function addCheckpoint(position: BoardPosition, config: BoardConfigInterface): BoardConfigInterface {
-	const { override, config: newConfig } = overrideField(position, config);
-	if (override) {
-		const newCheckpointsArray = config.checkPoints;
-		newCheckpointsArray.push(boardPosition2Position(position));
-		return { ...newConfig, checkPoints: newCheckpointsArray };
-	}
-	return config;
+	const { config: newConfig } = overrideField(position, config);
+	const newCheckpointsArray = newConfig.checkPoints;
+	newCheckpointsArray.push(boardPosition2Position(position));
+	return { ...newConfig, checkPoints: newCheckpointsArray };
 }
 
 /**
@@ -228,16 +222,14 @@ export function addCheckpoint(position: BoardPosition, config: BoardConfigInterf
  * @param config
  */
 export function addStartField(position: BoardPosition, config: BoardConfigInterface): BoardConfigInterface {
-	const { override, config: newConfig } = overrideField(position, config);
-	if (override) {
-		const newStartFieldsArray = config.startFields;
-		newStartFieldsArray.push({
-			position: boardPosition2Position(position),
-			direction: 'NORTH',
-		});
-		return { ...newConfig, startFields: newStartFieldsArray };
-	}
-	return config;
+	const { config: newConfig } = overrideField(position, config);
+
+	const newStartFieldsArray = newConfig.startFields;
+	newStartFieldsArray.push({
+		position: boardPosition2Position(position),
+		direction: 'NORTH',
+	});
+	return { ...newConfig, startFields: newStartFieldsArray };
 }
 
 /**
@@ -246,16 +238,13 @@ export function addStartField(position: BoardPosition, config: BoardConfigInterf
  * @param config
  */
 export function addLembasField(position: BoardPosition, config: BoardConfigInterface): BoardConfigInterface {
-	const { override, config: newConfig } = overrideField(position, config);
-	if (override) {
-		const newLembasFieldsArray = config.lembasFields;
-		newLembasFieldsArray.push({
-			position: boardPosition2Position(position),
-			amount: 3,
-		});
-		return { ...newConfig, lembasFields: newLembasFieldsArray };
-	}
-	return config;
+	const { config: newConfig } = overrideField(position, config);
+	const newLembasFieldsArray = newConfig.lembasFields;
+	newLembasFieldsArray.push({
+		position: boardPosition2Position(position),
+		amount: 3,
+	});
+	return { ...newConfig, lembasFields: newLembasFieldsArray };
 }
 
 /**
@@ -264,16 +253,13 @@ export function addLembasField(position: BoardPosition, config: BoardConfigInter
  * @param config
  */
 export function addRiver(position: BoardPosition, config: BoardConfigInterface): BoardConfigInterface {
-	const { override, config: newConfig } = overrideField(position, config);
-	if (override) {
-		const newRiverFieldsArray = config.riverFields;
-		newRiverFieldsArray.push({
-			position: boardPosition2Position(position),
-			direction: 'NORTH',
-		});
-		return { ...newConfig, riverFields: newRiverFieldsArray };
-	}
-	return config;
+	const { config: newConfig } = overrideField(position, config);
+	const newRiverFieldsArray = newConfig.riverFields;
+	newRiverFieldsArray.push({
+		position: boardPosition2Position(position),
+		direction: 'NORTH',
+	});
+	return { ...newConfig, riverFields: newRiverFieldsArray };
 }
 
 /**
@@ -282,13 +268,10 @@ export function addRiver(position: BoardPosition, config: BoardConfigInterface):
  * @param config
  */
 export function addHole(position: BoardPosition, config: BoardConfigInterface): BoardConfigInterface {
-	const { override, config: newConfig } = overrideField(position, config);
-	if (override) {
-		const newHolesArray = config.holes;
-		newHolesArray.push(boardPosition2Position(position));
-		return { ...newConfig, holes: newHolesArray };
-	}
-	return config;
+	const { config: newConfig } = overrideField(position, config);
+	const newHolesArray = newConfig.holes;
+	newHolesArray.push(boardPosition2Position(position));
+	return { ...newConfig, holes: newHolesArray };
 }
 
 /**
