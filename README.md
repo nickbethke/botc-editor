@@ -23,6 +23,7 @@ npm install
 Starte die App in der `dev` Umgebung:
 
 ```bash
+npm i -g ts ts-node
 npm start
 ```
 
