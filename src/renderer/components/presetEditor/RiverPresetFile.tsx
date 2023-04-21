@@ -28,7 +28,7 @@ class RiverPresetFile extends React.Component<RiverPresetFileProps, RiverPresetF
 		return (
 			<ContextMenuV2 position={{ x: event.clientX, y: event.clientY }}>
 				<ContextMenuItemV2
-					text={window.languageHelper.translate('Close')}
+					text={window.translationHelper.translate('Close')}
 					onClick={() => {
 						onCloseOpenPreset(fileName);
 					}}

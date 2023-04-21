@@ -201,11 +201,15 @@ class RandomBoardStartValuesDialogV2 extends React.Component<
 		const { windowDimensions, os, topOffset, onAbort, settings } = this.props;
 		return (
 			<ConfirmPopupV2
-				title={window.languageHelper.translate('Random Board - Start Values')}
-				abortButtonText={window.languageHelper.translate('Cancel')}
+				title={window.translationHelper.translate('Random Board - Start Values')}
+				abortButtonText={window.translationHelper.translate('Cancel')}
 				onAbort={onAbort}
 				confirmButtonText={
-					generating ? <TailSpin height={16} width={16} color="#ffffff" /> : window.languageHelper.translate('Generate')
+					generating ? (
+						<TailSpin height={16} width={16} color="#ffffff" />
+					) : (
+						window.translationHelper.translate('Generate')
+					)
 				}
 				onConfirm={this.generate}
 				windowDimensions={windowDimensions}
@@ -217,7 +221,7 @@ class RandomBoardStartValuesDialogV2 extends React.Component<
 				<div className="grid grid-cols-2 gap-8">
 					<div className="col-span-2">
 						<InputLabel
-							label={window.languageHelper.translate('Board Name')}
+							label={window.translationHelper.translate('Board Name')}
 							value={name}
 							onChange={(value) => {
 								this.setState({
@@ -229,7 +233,7 @@ class RandomBoardStartValuesDialogV2 extends React.Component<
 					</div>
 					<div className="flex flex-col gap-8">
 						<InputLabel
-							label={window.languageHelper.translate('Board Width')}
+							label={window.translationHelper.translate('Board Width')}
 							value={width}
 							onChange={(value) => {
 								this.setState({
@@ -241,7 +245,7 @@ class RandomBoardStartValuesDialogV2 extends React.Component<
 							max={this.dimensionMax}
 						/>
 						<InputLabel
-							label={window.languageHelper.translate('Start Fields')}
+							label={window.translationHelper.translate('Start Fields')}
 							value={startFields}
 							onChange={(value) => {
 								this.setState({
@@ -255,7 +259,7 @@ class RandomBoardStartValuesDialogV2 extends React.Component<
 					</div>
 					<div className="flex flex-col gap-8">
 						<InputLabel
-							label={window.languageHelper.translate('Board Height')}
+							label={window.translationHelper.translate('Board Height')}
 							value={height}
 							onChange={(value) => {
 								this.setState({
@@ -266,7 +270,7 @@ class RandomBoardStartValuesDialogV2 extends React.Component<
 							min={2}
 						/>
 						<InputLabel
-							label={window.languageHelper.translate('Checkpoints')}
+							label={window.translationHelper.translate('Checkpoints')}
 							value={checkpoints}
 							onChange={(value) => {
 								this.setState({
@@ -282,7 +286,7 @@ class RandomBoardStartValuesDialogV2 extends React.Component<
 				<hr className="my-4" />
 				<div className="relative grid grid-cols-2 gap-8 h-fit">
 					<InputLabel
-						label={window.languageHelper.translate('Lembas Fields')}
+						label={window.translationHelper.translate('Lembas Fields')}
 						value={lembasFields}
 						onChange={(value) => {
 							this.setState({
@@ -294,7 +298,7 @@ class RandomBoardStartValuesDialogV2 extends React.Component<
 						max={32}
 					/>
 					<InputLabel
-						label={window.languageHelper.translate('Lembas Count')}
+						label={window.translationHelper.translate('Lembas Count')}
 						value={maxLembasAmountOnField}
 						onChange={(value) => {
 							this.setState({
@@ -307,7 +311,7 @@ class RandomBoardStartValuesDialogV2 extends React.Component<
 					/>
 					<div className="col-span-2">
 						<InputLabel
-							label={window.languageHelper.translate('Exact Lembas Count or Random between 0 and Lembas Count')}
+							label={window.translationHelper.translate('Exact Lembas Count or Random between 0 and Lembas Count')}
 							value={lembasAmountExactMaximum}
 							onChange={(value) => {
 								this.setState({
@@ -321,7 +325,7 @@ class RandomBoardStartValuesDialogV2 extends React.Component<
 				<hr className="my-4" />
 				<div className="relative grid gap-8 h-fit">
 					<InputLabel
-						label={window.languageHelper.translate('Holes')}
+						label={window.translationHelper.translate('Holes')}
 						type="range"
 						value={holes}
 						onChange={(value) => {
@@ -335,7 +339,7 @@ class RandomBoardStartValuesDialogV2 extends React.Component<
 				</div>
 				<hr className="my-4" />
 				<div className="text-center font-lato flex flex-col">
-					<span>{window.languageHelper.translate('possible empty fields / total number of fields')}</span>
+					<span>{window.translationHelper.translate('possible empty fields / total number of fields')}</span>
 					<span className="text-2xl">
 						{width * height - this.getNeededFieldCount()}/{width * height}
 					</span>
@@ -344,7 +348,7 @@ class RandomBoardStartValuesDialogV2 extends React.Component<
 				<div className="relative grid grid-cols-2 gap-8 h-fit">
 					<InputLabel
 						type="switch"
-						label={window.languageHelper.translate('Rivers')}
+						label={window.translationHelper.translate('Rivers')}
 						value={rivers}
 						onChange={(value) => {
 							this.setState({
@@ -354,7 +358,7 @@ class RandomBoardStartValuesDialogV2 extends React.Component<
 					/>
 					{rivers ? (
 						<div className="flex flex-row font-lato items-center gap-2">
-							<span>{window.languageHelper.translate('Default')}</span>
+							<span>{window.translationHelper.translate('Default')}</span>
 							<InputLabel
 								type="switch"
 								bothSides
@@ -365,14 +369,14 @@ class RandomBoardStartValuesDialogV2 extends React.Component<
 									});
 								}}
 							/>
-							<span>{window.languageHelper.translate('Complex')}</span>
+							<span>{window.translationHelper.translate('Complex')}</span>
 						</div>
 					) : null}
 				</div>
 				<hr className="my-4" />
 				<div className="relative grid grid-cols-2 gap-8 h-fit">
 					<InputLabel
-						label={window.languageHelper.translate('Walls')}
+						label={window.translationHelper.translate('Walls')}
 						type="switch"
 						value={walls}
 						onChange={(value) => {
@@ -383,7 +387,7 @@ class RandomBoardStartValuesDialogV2 extends React.Component<
 					/>
 					{walls ? (
 						<div className="flex flex-row font-lato items-center gap-2">
-							<span>{window.languageHelper.translate('Iterative')}</span>
+							<span>{window.translationHelper.translate('Iterative')}</span>
 							<InputLabel
 								type="switch"
 								bothSides
@@ -394,7 +398,7 @@ class RandomBoardStartValuesDialogV2 extends React.Component<
 									});
 								}}
 							/>
-							<span>{window.languageHelper.translate('Random')}</span>
+							<span>{window.translationHelper.translate('Random')}</span>
 						</div>
 					) : null}
 				</div>

@@ -117,7 +117,8 @@ class InputLabel extends React.Component<InputLabelProps, InputLabelState> {
 			} else {
 				this.setState({ value });
 			}
-			onChange(Number.parseInt(value, 10));
+			if (value !== '') onChange(Number.parseInt(value, 10));
+			else onChange(0);
 		} else if (type === 'range') {
 			if (validator) {
 				const { valid, warning } = validator.validate(value);

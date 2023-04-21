@@ -459,8 +459,8 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 				if (error.start && error.end) {
 					newWarnings.set(_uniqueId('warning-'), {
 						type: Warnings.pathImpossible,
-						title: window.languageHelper.translate('Pathfinding'),
-						content: window.languageHelper.translateVars(
+						title: window.translationHelper.translate('Pathfinding'),
+						content: window.translationHelper.translateVars(
 							'The current board state is not playable, because {0} to {1} has no valid path.',
 							[`[${error.start.x}, ${error.start.y}]`, `[${error.end.x}, ${error.end.y}]`]
 						),
@@ -469,8 +469,8 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 				} else {
 					newWarnings.set(_uniqueId('warning-'), {
 						type: Warnings.pathImpossible,
-						title: window.languageHelper.translate('Pathfinding'),
-						content: window.languageHelper.translate('The current board state is not playable.'),
+						title: window.translationHelper.translate('Pathfinding'),
+						content: window.translationHelper.translate('The current board state is not playable.'),
 					});
 				}
 			}
@@ -479,31 +479,31 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 		if (handledConfig.startFields.length < 2) {
 			newWarnings.set(_uniqueId('warning-'), {
 				type: Warnings.configurationInvalid,
-				title: window.languageHelper.translate('Start fields'),
-				content: window.languageHelper.translate(
+				title: window.translationHelper.translate('Start fields'),
+				content: window.translationHelper.translate(
 					'The current game board state is not playable because there are not enough starting spaces.'
 				),
-				helper: [window.languageHelper.translateVars('Minimum {0}', ['2'])],
+				helper: [window.translationHelper.translateVars('Minimum {0}', ['2'])],
 			});
 		} else if (handledConfig.startFields.length > 6) {
 			newWarnings.set(_uniqueId('warning-'), {
 				type: Warnings.configurationInvalid,
-				title: window.languageHelper.translate('Start fields'),
-				content: window.languageHelper.translate(
+				title: window.translationHelper.translate('Start fields'),
+				content: window.translationHelper.translate(
 					'The current game board state is invalid because there are too many starting spaces.'
 				),
-				helper: [window.languageHelper.translateVars('Maximum {0}', ['6'])],
+				helper: [window.translationHelper.translateVars('Maximum {0}', ['6'])],
 			});
 		}
 
 		if (handledConfig.checkPoints.length < 2) {
 			newWarnings.set(_uniqueId('warning-'), {
 				type: Warnings.configurationInvalid,
-				title: window.languageHelper.translate('Checkpoints'),
-				content: window.languageHelper.translate(
+				title: window.translationHelper.translate('Checkpoints'),
+				content: window.translationHelper.translate(
 					'The current game board state is not playable because there are not enough checkpoints.'
 				),
-				helper: [window.languageHelper.translateVars('Minimum {0}', ['2'])],
+				helper: [window.translationHelper.translateVars('Minimum {0}', ['2'])],
 			});
 		}
 
@@ -517,8 +517,8 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 				if (occupiedWallsMap.has(string)) {
 					newWarnings.set(_uniqueId('warning-'), {
 						type: Warnings.configurationInvalid,
-						title: window.languageHelper.translate('Wall'),
-						content: window.languageHelper.translate(
+						title: window.translationHelper.translate('Wall'),
+						content: window.translationHelper.translate(
 							'The current game board state is not playable because there is a wall set on another wall.'
 						),
 						helper: [`${x}:${y}`, `${x1}:${y1}`],
@@ -544,8 +544,8 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 			) {
 				newWarnings.set(_uniqueId('warning-'), {
 					type: Warnings.configurationInvalid,
-					title: window.languageHelper.translate('Wall'),
-					content: window.languageHelper.translate(
+					title: window.translationHelper.translate('Wall'),
+					content: window.translationHelper.translate(
 						'The current game board state is not playable because there is a wall between two rivers.'
 					),
 					helper: [`${x}:${y}`, `${x1}:${y1}`],
@@ -632,8 +632,8 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 		if (occupiedFields.has(string)) {
 			warnings.set(_uniqueId('warning-'), {
 				type: Warnings.configurationInvalid,
-				title: window.languageHelper.translate('Occupation'),
-				content: window.languageHelper.translate(
+				title: window.translationHelper.translate('Occupation'),
+				content: window.translationHelper.translate(
 					'The current game board state is not valid, due to a field has the same position as another field.'
 				),
 				helper: [`${position[0]}:${position[1]}`],
@@ -643,6 +643,14 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 			occupiedFields.add(string);
 		}
 		return { occupiedFields, warnings };
+	};
+
+	initLoadedConfiguration = (newConfig: BoardConfigInterface) => {
+		this.setState({
+			warnings: this.checkWarnings(newConfig),
+			config: newConfig,
+			fileSaved: true,
+		});
 	};
 
 	updateConfiguration = (newConfig: BoardConfigInterface) => {
@@ -764,12 +772,12 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 		if (popup === 'closeSaveCurrent') {
 			return (
 				<ConfirmPopupV2
-					title={window.languageHelper.translate('Close Board Configurator')}
-					abortButtonText={window.languageHelper.translate('Cancel')}
+					title={window.translationHelper.translate('Close Board Configurator')}
+					abortButtonText={window.translationHelper.translate('Cancel')}
 					onAbort={() => {
 						this.setState({ popup: null });
 					}}
-					confirmButtonText={window.languageHelper.translate('Discard')}
+					confirmButtonText={window.translationHelper.translate('Discard')}
 					onConfirm={() => {
 						const { onClose } = this.props;
 						onClose();
@@ -779,7 +787,7 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 					topOffset
 					settings={settings}
 				>
-					{window.languageHelper.translate(
+					{window.translationHelper.translate(
 						'The current file has not yet been saved. Do you want to discard the current changes?'
 					)}
 				</ConfirmPopupV2>
@@ -788,12 +796,12 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 		if (popup === 'newFileSaveCurrent' || popup === 'newRandomFileSaveCurrent') {
 			return (
 				<ConfirmPopupV2
-					title={window.languageHelper.translate('New Config')}
-					abortButtonText={window.languageHelper.translate('Cancel')}
+					title={window.translationHelper.translate('New Config')}
+					abortButtonText={window.translationHelper.translate('Cancel')}
 					onAbort={() => {
 						this.setState({ popup: null });
 					}}
-					confirmButtonText={window.languageHelper.translate('Discard')}
+					confirmButtonText={window.translationHelper.translate('Discard')}
 					onConfirm={() => {
 						if (popup === 'newRandomFileSaveCurrent') {
 							this.setState({ popup: 'newFromRandom' });
@@ -811,7 +819,7 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 					topOffset
 					settings={settings}
 				>
-					{window.languageHelper.translate(
+					{window.translationHelper.translate(
 						'The current file has not yet been saved. Do you want to discard the current changes?'
 					)}
 				</ConfirmPopupV2>
@@ -942,7 +950,7 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 			.openBoardConfig()
 			.then((loadedConfig) => {
 				if (loadedConfig) {
-					this.updateConfiguration(loadedConfig.config);
+					this.initLoadedConfiguration(loadedConfig.config);
 					this.setState({
 						file: loadedConfig,
 						fileSaved: true,
@@ -1022,9 +1030,9 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 			<section className="text-white font-lato dark:bg-muted-800 bg-muted-600">
 				{os === 'win32' ? (
 					<div className="dragger w-[100vw] h-8 bg-muted flex items-center px-2 text-sm">
-						{window.languageHelper.translate('Board-Configurator')}
+						{window.translationHelper.translate('Board-Configurator')}
 						{' - '}
-						{file ? file.path : window.languageHelper.translate('Unsaved File')}
+						{file ? file.path : window.translationHelper.translate('Unsaved File')}
 						{fileSaved ? '' : ` *`}
 					</div>
 				) : (
@@ -1113,7 +1121,7 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 								}}
 								file={file}
 								fileSaved={fileSaved}
-								fileSep={os === 'win32' ? '\\' : '/'}
+								os={os}
 							/>
 						</div>
 						<div

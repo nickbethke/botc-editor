@@ -99,17 +99,17 @@ class IPCHelper {
 			let currentFilePaths;
 			if (window) {
 				const { canceled, filePaths } = await dialog.showOpenDialog(window, {
-					title: 'Board-Konfiguration auswählen',
+					title: 'Select Board-Configuration',
 					properties: ['openFile'],
-					filters: [{ name: 'Board-Konfiguration', extensions: ['json'] }],
+					filters: [{ name: 'Board-configuration', extensions: ['json'] }],
 				});
 				currentCanceled = canceled;
 				currentFilePaths = filePaths;
 			} else {
 				const { canceled, filePaths } = await dialog.showOpenDialog({
-					title: 'Board-Konfiguration auswählen',
+					title: 'Select Board-Configuration',
 					properties: ['openFile'],
-					filters: [{ name: 'Board-Konfiguration', extensions: ['json'] }],
+					filters: [{ name: 'Board-configuration', extensions: ['json'] }],
 				});
 				currentCanceled = canceled;
 				currentFilePaths = filePaths;
@@ -129,17 +129,17 @@ class IPCHelper {
 			let currentFilePaths;
 			if (window) {
 				const { canceled, filePaths } = await dialog.showOpenDialog(window, {
-					title: 'Partie-Konfiguration auswählen',
+					title: 'Select Game-Configuration',
 					properties: ['openFile'],
-					filters: [{ name: 'Partie-Konfiguration', extensions: ['json'] }],
+					filters: [{ name: 'Game-Configuration', extensions: ['json'] }],
 				});
 				currentCanceled = canceled;
 				currentFilePaths = filePaths;
 			} else {
 				const { canceled, filePaths } = await dialog.showOpenDialog({
-					title: 'Partie-Konfiguration auswählen',
+					title: 'Select Game-Configuration',
 					properties: ['openFile'],
-					filters: [{ name: 'Partie-Konfiguration', extensions: ['json'] }],
+					filters: [{ name: 'Game-Configuration', extensions: ['json'] }],
 				});
 				currentCanceled = canceled;
 				currentFilePaths = filePaths;
@@ -159,22 +159,22 @@ class IPCHelper {
 			let currentFilePaths;
 			if (window) {
 				const { canceled, filePaths } = await dialog.showOpenDialog(window, {
-					title: 'Konfiguration auswählen',
+					title: 'Select Configuration',
 					properties: ['openFile'],
 					filters: [
-						{ name: 'Partie-Konfig', extensions: ['json'] },
-						{ name: 'Board-Konfig', extensions: ['json'] },
+						{ name: 'Game-Configuration', extensions: ['json'] },
+						{ name: 'Board-Configuration', extensions: ['json'] },
 					],
 				});
 				currentCanceled = canceled;
 				currentFilePaths = filePaths;
 			} else {
 				const { canceled, filePaths } = await dialog.showOpenDialog({
-					title: 'Konfiguration auswählen',
+					title: 'Select Configuration',
 					properties: ['openFile'],
 					filters: [
-						{ name: 'Partie-Konfig', extensions: ['json'] },
-						{ name: 'Board-Konfig', extensions: ['json'] },
+						{ name: 'Game-Configuration', extensions: ['json'] },
+						{ name: 'Board-Configuration', extensions: ['json'] },
 					],
 				});
 				currentCanceled = canceled;

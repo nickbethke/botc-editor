@@ -13,8 +13,8 @@ import Checkpoint from '../renderer/components/generator/fields/Checkpoint';
 import AStar from '../renderer/components/generator/helper/AStar';
 import Hole from '../renderer/components/generator/fields/Hole';
 
-describe('start values unchanged', () => {
-	test('no start values equal to default after generation', () => {
+describe('start configuration unchanged', () => {
+	test('no start configuration equal to default after generation', () => {
 		const { startValues } = Board.generateRandom();
 		expect(startValues).toStrictEqual(defaultStartValues);
 	});

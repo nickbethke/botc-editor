@@ -117,7 +117,7 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 			return (
 				<div className="flex flex-col">
 					<div className="p-2 border-y dark:border-muted-700 border-muted-400">
-						{window.languageHelper.translate('Direction')}
+						{window.translationHelper.translate('Direction')}
 					</div>
 					<div className="p-4 flex flex-col gap-4">
 						<select
@@ -128,10 +128,10 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 								this.onDirectionChange(event);
 							}}
 						>
-							<option value={DirectionEnum.NORTH}>{window.languageHelper.translate('North')}</option>
-							<option value={DirectionEnum.EAST}>{window.languageHelper.translate('East')}</option>
-							<option value={DirectionEnum.SOUTH}>{window.languageHelper.translate('South')}</option>
-							<option value={DirectionEnum.WEST}>{window.languageHelper.translate('West')}</option>
+							<option value={DirectionEnum.NORTH}>{window.translationHelper.translate('North')}</option>
+							<option value={DirectionEnum.EAST}>{window.translationHelper.translate('East')}</option>
+							<option value={DirectionEnum.SOUTH}>{window.translationHelper.translate('South')}</option>
+							<option value={DirectionEnum.WEST}>{window.translationHelper.translate('West')}</option>
 						</select>
 					</div>
 				</div>
@@ -178,11 +178,11 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 			return (
 				<div className="flex flex-col">
 					<div className="p-2 border-y dark:border-muted-700 border-muted-400">
-						{window.languageHelper.translate('Amount')}
+						{window.translationHelper.translate('Amount')}
 					</div>
 					<div className="p-4 flex flex-col gap-4">
 						<InputLabel
-							label={window.languageHelper.translate('Lembas amount')}
+							label={window.translationHelper.translate('Lembas amount')}
 							type="range"
 							value={amountField ? amountField.amount : 0}
 							min={0}
@@ -206,12 +206,12 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 		return (
 			<div className="flex flex-col">
 				<div className="p-2 border-b dark:border-muted-700 border-muted-400">
-					{window.languageHelper.translate('Global Settings')}
+					{window.translationHelper.translate('Global Settings')}
 				</div>
 				<div className="p-4 flex flex-col gap-4">
 					<InputLabel
 						type="text"
-						label={window.languageHelper.translate('Board Name')}
+						label={window.translationHelper.translate('Board Name')}
 						value={config.name}
 						onChange={(name) => {
 							const newConfig = {
@@ -223,7 +223,7 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 					/>
 					<InputLabel
 						type="range"
-						label={window.languageHelper.translate('Board Width')}
+						label={window.translationHelper.translate('Board Width')}
 						value={config.width}
 						min={Math.max(config.eye.position[0] + 1, 2)}
 						max={20}
@@ -237,7 +237,7 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 					/>
 					<InputLabel
 						type="range"
-						label={window.languageHelper.translate('Board Height')}
+						label={window.translationHelper.translate('Board Height')}
 						value={config.height}
 						min={Math.max(config.eye.position[1] + 1, 2)}
 						max={20}
@@ -264,7 +264,7 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 		return (
 			<div className="flex flex-col">
 				<div className="p-2 border-b dark:border-muted-700 border-muted-400">
-					{window.languageHelper.translate('Checkpoint Order')}
+					{window.translationHelper.translate('Checkpoint Order')}
 				</div>
 				<div
 					className="p-4 flex flex-col gap-4 overflow-y-auto"
@@ -295,7 +295,7 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 		return (
 			<div className="flex flex-col">
 				<div className="p-2 border-b dark:border-muted-700 border-muted-400">
-					{window.languageHelper.translate('Presets')}
+					{window.translationHelper.translate('Presets')}
 				</div>
 				<div className="overflow-y-auto">
 					<PresetView
@@ -339,97 +339,97 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 		return (
 			<>
 				<SidebarMenuItem
-					label={window.languageHelper.translate('Mouse')}
+					label={window.translationHelper.translate('Mouse')}
 					open={currentTool === null}
 					icon={<BsCursor />}
 					onClick={() => {
 						this.handleCurrentToolChange(null);
 					}}
-					shortCut={`${window.languageHelper.translate('Ctrl')}+0`}
+					shortCut={`${window.translationHelper.translate('Ctrl')}+0`}
 				/>
 				<SidebarMenuItem
-					label={window.languageHelper.translate('Edit Field')}
+					label={window.translationHelper.translate('Edit Field')}
 					open={currentTool === 'edit'}
 					icon={<VscEdit />}
 					onClick={() => {
 						this.handleCurrentToolChange('edit');
 					}}
-					shortCut={`${window.languageHelper.translate('Ctrl')}+E`}
+					shortCut={`${window.translationHelper.translate('Ctrl')}+E`}
 				/>
 				<SidebarMenuItem
-					label={window.languageHelper.translate('Delete')}
+					label={window.translationHelper.translate('Delete')}
 					open={currentTool === 'delete'}
 					icon={<VscTrash />}
 					onClick={() => {
 						this.handleCurrentToolChange('delete');
 					}}
-					shortCut={`${window.languageHelper.translate('Ctrl')}+D`}
+					shortCut={`${window.translationHelper.translate('Ctrl')}+D`}
 				/>
 				<SidebarMenuItemSeparator />
 
 				<SidebarMenuItem
-					label={window.languageHelper.translate('Start')}
+					label={window.translationHelper.translate('Start')}
 					open={currentTool === FieldsEnum.START}
 					icon={<VscHome />}
 					onClick={() => {
 						this.handleCurrentToolChange(FieldsEnum.START);
 					}}
-					shortCut={`${window.languageHelper.translate('Ctrl')}+1`}
+					shortCut={`${window.translationHelper.translate('Ctrl')}+1`}
 				/>
 				<SidebarMenuItem
-					label={window.languageHelper.translate('Checkpoint')}
+					label={window.translationHelper.translate('Checkpoint')}
 					open={currentTool === FieldsEnum.CHECKPOINT}
 					icon={<VscPass />}
 					onClick={() => {
 						this.handleCurrentToolChange(FieldsEnum.CHECKPOINT);
 					}}
-					shortCut={`${window.languageHelper.translate('Ctrl')}+2`}
+					shortCut={`${window.translationHelper.translate('Ctrl')}+2`}
 				/>
 				<SidebarMenuItem
-					label={window.languageHelper.translate('Saurons Eye')}
+					label={window.translationHelper.translate('Saurons Eye')}
 					open={currentTool === FieldsEnum.EYE}
 					icon={<VscEye />}
 					onClick={() => {
 						this.handleCurrentToolChange(FieldsEnum.EYE);
 					}}
-					shortCut={`${window.languageHelper.translate('Ctrl')}+3`}
+					shortCut={`${window.translationHelper.translate('Ctrl')}+3`}
 				/>
 				<SidebarMenuItem
-					label={window.languageHelper.translate('Lembas Field')}
+					label={window.translationHelper.translate('Lembas Field')}
 					open={currentTool === FieldsEnum.LEMBAS}
 					icon={<MdOutlineFastfood />}
 					onClick={() => {
 						this.handleCurrentToolChange(FieldsEnum.LEMBAS);
 					}}
-					shortCut={`${window.languageHelper.translate('Ctrl')}+4`}
+					shortCut={`${window.translationHelper.translate('Ctrl')}+4`}
 				/>
 				<SidebarMenuItem
-					label={window.languageHelper.translate('River Field')}
+					label={window.translationHelper.translate('River Field')}
 					open={currentTool === FieldsEnum.RIVER}
 					icon={<BiWater />}
 					onClick={() => {
 						this.handleCurrentToolChange(FieldsEnum.RIVER);
 					}}
-					shortCut={`${window.languageHelper.translate('Ctrl')}+5`}
+					shortCut={`${window.translationHelper.translate('Ctrl')}+5`}
 				/>
 				<SidebarMenuItem
-					label={window.languageHelper.translate('Hole')}
+					label={window.translationHelper.translate('Hole')}
 					open={currentTool === FieldsEnum.HOLE}
 					icon={<VscCircleLarge />}
 					onClick={() => {
 						this.handleCurrentToolChange(FieldsEnum.HOLE);
 					}}
-					shortCut={`${window.languageHelper.translate('Ctrl')}+6`}
+					shortCut={`${window.translationHelper.translate('Ctrl')}+6`}
 				/>
 				<SidebarMenuItemSeparator />
 				<SidebarMenuItem
-					label={window.languageHelper.translate('Wall Tool')}
+					label={window.translationHelper.translate('Wall Tool')}
 					open={currentTool === FieldsEnum.WALL}
 					icon={<MdBorderStyle />}
 					onClick={() => {
 						this.handleCurrentToolChange(FieldsEnum.WALL);
 					}}
-					shortCut={`${window.languageHelper.translate('Ctrl')}+7`}
+					shortCut={`${window.translationHelper.translate('Ctrl')}+7`}
 				/>
 			</>
 		);
@@ -444,7 +444,7 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 		return (
 			<>
 				<SidebarMenuItem
-					label={window.languageHelper.translate('Settings')}
+					label={window.translationHelper.translate('Settings')}
 					open={openTab === 'settings'}
 					icon={<VscSettings />}
 					onClick={() => {
@@ -453,7 +453,7 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 					shortCut="Alt+1"
 				/>
 				<SidebarMenuItem
-					label={window.languageHelper.translate('Checkpoint Order')}
+					label={window.translationHelper.translate('Checkpoint Order')}
 					open={openTab === 'checkpointOrder'}
 					icon={<VscListOrdered />}
 					onClick={() => {
@@ -462,7 +462,7 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 					shortCut="Alt+2"
 				/>
 				<SidebarMenuItem
-					label={window.languageHelper.translate('Presets')}
+					label={window.translationHelper.translate('Presets')}
 					open={openTab === 'presets'}
 					icon={<VscFolder />}
 					onClick={() => {

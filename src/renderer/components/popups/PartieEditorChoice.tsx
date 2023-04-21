@@ -38,16 +38,16 @@ class PartieEditorChoice extends React.Component<PartieEditorChoiceProps, unknow
 				<div>
 					<div className="absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]">
 						<div className="text-center text-3xl mb-8 font-flicker tracking-widest">
-							{window.languageHelper.translate('Party Configuration')}
+							{window.translationHelper.translate('Game-Configuration')}
 						</div>
 						<div className="relative flex gap-8 w-[80vw] xl:w-[70vw] 2xl:w-[60vw]  mx-auto">
 							<PartieEditorChoiceCard
-								text={window.languageHelper.translate('New Party Configuration')}
+								text={window.translationHelper.translate('New Game Configuration')}
 								bgImage={newBGImage}
 								onClickAction={this.openNewConfigScreen}
 							/>
 							<PartieEditorChoiceCard
-								text={window.languageHelper.translate('Load')}
+								text={window.translationHelper.translate('Load')}
 								bgImage={loadingBGImage}
 								onClickAction={this.openLoadPartieConfig}
 							/>

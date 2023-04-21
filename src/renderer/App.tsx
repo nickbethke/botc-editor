@@ -8,7 +8,7 @@ import PartieEditorChoice from './components/popups/PartieEditorChoice';
 import PartyConfigurator from './screens/PartyConfigurator';
 import JSONValidierer from './screens/JSONValidierer';
 import BoardGenerator from './components/generator/BoardGenerator';
-import PartieConfigInterface from './components/interfaces/PartieConfigInterface';
+import { PartieConfigWithPath } from './components/interfaces/PartieConfigInterface';
 import BoardConfigInterface from './components/interfaces/BoardConfigInterface';
 import sunImage from '../../assets/images/sun.gif';
 import bgImage from '../../assets/images/bg-color-2x-no-bg.png';
@@ -192,7 +192,7 @@ class App extends React.Component<AppProps, AppStates> {
 	};
 
 	handleLanguageChange = async (lang: AvailableLanguages) => {
-		await window.languageHelper.switchLanguage(lang);
+		await window.translationHelper.switchLanguage(lang);
 	};
 
 	render = () => {
@@ -247,13 +247,13 @@ class App extends React.Component<AppProps, AppStates> {
 		}
 		if (openScreen === 'partieConfigLoadScreen') {
 			const { toLoad } = this.state;
-			this.setState({ toLoad: null });
+			if (toLoad) this.setState({ toLoad: null });
 			return (
 				<PartyConfigurator
 					settings={settings}
 					os={os}
 					onClose={this.handleCloseChildScreen}
-					loadedValues={toLoad as PartieConfigInterface}
+					loadedValues={toLoad as PartieConfigWithPath}
 					onSettingsUpdate={this.handleSettingsChange}
 					fullScreen={fullScreen}
 				/>
@@ -351,8 +351,8 @@ class App extends React.Component<AppProps, AppStates> {
 		const { os } = this.props;
 		return (
 			<PopupV2
-				title={errorMessage ? errorMessage.title : window.languageHelper.translate('Error')}
-				closeButtonText={window.languageHelper.translate('Close')}
+				title={errorMessage ? errorMessage.title : window.translationHelper.translate('Error')}
+				closeButtonText={window.translationHelper.translate('Close')}
 				onClose={() => {
 					this.setState({ openPopup: null });
 				}}
@@ -378,7 +378,7 @@ class App extends React.Component<AppProps, AppStates> {
 			} else {
 				this.setState({
 					errorMessage: {
-						title: window.languageHelper.translate('Board Configuration Validation Error'),
+						title: window.translationHelper.translate('Board Configuration Validation Error'),
 						error: validation.toString(),
 					},
 					openPopup: 'error',
@@ -397,7 +397,7 @@ class App extends React.Component<AppProps, AppStates> {
 				<div id="home" className={`${popup ? 'blur' : ''} flex flex-col`}>
 					{os === 'win32' ? (
 						<div className="dragger w-[100vw] h-8 bg-muted flex items-center px-2 text-sm">
-							{window.languageHelper.translate('Battle of the Centerländ - Editor')}
+							{window.translationHelper.translate('Battle of the Centerländ - Editor')}
 						</div>
 					) : (
 						<div className="fixed top-0 left-0 dragger w-[100vw] h-8" />
@@ -408,34 +408,34 @@ class App extends React.Component<AppProps, AppStates> {
 								<div>
 									<div className="text-4xl xl:text-6xl 2xl:text-8xl">Battle of the Centerländ</div>
 									<div className="text-2xl xl:text-4xl 2xl:text-6xl tracking-widest">
-										{window.languageHelper.translate('Editor')}
+										{window.translationHelper.translate('Editor')}
 									</div>
 								</div>
 								<div className="flex flex-col justify-start gap-4 w-fit text-left tracking-widest">
 									<HomeScreenButton
-										text={window.languageHelper.translate('Board-Configurator')}
+										text={window.translationHelper.translate('Board-Configurator')}
 										onClick={this.handleOpenBoardEditorChoiceV2}
 										tabIndex={tabIndex}
 									/>
 									<HomeScreenButton
-										text={window.languageHelper.translate('Party-Configurator')}
+										text={window.translationHelper.translate('Game-Configurator')}
 										onClick={this.handleOpenPartieEditorChoice}
 										tabIndex={tabIndex}
 									/>
 									<HomeScreenButton
-										text={window.languageHelper.translate('Validator')}
+										text={window.translationHelper.translate('Validator')}
 										onClick={this.handleOpenValidator}
 										tabIndex={tabIndex}
 									/>
 									<TopMenuSeparator />
 									<HomeScreenButton
-										text={window.languageHelper.translate('Settings')}
+										text={window.translationHelper.translate('Settings')}
 										onClick={this.handleOpenSettings}
 										tabIndex={tabIndex}
 									/>
 									<TopMenuSeparator />
 									<HomeScreenButton
-										text={window.languageHelper.translate('Exit')}
+										text={window.translationHelper.translate('Exit')}
 										onClick={this.handleCloseApp}
 										tabIndex={tabIndex}
 										last
@@ -448,7 +448,7 @@ class App extends React.Component<AppProps, AppStates> {
 								<img
 									className="w-full home-bg"
 									src={bgImage}
-									alt={window.languageHelper.translate('Background image')}
+									alt={window.translationHelper.translate('Background image')}
 								/>
 								<img
 									alt="surprise sun"
@@ -462,7 +462,7 @@ class App extends React.Component<AppProps, AppStates> {
 					</div>
 					<div className="absolute bottom-0 left-0 z-10 bg-muted p-2 w-[100vw] font-jetbrains flex flex-row items-center justify-end gap-2 text-[10px]">
 						<span>
-							{window.languageHelper.translate('Editor Version')}: {version}
+							{window.translationHelper.translate('Editor Version')}: {version}
 						</span>
 					</div>
 				</div>
@@ -544,7 +544,7 @@ class App extends React.Component<AppProps, AppStates> {
 							if (partieJSON) {
 								this.setState({
 									openScreen: 'partieConfigLoadScreen',
-									toLoad: partieJSON.config,
+									toLoad: partieJSON,
 								});
 							}
 						}}

@@ -181,7 +181,7 @@ class PromptPopupV2 extends React.Component<PromptPopupV2Props, PromptPopupV2Sta
 				<div
 					role="presentation"
 					id="popupV2"
-					className={`fixed origin-top-left z-50 max-w-[33.333vw] transition transition-opacity ${
+					className={`fixed origin-top-left z-50 max-w-[33.333vw] transition-opacity ${
 						visible ? 'opacity-1' : 'opacity-0'
 					} ${offClick && 'popup-warn'}`}
 					style={{
@@ -193,7 +193,7 @@ class PromptPopupV2 extends React.Component<PromptPopupV2Props, PromptPopupV2Sta
 						<div
 							role="presentation"
 							className="p-2 flex justify-start gap-4 items-center text-lg border-b dark:border-muted-700 border-muted-400"
-							draggable
+							draggable="true"
 							onMouseDown={(e) => {
 								const { isDragged } = this.state;
 								const { settings } = this.props;
@@ -239,7 +239,7 @@ class PromptPopupV2 extends React.Component<PromptPopupV2Props, PromptPopupV2Sta
 								e.preventDefault();
 							}}
 						>
-							<img className="h-6" src={destinyMountainImage} alt={window.languageHelper.translate('Logo')} />
+							<img className="h-6" src={destinyMountainImage} alt={window.translationHelper.translate('Logo')} />
 							<span>{title}</span>
 						</div>
 						<div className="py-2 px-4 mb-2">{input.type === 'text' ? this.textInput() : null}</div>

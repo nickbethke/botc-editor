@@ -307,12 +307,12 @@ class RiverPresetEditor extends React.Component<RiverPresetEditorProps, RiverPre
 					this.setState({
 						popup: (
 							<ConfirmPopupV2
-								title={window.languageHelper.translate('Close River-Preset Editor')}
-								abortButtonText={window.languageHelper.translate('Cancel')}
+								title={window.translationHelper.translate('Close River-Preset Editor')}
+								abortButtonText={window.translationHelper.translate('Cancel')}
 								onAbort={() => {
 									this.setState({ popup: null });
 								}}
-								confirmButtonText={window.languageHelper.translate('Save and close')}
+								confirmButtonText={window.translationHelper.translate('Save and close')}
 								onConfirm={() => {
 									const unsavedFiles = editorCache.getUnsavedFiles();
 									unsavedFiles.forEach((value) => {
@@ -332,7 +332,7 @@ class RiverPresetEditor extends React.Component<RiverPresetEditorProps, RiverPre
 								os={os}
 								settings={settings}
 							>
-								{window.languageHelper.translate(
+								{window.translationHelper.translate(
 									'There are still unsaved changes. Do you want to save changes before closing?'
 								)}
 							</ConfirmPopupV2>
@@ -373,7 +373,7 @@ class RiverPresetEditor extends React.Component<RiverPresetEditorProps, RiverPre
 			<section className="text-white font-lato dark:bg-muted-800 bg-muted-600 h-full">
 				{os === 'win32' ? (
 					<div className="dragger w-[100vw] h-8 bg-muted flex items-center px-2 text-sm">
-						{window.languageHelper.translate('River-Preset Editor')}
+						{window.translationHelper.translate('River-Preset Editor')}
 					</div>
 				) : (
 					<div className="fixed top-0 right-0 dragger w-[83vw] h-8" style={{ width: window.innerWidth - 205 }} />
@@ -384,15 +384,15 @@ class RiverPresetEditor extends React.Component<RiverPresetEditorProps, RiverPre
 						os === 'darwin' ? 'pl-20' : ''
 					}`}
 				>
-					<img className="h-6 ml-2 mr-4" src={destinyMountainImage} alt={window.languageHelper.translate('Logo')} />
-					<TopMenuItemCollapsable label={window.languageHelper.translate('File')}>
+					<img className="h-6 ml-2 mr-4" src={destinyMountainImage} alt={window.translationHelper.translate('Logo')} />
+					<TopMenuItemCollapsable label={window.translationHelper.translate('File')}>
 						<TopMenuItem
 							className="text-left"
 							action={TopMenuActions.NEW}
 							onAction={this.onTopMenuAction}
 							icon={<VscNewFile />}
-							label={window.languageHelper.translate('New')}
-							shortCut={`${window.languageHelper.translate('Ctrl')}+N`}
+							label={window.translationHelper.translate('New')}
+							shortCut={`${window.translationHelper.translate('Ctrl')}+N`}
 							type="default"
 						/>
 						<TopMenuSeparator />
@@ -400,8 +400,8 @@ class RiverPresetEditor extends React.Component<RiverPresetEditorProps, RiverPre
 							className="text-left"
 							action={TopMenuActions.SAVE}
 							onAction={this.onTopMenuAction}
-							label={`${window.languageHelper.translate('Save')}...`}
-							shortCut={`${window.languageHelper.translate('Ctrl')}+S`}
+							label={`${window.translationHelper.translate('Save')}...`}
+							shortCut={`${window.translationHelper.translate('Ctrl')}+S`}
 							type="default"
 						/>
 						<TopMenuSeparator />
@@ -409,7 +409,7 @@ class RiverPresetEditor extends React.Component<RiverPresetEditorProps, RiverPre
 							className="text-left"
 							action={TopMenuActions.OPEN_PRESET_FOLDER}
 							onAction={this.onTopMenuAction}
-							label={`${window.languageHelper.translate('Open Presets Folder')}...`}
+							label={`${window.translationHelper.translate('Open Presets Folder')}...`}
 							type="default"
 						/>
 						<TopMenuSeparator />
@@ -417,18 +417,18 @@ class RiverPresetEditor extends React.Component<RiverPresetEditorProps, RiverPre
 							className="text-left"
 							action={TopMenuActions.CLOSE}
 							onAction={this.onTopMenuAction}
-							label={window.languageHelper.translate('Close')}
+							label={window.translationHelper.translate('Close')}
 							type="default"
 						/>
 					</TopMenuItemCollapsable>
 					<div className="ml-auto">
 						<SidebarMenuItem
 							key={_uniqueId()}
-							label={window.languageHelper.translate('Dark Mode')}
+							label={window.translationHelper.translate('Dark Mode')}
 							open={false}
 							icon={
 								<VscColorMode
-									title={window.languageHelper.translate('Dark Mode')}
+									title={window.translationHelper.translate('Dark Mode')}
 									className={`${
 										settings.darkMode ? 'rotate-0' : 'rotate-180'
 									} transition transition-transform transform-gpu text-lg`}
@@ -476,12 +476,12 @@ class RiverPresetEditor extends React.Component<RiverPresetEditorProps, RiverPre
 								this.setState({
 									popup: (
 										<PromptPopupV2
-											title={window.languageHelper.translate('Rename Preset')}
-											abortButtonText={window.languageHelper.translate('Cancel')}
+											title={window.translationHelper.translate('Rename Preset')}
+											abortButtonText={window.translationHelper.translate('Cancel')}
 											onAbort={() => {
 												this.setState({ popup: null });
 											}}
-											confirmButtonText={window.languageHelper.translate('Rename')}
+											confirmButtonText={window.translationHelper.translate('Rename')}
 											onConfirm={async (newName) => {
 												const newFileName = `${newName}.json`;
 												if (fullPath.base !== newFileName) {
@@ -553,12 +553,12 @@ class RiverPresetEditor extends React.Component<RiverPresetEditorProps, RiverPre
 										this.setState({
 											popup: (
 												<ConfirmPopupV2
-													title={window.languageHelper.translate('Close River Preset')}
-													abortButtonText={window.languageHelper.translate('Cancel')}
+													title={window.translationHelper.translate('Close River Preset')}
+													abortButtonText={window.translationHelper.translate('Cancel')}
 													onAbort={() => {
 														this.setState({ popup: null });
 													}}
-													confirmButtonText={window.languageHelper.translate('Save and close')}
+													confirmButtonText={window.translationHelper.translate('Save and close')}
 													onConfirm={async () => {
 														// TODO: Save
 														if (toClose) {
@@ -586,7 +586,7 @@ class RiverPresetEditor extends React.Component<RiverPresetEditorProps, RiverPre
 													os={os}
 													settings={settings}
 												>
-													{window.languageHelper.translate(
+													{window.translationHelper.translate(
 														'This file has not yet been saved. Do you want to save the current changes before closing?'
 													)}
 												</ConfirmPopupV2>

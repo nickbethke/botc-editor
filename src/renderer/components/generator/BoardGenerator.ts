@@ -18,7 +18,7 @@ import AStar from './helper/AStar';
 import DirectionHelper from './helper/DirectionHelper';
 
 /**
- * random boardConfigurator start values type
+ * random boardConfigurator start configuration type
  */
 export type RandomBoardStartValues = {
 	name: string;
@@ -47,7 +47,7 @@ export type RiverAlgorithm = 'default' | 'complex';
 export type WallAlgorithm = 'iterative' | 'random';
 
 /**
- * default random boardConfigurator start values
+ * default random boardConfigurator start configuration
  */
 export const defaultStartValues: RandomBoardStartValues = {
 	name: 'THE CENTERLÄND',
@@ -92,7 +92,7 @@ class BoardGenerator {
 	readonly board: Array<Array<FieldWithPositionInterface>>;
 
 	/**
-	 * The start values for the generation
+	 * The start configuration for the generation
 	 */
 	readonly startValues: RandomBoardStartValues;
 
@@ -158,13 +158,13 @@ class BoardGenerator {
 	}>;
 
 	/**
-	 * The constructor of the class, that initializes all values and starts the generation process
+	 * The constructor of the class, that initializes all configuration and starts the generation process
 	 * @param startValues
 	 */
 	constructor(startValues?: RandomBoardStartValues) {
 		this.holesSet = 0;
 
-		// merging custom start values with default values
+		// merging custom start configuration with default configuration
 		this.startValues = { ...defaultStartValues, ...startValues };
 
 		// initializing all needed/required attributes

@@ -1,7 +1,8 @@
 import React from 'react';
 import { BiChevronLeft } from 'react-icons/bi';
-import { VscColorMode } from 'react-icons/vsc';
+import { VscAdd, VscColorMode, VscFile, VscSave } from 'react-icons/vsc';
 import { isBoolean } from 'lodash';
+import Mousetrap from 'mousetrap';
 import backgroundImage from '../../../assets/images/damn_nice_background_color.png';
 import backgroundImageDark from '../../../assets/images/damn_nice_background.png';
 import InputLabel from '../components/InputLabel';
@@ -9,25 +10,33 @@ import Notification from '../components/Notification';
 import Error from '../components/Error';
 import InputValidator, { InputValidatorType } from '../helper/InputValidator';
 
-import PartieConfigInterface from '../components/interfaces/PartieConfigInterface';
+import PartieConfigInterface, {
+	PartieConfigWithPath,
+	PathInterface,
+} from '../components/interfaces/PartieConfigInterface';
 import ConfirmPopupV2 from '../components/boardConfigurator/ConfirmPopupV2';
 import { SettingsInterface } from '../../interfaces/SettingsInterface';
+import FilePathComponent from '../components/FilePathComponent';
 
 type PartieKonfiguratorProps = {
 	onClose: () => void;
-	loadedValues: PartieConfigInterface | null;
+	loadedValues: PartieConfigWithPath | null;
 	os: NodeJS.Platform;
 	settings: SettingsInterface;
 	onSettingsUpdate: (settings: SettingsInterface) => void;
 	fullScreen: boolean;
 };
 type PartieKonfiguratorState = {
-	values: PartieConfigInterface;
+	configuration: PartieConfigInterface;
 	popupLeave: boolean;
+	popupNew: boolean;
 	windowDimensions: {
 		width: number;
 		height: number;
 	};
+	notification: JSX.Element | null;
+	file: PathInterface | null;
+	edited: boolean;
 };
 
 // TODO: Translations
@@ -43,8 +52,6 @@ class PartyConfigurator extends React.Component<PartieKonfiguratorProps, PartieK
 		startLembas: 0,
 	};
 
-	private notification: JSX.Element | undefined;
-
 	constructor(props: PartieKonfiguratorProps) {
 		super(props);
 		this.handleBackButton = this.handleBackButton.bind(this);
@@ -52,35 +59,57 @@ class PartyConfigurator extends React.Component<PartieKonfiguratorProps, PartieK
 		this.openLoadPartieConfig = this.openLoadPartieConfig.bind(this);
 		this.abortBackToHomeScreen = this.abortBackToHomeScreen.bind(this);
 		this.state = {
-			values: this.default,
+			configuration: this.default,
 			popupLeave: false,
 			windowDimensions: {
 				width: window.innerWidth,
 				height: window.innerHeight,
 			},
+			notification: null,
+			file: null,
+			edited: false,
+			popupNew: false,
 		};
 	}
 
 	componentDidMount() {
+		Mousetrap.bind('ctrl+s', () => {
+			this.handleSaveClick().catch(() => {});
+		});
+		Mousetrap.bind('ctrl+n', () => {
+			this.handleNewConfigClick();
+		});
+		window.addEventListener('resize', () => {
+			this.setState({
+				windowDimensions: {
+					width: window.innerWidth,
+					height: window.innerHeight,
+				},
+			});
+		});
 		const { loadedValues } = this.props;
-		if (loadedValues && this.predictIfConfigurationIsPartyConfiguration(loadedValues)) {
-			const values = { ...this.default, ...loadedValues };
+		const { file } = this.state;
+		if (loadedValues && file == null && this.predictIfConfigurationIsPartyConfiguration(loadedValues.config)) {
+			const configuration: PartieConfigInterface = { ...this.default, ...loadedValues.config };
 			window.electron
-				.validate(loadedValues, 'partie')
+				.validate(loadedValues.config, 'partie')
 				.then((valid) => {
 					if (isBoolean(valid) && valid) {
-						this.setState({ values });
-						this.notification = <Notification label={window.languageHelper.translate('Loaded successfully')} />;
+						this.setState({
+							configuration,
+							notification: <Notification label={window.translationHelper.translate('Loaded successfully')} />,
+							file: loadedValues as PathInterface,
+						});
+
 						return null;
 					}
-					this.notification = <Error label={window.languageHelper.translate('Failed to load file!')} />;
+					this.setState({
+						file: null,
+						notification: <Error label={window.translationHelper.translate('Failed to load file!')} />,
+					});
 					return null;
 				})
 				.catch(() => {});
-		} else {
-			this.notification = (
-				<Error label={window.languageHelper.translate('The loaded file is not a party configuration.')} />
-			);
 		}
 	}
 
@@ -98,7 +127,13 @@ class PartyConfigurator extends React.Component<PartieKonfiguratorProps, PartieK
 	};
 
 	handleBackButton = () => {
-		this.setState({ popupLeave: true });
+		const { edited } = this.state;
+		if (edited) {
+			this.setState({ popupLeave: true });
+		} else {
+			const { onClose } = this.props;
+			onClose();
+		}
 	};
 
 	backToHomeScreen = () => {
@@ -111,55 +146,116 @@ class PartyConfigurator extends React.Component<PartieKonfiguratorProps, PartieK
 	};
 
 	handleSaveClick = async () => {
-		const { values } = this.state;
-		const json = JSON.stringify({ ...this.default, ...values }, null, 4);
-		const answer = await window.electron.dialog.savePartieConfig(json);
-		if (answer) this.notification = <Notification label="Erfolgreich gespeichert" />;
-		this.setState({ values: { ...this.default, ...values } });
+		const { configuration, file } = this.state;
+		const json = JSON.stringify({ ...this.default, ...configuration }, null, 4);
+
+		if (file) {
+			const answer = await window.electron.file.save(file.path, json);
+			if (answer)
+				this.setState({
+					edited: false,
+					notification: <Notification label="Erfolgreich gespeichert" />,
+				});
+			else
+				this.setState({
+					notification: <Error label="Speichern fehlgeschlagen!" />,
+				});
+		} else {
+			const answer = await window.electron.dialog.savePartieConfig(json);
+			if (answer)
+				this.setState({
+					file: answer as PathInterface,
+					edited: false,
+					notification: <Notification label="Erfolgreich gespeichert" />,
+				});
+			else
+				this.setState({
+					notification: <Error label="Speichern fehlgeschlagen!" />,
+				});
+		}
 	};
 
 	openLoadPartieConfig = async () => {
+		this.setState({
+			notification: null,
+		});
 		const partieJSON = await window.electron.dialog.openPartieConfig();
-		const valid = await window.electron.validate(partieJSON as object, 'partie');
-		if (partieJSON && valid === true) {
+		if (partieJSON) {
+			if (this.predictIfConfigurationIsPartyConfiguration(partieJSON.config)) {
+				this.setState({
+					configuration: { ...partieJSON.config },
+					file: partieJSON as PathInterface,
+					notification: <Notification label="Erfolgreich geladen" />,
+					edited: false,
+				});
+				return;
+			}
 			this.setState({
-				values: { ...partieJSON.config },
+				notification: (
+					<Error label={window.translationHelper.translate('The loaded file is not a party configuration.')} />
+				),
 			});
-			this.notification = <Notification label="Erfolgreich geladen" />;
+			return;
+		}
+		this.setState({
+			notification: (
+				<Error label={window.translationHelper.translate('The loaded file is not a party configuration.')} />
+			),
+		});
+	};
+
+	handleNewConfigClick = () => {
+		const { edited } = this.state;
+		if (edited) {
+			this.setState({ popupNew: true });
 		} else {
-			this.notification = <Error label="Laden der Datei fehlgeschlagen!" />;
+			this.setState({ edited: false, file: null, configuration: this.default });
 		}
 	};
 
 	render = () => {
-		const { values } = this.state;
-		const { popupLeave, windowDimensions } = this.state;
+		const { configuration, notification, popupLeave, windowDimensions, file, edited, popupNew } = this.state;
 		const { os, settings, onSettingsUpdate, fullScreen } = this.props;
-
-		let popupLeaveR = null;
-		if (popupLeave) {
-			popupLeaveR = (
-				<ConfirmPopupV2
-					title={window.languageHelper.translate('Close Party Configurator')}
-					onConfirm={this.backToHomeScreen}
-					onAbort={this.abortBackToHomeScreen}
-					settings={settings}
-					windowDimensions={windowDimensions}
-					confirmButtonText={window.languageHelper.translate('Discard')}
-					os={os}
-					abortButtonText={window.languageHelper.translate('Cancel')}
-				>
-					{window.languageHelper.translate(
-						'The current file has not yet been saved. Do you want to discard the current changes?'
-					)}
-				</ConfirmPopupV2>
-			);
-		}
 		const notWinDragger = !fullScreen ? <div className="dragger w-[100vw] h-8 absolute top-0 left-0" /> : null;
 		return (
 			<div className="dark:bg-muted-800 bg-muted-600 flex flex-col duration-500">
 				{os === 'win32' ? <div className="dragger w-[100vw] h-8 bg-muted" /> : notWinDragger}
-				{popupLeaveR}
+				{popupLeave ? (
+					<ConfirmPopupV2
+						title={window.translationHelper.translate('Close Game Configurator')}
+						onConfirm={this.backToHomeScreen}
+						onAbort={this.abortBackToHomeScreen}
+						settings={settings}
+						windowDimensions={windowDimensions}
+						confirmButtonText={window.translationHelper.translate('Discard')}
+						os={os}
+						abortButtonText={window.translationHelper.translate('Cancel')}
+					>
+						{window.translationHelper.translate(
+							'The current file has not yet been saved. Do you want to discard the current changes?'
+						)}
+					</ConfirmPopupV2>
+				) : null}
+				{popupNew ? (
+					<ConfirmPopupV2
+						title={window.translationHelper.translate('New Game Configuration')}
+						onConfirm={() => {
+							this.setState({ edited: false, popupNew: false, configuration: this.default, file: null });
+						}}
+						onAbort={() => {
+							this.setState({ popupNew: false });
+						}}
+						settings={settings}
+						windowDimensions={windowDimensions}
+						confirmButtonText={window.translationHelper.translate('Discard')}
+						os={os}
+						abortButtonText={window.translationHelper.translate('Cancel')}
+					>
+						{window.translationHelper.translate(
+							'The current changes had not yet been saved. Do you want to discard the current changes?'
+						)}
+					</ConfirmPopupV2>
+				) : null}
 				<div
 					className="text-white grid grid-cols-3 2xl:grid-cols-2 gap-0 grow w-[100vw]"
 					style={{
@@ -167,25 +263,25 @@ class PartyConfigurator extends React.Component<PartieKonfiguratorProps, PartieK
 					}}
 				>
 					<div
-						className="transition transition-all duration-500"
+						className="transition-all duration-500"
 						style={{
 							backgroundImage: `url(${settings.darkMode ? backgroundImageDark : backgroundImage})`,
 							backgroundSize: 'cover',
 						}}
 					/>
-					<div className="col-span-2 2xl:col-span-1 m-8 flex flex-col gap-4 transition transition-all">
+					<div className="col-span-2 2xl:col-span-1 m-8 flex flex-col gap-4 transition">
 						<div className="flex flex-row justify-start gap-8">
 							<button
 								type="button"
-								className="rounded border dark:border-muted-700 border-muted-400 hover:bg-accent-500 transition transition-colors"
+								className="rounded border dark:border-muted-700 border-muted-400 hover:bg-accent-500 transition"
 								onClick={this.handleBackButton}
 							>
 								<BiChevronLeft className="text-4xl" />
 							</button>
-							<div className="text-4xl">Partie Konfigurator</div>
+							<div className="text-4xl">{window.translationHelper.translate('Game-Configurator')}</div>
 							<button
 								type="button"
-								className="p-1 dark:bg-muted-800 bg-muted-600 dark:hover:bg-muted-700 hover:bg-muted-500 transition transition-colors flex items-center ml-auto"
+								className="p-1 dark:bg-muted-800 bg-muted-600 dark:hover:bg-muted-700 hover:bg-muted-500 transition flex items-center ml-auto"
 								onClick={() => {
 									onSettingsUpdate({
 										...settings,
@@ -194,32 +290,56 @@ class PartyConfigurator extends React.Component<PartieKonfiguratorProps, PartieK
 								}}
 							>
 								<VscColorMode
-									title={window.languageHelper.translate('Dark Mode')}
-									className={`${settings.darkMode ? '' : 'rotate-180'} transition transition-all transform-gpu text-lg`}
+									title={window.translationHelper.translate('Dark Mode')}
+									className={`${settings.darkMode ? '' : 'rotate-180'} transition transform-gpu text-lg`}
 								/>
 							</button>
 						</div>
-						<div className="flex gap-4">
+						<div className="flex gap-4 items-center">
 							<div>
 								<button
 									type="button"
-									className="rounded border dark:border-muted-700 border-muted-400 dark:bg-muted-800 bg-muted-500 dark:hover:bg-accent-500 hover:bg-accent-500 transition transition-colors px-4 py-2"
+									className="flex gap-2 items-center rounded border dark:border-muted-700 border-muted-400 dark:bg-muted-800 bg-muted-500 dark:hover:bg-accent-500 hover:bg-accent-500 transition px-4 py-2"
+									onClick={this.handleNewConfigClick}
+								>
+									<VscAdd /> {window.translationHelper.translate('New')}
+								</button>
+							</div>
+							<div>
+								<button
+									type="button"
+									className="flex gap-2 items-center rounded border dark:border-muted-700 border-muted-400 dark:bg-muted-800 bg-muted-500 dark:hover:bg-accent-500 hover:bg-accent-500 transition px-4 py-2"
 									onClick={this.handleSaveClick}
 								>
-									Speichern
+									<VscSave /> {window.translationHelper.translate('Save')}
 								</button>
 							</div>
 							<div>
 								<button
 									type="button"
-									className="rounded border dark:border-muted-700 border-muted-400 dark:bg-muted-800 bg-muted-500 dark:hover:bg-accent-500  hover:bg-accent-500 transition transition-colors px-4 py-2"
+									className="flex gap-2 items-center rounded border dark:border-muted-700 border-muted-400 dark:bg-muted-800 bg-muted-500 dark:hover:bg-accent-500 hover:bg-accent-500 transition px-4 py-2"
 									onClick={this.openLoadPartieConfig}
 								>
-									Laden
+									<VscFile />
+									{window.translationHelper.translate('Load')}
 								</button>
 							</div>
+							<div>
+								{file ? (
+									<div className="rounded border dark:border-muted-700 border-muted-400 dark:bg-muted-800 bg-muted-500 px-4 py-2">
+										<FilePathComponent file={file.parsedPath} os={os} edited={edited} />
+									</div>
+								) : (
+									<div className="rounded border dark:border-muted-700 border-muted-400 dark:bg-muted-800 bg-muted-500 px-4 py-2">
+										<div className="flex items-center gap-0 h-full">
+											{window.translationHelper.translate('Unsaved File')}
+											{!edited ? '' : ` *`}
+										</div>
+									</div>
+								)}
+							</div>
 						</div>
-						{this.notification ? <div>{this.notification}</div> : null}
+						{notification ? <div>{notification}</div> : null}
 						<div className="grid grid-cols-2 gap-8">
 							<div>
 								<InputLabel
@@ -227,7 +347,7 @@ class PartyConfigurator extends React.Component<PartieKonfiguratorProps, PartieK
 									type="number"
 									min={-1}
 									max={200}
-									value={values.maxRounds}
+									value={configuration.maxRounds}
 									validator={
 										new InputValidator({
 											type: InputValidatorType.TYPE_NUMBER,
@@ -246,10 +366,10 @@ class PartyConfigurator extends React.Component<PartieKonfiguratorProps, PartieK
 									}
 									onChange={(value) => {
 										this.setState({
-											popupLeave: false,
-											values: {
-												...values,
-												maxRounds: Number.parseFloat(value.toString()),
+											edited: true,
+											configuration: {
+												...configuration,
+												maxRounds: value,
 											},
 										});
 									}}
@@ -259,7 +379,7 @@ class PartyConfigurator extends React.Component<PartieKonfiguratorProps, PartieK
 								<InputLabel
 									label="Start Lembas"
 									type="number"
-									value={values.startLembas}
+									value={configuration.startLembas}
 									validator={
 										new InputValidator({
 											type: InputValidatorType.TYPE_NUMBER,
@@ -274,9 +394,10 @@ class PartyConfigurator extends React.Component<PartieKonfiguratorProps, PartieK
 									}
 									onChange={(value) => {
 										this.setState({
-											values: {
-												...values,
-												startLembas: Number.parseFloat(value.toString()),
+											edited: true,
+											configuration: {
+												...configuration,
+												startLembas: value,
 											},
 										});
 									}}
@@ -290,13 +411,14 @@ class PartyConfigurator extends React.Component<PartieKonfiguratorProps, PartieK
 									type="number"
 									onChange={(value) => {
 										this.setState({
-											values: {
-												...values,
-												shotLembas: Number.parseFloat(value.toString()),
+											edited: true,
+											configuration: {
+												...configuration,
+												shotLembas: value,
 											},
 										});
 									}}
-									value={values.shotLembas}
+									value={configuration.shotLembas}
 								/>
 							</div>
 							<div>
@@ -305,13 +427,14 @@ class PartyConfigurator extends React.Component<PartieKonfiguratorProps, PartieK
 									type="number"
 									onChange={(value) => {
 										this.setState({
-											values: {
-												...values,
-												riverMoveCount: Number.parseFloat(value.toString()),
+											edited: true,
+											configuration: {
+												...configuration,
+												riverMoveCount: value,
 											},
 										});
 									}}
-									value={values.riverMoveCount}
+									value={configuration.riverMoveCount}
 								/>
 							</div>
 						</div>
@@ -323,13 +446,14 @@ class PartyConfigurator extends React.Component<PartieKonfiguratorProps, PartieK
 									helperText="-1 für dauerhaften Tod"
 									onChange={(value) => {
 										this.setState({
-											values: {
-												...values,
-												reviveRounds: Number.parseFloat(value.toString()),
+											edited: true,
+											configuration: {
+												...configuration,
+												reviveRounds: value,
 											},
 										});
 									}}
-									value={values.reviveRounds}
+									value={configuration.reviveRounds}
 								/>
 							</div>
 							<div>
@@ -341,13 +465,14 @@ class PartyConfigurator extends React.Component<PartieKonfiguratorProps, PartieK
 									max={10 ** 6}
 									onChange={(value) => {
 										this.setState({
-											values: {
-												...values,
-												characterChoiceTimeout: Number.parseFloat(value.toString()),
+											edited: true,
+											configuration: {
+												...configuration,
+												characterChoiceTimeout: value,
 											},
 										});
 									}}
-									value={values.characterChoiceTimeout}
+									value={configuration.characterChoiceTimeout}
 								/>
 							</div>
 						</div>
@@ -361,13 +486,14 @@ class PartyConfigurator extends React.Component<PartieKonfiguratorProps, PartieK
 									max={10 ** 6}
 									onChange={(value) => {
 										this.setState({
-											values: {
-												...values,
-												cardSelectionTimeout: Number.parseFloat(value.toString()),
+											edited: true,
+											configuration: {
+												...configuration,
+												cardSelectionTimeout: value,
 											},
 										});
 									}}
-									value={values.cardSelectionTimeout}
+									value={configuration.cardSelectionTimeout}
 								/>
 							</div>
 							<div>
@@ -379,13 +505,14 @@ class PartyConfigurator extends React.Component<PartieKonfiguratorProps, PartieK
 									max={10 ** 6}
 									onChange={(value) => {
 										this.setState({
-											values: {
-												...values,
-												serverIngameDelay: Number.parseFloat(value.toString()),
+											edited: true,
+											configuration: {
+												...configuration,
+												serverIngameDelay: value,
 											},
 										});
 									}}
-									value={values.serverIngameDelay}
+									value={configuration.serverIngameDelay}
 								/>
 							</div>
 						</div>

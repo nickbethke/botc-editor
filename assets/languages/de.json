@@ -2,8 +2,8 @@
 	"lang": "de",
 	"data": [
 		[
-			"Party-Configurator",
-			"Partie-Konfigurator"
+			"Game-Configurator",
+			"Game-Konfigurator"
 		],
 		[
 			"Board-Configurator",
@@ -42,12 +42,12 @@
 			"Board Konfiguration"
 		],
 		[
-			"New Party Configuration",
-			"Neue Partie Konfiguration"
+			"New Game Configuration",
+			"Neue Game Konfiguration"
 		],
 		[
-			"Party Configuration",
-			"Partie Konfiguration"
+			"Game Configuration",
+			"Game Konfiguration"
 		],
 		[
 			"New",
@@ -450,8 +450,8 @@
 			"Feld"
 		],
 		[
-			"Close Party Configurator",
-			"Partie-Konfigurator schließen"
+			"Close Game Configurator",
+			"Game-Konfigurator schließen"
 		],
 		[
 			"River-Preset Editor",

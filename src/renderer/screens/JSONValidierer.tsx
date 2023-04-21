@@ -241,16 +241,16 @@ class JSONValidierer extends React.Component<JSONValidatorProps, JSONValidatorSt
 		const { settings, os } = this.props;
 		return (
 			<ConfirmPopupV2
-				title={window.languageHelper.translate('Close Validator')}
+				title={window.translationHelper.translate('Close Validator')}
 				onConfirm={this.backToHomeScreen}
 				onAbort={this.abortBackToHomeScreen}
-				confirmButtonText={window.languageHelper.translate('OK')}
-				abortButtonText={window.languageHelper.translate('Cancel')}
+				confirmButtonText={window.translationHelper.translate('OK')}
+				abortButtonText={window.translationHelper.translate('Cancel')}
 				windowDimensions={windowDimensions}
 				os={os}
 				settings={settings}
 			>
-				{window.languageHelper.translate('There are unsaved changes. Are you sure you want to leave?')}
+				{window.translationHelper.translate('There are unsaved changes. Are you sure you want to leave?')}
 			</ConfirmPopupV2>
 		);
 	};
@@ -260,7 +260,7 @@ class JSONValidierer extends React.Component<JSONValidatorProps, JSONValidatorSt
 		const { settings, os } = this.props;
 		return (
 			<ConfirmPopupV2
-				title={window.languageHelper.translate('Save Config')}
+				title={window.translationHelper.translate('Save Config')}
 				onConfirm={() => {
 					this.saveFile()
 						.then(() => {
@@ -282,13 +282,15 @@ class JSONValidierer extends React.Component<JSONValidatorProps, JSONValidatorSt
 						code: '{}',
 					});
 				}}
-				confirmButtonText={window.languageHelper.translate('Save')}
-				abortButtonText={window.languageHelper.translate('Discard')}
+				confirmButtonText={window.translationHelper.translate('Save')}
+				abortButtonText={window.translationHelper.translate('Discard')}
 				settings={settings}
 				os={os}
 				windowDimensions={windowDimensions}
 			>
-				{window.languageHelper.translate('There are unsaved changes. Are you sure you want to discard these changes?')}
+				{window.translationHelper.translate(
+					'There are unsaved changes. Are you sure you want to discard these changes?'
+				)}
 			</ConfirmPopupV2>
 		);
 	};
@@ -298,14 +300,14 @@ class JSONValidierer extends React.Component<JSONValidatorProps, JSONValidatorSt
 		const { settings, os } = this.props;
 		return (
 			<PopupV2
-				title={label || window.languageHelper.translate('Open Configuration')}
+				title={label || window.translationHelper.translate('Open Configuration')}
 				windowDimensions={windowDimensions}
 				os={os}
 				settings={settings}
 				onClose={() => {
 					this.setState({ popup: null });
 				}}
-				closeButtonText={window.languageHelper.translate('Close')}
+				closeButtonText={window.translationHelper.translate('Close')}
 			>
 				<ProgressBar
 					wrapperClass="text-center mx-auto justify-center"
@@ -372,7 +374,7 @@ class JSONValidierer extends React.Component<JSONValidatorProps, JSONValidatorSt
 			await window.electron.file.save(currentFile.path, code);
 		} else {
 			this.setState({
-				popup: this.loadingPopup(window.languageHelper.translate('Save Configuration')),
+				popup: this.loadingPopup(window.translationHelper.translate('Save Configuration')),
 			});
 			let save;
 			switch (type) {
@@ -433,9 +435,9 @@ class JSONValidierer extends React.Component<JSONValidatorProps, JSONValidatorSt
 			<div className="dark:bg-muted-800 bg-muted-500 text-white h-[100vh] w-[100vw]">
 				{os === 'win32' ? (
 					<div className="dragger w-[100vw] h-8 bg-muted flex items-center px-2 text-sm">
-						{window.languageHelper.translate('Validator')}
+						{window.translationHelper.translate('Validator')}
 						{` - `}
-						{currentFile ? currentFile.parsed.base : window.languageHelper.translate('Unsaved Configuration')}
+						{currentFile ? currentFile.parsed.base : window.translationHelper.translate('Unsaved Configuration')}
 						{fileHasBeenEdited ? ' *' : ''}
 					</div>
 				) : (
@@ -447,18 +449,22 @@ class JSONValidierer extends React.Component<JSONValidatorProps, JSONValidatorSt
 							os !== 'win32' ? 'pl-20' : ''
 						} `}
 					>
-						<img className="h-6 ml-2 mr-4" src={destinyMountainImage} alt={window.languageHelper.translate('Logo')} />
-						<TopMenuItemCollapsable label={window.languageHelper.translate('Validator')}>
+						<img
+							className="h-6 ml-2 mr-4"
+							src={destinyMountainImage}
+							alt={window.translationHelper.translate('Logo')}
+						/>
+						<TopMenuItemCollapsable label={window.translationHelper.translate('Validator')}>
 							<TopMenuItem
 								type="none"
 								onAction={this.openNewFile}
-								label={window.languageHelper.translate('New')}
+								label={window.translationHelper.translate('New')}
 								icon={<VscNewFile />}
 							/>
 							<TopMenuItem
 								type="none"
 								onAction={this.openFile}
-								label={window.languageHelper.translate('Open')}
+								label={window.translationHelper.translate('Open')}
 								icon={<VscFolder />}
 							/>
 							<TopMenuSeparator />
@@ -466,7 +472,9 @@ class JSONValidierer extends React.Component<JSONValidatorProps, JSONValidatorSt
 								type="none"
 								onAction={this.saveFile}
 								label={`${
-									currentFile ? window.languageHelper.translate('Save') : window.languageHelper.translate('Save as')
+									currentFile
+										? window.translationHelper.translate('Save')
+										: window.translationHelper.translate('Save as')
 								}...`}
 								icon={<VscSave />}
 							/>
@@ -474,7 +482,7 @@ class JSONValidierer extends React.Component<JSONValidatorProps, JSONValidatorSt
 							<TopMenuItem
 								type="none"
 								onAction={this.handleBackButton}
-								label={window.languageHelper.translate('Close')}
+								label={window.translationHelper.translate('Close')}
 							/>
 						</TopMenuItemCollapsable>
 						<div className="flex items-center">
@@ -484,16 +492,16 @@ class JSONValidierer extends React.Component<JSONValidatorProps, JSONValidatorSt
 								options={[
 									{
 										value: 'partie',
-										text: window.languageHelper.translate('Party Configuration'),
+										text: window.translationHelper.translate('Party Configuration'),
 									},
-									{ value: 'board', text: window.languageHelper.translate('Board Configuration') },
+									{ value: 'board', text: window.translationHelper.translate('Board Configuration') },
 								]}
 							/>
 							{currentFile ? (
 								<FilePathComponent os={os} file={currentFile.parsed} edited={fileHasBeenEdited} />
 							) : (
 								<span className="italic">
-									{window.languageHelper.translate('Unsaved Configuration')}
+									{window.translationHelper.translate('Unsaved Configuration')}
 									{fileHasBeenEdited ? ' *' : ''}
 								</span>
 							)}
@@ -507,16 +515,14 @@ class JSONValidierer extends React.Component<JSONValidatorProps, JSONValidatorSt
 								label={null}
 								icon={
 									<VscColorMode
-										title={window.languageHelper.translate('Dark Mode')}
-										className={`${
-											settings.darkMode ? '' : 'rotate-180'
-										} transition transition-all transform-gpu text-lg`}
+										title={window.translationHelper.translate('Dark Mode')}
+										className={`${settings.darkMode ? '' : 'rotate-180'} transition-all transform-gpu text-lg`}
 									/>
 								}
 							/>
 							<TopMenuItem
 								type="none"
-								label={`${window.languageHelper.translate('Version')}: 1.1.2`}
+								label={`${window.translationHelper.translate('Version')}: 1.1.21`}
 								icon={<VscVersions />}
 							/>
 						</div>
@@ -538,7 +544,7 @@ class JSONValidierer extends React.Component<JSONValidatorProps, JSONValidatorSt
 						<div className="grid xl:grid-cols-4 grid-cols-2">
 							<div className="w-full h-[300px] max-h-[300px] flex flex-col border-r border-gray-600 xl:col-span-3">
 								<div className="text-white flex flex-col justify-center border-b border-gray-600 p-1">
-									<div className="pl-4">{window.languageHelper.translate('JSON-Validation')}</div>
+									<div className="pl-4">{window.translationHelper.translate('JSON-Validation')}</div>
 								</div>
 								<div className="w-full bg-white/10 text-white overflow-auto grow">
 									<div className="h-full max-h-full pl-2 font-jetbrains text-sm">{errorMsg}</div>
@@ -546,7 +552,7 @@ class JSONValidierer extends React.Component<JSONValidatorProps, JSONValidatorSt
 							</div>
 							<div className="w-full h-[300px] max-h-[300px] flex flex-col">
 								<div className="text-white flex flex-col justify-center border-b border-gray-600 p-1">
-									<div className="pl-4">{window.languageHelper.translate('Errors')}</div>
+									<div className="pl-4">{window.translationHelper.translate('Errors')}</div>
 								</div>
 								<div className="w-full text-white overflow-auto grow bg-white/10">
 									<div className="h-full max-h-full pl-6 pt-2">

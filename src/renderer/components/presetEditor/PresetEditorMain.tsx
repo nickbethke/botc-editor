@@ -217,7 +217,7 @@ class PresetEditorMain extends React.Component<PresetEditorMainProps, PresetEdit
 					<div className="border-r dark:border-muted-700 border-muted-400 dark:bg-muted-800 flex flex-col">
 						<SidebarMenuItem
 							key={_uniqueId()}
-							label={window.languageHelper.translate('Delete')}
+							label={window.translationHelper.translate('Delete')}
 							open={currentTool === 'delete'}
 							icon={<VscTrash />}
 							onClick={() => {
@@ -227,13 +227,13 @@ class PresetEditorMain extends React.Component<PresetEditorMainProps, PresetEdit
 									onToolChange('delete');
 								}
 							}}
-							shortCut={`${window.languageHelper.translate('Ctrl')}+D`}
+							shortCut={`${window.translationHelper.translate('Ctrl')}+D`}
 							position="right"
 						/>
 						<SidebarMenuItemSeparator />
 						<SidebarMenuItem
 							key={_uniqueId()}
-							label={window.languageHelper.translate('Direction')}
+							label={window.translationHelper.translate('Direction')}
 							open={false}
 							icon={getDirectionArrow(lastSetDirection)}
 							onClick={() => {
@@ -311,13 +311,13 @@ class PresetEditorMain extends React.Component<PresetEditorMainProps, PresetEdit
 					<div className="border-l dark:border-muted-700 border-muted-400 dark:bg-muted-800 flex flex-col">
 						<SidebarMenuItem
 							key={_uniqueId()}
-							label={window.languageHelper.translate('Code Preview')}
+							label={window.translationHelper.translate('Code Preview')}
 							open={previewOpen}
 							icon={<VscJson />}
 							onClick={() => {
 								this.setState({ previewOpen: !previewOpen });
 							}}
-							shortCut={`${window.languageHelper.translate('Ctrl')}+D`}
+							shortCut={`${window.translationHelper.translate('Ctrl')}+D`}
 							position="left"
 						/>
 					</div>

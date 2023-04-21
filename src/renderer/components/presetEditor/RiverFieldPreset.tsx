@@ -44,7 +44,7 @@ class RiverFieldPreset extends React.Component<RiverFieldPresetProps, unknown> {
 				<ContextMenuItemV2
 					text={
 						<div className="flex gap-2">
-							<span>{window.languageHelper.translate('Position')}:</span>
+							<span>{window.translationHelper.translate('Position')}:</span>
 							<span>
 								[{field.position[0]}, {field.position[1]}]
 							</span>
@@ -55,7 +55,7 @@ class RiverFieldPreset extends React.Component<RiverFieldPresetProps, unknown> {
 				<ContextMenuItemV2
 					text={
 						<button type="button" className="flex gap-4 items-center justify-between">
-							<span>{window.languageHelper.translate('North')}</span>
+							<span>{window.translationHelper.translate('North')}</span>
 							{field.direction === 'NORTH' ? <VscCheck /> : null}
 						</button>
 					}
@@ -66,7 +66,7 @@ class RiverFieldPreset extends React.Component<RiverFieldPresetProps, unknown> {
 				<ContextMenuItemV2
 					text={
 						<button type="button" className="flex gap-4 items-center justify-between">
-							<span>{window.languageHelper.translate('East')}</span>
+							<span>{window.translationHelper.translate('East')}</span>
 							{field.direction === 'EAST' ? <VscCheck /> : null}
 						</button>
 					}
@@ -77,7 +77,7 @@ class RiverFieldPreset extends React.Component<RiverFieldPresetProps, unknown> {
 				<ContextMenuItemV2
 					text={
 						<button type="button" className="flex gap-4 items-center justify-between">
-							<span>{window.languageHelper.translate('South')}</span>
+							<span>{window.translationHelper.translate('South')}</span>
 							{field.direction === 'SOUTH' ? <VscCheck /> : null}
 						</button>
 					}
@@ -88,7 +88,7 @@ class RiverFieldPreset extends React.Component<RiverFieldPresetProps, unknown> {
 				<ContextMenuItemV2
 					text={
 						<button type="button" className="flex gap-4 items-center justify-between">
-							<span>{window.languageHelper.translate('West')}</span>
+							<span>{window.translationHelper.translate('West')}</span>
 							{field.direction === 'WEST' ? <VscCheck /> : null}
 						</button>
 					}

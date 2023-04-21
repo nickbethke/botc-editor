@@ -15,6 +15,7 @@ import { getDirectionFieldConfig, getFieldType, getLembasFieldConfig, isDestinyM
 import DirectionHelper from '../generator/helper/DirectionHelper';
 import ContextMenuV2 from './ContextMenuV2';
 import ContextMenuItemV2, { ContextMenuDividerV2 } from './ContextMenuItemV2';
+import FilePathComponent from '../FilePathComponent';
 
 /**
  * The field type onClick arguments
@@ -64,7 +65,7 @@ function WallHelper(props: WallHelperProps) {
 				<ContextMenuItemV2
 					text={
 						<div className="flex gap-2">
-							<span>{window.languageHelper.translate('Position')}:</span>
+							<span>{window.translationHelper.translate('Position')}:</span>
 							<span>
 								[{position[0].x}, {position[0].y}]
 							</span>
@@ -194,7 +195,7 @@ function FieldHelper(props: FieldHelperProps) {
 					<ContextMenuItemV2
 						text={
 							<div className="flex gap-2">
-								<span>{window.languageHelper.translate('Position')}:</span>
+								<span>{window.translationHelper.translate('Position')}:</span>
 								<span>
 									[{position.x}, {position.y}]
 								</span>
@@ -206,7 +207,7 @@ function FieldHelper(props: FieldHelperProps) {
 						text={
 							<div className="flex gap-2 items-center">
 								<VscEdit />
-								{window.languageHelper.translate('Edit')}
+								{window.translationHelper.translate('Edit')}
 							</div>
 						}
 						onClick={() => {
@@ -221,7 +222,7 @@ function FieldHelper(props: FieldHelperProps) {
 				<ContextMenuItemV2
 					text={
 						<div className="flex gap-2">
-							<span>{window.languageHelper.translate('Position')}:</span>
+							<span>{window.translationHelper.translate('Position')}:</span>
 							<span>
 								[{position.x}, {position.y}]
 							</span>
@@ -271,7 +272,7 @@ type MainEditorProps = {
 		path: string;
 	} | null;
 	fileSaved: boolean;
-	fileSep: string;
+	os: NodeJS.Platform;
 };
 /**
  * The main editor component state properties
@@ -463,7 +464,7 @@ class MainEditor extends React.Component<MainEditorProps, MainEditorState> {
 	 * Renders the main editor
 	 */
 	render() {
-		const { config, zoom, file, fileSaved, fileSep } = this.props;
+		const { config, zoom, file, fileSaved, os } = this.props;
 
 		const element = document.getElementById('main-editor-board-board');
 		const element2 = document.getElementById('main-editor');
@@ -481,22 +482,13 @@ class MainEditor extends React.Component<MainEditorProps, MainEditorState> {
 			<div className="max-h-full h-full">
 				<div className="px-2 dark:bg-muted-800 bg-muted-600 text-sm dark:text-muted-200 text-muted-50 h-fit overflow-x-hidden">
 					{file ? (
-						<div className="flex items-center gap-0 h-full">
-							<span className="py-[10px]">
-								{file.parsedPath.dir}
-								{fileSep}
-							</span>
-							<span>
-								{file.parsedPath.base}
-								{fileSaved ? '' : ` *`}
-							</span>
-							<span className="px-2">-</span>
-							<span>{config.name}</span>
+						<div className="flex items-center gap-0 h-full py-[10px]">
+							<FilePathComponent file={file.parsedPath} edited={!fileSaved} os={os} />
 						</div>
 					) : (
 						<div className="flex items-center gap-0 h-full">
 							<span className="py-[10px]">
-								{window.languageHelper.translate('Unsaved File')}
+								{window.translationHelper.translate('Unsaved File')}
 								{fileSaved ? '' : ` *`}
 							</span>
 						</div>

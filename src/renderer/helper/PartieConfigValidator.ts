@@ -11,28 +11,28 @@ class PartieConfigValidator {
 		this.config = partieConfig;
 		this.json = JSON.parse(JSON.stringify(partieConfig));
 
-		if (!this.config.cardSelectionTimeout) {
+		if (!('cardSelectionTimeout' in this.config)) {
 			this.errors.push('cardSelectionTimeout is required');
 		}
-		if (!this.config.characterChoiceTimeout) {
+		if (!('characterChoiceTimeout' in this.config)) {
 			this.errors.push('characterChoiceTimeout is required');
 		}
-		if (!this.config.maxRounds) {
+		if (!('maxRounds' in this.config)) {
 			this.errors.push('maxRounds is required');
 		}
-		if (!this.config.reviveRounds) {
+		if (!('reviveRounds' in this.config)) {
 			this.errors.push('reviveRounds is required');
 		}
-		if (!this.config.riverMoveCount) {
+		if (!('riverMoveCount' in this.config)) {
 			this.errors.push('riverMoveCount is required');
 		}
-		if (!this.config.serverIngameDelay) {
+		if (!('serverIngameDelay' in this.config)) {
 			this.errors.push('serverIngameDelay is required');
 		}
-		if (!this.config.shotLembas) {
+		if (!('shotLembas' in this.config)) {
 			this.errors.push('shotLembas is required');
 		}
-		if (!this.config.startLembas) {
+		if (!('startLembas' in this.config)) {
 			this.errors.push('startLembas is required');
 		}
 	}

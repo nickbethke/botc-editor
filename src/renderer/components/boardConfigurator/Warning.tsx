@@ -86,7 +86,7 @@ function Warning(props: WarningProps) {
 								onFieldSelect(field);
 							}}
 						>
-							{window.languageHelper.translate('Field')}: [{field.x}, {field.y}]
+							{window.translationHelper.translate('Field')}: [{field.x}, {field.y}]
 						</button>
 					))}
 				</div>
@@ -113,7 +113,7 @@ function Warning(props: WarningProps) {
 							onRemoveWall(removeWall);
 						}}
 					>
-						<VscTrash /> {window.languageHelper.translate('Remove wall')}{' '}
+						<VscTrash /> {window.translationHelper.translate('Remove wall')}{' '}
 					</div>
 				</div>
 			) : null}
@@ -128,7 +128,7 @@ function Warning(props: WarningProps) {
 						}}
 					>
 						<VscTrash />{' '}
-						{window.languageHelper.translateVars('Remove {0} field', [fieldEnumToString(removeField.type)])}{' '}
+						{window.translationHelper.translateVars('Remove {0} field', [fieldEnumToString(removeField.type)])}{' '}
 					</div>
 				</div>
 			) : null}

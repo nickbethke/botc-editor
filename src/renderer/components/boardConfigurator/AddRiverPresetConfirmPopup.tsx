@@ -115,10 +115,10 @@ export default class AddRiverPresetConfirmPopup extends Component<
 		const board = this.buildBoard();
 		return (
 			<ConfirmPopupV2
-				title={window.languageHelper.translate('Add River Preset')}
-				abortButtonText={window.languageHelper.translate('Cancel')}
+				title={window.translationHelper.translate('Add River Preset')}
+				abortButtonText={window.translationHelper.translate('Cancel')}
 				onAbort={onCancel}
-				confirmButtonText={window.languageHelper.translate('Add')}
+				confirmButtonText={window.translationHelper.translate('Add')}
 				onConfirm={() => {
 					onConfirm(position, adjustBoardSize);
 				}}
@@ -127,11 +127,11 @@ export default class AddRiverPresetConfirmPopup extends Component<
 				windowDimensions={windowDimensions}
 			>
 				<div className="flex flex-col gap-4">
-					<p>{window.languageHelper.translateVars('Add {0} river preset.', [`"${preset.name}"`])}</p>
+					<p>{window.translationHelper.translateVars('Add {0} river preset.', [`"${preset.name}"`])}</p>
 					<div className="flex gap-2 justify-center items-center">
 						<InputLabel
 							type="switch"
-							label={window.languageHelper.translate('Adjust board size')}
+							label={window.translationHelper.translate('Adjust board size')}
 							value={adjustBoardSize}
 							onChange={() => {
 								this.setState({ adjustBoardSize: !adjustBoardSize });

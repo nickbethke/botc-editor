@@ -77,7 +77,7 @@ export default class PresetView extends Component<PresetViewProps, PresetViewSta
 						<div className="flex flex-col items-center justify-center text-[12px]">
 							<p>{riverPreset.name}</p>
 						</div>
-						<div className="flex" draggable>
+						<div className="flex">
 							{board.map((row) => (
 								<div className="flex flex-col">{row.map((cell) => cell)}</div>
 							))}
@@ -98,7 +98,7 @@ export default class PresetView extends Component<PresetViewProps, PresetViewSta
 							}}
 						>
 							<VscAdd />
-							<p className="whitespace-nowrap">{window.languageHelper.translate('Add to board')}</p>
+							<p className="whitespace-nowrap">{window.translationHelper.translate('Add to board')}</p>
 						</button>
 					</div>
 				</div>
@@ -123,14 +123,14 @@ export default class PresetView extends Component<PresetViewProps, PresetViewSta
 							open === 'riverPresets' ? 'active' : ''
 						}`}
 					>
-						{window.languageHelper.translate('River Presets')}
+						{window.translationHelper.translate('River Presets')}
 					</button>
 					<button
 						type="button"
 						onClick={() => this.setState({ open: 'boardPresets' })}
 						className={`w-full p-2 ${open === 'boardPresets' ? 'active' : ''}`}
 					>
-						{window.languageHelper.translate('Board Presets')}
+						{window.translationHelper.translate('Board Presets')}
 					</button>
 				</div>
 				<div
@@ -170,7 +170,7 @@ export default class PresetView extends Component<PresetViewProps, PresetViewSta
 											contextMenu: (
 												<ContextMenuV2 position={{ x: event.clientX, y: event.clientY }}>
 													<ContextMenuItemV2
-														text={`${window.languageHelper.translate('Open preset')}...`}
+														text={`${window.translationHelper.translate('Open preset')}...`}
 														onClick={async () => {
 															await window.electron.file.openExternal(`${preset.file.dir}/${preset.file.base}`);
 														}}

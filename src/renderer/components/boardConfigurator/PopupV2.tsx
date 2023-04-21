@@ -143,7 +143,7 @@ class PopupV2 extends React.Component<PopupV2Props, PopupV2State> {
 				<div
 					role="presentation"
 					id="popupV2Popup"
-					className={`fixed origin-top-left z-50 max-w-[50vw] transition transition-opacity ${
+					className={`fixed origin-top-left z-50 max-w-[50vw] transition-opacity ${
 						visible ? 'opacity-1' : 'opacity-0'
 					}`}
 					style={{
@@ -155,7 +155,7 @@ class PopupV2 extends React.Component<PopupV2Props, PopupV2State> {
 						<div
 							role="presentation"
 							className="p-2 flex justify-start gap-4 items-center text-lg border-b dark:border-muted-700 border-muted-400"
-							draggable
+							draggable="true"
 							onMouseDown={(e) => {
 								const { isDragged } = this.state;
 								const { settings } = this.props;
@@ -201,7 +201,7 @@ class PopupV2 extends React.Component<PopupV2Props, PopupV2State> {
 								e.preventDefault();
 							}}
 						>
-							<img className="h-6" src={destinyMountainImage} alt={window.languageHelper.translate('Logo')} />
+							<img className="h-6" src={destinyMountainImage} alt={window.translationHelper.translate('Logo')} />
 							<span>{title}</span>
 						</div>
 						<div className="py-2 px-4 overflow-y-auto max-h-[508px]">{children}</div>

@@ -93,51 +93,54 @@ class ConfirmPopupV2 extends React.Component<ConfirmPopupV2Props, ConfirmPopupV2
 	 */
 	componentDidUpdate(prevProps: Readonly<ConfirmPopupV2Props>, prevState: Readonly<ConfirmPopupV2State>) {
 		const { offClick: preOffClick, dimension: preDimension } = prevState;
+		const { visible } = this.state;
 		const popup = document.getElementById('popupV2');
-		if (popup) {
-			const dimension = {
-				width: popup.clientWidth + 4,
-				height: popup.clientHeight + 4,
-			};
-			if (dimension.width !== preDimension.width || dimension.height !== preDimension.height) {
-				this.setState({ dimension });
+		if (visible) {
+			if (popup) {
+				const dimension = {
+					width: popup.clientWidth + 4,
+					height: popup.clientHeight + 4,
+				};
+				if (dimension.width !== preDimension.width || dimension.height !== preDimension.height) {
+					this.setState({ dimension });
+				}
 			}
-		}
 
-		const { offClick, position, dimension } = this.state;
-		const { windowDimensions, os } = this.props;
-		if (offClick !== preOffClick && !preOffClick) {
-			window.electron.app.beep().catch(() => {});
-			setTimeout(() => {
-				this.setState({ offClick: false });
-			}, 500);
-		}
-		if (position.x < 0) {
-			this.setState({ position: { x: 0, y: position.y } });
-		}
-		if (position.y < (os === 'win32' ? 32 : 0)) {
-			this.setState({
-				position: {
-					x: position.x,
-					y: os === 'win32' ? 32 : 0,
-				},
-			});
-		}
-		if (position.x + dimension.width > windowDimensions.width) {
-			this.setState({
-				position: {
-					x: windowDimensions.width - dimension.width,
-					y: position.y,
-				},
-			});
-		}
-		if (position.y + dimension.height > windowDimensions.height) {
-			this.setState({
-				position: {
-					x: position.x,
-					y: windowDimensions.height - dimension.height,
-				},
-			});
+			const { offClick, position, dimension } = this.state;
+			const { windowDimensions, os } = this.props;
+			if (offClick !== preOffClick && !preOffClick) {
+				window.electron.app.beep().catch(() => {});
+				setTimeout(() => {
+					this.setState({ offClick: false });
+				}, 500);
+			}
+			if (position.x < 0) {
+				this.setState({ position: { x: 0, y: position.y } });
+			}
+			if (position.y < (os === 'win32' ? 32 : 0)) {
+				this.setState({
+					position: {
+						x: position.x,
+						y: os === 'win32' ? 32 : 0,
+					},
+				});
+			}
+			if (position.x + dimension.width > windowDimensions.width) {
+				this.setState({
+					position: {
+						x: windowDimensions.width - dimension.width,
+						y: position.y,
+					},
+				});
+			}
+			if (position.y + dimension.height > windowDimensions.height) {
+				this.setState({
+					position: {
+						x: position.x,
+						y: windowDimensions.height - dimension.height,
+					},
+				});
+			}
 		}
 	}
 
@@ -184,7 +187,7 @@ class ConfirmPopupV2 extends React.Component<ConfirmPopupV2Props, ConfirmPopupV2
 						<div
 							role="presentation"
 							className="p-2 flex justify-start gap-4 items-center text-lg border-b dark:border-muted-700 border-muted-400"
-							draggable
+							draggable="true"
 							onMouseDown={(e) => {
 								const { isDragged } = this.state;
 								const { settings } = this.props;
@@ -230,7 +233,7 @@ class ConfirmPopupV2 extends React.Component<ConfirmPopupV2Props, ConfirmPopupV2
 								e.preventDefault();
 							}}
 						>
-							<img className="h-6" src={destinyMountainImage} alt={window.languageHelper.translate('Logo')} />
+							<img className="h-6" src={destinyMountainImage} alt={window.translationHelper.translate('Logo')} />
 							<span className="font-flicker tracking-widest">{title}</span>
 						</div>
 						<div className="py-2 px-4 mb-2">{children}</div>
