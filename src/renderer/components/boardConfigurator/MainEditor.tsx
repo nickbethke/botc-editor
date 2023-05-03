@@ -8,7 +8,7 @@ import {
 	boardPosition2String,
 	wallBoardPosition2String,
 	wallConfig2Map,
-} from '../generator/interfaces/boardPosition';
+} from '../generator/interfaces/BoardPosition';
 import { EditorToolType } from '../../screens/BoardConfiguratorV2';
 import { FieldsEnum } from '../generator/BoardGenerator';
 import {
@@ -71,7 +71,7 @@ function WallHelper(props: WallHelperProps) {
 				<ContextMenuItemV2
 					text={
 						<div className="flex gap-2">
-							<span>{window.translationHelper.translate('Position')}:</span>
+							<span>{window.t.translate('Position')}:</span>
 							<span>
 								[{position[0].x}, {position[0].y}]
 							</span>
@@ -201,7 +201,7 @@ function FieldHelper(props: FieldHelperProps) {
 					<ContextMenuItemV2
 						text={
 							<div className="flex gap-2">
-								<span>{window.translationHelper.translate('Position')}:</span>
+								<span>{window.t.translate('Position')}:</span>
 								<span>
 									[{position.x}, {position.y}]
 								</span>
@@ -213,7 +213,7 @@ function FieldHelper(props: FieldHelperProps) {
 						text={
 							<div className="flex gap-2 items-center">
 								<VscEdit />
-								{window.translationHelper.translate('Edit')}
+								{window.t.translate('Edit')}
 							</div>
 						}
 						onClick={() => {
@@ -228,7 +228,7 @@ function FieldHelper(props: FieldHelperProps) {
 				<ContextMenuItemV2
 					text={
 						<div className="flex gap-2">
-							<span>{window.translationHelper.translate('Position')}:</span>
+							<span>{window.t.translate('Position')}:</span>
 							<span>
 								[{position.x}, {position.y}]
 							</span>
@@ -497,7 +497,7 @@ class MainEditor extends React.Component<MainEditorProps, MainEditorState> {
 					) : (
 						<div className="flex items-center gap-0 h-full">
 							<span className="py-[10px]">
-								{window.translationHelper.translate('Unsaved File')}
+								{window.t.translate('Unsaved File')}
 								{fileSaved ? '' : ` *`}
 							</span>
 						</div>

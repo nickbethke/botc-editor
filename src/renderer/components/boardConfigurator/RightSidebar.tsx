@@ -7,7 +7,7 @@ import MonacoEditor from 'react-monaco-editor';
 import SidebarMenuItem from './SidebarMenuItem';
 import BoardConfigInterface, { Position } from '../interfaces/BoardConfigInterface';
 import Warning, { WarningsMap } from './Warning';
-import { BoardPosition } from '../generator/interfaces/boardPosition';
+import { BoardPosition } from '../generator/interfaces/BoardPosition';
 import { SettingsInterface } from '../../../interfaces/SettingsInterface';
 import { FieldsEnum } from '../generator/BoardGenerator';
 
@@ -74,7 +74,7 @@ class RightSidebar extends React.Component<RightSidebarProps, unknown> {
 		return (
 			<div className="flex flex-col h-full">
 				<div className="p-2 border-b dark:border-muted-700 border-muted-400">
-					{window.translationHelper.translate('Warnings')}
+					{window.t.translate('Warnings')}
 				</div>
 				<div className="flex bg-muted-900/25 flex-col gap-1 flex-grow max-h-full overflow-y-auto">
 					{Array.from(warnings).map((value) => (
@@ -114,7 +114,7 @@ class RightSidebar extends React.Component<RightSidebarProps, unknown> {
 		return (
 			<div className="flex flex-col h-full w-full">
 				<div className="p-2 w-full border-b dark:border-muted-700 border-muted-400 flex justify-between items-center">
-					{window.translationHelper.translate('Configuration Preview')}
+					{window.t.translate('Configuration Preview')}
 					<button
 						className="px-2 py-1 rounded bg-muted-900/25 hover:bg-muted-100/10 flex items-center gap-2"
 						type="button"
@@ -123,7 +123,7 @@ class RightSidebar extends React.Component<RightSidebarProps, unknown> {
 						}}
 					>
 						<VscCopy />
-						{window.translationHelper.translate('Copy')}
+						{window.t.translate('Copy')}
 					</button>
 				</div>
 				<div className="flex-grow bg-muted-900/25 relative w-[347px] overflow-y-auto">
@@ -149,27 +149,27 @@ class RightSidebar extends React.Component<RightSidebarProps, unknown> {
 			<>
 				<SidebarMenuItem
 					position="left"
-					label={window.translationHelper.translate('Warnings')}
+					label={window.t.translate('Warnings')}
 					open={openTab === 'warnings'}
 					icon={<VscWarning className={warnings.size ? 'text-orange-400' : 'text-accent'} />}
 					onClick={() => {
 						this.handleOpenTabChange('warnings');
 					}}
-					shortCut={`${window.translationHelper.translate('Alt')}+-`}
+					shortCut={`${window.t.translate('Alt')}+-`}
 				/>
 				<SidebarMenuItem
 					position="left"
-					label={window.translationHelper.translate('Configuration Preview')}
+					label={window.t.translate('Configuration Preview')}
 					open={openTab === 'configPreview'}
 					icon={<VscJson />}
 					onClick={() => {
 						this.handleOpenTabChange('configPreview');
 					}}
-					shortCut={`${window.translationHelper.translate('Alt')}++`}
+					shortCut={`${window.t.translate('Alt')}++`}
 				/>
 				<SidebarMenuItem
 					position="left"
-					label={window.translationHelper.translate('Save as screenshot')}
+					label={window.t.translate('Save as screenshot')}
 					open={false}
 					icon={<TbScreenShare />}
 					onClick={async () => {

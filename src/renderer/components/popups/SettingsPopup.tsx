@@ -34,10 +34,10 @@ class SettingsPopup extends React.Component<SettingsPopupProps, SettingsPopupSta
 		const { settings } = this.state;
 		return (
 			<ConfirmPopupV2
-				title={window.translationHelper.translate('Settings')}
-				abortButtonText={window.translationHelper.translate('Cancel')}
+				title={window.t.translate('Settings')}
+				abortButtonText={window.t.translate('Cancel')}
 				onAbort={onAbort}
-				confirmButtonText={window.translationHelper.translate('Save')}
+				confirmButtonText={window.t.translate('Save')}
 				onConfirm={() => {
 					onConfirm(settings);
 				}}
@@ -48,7 +48,7 @@ class SettingsPopup extends React.Component<SettingsPopupProps, SettingsPopupSta
 			>
 				<div className="flex flex-col gap-4 p-4">
 					<div className="grid grid-cols-2 items-center gap-8">
-						<p>{window.translationHelper.translate('Language')}</p>
+						<p>{window.t.translate('Language')}</p>
 						<select
 							className="bg-transparent border-b-2 text-sm px-2 py-1 w-full"
 							value={TranslationHelper.stringToEnum(settings.language)}
@@ -61,12 +61,12 @@ class SettingsPopup extends React.Component<SettingsPopupProps, SettingsPopupSta
 								});
 							}}
 						>
-							<option value={AvailableLanguages.de}>{window.translationHelper.translate('German')}</option>
-							<option value={AvailableLanguages.en}>{window.translationHelper.translate('English')}</option>
+							<option value={AvailableLanguages.de}>{window.t.translate('German')}</option>
+							<option value={AvailableLanguages.en}>{window.t.translate('English')}</option>
 						</select>
 					</div>
 					<div className="grid grid-cols-2 items-center gap-8">
-						<p>{window.translationHelper.translate('Dark Mode')}</p>
+						<p>{window.t.translate('Dark Mode')}</p>
 						<InputLabel
 							type="switch"
 							value={settings.darkMode}
@@ -81,7 +81,7 @@ class SettingsPopup extends React.Component<SettingsPopupProps, SettingsPopupSta
 						/>
 					</div>
 					<div className="grid grid-cols-2 items-center gap-8">
-						<p>{window.translationHelper.translate('Popups movable')}</p>
+						<p>{window.t.translate('Popups movable')}</p>
 						<InputLabel
 							type="switch"
 							value={settings.popupsDraggable}

@@ -98,7 +98,7 @@ export default class PresetView extends Component<PresetViewProps, PresetViewSta
 							}}
 						>
 							<VscAdd />
-							<p className="whitespace-nowrap">{window.translationHelper.translate('Add to board')}</p>
+							<p className="whitespace-nowrap">{window.t.translate('Add to board')}</p>
 						</button>
 					</div>
 				</div>
@@ -123,18 +123,18 @@ export default class PresetView extends Component<PresetViewProps, PresetViewSta
 							open === 'riverPresets' ? 'active' : ''
 						}`}
 					>
-						{window.translationHelper.translate('River Presets')}
+						{window.t.translate('River Presets')}
 					</button>
 					<button
 						type="button"
 						onClick={() => this.setState({ open: 'boardPresets' })}
 						className={`w-full p-2 ${open === 'boardPresets' ? 'active' : ''}`}
 					>
-						{window.translationHelper.translate('Board Presets')}
+						{window.t.translate('Board Presets')}
 					</button>
 				</div>
 				<div
-					className={`flex justify-center dark:bg-muted-700 bg-muted-500 transition transition-all overflow-hidden ${
+					className={`flex justify-center dark:bg-muted-700 bg-muted-500 transition-all overflow-hidden ${
 						activePreset
 							? 'h-[364px] opacity-100 m-2 border dark:border-muted-700 border-muted-400 p-2'
 							: 'opacity-0 h-0 p-0 m-0'
@@ -170,7 +170,7 @@ export default class PresetView extends Component<PresetViewProps, PresetViewSta
 											contextMenu: (
 												<ContextMenuV2 position={{ x: event.clientX, y: event.clientY }}>
 													<ContextMenuItemV2
-														text={`${window.translationHelper.translate('Open preset')}...`}
+														text={`${window.t.translate('Open preset')}...`}
 														onClick={async () => {
 															await window.electron.file.openExternal(`${preset.file.dir}/${preset.file.base}`);
 														}}

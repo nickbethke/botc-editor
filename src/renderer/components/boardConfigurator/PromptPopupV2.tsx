@@ -239,7 +239,7 @@ class PromptPopupV2 extends React.Component<PromptPopupV2Props, PromptPopupV2Sta
 								e.preventDefault();
 							}}
 						>
-							<img className="h-6" src={destinyMountainImage} alt={window.translationHelper.translate('Logo')} />
+							<img className="h-6" src={destinyMountainImage} alt={window.t.translate('Logo')} />
 							<span>{title}</span>
 						</div>
 						<div className="py-2 px-4 mb-2">{input.type === 'text' ? this.textInput() : null}</div>

@@ -58,7 +58,7 @@ class BoardEditorChoice extends React.Component<BoardEditorChoiceProps, BoardEdi
 		return (
 			<div className="relative flex gap-8 w-[90vw] xl:w-[80vw] 2xl:w-[60vw] mx-auto items-center justify-center">
 				<BoardEditorChoiceCard
-					text={window.translationHelper.translate('Open River-Preset Editor')}
+					text={window.t.translate('Open River-Preset Editor')}
 					bgImage={newBGImage}
 					onClickAction={this.openRiverPresetEditor}
 					single
@@ -71,17 +71,17 @@ class BoardEditorChoice extends React.Component<BoardEditorChoiceProps, BoardEdi
 		return (
 			<div className="relative flex gap-8 w-[80vw] xl:w-[70vw] 2xl:w-[60vw]  mx-auto">
 				<BoardEditorChoiceCard
-					text={window.translationHelper.translate('Empty Board')}
+					text={window.t.translate('Empty Board')}
 					bgImage={newBGImage}
 					onClickAction={this.openNewBoardConfig}
 				/>
 				<BoardEditorChoiceCard
-					text={window.translationHelper.translate('Random')}
+					text={window.t.translate('Random')}
 					bgImage={randomBGImage}
 					onClickAction={this.openRandomBoardConfig}
 				/>
 				<BoardEditorChoiceCard
-					text={window.translationHelper.translate('Load')}
+					text={window.t.translate('Load')}
 					bgImage={loadingBGImage}
 					onClickAction={this.openLoadBoardConfig}
 				/>
@@ -100,8 +100,8 @@ class BoardEditorChoice extends React.Component<BoardEditorChoiceProps, BoardEdi
 							<div className="flex gap-4 items-center justify-center">
 								<div className="text-center text-3xl font-flicker tracking-widest">
 									{view === 'default'
-										? window.translationHelper.translate('Board-Configurator')
-										: window.translationHelper.translate('River-Preset Editor')}
+										? window.t.translate('Board-Configurator')
+										: window.t.translate('River-Preset Editor')}
 								</div>
 							</div>
 							<div className="flex justify-center">
@@ -115,7 +115,7 @@ class BoardEditorChoice extends React.Component<BoardEditorChoiceProps, BoardEdi
 											this.setState({ view: 'default' });
 										}}
 									>
-										{window.translationHelper.translate('Configuration')}
+										{window.t.translate('Configuration')}
 									</button>
 									<button
 										type="button"
@@ -126,7 +126,7 @@ class BoardEditorChoice extends React.Component<BoardEditorChoiceProps, BoardEdi
 											this.setState({ view: 'riverPreset' });
 										}}
 									>
-										{window.translationHelper.translate('River Preset')}
+										{window.t.translate('River Preset')}
 									</button>
 								</div>
 							</div>

@@ -358,8 +358,12 @@
 			"Generieren"
 		],
 		[
-			"Exact Lembas Count or Random between 0 and Lembas Count",
-			"Exakte Lembas-Anzahl oder zufällig Anzahl zwischen 0 und Lembas-Anzahl"
+			"Random Lembas Count between 0 and Lembas Count",
+			"Zufällige Lembas Anzahl zwischen 0 und Lembas Anzahl"
+		],
+		[
+			"If not checked, the lembas count will be exact the value from above",
+			"Wenn nicht ausgewählt, wird die Lembas Anzahl genau dem Wert von oben entsprechen"
 		],
 		[
 			"possible empty fields / total number of fields",

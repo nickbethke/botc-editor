@@ -1,6 +1,6 @@
 import React from 'react';
 import SortableList, { SortableItem, SortableKnob } from 'react-easy-sort';
-import { BoardPosition } from '../generator/interfaces/boardPosition';
+import { BoardPosition } from '../generator/interfaces/BoardPosition';
 import { Position } from '../interfaces/BoardConfigInterface';
 
 /**

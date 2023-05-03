@@ -7,6 +7,12 @@ module.exports = {
 	content: ['./src/**/*.{html,js,tsx,ejs}'],
 	theme: {
 		extend: {
+			fontFamily: {
+				lato: ['Lato', 'sans-serif'],
+				mono: ['Consolas', 'Liberation Mono', 'Menlo', 'Courier', 'monospace'],
+				jetbrains: ['JetBrains Mono', 'Consolas', 'Liberation Mono', 'Menlo', 'Courier', 'monospace'],
+				flicker: ['flicker', 'sans-serif'],
+			},
 			colors: {
 				background: {
 					DEFAULT: '#010311',

@@ -41,22 +41,22 @@ function TopMenu(props: TopMenuProps) {
 	const { onAction, darkMode } = props;
 	return (
 		<div className="text-[14px] flex items-center">
-			<img className="h-6 ml-2 mr-4" src={destinyMountainImage} alt={window.translationHelper.translate('Logo')} />
-			<TopMenuItemCollapsable label={window.translationHelper.translate('File')}>
-				<TopMenuSubItemCollapsable label={window.translationHelper.translate('New')}>
+			<img className="h-6 ml-2 mr-4" src={destinyMountainImage} alt={window.t.translate('Logo')} />
+			<TopMenuItemCollapsable label={window.t.translate('File')}>
+				<TopMenuSubItemCollapsable label={window.t.translate('New')}>
 					<TopMenuItem
 						className="text-left"
 						action={TopMenuActions.NEW}
 						onAction={onAction}
 						icon={<VscNewFile />}
-						label={window.translationHelper.translate('Empty')}
+						label={window.t.translate('Empty')}
 						type="default"
 					/>
 					<TopMenuItem
 						className="text-left"
 						action={TopMenuActions.NEW_FROM_RANDOM}
 						onAction={onAction}
-						label={`${window.translationHelper.translate('Random')}...`}
+						label={`${window.t.translate('Random')}...`}
 						type="default"
 					/>
 				</TopMenuSubItemCollapsable>
@@ -64,8 +64,8 @@ function TopMenu(props: TopMenuProps) {
 					className="text-left"
 					action={TopMenuActions.OPEN}
 					onAction={onAction}
-					label={`${window.translationHelper.translate('Open')}...`}
-					shortCut={`${window.translationHelper.translate('Ctrl')}+O`}
+					label={`${window.t.translate('Open')}...`}
+					shortCut={`${window.t.translate('Ctrl')}+O`}
 					type="default"
 				/>
 				<TopMenuSeparator />
@@ -73,23 +73,23 @@ function TopMenu(props: TopMenuProps) {
 					className="text-left"
 					action={TopMenuActions.SAVE}
 					onAction={onAction}
-					label={`${window.translationHelper.translate('Save')}...`}
-					shortCut={`${window.translationHelper.translate('Ctrl')}+S`}
+					label={`${window.t.translate('Save')}...`}
+					shortCut={`${window.t.translate('Ctrl')}+S`}
 					type="default"
 				/>
-				<TopMenuSubItemCollapsable label={window.translationHelper.translate('Save as')}>
+				<TopMenuSubItemCollapsable label={window.t.translate('Save as')}>
 					<TopMenuItem
 						className="text-left"
 						action={TopMenuActions.SAVE}
 						onAction={onAction}
-						label={`${window.translationHelper.translate('Configuration')}...`}
+						label={`${window.t.translate('Configuration')}...`}
 						type="default"
 					/>
 					<TopMenuItem
 						className="text-left"
 						action={TopMenuActions.SAVE_AS_PRESET}
 						onAction={onAction}
-						label={`${window.translationHelper.translate('Preset')}...`}
+						label={`${window.t.translate('Preset')}...`}
 						type="default"
 					/>
 				</TopMenuSubItemCollapsable>
@@ -98,7 +98,7 @@ function TopMenu(props: TopMenuProps) {
 					className="text-left"
 					action={TopMenuActions.OPEN_PRESET_FOLDER}
 					onAction={onAction}
-					label={`${window.translationHelper.translate('Open Presets Folder')}...`}
+					label={`${window.t.translate('Open Presets Folder')}...`}
 					type="default"
 				/>
 				<TopMenuSeparator />
@@ -107,8 +107,8 @@ function TopMenu(props: TopMenuProps) {
 					action={TopMenuActions.SETTINGS}
 					onAction={onAction}
 					icon={<VscSettingsGear />}
-					label={`${window.translationHelper.translate('Settings')}...`}
-					shortCut={`${window.translationHelper.translate('Ctrl')}+Alt+S`}
+					label={`${window.t.translate('Settings')}...`}
+					shortCut={`${window.t.translate('Ctrl')}+Alt+S`}
 					type="default"
 				/>
 				<TopMenuSeparator />
@@ -116,18 +116,18 @@ function TopMenu(props: TopMenuProps) {
 					className="text-left"
 					action={TopMenuActions.CLOSE}
 					onAction={onAction}
-					label={window.translationHelper.translate('Close')}
+					label={window.t.translate('Close')}
 					type="default"
 				/>
 			</TopMenuItemCollapsable>
-			<TopMenuItemCollapsable label={window.translationHelper.translate('View')}>
-				<TopMenuSubItemCollapsable label={window.translationHelper.translate('Zoom')}>
+			<TopMenuItemCollapsable label={window.t.translate('View')}>
+				<TopMenuSubItemCollapsable label={window.t.translate('Zoom')}>
 					<TopMenuItem
 						className="text-left"
 						action={TopMenuActions.ZOOM_RESET}
 						onAction={onAction}
 						label="100%"
-						shortCut={`${window.translationHelper.translate('Ctrl')}+Enter`}
+						shortCut={`${window.t.translate('Ctrl')}+Enter`}
 						type="default"
 					/>
 					<TopMenuItem
@@ -135,8 +135,8 @@ function TopMenu(props: TopMenuProps) {
 						action={TopMenuActions.ZOOM_IN}
 						onAction={onAction}
 						icon={<VscZoomIn />}
-						label={window.translationHelper.translate('Zoom in')}
-						shortCut={`${window.translationHelper.translate('Ctrl')}++`}
+						label={window.t.translate('Zoom in')}
+						shortCut={`${window.t.translate('Ctrl')}++`}
 						type="default"
 					/>
 					<TopMenuItem
@@ -144,8 +144,8 @@ function TopMenu(props: TopMenuProps) {
 						action={TopMenuActions.ZOOM_OUT}
 						onAction={onAction}
 						icon={<VscZoomOut />}
-						label={window.translationHelper.translate('Zoom out')}
-						shortCut={`${window.translationHelper.translate('Ctrl')}+-`}
+						label={window.t.translate('Zoom out')}
+						shortCut={`${window.t.translate('Ctrl')}+-`}
 						type="default"
 					/>
 				</TopMenuSubItemCollapsable>
@@ -157,8 +157,8 @@ function TopMenu(props: TopMenuProps) {
 					onAction={onAction}
 					icon={
 						<VscColorMode
-							title={window.translationHelper.translate('Dark Mode')}
-							className={`${darkMode ? '' : 'rotate-180'} transition transition-all transform-gpu text-lg`}
+							title={window.t.translate('Dark Mode')}
+							className={`${darkMode ? '' : 'rotate-180'} transition-all transform-gpu text-lg`}
 						/>
 					}
 					label={null}

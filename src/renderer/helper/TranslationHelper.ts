@@ -46,7 +46,8 @@ class TranslationHelper {
 				this.loadedLanguage = new Map<string, string>(json.data);
 				return null;
 			})
-			.catch(() => {});
+			.catch(() => {
+			});
 	}
 
 	public switchLanguage(lang: AvailableLanguages) {
@@ -60,7 +61,8 @@ class TranslationHelper {
 					resolve();
 					return null;
 				})
-				.catch(() => {});
+				.catch(() => {
+				});
 		});
 	}
 

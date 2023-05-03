@@ -3,7 +3,7 @@ import TranslationHelper from './helper/TranslationHelper';
 
 declare global {
 	interface Window {
-		translationHelper: TranslationHelper;
+		t: TranslationHelper;
 		electron: ElectronHandler;
 	}
 }

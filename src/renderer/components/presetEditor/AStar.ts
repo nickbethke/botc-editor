@@ -1,7 +1,7 @@
 import { AStarFinder } from 'astar-typescript';
 import { IPoint } from 'astar-typescript/dist/interfaces/astar.interfaces';
 import { RiverPreset } from '../../../main/helper/PresetsLoader';
-import { BoardPosition } from '../generator/interfaces/boardPosition';
+import { BoardPosition } from '../generator/interfaces/BoardPosition';
 import { getBoardMaxDimension } from './Helper';
 
 class AStarRiverPreset {

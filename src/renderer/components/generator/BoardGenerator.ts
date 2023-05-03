@@ -75,7 +75,6 @@ export type BoardPosition = {
 	y: number;
 };
 
-// TODO: Flüsse und andere Felder werden an Stellen gesetzt, wo schon ein anderes Feld ist...
 /**
  * The board generation algorithm class
  */

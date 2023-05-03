@@ -2,7 +2,7 @@ import { RiverPresetWithFile } from 'main/helper/PresetsLoader';
 import React, { Component } from 'react';
 import { VscAdd } from 'react-icons/vsc';
 import { SettingsInterface } from '../../../interfaces/SettingsInterface';
-import { BoardPosition } from '../generator/interfaces/boardPosition';
+import { BoardPosition } from '../generator/interfaces/BoardPosition';
 import ConfirmPopupV2 from './ConfirmPopupV2';
 import BoardConfigInterface from '../interfaces/BoardConfigInterface';
 import InputLabel from '../InputLabel';
@@ -115,10 +115,10 @@ export default class AddRiverPresetConfirmPopup extends Component<
 		const board = this.buildBoard();
 		return (
 			<ConfirmPopupV2
-				title={window.translationHelper.translate('Add River Preset')}
-				abortButtonText={window.translationHelper.translate('Cancel')}
+				title={window.t.translate('Add River Preset')}
+				abortButtonText={window.t.translate('Cancel')}
 				onAbort={onCancel}
-				confirmButtonText={window.translationHelper.translate('Add')}
+				confirmButtonText={window.t.translate('Add')}
 				onConfirm={() => {
 					onConfirm(position, adjustBoardSize);
 				}}
@@ -127,11 +127,11 @@ export default class AddRiverPresetConfirmPopup extends Component<
 				windowDimensions={windowDimensions}
 			>
 				<div className="flex flex-col gap-4">
-					<p>{window.translationHelper.translateVars('Add {0} river preset.', [`"${preset.name}"`])}</p>
+					<p>{window.t.translateVars('Add {0} river preset.', [`"${preset.name}"`])}</p>
 					<div className="flex gap-2 justify-center items-center">
 						<InputLabel
 							type="switch"
-							label={window.translationHelper.translate('Adjust board size')}
+							label={window.t.translate('Adjust board size')}
 							value={adjustBoardSize}
 							onChange={() => {
 								this.setState({ adjustBoardSize: !adjustBoardSize });

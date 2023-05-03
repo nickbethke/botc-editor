@@ -45,14 +45,14 @@ class PresetEditSidebar extends React.Component<PresetEditSidebarProps, unknown>
 					onContextMenu(
 						<ContextMenuV2 position={{ x: event.clientX, y: event.clientY }}>
 							<ContextMenuItemV2
-								text={window.translationHelper.translate('Rename')}
+								text={window.t.translate('Rename')}
 								onClick={() => {
 									onRenamePreset(riverPresetWithFile.file);
 								}}
 							/>
 							<ContextMenuDividerV2 />
 							<ContextMenuItemV2
-								text={window.translationHelper.translate('Delete')}
+								text={window.t.translate('Delete')}
 								onClick={() => {
 									onDeletePreset(
 										riverPresetWithFile.file.dir + fileSep + riverPresetWithFile.file.base,
@@ -80,7 +80,7 @@ class PresetEditSidebar extends React.Component<PresetEditSidebarProps, unknown>
 			<div className="h-full max-w-[450px] w-[450px] flex flex-col">
 				<div className="border-y border-r dark:border-muted-700 border-muted-400 dark:bg-muted-800 flex w-full">
 					<SidebarMenuItem
-						label={window.translationHelper.translate('New Preset')}
+						label={window.t.translate('New Preset')}
 						open={false}
 						icon={<VscNewFile />}
 						onClick={onNewFile}
@@ -89,7 +89,7 @@ class PresetEditSidebar extends React.Component<PresetEditSidebarProps, unknown>
 					{isLoadingPresets ? (
 						<div className="ml-auto">
 							<SidebarMenuItem
-								label={window.translationHelper.translate('Loading...')}
+								label={window.t.translate('Loading...')}
 								open={false}
 								icon={<TailSpin height={20} width={20} color="#ffffff" />}
 								onClick={onNewFile}

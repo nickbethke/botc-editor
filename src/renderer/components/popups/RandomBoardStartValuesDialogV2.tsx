@@ -1,8 +1,8 @@
 import React from 'react';
-import { TailSpin } from 'react-loader-spinner';
+import {TailSpin} from 'react-loader-spinner';
 import InputLabel from '../InputLabel';
 import BoardGenerator from '../generator/BoardGenerator';
-import { SettingsInterface } from '../../../interfaces/SettingsInterface';
+import {SettingsInterface} from '../../../interfaces/SettingsInterface';
 import ConfirmPopupV2 from '../boardConfigurator/ConfirmPopupV2';
 
 export type RandomBoardStartValuesDialogV2Stats = {
@@ -93,7 +93,7 @@ class RandomBoardStartValuesDialogV2 extends React.Component<
 		prevProps: Readonly<RandomBoardStartValuesDialogV2Props>,
 		prevState: Readonly<RandomBoardStartValuesDialogV2Stats>
 	) {
-		const { width, height } = this.state;
+		const {width, height} = this.state;
 		const fieldCountNeeded = this.getNeededFieldCount();
 		if (width > this.dimensionMax) {
 			const neededDimension = Math.ceil(fieldCountNeeded / this.dimensionMax);
@@ -112,7 +112,7 @@ class RandomBoardStartValuesDialogV2 extends React.Component<
 			return;
 		}
 		if (fieldCountNeeded > width * height) {
-			const { height: prevHeight, width: prevWidth } = prevState;
+			const {height: prevHeight, width: prevWidth} = prevState;
 			if (prevHeight !== height || (prevWidth === width && height > width)) {
 				const neededDimension = Math.ceil(fieldCountNeeded / height);
 				this.setState({
@@ -136,12 +136,12 @@ class RandomBoardStartValuesDialogV2 extends React.Component<
 	}
 
 	getNeededFieldCount = () => {
-		const { startFields, checkpoints, lembasFields, holes } = this.state;
+		const {startFields, checkpoints, lembasFields, holes} = this.state;
 		return startFields + checkpoints + lembasFields + holes + 1;
 	};
 
 	generate = () => {
-		this.setState({ generating: true }, () => {
+		this.setState({generating: true}, () => {
 			setTimeout(() => {
 				const {
 					height,
@@ -158,7 +158,7 @@ class RandomBoardStartValuesDialogV2 extends React.Component<
 					name,
 					width,
 				} = this.state;
-				const { onConfirm } = this.props;
+				const {onConfirm} = this.props;
 				const generationValues: RandomBoardStartValuesV2 = {
 					height,
 					startFields,
@@ -175,7 +175,7 @@ class RandomBoardStartValuesDialogV2 extends React.Component<
 					width,
 				};
 				const generator = new BoardGenerator(generationValues);
-				this.setState({ generating: false });
+				this.setState({generating: false});
 				onConfirm(generator);
 			}, 1000);
 		});
@@ -198,17 +198,17 @@ class RandomBoardStartValuesDialogV2 extends React.Component<
 			holes,
 			generating,
 		} = this.state;
-		const { windowDimensions, os, topOffset, onAbort, settings } = this.props;
+		const {windowDimensions, os, topOffset, onAbort, settings} = this.props;
 		return (
 			<ConfirmPopupV2
-				title={window.translationHelper.translate('Random Board - Start Values')}
-				abortButtonText={window.translationHelper.translate('Cancel')}
+				title={window.t.translate('Random Board - Start Values')}
+				abortButtonText={window.t.translate('Cancel')}
 				onAbort={onAbort}
 				confirmButtonText={
 					generating ? (
-						<TailSpin height={16} width={16} color="#ffffff" />
+						<TailSpin height={16} width={16} color="#ffffff"/>
 					) : (
-						window.translationHelper.translate('Generate')
+						window.t.translate('Generate')
 					)
 				}
 				onConfirm={this.generate}
@@ -217,190 +217,194 @@ class RandomBoardStartValuesDialogV2 extends React.Component<
 				topOffset={topOffset}
 				settings={settings}
 				maxWidth={1000}
+				big={true}
 			>
-				<div className="grid grid-cols-2 gap-8">
-					<div className="col-span-2">
-						<InputLabel
-							label={window.translationHelper.translate('Board Name')}
-							value={name}
-							onChange={(value) => {
-								this.setState({
-									name: value.toString(),
-								});
-							}}
-							type="text"
-						/>
+				<div className="px-16">
+					<div className="grid grid-cols-2 gap-8">
+						<div className="col-span-2">
+							<InputLabel
+								label={window.t.translate('Board Name')}
+								value={name}
+								onChange={(value) => {
+									this.setState({
+										name: value.toString(),
+									});
+								}}
+								type="text"
+							/>
+						</div>
+						<div className="flex flex-col gap-8">
+							<InputLabel
+								label={window.t.translate('Board Width')}
+								value={width}
+								onChange={(value) => {
+									this.setState({
+										width: Number.parseInt(value.toString(), 10),
+									});
+								}}
+								type="range"
+								min={2}
+								max={this.dimensionMax}
+							/>
+							<InputLabel
+								label={window.t.translate('Start Fields')}
+								value={startFields}
+								onChange={(value) => {
+									this.setState({
+										startFields: Number.parseInt(value.toString(), 10),
+									});
+								}}
+								type="range"
+								min={2}
+								max={6}
+							/>
+						</div>
+						<div className="flex flex-col gap-8">
+							<InputLabel
+								label={window.t.translate('Board Height')}
+								value={height}
+								onChange={(value) => {
+									this.setState({
+										height: Number.parseInt(value.toString(), 10),
+									});
+								}}
+								type="range"
+								min={2}
+							/>
+							<InputLabel
+								label={window.t.translate('Checkpoints')}
+								value={checkpoints}
+								onChange={(value) => {
+									this.setState({
+										checkpoints: Number.parseInt(value.toString(), 10),
+									});
+								}}
+								type="range"
+								min={2}
+								max={32}
+							/>
+						</div>
 					</div>
-					<div className="flex flex-col gap-8">
+					<hr className="my-4"/>
+					<div className="relative grid grid-cols-2 gap-8 h-fit">
 						<InputLabel
-							label={window.translationHelper.translate('Board Width')}
-							value={width}
+							label={window.t.translate('Lembas Fields')}
+							value={lembasFields}
 							onChange={(value) => {
 								this.setState({
-									width: Number.parseInt(value.toString(), 10),
+									lembasFields: Number.parseInt(value.toString(), 10),
 								});
 							}}
 							type="range"
-							min={2}
-							max={this.dimensionMax}
+							min={0}
+							max={32}
 						/>
 						<InputLabel
-							label={window.translationHelper.translate('Start Fields')}
-							value={startFields}
+							label={window.t.translate('Lembas Count')}
+							value={maxLembasAmountOnField}
 							onChange={(value) => {
 								this.setState({
-									startFields: Number.parseInt(value.toString(), 10),
+									maxLembasAmountOnField: Number.parseInt(value.toString(), 10),
 								});
 							}}
 							type="range"
-							min={2}
-							max={6}
+							min={0}
+							max={32}
 						/>
+						<div className="col-span-2">
+							<InputLabel
+								label={window.t.translate('Random Lembas Count between 0 and Lembas Count')}
+								value={!lembasAmountExactMaximum}
+								onChange={(value) => {
+									this.setState({
+										lembasAmountExactMaximum: !value,
+									});
+								}}
+								type="switch"
+							/>
+							<p className="text-sm text-gray-500 text-center"> {window.t.translate('If not checked, the lembas count will be exact the value from above')}</p>
+						</div>
 					</div>
-					<div className="flex flex-col gap-8">
+					<hr className="my-4"/>
+					<div className="relative grid gap-8 h-fit mx-auto w-1/2">
 						<InputLabel
-							label={window.translationHelper.translate('Board Height')}
-							value={height}
+							label={window.t.translate('Holes')}
+							type="range"
+							value={holes}
 							onChange={(value) => {
 								this.setState({
-									height: Number.parseInt(value.toString(), 10),
+									holes: Number.parseInt(value.toString(), 10),
 								});
 							}}
-							type="range"
-							min={2}
-						/>
-						<InputLabel
-							label={window.translationHelper.translate('Checkpoints')}
-							value={checkpoints}
-							onChange={(value) => {
-								this.setState({
-									checkpoints: Number.parseInt(value.toString(), 10),
-								});
-							}}
-							type="range"
-							min={2}
+							min={0}
 							max={32}
 						/>
 					</div>
-				</div>
-				<hr className="my-4" />
-				<div className="relative grid grid-cols-2 gap-8 h-fit">
-					<InputLabel
-						label={window.translationHelper.translate('Lembas Fields')}
-						value={lembasFields}
-						onChange={(value) => {
-							this.setState({
-								lembasFields: Number.parseInt(value.toString(), 10),
-							});
-						}}
-						type="range"
-						min={0}
-						max={32}
-					/>
-					<InputLabel
-						label={window.translationHelper.translate('Lembas Count')}
-						value={maxLembasAmountOnField}
-						onChange={(value) => {
-							this.setState({
-								maxLembasAmountOnField: Number.parseInt(value.toString(), 10),
-							});
-						}}
-						type="range"
-						min={0}
-						max={32}
-					/>
-					<div className="col-span-2">
-						<InputLabel
-							label={window.translationHelper.translate('Exact Lembas Count or Random between 0 and Lembas Count')}
-							value={lembasAmountExactMaximum}
-							onChange={(value) => {
-								this.setState({
-									lembasAmountExactMaximum: !!value,
-								});
-							}}
-							type="switch"
-						/>
-					</div>
-				</div>
-				<hr className="my-4" />
-				<div className="relative grid gap-8 h-fit">
-					<InputLabel
-						label={window.translationHelper.translate('Holes')}
-						type="range"
-						value={holes}
-						onChange={(value) => {
-							this.setState({
-								holes: Number.parseInt(value.toString(), 10),
-							});
-						}}
-						min={0}
-						max={32}
-					/>
-				</div>
-				<hr className="my-4" />
-				<div className="text-center font-lato flex flex-col">
-					<span>{window.translationHelper.translate('possible empty fields / total number of fields')}</span>
-					<span className="text-2xl">
+					<hr className="my-4"/>
+					<div className="text-center font-lato flex flex-col">
+						<span>{window.t.translate('possible empty fields / total number of fields')}</span>
+						<span className="text-2xl">
 						{width * height - this.getNeededFieldCount()}/{width * height}
 					</span>
-				</div>
-				<hr className="my-4" />
-				<div className="relative grid grid-cols-2 gap-8 h-fit">
-					<InputLabel
-						type="switch"
-						label={window.translationHelper.translate('Rivers')}
-						value={rivers}
-						onChange={(value) => {
-							this.setState({
-								rivers: !!value,
-							});
-						}}
-					/>
-					{rivers ? (
-						<div className="flex flex-row font-lato items-center gap-2">
-							<span>{window.translationHelper.translate('Default')}</span>
-							<InputLabel
-								type="switch"
-								bothSides
-								value={riverAlgorithm === 'complex'}
-								onChange={(value) => {
-									this.setState({
-										riverAlgorithm: value ? 'complex' : 'default',
-									});
-								}}
-							/>
-							<span>{window.translationHelper.translate('Complex')}</span>
-						</div>
-					) : null}
-				</div>
-				<hr className="my-4" />
-				<div className="relative grid grid-cols-2 gap-8 h-fit">
-					<InputLabel
-						label={window.translationHelper.translate('Walls')}
-						type="switch"
-						value={walls}
-						onChange={(value) => {
-							this.setState({
-								walls: !!value,
-							});
-						}}
-					/>
-					{walls ? (
-						<div className="flex flex-row font-lato items-center gap-2">
-							<span>{window.translationHelper.translate('Iterative')}</span>
-							<InputLabel
-								type="switch"
-								bothSides
-								value={wallsAlgorithm === 'random'}
-								onChange={(value) => {
-									this.setState({
-										wallsAlgorithm: value ? 'random' : 'iterative',
-									});
-								}}
-							/>
-							<span>{window.translationHelper.translate('Random')}</span>
-						</div>
-					) : null}
+					</div>
+					<hr className="my-4"/>
+					<div className="relative grid grid-cols-2 gap-8 h-fit">
+						<InputLabel
+							type="switch"
+							label={window.t.translate('Rivers')}
+							value={rivers}
+							onChange={(value) => {
+								this.setState({
+									rivers: !!value,
+								});
+							}}
+						/>
+						{rivers ? (
+							<div className="flex flex-row font-lato items-center gap-2">
+								<span>{window.t.translate('Default')}</span>
+								<InputLabel
+									type="switch"
+									bothSides
+									value={riverAlgorithm === 'complex'}
+									onChange={(value) => {
+										this.setState({
+											riverAlgorithm: value ? 'complex' : 'default',
+										});
+									}}
+								/>
+								<span>{window.t.translate('Complex')}</span>
+							</div>
+						) : null}
+					</div>
+					<hr className="my-4"/>
+					<div className="relative grid grid-cols-2 gap-8 h-fit">
+						<InputLabel
+							label={window.t.translate('Walls')}
+							type="switch"
+							value={walls}
+							onChange={(value) => {
+								this.setState({
+									walls: !!value,
+								});
+							}}
+						/>
+						{walls ? (
+							<div className="flex flex-row font-lato items-center gap-2">
+								<span>{window.t.translate('Iterative')}</span>
+								<InputLabel
+									type="switch"
+									bothSides
+									value={wallsAlgorithm === 'random'}
+									onChange={(value) => {
+										this.setState({
+											wallsAlgorithm: value ? 'random' : 'iterative',
+										});
+									}}
+								/>
+								<span>{window.t.translate('Random')}</span>
+							</div>
+						) : null}
+					</div>
 				</div>
 			</ConfirmPopupV2>
 		);

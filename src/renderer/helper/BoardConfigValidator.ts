@@ -1,6 +1,6 @@
-import BoardConfigInterface, { Position } from '../components/interfaces/BoardConfigInterface';
+import BoardConfigInterface, {Position} from '../components/interfaces/BoardConfigInterface';
 import BoardGenerator from '../components/generator/BoardGenerator';
-import { wallPosition2String } from '../components/generator/interfaces/boardPosition';
+import {wallPosition2String} from '../components/generator/interfaces/BoardPosition';
 
 class BoardConfigValidator {
 	private readonly json: JSON;
@@ -13,22 +13,22 @@ class BoardConfigValidator {
 		this.config = boardConfig;
 		this.json = JSON.parse(JSON.stringify(boardConfig));
 
-		if (!this.config.name) {
+		if (!this.config.name || !('name' in this.config)) {
 			this.errors.push(`Board name is not defined`);
 		}
-		if (!this.config.width) {
+		if (!this.config.width || !('width' in this.config)) {
 			this.errors.push(`Board width is not defined`);
 		}
-		if (!this.config.height) {
+		if (!this.config.height || !('height' in this.config)) {
 			this.errors.push(`Board height is not defined`);
 		}
-		if (!this.config.eye) {
+		if (!this.config.eye || !('eye' in this.config)) {
 			this.errors.push(`Board eye is not defined`);
 		}
-		if (!this.config.checkPoints || this.config.checkPoints.length < 2) {
+		if (!this.config.checkPoints || this.config.checkPoints.length < 2 || !('checkPoints' in this.config)) {
 			this.errors.push(`Check points are to less (minimum 2) or not defined`);
 		}
-		if (!this.config.startFields || this.config.startFields.length < 2) {
+		if (!this.config.startFields || this.config.startFields.length < 2 || !('startFields' in this.config)) {
 			this.errors.push(`Start fields are to less (minimum 2) or not defined`);
 		}
 
@@ -133,7 +133,7 @@ class BoardConfigValidator {
 	 * @private
 	 */
 	private checkDimensions(): false | Position {
-		let maxDimensions = { x: 0, y: 0 };
+		let maxDimensions = {x: 0, y: 0};
 		if (this.config.eye) {
 			maxDimensions = BoardConfigValidator.getMaxDimension(maxDimensions, this.config.eye.position);
 		}

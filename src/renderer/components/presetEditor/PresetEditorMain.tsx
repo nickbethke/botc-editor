@@ -7,7 +7,7 @@ import SidebarMenuItem, { SidebarMenuItemSeparator } from '../boardConfigurator/
 import { RiverPreset, RiverPresetDirection } from '../../../main/helper/PresetsLoader';
 import { RiverPresetEditorTools } from '../../screens/RiverPresetEditor';
 import { removeRiver } from './Helper';
-import { BoardPosition } from '../generator/interfaces/boardPosition';
+import { BoardPosition } from '../generator/interfaces/BoardPosition';
 import { SettingsInterface } from '../../../interfaces/SettingsInterface';
 import OpenPresets from './OpenPresets';
 import EditorCache from './EditorCache';
@@ -217,7 +217,7 @@ class PresetEditorMain extends React.Component<PresetEditorMainProps, PresetEdit
 					<div className="border-r dark:border-muted-700 border-muted-400 dark:bg-muted-800 flex flex-col">
 						<SidebarMenuItem
 							key={_uniqueId()}
-							label={window.translationHelper.translate('Delete')}
+							label={window.t.translate('Delete')}
 							open={currentTool === 'delete'}
 							icon={<VscTrash />}
 							onClick={() => {
@@ -227,13 +227,13 @@ class PresetEditorMain extends React.Component<PresetEditorMainProps, PresetEdit
 									onToolChange('delete');
 								}
 							}}
-							shortCut={`${window.translationHelper.translate('Ctrl')}+D`}
+							shortCut={`${window.t.translate('Ctrl')}+D`}
 							position="right"
 						/>
 						<SidebarMenuItemSeparator />
 						<SidebarMenuItem
 							key={_uniqueId()}
-							label={window.translationHelper.translate('Direction')}
+							label={window.t.translate('Direction')}
 							open={false}
 							icon={getDirectionArrow(lastSetDirection)}
 							onClick={() => {
@@ -264,7 +264,7 @@ class PresetEditorMain extends React.Component<PresetEditorMainProps, PresetEdit
 						<div
 							className={`${
 								previewOpen && previewFull ? 'opacity-0' : 'opacity-100'
-							} grow overflow-x-hidden col-span-2 flex justify-center items-center grow dark:bg-muted-700 bg-muted-500 transition transition-all`}
+							} grow overflow-x-hidden col-span-2 flex justify-center items-center grow dark:bg-muted-700 bg-muted-500 transition-all`}
 							style={previewOpen ? preViewOpenMainStyle : { width: 'calc(100vw - 506px)' }}
 						>
 							<div className="p-4 w-fit h-fit dark:bg-muted-800 bg-muted-600 rounded">
@@ -280,7 +280,7 @@ class PresetEditorMain extends React.Component<PresetEditorMainProps, PresetEdit
 						<div
 							className={`${
 								previewOpen && previewFull ? 'hidden w-0' : 'display w-full'
-							} dark:bg-muted-800 bg-muted-600 p-2 transition transition-all`}
+							} dark:bg-muted-800 bg-muted-600 p-2 transition-all`}
 						>
 							<InputLabel
 								type="text"
@@ -294,7 +294,7 @@ class PresetEditorMain extends React.Component<PresetEditorMainProps, PresetEdit
 							/>
 						</div>
 					</div>
-					<div className={`transition transition-all overflow-x-hidden ${previewOpen ? previewOpenClass : 'w-0'}`}>
+					<div className={`transition-all overflow-x-hidden ${previewOpen ? previewOpenClass : 'w-0'}`}>
 						<MonacoEditor
 							value={config ? JSON.stringify(config, null, 4) : ''}
 							width={previewFull ? window.innerWidth - 506 : 450}
@@ -314,13 +314,13 @@ class PresetEditorMain extends React.Component<PresetEditorMainProps, PresetEdit
 					<div className="border-l dark:border-muted-700 border-muted-400 dark:bg-muted-800 flex flex-col">
 						<SidebarMenuItem
 							key={_uniqueId()}
-							label={window.translationHelper.translate('Code Preview')}
+							label={window.t.translate('Code Preview')}
 							open={previewOpen}
 							icon={<VscJson />}
 							onClick={() => {
 								this.setState({ previewOpen: !previewOpen });
 							}}
-							shortCut={`${window.translationHelper.translate('Ctrl')}+D`}
+							shortCut={`${window.t.translate('Ctrl')}+D`}
 							position="left"
 						/>
 					</div>

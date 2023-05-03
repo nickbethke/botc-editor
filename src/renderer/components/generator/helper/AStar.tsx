@@ -4,7 +4,7 @@ import { BoardPosition } from '../BoardGenerator';
 import Hole from '../fields/Hole';
 import River from '../fields/River';
 import BoardConfigInterface from '../../interfaces/BoardConfigInterface';
-import { position2BoardPosition, wallBoardPositions2String, wallConfig2Map } from '../interfaces/boardPosition';
+import { position2BoardPosition, wallBoardPositions2String, wallConfig2Map } from '../interfaces/BoardPosition';
 import directionHelper from './DirectionHelper';
 import StartField from '../fields/StartField';
 import Checkpoint from '../fields/Checkpoint';

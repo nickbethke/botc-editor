@@ -1,7 +1,7 @@
 import React from 'react';
 import _uniqueId from 'lodash/uniqueId';
 import { VscTrash } from 'react-icons/vsc';
-import { BoardPosition } from '../generator/interfaces/boardPosition';
+import { BoardPosition } from '../generator/interfaces/BoardPosition';
 import { Position } from '../interfaces/BoardConfigInterface';
 import { FieldsEnum } from '../generator/BoardGenerator';
 
@@ -86,7 +86,7 @@ function Warning(props: WarningProps) {
 								onFieldSelect(field);
 							}}
 						>
-							{window.translationHelper.translate('Field')}: [{field.x}, {field.y}]
+							{window.t.translate('Field')}: [{field.x}, {field.y}]
 						</button>
 					))}
 				</div>
@@ -113,7 +113,7 @@ function Warning(props: WarningProps) {
 							onRemoveWall(removeWall);
 						}}
 					>
-						<VscTrash /> {window.translationHelper.translate('Remove wall')}{' '}
+						<VscTrash /> {window.t.translate('Remove wall')}{' '}
 					</div>
 				</div>
 			) : null}
@@ -128,7 +128,7 @@ function Warning(props: WarningProps) {
 						}}
 					>
 						<VscTrash />{' '}
-						{window.translationHelper.translateVars('Remove {0} field', [fieldEnumToString(removeField.type)])}{' '}
+						{window.t.translateVars('Remove {0} field', [fieldEnumToString(removeField.type)])}{' '}
 					</div>
 				</div>
 			) : null}

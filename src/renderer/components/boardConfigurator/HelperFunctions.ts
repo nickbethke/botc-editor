@@ -5,7 +5,7 @@ import {
 	position2String,
 	wallBoardPosition2String,
 	wallPosition2String,
-} from '../generator/interfaces/boardPosition';
+} from '../generator/interfaces/BoardPosition';
 import BoardConfigInterface, {
 	DirectionEnum,
 	LembasField,

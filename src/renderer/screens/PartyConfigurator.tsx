@@ -1,21 +1,21 @@
 import React from 'react';
-import { BiChevronLeft } from 'react-icons/bi';
-import { VscAdd, VscColorMode, VscFile, VscSave } from 'react-icons/vsc';
-import { isBoolean } from 'lodash';
+import {BiChevronLeft} from 'react-icons/bi';
+import {VscAdd, VscColorMode, VscFile, VscSave} from 'react-icons/vsc';
+import {isBoolean} from 'lodash';
 import Mousetrap from 'mousetrap';
 import backgroundImage from '../../../assets/images/damn_nice_background_color.png';
 import backgroundImageDark from '../../../assets/images/damn_nice_background.png';
 import InputLabel from '../components/InputLabel';
 import Notification from '../components/Notification';
 import Error from '../components/Error';
-import InputValidator, { InputValidatorType } from '../helper/InputValidator';
+import InputValidator, {InputValidatorType} from '../helper/InputValidator';
 
 import PartieConfigInterface, {
 	PartieConfigWithPath,
 	PathInterface,
 } from '../components/interfaces/PartieConfigInterface';
 import ConfirmPopupV2 from '../components/boardConfigurator/ConfirmPopupV2';
-import { SettingsInterface } from '../../interfaces/SettingsInterface';
+import {SettingsInterface} from '../../interfaces/SettingsInterface';
 import FilePathComponent from '../components/FilePathComponent';
 
 type PartieKonfiguratorProps = {
@@ -74,30 +74,25 @@ class PartyConfigurator extends React.Component<PartieKonfiguratorProps, PartieK
 
 	componentDidMount() {
 		Mousetrap.bind('ctrl+s', () => {
-			this.handleSaveClick().catch(() => {});
+			this.handleSaveClick().catch(() => {
+			});
 		});
 		Mousetrap.bind('ctrl+n', () => {
 			this.handleNewConfigClick();
 		});
-		window.addEventListener('resize', () => {
-			this.setState({
-				windowDimensions: {
-					width: window.innerWidth,
-					height: window.innerHeight,
-				},
-			});
-		});
-		const { loadedValues } = this.props;
-		const { file } = this.state;
+		window.addEventListener('resize', this.handleResize);
+
+		const {loadedValues} = this.props;
+		const {file} = this.state;
 		if (loadedValues && file == null && this.predictIfConfigurationIsPartyConfiguration(loadedValues.config)) {
-			const configuration: PartieConfigInterface = { ...this.default, ...loadedValues.config };
+			const configuration: PartieConfigInterface = {...this.default, ...loadedValues.config};
 			window.electron
 				.validate(loadedValues.config, 'partie')
 				.then((valid) => {
 					if (isBoolean(valid) && valid) {
 						this.setState({
 							configuration,
-							notification: <Notification label={window.translationHelper.translate('Loaded successfully')} />,
+							notification: <Notification label={window.t.translate('Loaded successfully')}/>,
 							file: loadedValues as PathInterface,
 						});
 
@@ -105,12 +100,28 @@ class PartyConfigurator extends React.Component<PartieKonfiguratorProps, PartieK
 					}
 					this.setState({
 						file: null,
-						notification: <Error label={window.translationHelper.translate('Failed to load file!')} />,
+						notification: <Error label={window.t.translate('Failed to load file!')}/>,
 					});
 					return null;
 				})
-				.catch(() => {});
+				.catch(() => {
+				});
 		}
+	}
+
+	componentWillUnmount() {
+		Mousetrap.unbind('ctrl+s');
+		Mousetrap.unbind('ctrl+n');
+		window.removeEventListener('resize', this.handleResize);
+	}
+
+	handleResize = () => {
+		this.setState({
+			windowDimensions: {
+				width: window.innerWidth,
+				height: window.innerHeight,
+			},
+		});
 	}
 
 	predictIfConfigurationIsPartyConfiguration = (configuration: object) => {
@@ -127,38 +138,38 @@ class PartyConfigurator extends React.Component<PartieKonfiguratorProps, PartieK
 	};
 
 	handleBackButton = () => {
-		const { edited } = this.state;
+		const {edited} = this.state;
 		if (edited) {
-			this.setState({ popupLeave: true });
+			this.setState({popupLeave: true});
 		} else {
-			const { onClose } = this.props;
+			const {onClose} = this.props;
 			onClose();
 		}
 	};
 
 	backToHomeScreen = () => {
-		const { onClose } = this.props;
+		const {onClose} = this.props;
 		onClose();
 	};
 
 	abortBackToHomeScreen = () => {
-		this.setState({ popupLeave: false });
+		this.setState({popupLeave: false});
 	};
 
 	handleSaveClick = async () => {
-		const { configuration, file } = this.state;
-		const json = JSON.stringify({ ...this.default, ...configuration }, null, 4);
+		const {configuration, file} = this.state;
+		const json = JSON.stringify({...this.default, ...configuration}, null, 4);
 
 		if (file) {
 			const answer = await window.electron.file.save(file.path, json);
 			if (answer)
 				this.setState({
 					edited: false,
-					notification: <Notification label="Erfolgreich gespeichert" />,
+					notification: <Notification label="Erfolgreich gespeichert"/>,
 				});
 			else
 				this.setState({
-					notification: <Error label="Speichern fehlgeschlagen!" />,
+					notification: <Error label="Speichern fehlgeschlagen!"/>,
 				});
 		} else {
 			const answer = await window.electron.dialog.savePartieConfig(json);
@@ -166,11 +177,11 @@ class PartyConfigurator extends React.Component<PartieKonfiguratorProps, PartieK
 				this.setState({
 					file: answer as PathInterface,
 					edited: false,
-					notification: <Notification label="Erfolgreich gespeichert" />,
+					notification: <Notification label="Erfolgreich gespeichert"/>,
 				});
 			else
 				this.setState({
-					notification: <Error label="Speichern fehlgeschlagen!" />,
+					notification: <Error label="Speichern fehlgeschlagen!"/>,
 				});
 		}
 	};
@@ -183,75 +194,75 @@ class PartyConfigurator extends React.Component<PartieKonfiguratorProps, PartieK
 		if (partieJSON) {
 			if (this.predictIfConfigurationIsPartyConfiguration(partieJSON.config)) {
 				this.setState({
-					configuration: { ...partieJSON.config },
+					configuration: {...partieJSON.config},
 					file: partieJSON as PathInterface,
-					notification: <Notification label="Erfolgreich geladen" />,
+					notification: <Notification label="Erfolgreich geladen"/>,
 					edited: false,
 				});
 				return;
 			}
 			this.setState({
 				notification: (
-					<Error label={window.translationHelper.translate('The loaded file is not a party configuration.')} />
+					<Error label={window.t.translate('The loaded file is not a party configuration.')}/>
 				),
 			});
 			return;
 		}
 		this.setState({
 			notification: (
-				<Error label={window.translationHelper.translate('The loaded file is not a party configuration.')} />
+				<Error label={window.t.translate('The loaded file is not a party configuration.')}/>
 			),
 		});
 	};
 
 	handleNewConfigClick = () => {
-		const { edited } = this.state;
+		const {edited} = this.state;
 		if (edited) {
-			this.setState({ popupNew: true });
+			this.setState({popupNew: true});
 		} else {
-			this.setState({ edited: false, file: null, configuration: this.default });
+			this.setState({edited: false, file: null, configuration: this.default});
 		}
 	};
 
 	render = () => {
-		const { configuration, notification, popupLeave, windowDimensions, file, edited, popupNew } = this.state;
-		const { os, settings, onSettingsUpdate, fullScreen } = this.props;
-		const notWinDragger = !fullScreen ? <div className="dragger w-[100vw] h-8 absolute top-0 left-0" /> : null;
+		const {configuration, notification, popupLeave, windowDimensions, file, edited, popupNew} = this.state;
+		const {os, settings, onSettingsUpdate, fullScreen} = this.props;
+		const notWinDragger = !fullScreen ? <div className="dragger w-[100vw] h-8 absolute top-0 left-0"/> : null;
 		return (
 			<div className="dark:bg-muted-800 bg-muted-600 flex flex-col duration-500">
-				{os === 'win32' ? <div className="dragger w-[100vw] h-8 bg-muted" /> : notWinDragger}
+				{os === 'win32' ? <div className="dragger w-[100vw] h-8 bg-muted"/> : notWinDragger}
 				{popupLeave ? (
 					<ConfirmPopupV2
-						title={window.translationHelper.translate('Close Game Configurator')}
+						title={window.t.translate('Close Game Configurator')}
 						onConfirm={this.backToHomeScreen}
 						onAbort={this.abortBackToHomeScreen}
 						settings={settings}
 						windowDimensions={windowDimensions}
-						confirmButtonText={window.translationHelper.translate('Discard')}
+						confirmButtonText={window.t.translate('Discard')}
 						os={os}
-						abortButtonText={window.translationHelper.translate('Cancel')}
+						abortButtonText={window.t.translate('Cancel')}
 					>
-						{window.translationHelper.translate(
+						{window.t.translate(
 							'The current file has not yet been saved. Do you want to discard the current changes?'
 						)}
 					</ConfirmPopupV2>
 				) : null}
 				{popupNew ? (
 					<ConfirmPopupV2
-						title={window.translationHelper.translate('New Game Configuration')}
+						title={window.t.translate('New Game Configuration')}
 						onConfirm={() => {
-							this.setState({ edited: false, popupNew: false, configuration: this.default, file: null });
+							this.setState({edited: false, popupNew: false, configuration: this.default, file: null});
 						}}
 						onAbort={() => {
-							this.setState({ popupNew: false });
+							this.setState({popupNew: false});
 						}}
 						settings={settings}
 						windowDimensions={windowDimensions}
-						confirmButtonText={window.translationHelper.translate('Discard')}
+						confirmButtonText={window.t.translate('Discard')}
 						os={os}
-						abortButtonText={window.translationHelper.translate('Cancel')}
+						abortButtonText={window.t.translate('Cancel')}
 					>
-						{window.translationHelper.translate(
+						{window.t.translate(
 							'The current changes had not yet been saved. Do you want to discard the current changes?'
 						)}
 					</ConfirmPopupV2>
@@ -276,9 +287,9 @@ class PartyConfigurator extends React.Component<PartieKonfiguratorProps, PartieK
 								className="rounded border dark:border-muted-700 border-muted-400 hover:bg-accent-500 transition"
 								onClick={this.handleBackButton}
 							>
-								<BiChevronLeft className="text-4xl" />
+								<BiChevronLeft className="text-4xl"/>
 							</button>
-							<div className="text-4xl">{window.translationHelper.translate('Game-Configurator')}</div>
+							<div className="text-4xl">{window.t.translate('Game-Configurator')}</div>
 							<button
 								type="button"
 								className="p-1 dark:bg-muted-800 bg-muted-600 dark:hover:bg-muted-700 hover:bg-muted-500 transition flex items-center ml-auto"
@@ -290,7 +301,7 @@ class PartyConfigurator extends React.Component<PartieKonfiguratorProps, PartieK
 								}}
 							>
 								<VscColorMode
-									title={window.translationHelper.translate('Dark Mode')}
+									title={window.t.translate('Dark Mode')}
 									className={`${settings.darkMode ? '' : 'rotate-180'} transition transform-gpu text-lg`}
 								/>
 							</button>
@@ -302,7 +313,7 @@ class PartyConfigurator extends React.Component<PartieKonfiguratorProps, PartieK
 									className="flex gap-2 items-center rounded border dark:border-muted-700 border-muted-400 dark:bg-muted-800 bg-muted-500 dark:hover:bg-accent-500 hover:bg-accent-500 transition px-4 py-2"
 									onClick={this.handleNewConfigClick}
 								>
-									<VscAdd /> {window.translationHelper.translate('New')}
+									<VscAdd/> {window.t.translate('New')}
 								</button>
 							</div>
 							<div>
@@ -311,7 +322,7 @@ class PartyConfigurator extends React.Component<PartieKonfiguratorProps, PartieK
 									className="flex gap-2 items-center rounded border dark:border-muted-700 border-muted-400 dark:bg-muted-800 bg-muted-500 dark:hover:bg-accent-500 hover:bg-accent-500 transition px-4 py-2"
 									onClick={this.handleSaveClick}
 								>
-									<VscSave /> {window.translationHelper.translate('Save')}
+									<VscSave/> {window.t.translate('Save')}
 								</button>
 							</div>
 							<div>
@@ -320,19 +331,21 @@ class PartyConfigurator extends React.Component<PartieKonfiguratorProps, PartieK
 									className="flex gap-2 items-center rounded border dark:border-muted-700 border-muted-400 dark:bg-muted-800 bg-muted-500 dark:hover:bg-accent-500 hover:bg-accent-500 transition px-4 py-2"
 									onClick={this.openLoadPartieConfig}
 								>
-									<VscFile />
-									{window.translationHelper.translate('Load')}
+									<VscFile/>
+									{window.t.translate('Load')}
 								</button>
 							</div>
 							<div>
 								{file ? (
-									<div className="rounded border dark:border-muted-700 border-muted-400 dark:bg-muted-800 bg-muted-500 px-4 py-2">
-										<FilePathComponent file={file.parsedPath} os={os} edited={edited} />
+									<div
+										className="rounded border dark:border-muted-700 border-muted-400 dark:bg-muted-800 bg-muted-500 px-4 py-2">
+										<FilePathComponent file={file.parsedPath} os={os} edited={edited}/>
 									</div>
 								) : (
-									<div className="rounded border dark:border-muted-700 border-muted-400 dark:bg-muted-800 bg-muted-500 px-4 py-2">
+									<div
+										className="rounded border dark:border-muted-700 border-muted-400 dark:bg-muted-800 bg-muted-500 px-4 py-2">
 										<div className="flex items-center gap-0 h-full">
-											{window.translationHelper.translate('Unsaved File')}
+											{window.t.translate('Unsaved File')}
 											{!edited ? '' : ` *`}
 										</div>
 									</div>

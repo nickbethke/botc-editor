@@ -1,6 +1,6 @@
 {
 	"$schema": "http://json-schema.org/draft-07/schema",
-	"title": "Party configuration schema",
+	"title": "Game Configuration Schema",
 	"type": "object",
 	"required": [
 		"startLembas",
@@ -45,5 +45,6 @@
 			"type": "integer",
 			"minimum": 0
 		}
-	}
+	},
+	"additionalProperties": false
 }

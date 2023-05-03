@@ -1,4 +1,4 @@
-import { BoardPosition } from '../generator/interfaces/boardPosition';
+import { BoardPosition } from '../generator/interfaces/BoardPosition';
 import { RiverPreset } from '../../../main/helper/PresetsLoader';
 
 export function removeRiver(position: BoardPosition, config: RiverPreset) {

@@ -201,7 +201,7 @@ class PopupV2 extends React.Component<PopupV2Props, PopupV2State> {
 								e.preventDefault();
 							}}
 						>
-							<img className="h-6" src={destinyMountainImage} alt={window.translationHelper.translate('Logo')} />
+							<img className="h-6" src={destinyMountainImage} alt={window.t.translate('Logo')} />
 							<span>{title}</span>
 						</div>
 						<div className="py-2 px-4 overflow-y-auto max-h-[508px]">{children}</div>
