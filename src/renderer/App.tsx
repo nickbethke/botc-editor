@@ -20,22 +20,7 @@ import SettingsPopup from './components/popups/SettingsPopup';
 import RandomBoardStartValuesDialogV2 from './components/popups/RandomBoardStartValuesDialogV2';
 import PopupV2 from './components/boardConfigurator/PopupV2';
 import RiverPresetEditor from './screens/RiverPresetEditor';
-
-function HomeScreenButton(props: { text: string; onClick: () => void; tabIndex: number; last?: boolean }) {
-	const {onClick, tabIndex, text, last} = props;
-	return (
-		<span
-			role="presentation"
-			tabIndex={tabIndex}
-			className={`text-2xl cursor-pointer hover ${last ? 'last' : ''}`}
-			onClick={onClick}
-		>
-			{text}
-		</span>
-	);
-}
-
-HomeScreenButton.defaultProps = {last: false};
+import {HomeMenuSeparator, HomeScreenButton} from "./components/HomeScreenButton";
 
 type AppPopups =
 	| 'boardEditorChoiceV2'
@@ -404,17 +389,25 @@ class App extends React.Component<AppProps, AppStates> {
 					) : (
 						<div className="fixed top-0 left-0 dragger w-[100vw] h-8"/>
 					)}
-					<div className="grid grid-cols-2 grow font-flicker">
+
+					<div className="grid grid-cols-2 grow">
+
 						<div className="flex flex-col pb-8"
 							 style={{height: window.innerHeight - (os === 'win32' ? 32 : 0)}}>
-							<div className="flex flex-col py-8 px-12 justify-between grow">
-								<div>
-									<div className="text-4xl xl:text-6xl 2xl:text-8xl">Battle of the Centerländ</div>
-									<div className="text-2xl xl:text-4xl 2xl:text-6xl tracking-widest">
+							<div className="flex flex-col pt-8 justify-between grow">
+								<div
+									className="flex xl:flex-col items-center xl:items-start gap-4 xl:gap-0 w-full px-12">
+									<div
+										className="text-4xl xl:text-6xl 2xl:text-8xl dark:font-with-gradient pt-4 font-flicker">Battle
+										of the Centerländ
+									</div>
+									<div
+										className="text-2xl xl:text-4xl 2xl:text-6xl tracking-widest dark:font-with-gradient pt-4 xl:pt-0 font-flicker">
 										{window.t.translate('Editor')}
 									</div>
 								</div>
-								<div className="flex flex-col justify-start gap-4 w-fit text-left tracking-widest">
+								<div
+									className="flex flex-col justify-start gap-4 w-fit text-left tracking-widest p-12">
 									<HomeScreenButton
 										text={window.t.translate('Board-Configurator')}
 										onClick={this.handleOpenBoardEditorChoiceV2}
@@ -425,18 +418,19 @@ class App extends React.Component<AppProps, AppStates> {
 										onClick={this.handleOpenPartieEditorChoice}
 										tabIndex={tabIndex}
 									/>
+									<HomeMenuSeparator/>
 									<HomeScreenButton
 										text={window.t.translate('Validator')}
 										onClick={this.handleOpenValidator}
 										tabIndex={tabIndex}
 									/>
-									<TopMenuSeparator/>
+									<HomeMenuSeparator/>
 									<HomeScreenButton
 										text={window.t.translate('Settings')}
 										onClick={this.handleOpenSettings}
 										tabIndex={tabIndex}
 									/>
-									<TopMenuSeparator/>
+									<HomeMenuSeparator/>
 									<HomeScreenButton
 										text={window.t.translate('Exit')}
 										onClick={this.handleCloseApp}
@@ -464,7 +458,7 @@ class App extends React.Component<AppProps, AppStates> {
 						</div>
 					</div>
 					<div
-						className="absolute bottom-0 left-0 z-10 bg-muted p-2 w-[100vw] font-jetbrains flex flex-row items-center justify-end gap-2 text-[10px]">
+						className="absolute bottom-0 left-0 z-10 bg-white/25 dark:bg-white/10 p-2 w-[100vw] font-jetbrains flex flex-row items-center justify-end gap-2 text-[10px]">
 						<span>
 							{window.t.translate('Editor Version')}: {version}
 						</span>

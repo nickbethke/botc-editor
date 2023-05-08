@@ -1,5 +1,5 @@
 import React from 'react';
-import { VscChromeClose } from 'react-icons/vsc';
+import {VscChromeClose} from 'react-icons/vsc';
 
 type NotificationProps = {
 	label: string;
@@ -11,16 +11,16 @@ type NotificationState = {
 class Notification extends React.Component<NotificationProps, NotificationState> {
 	constructor(props: NotificationProps) {
 		super(props);
-		this.state = { visible: true };
+		this.state = {visible: true};
 	}
 
 	close = () => {
-		this.setState({ visible: false });
+		this.setState({visible: false});
 	};
 
 	render() {
-		const { visible } = this.state;
-		const { label } = this.props;
+		const {visible} = this.state;
+		const {label} = this.props;
 		return (
 			<div
 				className={`dark:bg-muted-100/25 bg-muted-100/10 border border-green-400 px-4 py-2 rounded flex items-center relative${
@@ -33,10 +33,10 @@ class Notification extends React.Component<NotificationProps, NotificationState>
 					type="button"
 					className="ml-auto"
 					onClick={() => {
-						this.setState({ visible: false });
+						this.setState({visible: false});
 					}}
 				>
-					<VscChromeClose onClick={this.close} />
+					<VscChromeClose onClick={this.close}/>
 				</button>
 			</div>
 		);

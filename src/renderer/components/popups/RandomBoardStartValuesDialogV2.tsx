@@ -322,7 +322,7 @@ class RandomBoardStartValuesDialogV2 extends React.Component<
 								}}
 								type="switch"
 							/>
-							<p className="text-sm text-gray-500 text-center"> {window.t.translate('If not checked, the lembas count will be exact the value from above')}</p>
+							<p className="text-sm text-gray-300 dark:text-gray-500 text-center"> {window.t.translate('If not checked, the lembas count will be exact the value from above')}</p>
 						</div>
 					</div>
 					<hr className="my-4"/>

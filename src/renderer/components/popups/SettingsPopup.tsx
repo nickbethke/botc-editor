@@ -1,8 +1,8 @@
 import React from 'react';
-import { SettingsInterface } from '../../../interfaces/SettingsInterface';
+import {SettingsInterface} from '../../../interfaces/SettingsInterface';
 import ConfirmPopupV2 from '../boardConfigurator/ConfirmPopupV2';
 import InputLabel from '../InputLabel';
-import TranslationHelper, { AvailableLanguages } from '../../helper/TranslationHelper';
+import TranslationHelper from '../../helper/TranslationHelper';
 
 interface SettingsPopupProps {
 	settings: SettingsInterface;
@@ -20,7 +20,7 @@ interface SettingsPopupStat {
 class SettingsPopup extends React.Component<SettingsPopupProps, SettingsPopupStat> {
 	constructor(props: SettingsPopupProps) {
 		super(props);
-		this.state = { settings: props.settings };
+		this.state = {settings: props.settings};
 	}
 
 	static get defaultProps() {
@@ -30,8 +30,8 @@ class SettingsPopup extends React.Component<SettingsPopupProps, SettingsPopupSta
 	}
 
 	render() {
-		const { os, windowDimensions, onAbort, onConfirm, topOffset } = this.props;
-		const { settings } = this.state;
+		const {os, windowDimensions, onAbort, onConfirm, topOffset} = this.props;
+		const {settings} = this.state;
 		return (
 			<ConfirmPopupV2
 				title={window.t.translate('Settings')}
@@ -51,18 +51,19 @@ class SettingsPopup extends React.Component<SettingsPopupProps, SettingsPopupSta
 						<p>{window.t.translate('Language')}</p>
 						<select
 							className="bg-transparent border-b-2 text-sm px-2 py-1 w-full"
-							value={TranslationHelper.stringToEnum(settings.language)}
+							value={settings.language}
 							onChange={(event) => {
 								this.setState({
 									settings: {
 										...settings,
-										language: AvailableLanguages[Number.parseInt(event.target.value, 10)] as 'de' | 'en',
+										language: event.target.value,
 									},
 								});
 							}}
 						>
-							<option value={AvailableLanguages.de}>{window.t.translate('German')}</option>
-							<option value={AvailableLanguages.en}>{window.t.translate('English')}</option>
+							<option value={'de'}>{window.t.translate('German')}</option>
+							<option value={'en'}>{window.t.translate('English')}</option>
+							<option value={'fr'}>{window.t.translate('French')}</option>
 						</select>
 					</div>
 					<div className="grid grid-cols-2 items-center gap-8">

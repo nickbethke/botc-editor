@@ -3,7 +3,7 @@
  */
 export interface SettingsInterface {
 	darkMode: boolean;
-	language: 'en' | 'de';
+	language: string;
 	popupsDraggable: boolean;
 
 	[k: string]: unknown;

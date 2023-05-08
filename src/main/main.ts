@@ -9,17 +9,23 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 import path from 'path';
-import { app, BrowserWindow, ipcMain, shell } from 'electron';
-import { resolveHtmlPath } from './util';
+import {app, BrowserWindow, ipcMain, shell} from 'electron';
+import {resolveHtmlPath} from './util';
 import IPCHelper from './helper/IPCHelper';
 
 let mainWindow: BrowserWindow | null = null;
 
+/**
+ * if app is in production mode add source map support
+ */
 if (process.env.NODE_ENV === 'production') {
 	const sourceMapSupport = require('source-map-support');
 	sourceMapSupport.install();
 }
 
+/**
+ * if app is in development mode add debug
+ */
 const isDebug = process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true';
 
 if (isDebug) {
@@ -36,9 +42,13 @@ const installExtensions = async () => {
 			extensions.map((name) => installer[name]),
 			forceDownload
 		)
-		.catch(() => {});
+		.catch(() => {
+		});
 };
 
+/**
+ * Creates the main window, registers all callbacks and loads the index.html file
+ */
 const createWindow = async () => {
 	if (isDebug) {
 		await installExtensions();
@@ -66,8 +76,8 @@ const createWindow = async () => {
 			symbolColor: '#ffffff',
 			height: 32,
 		},
-		trafficLightPosition:{
-			x: 10, y:11
+		trafficLightPosition: {
+			x: 10, y: 11
 		},
 		icon: getAssetPath('icon.png'),
 		webPreferences: {
@@ -76,7 +86,17 @@ const createWindow = async () => {
 		},
 	});
 
-	mainWindow.loadURL(resolveHtmlPath('index.html'));
+	mainWindow.loadURL(resolveHtmlPath('index.html')).then(() => {
+		if (!mainWindow) {
+			throw new Error('"mainWindow" is not defined');
+		}
+		if (process.env.START_MINIMIZED) {
+			mainWindow.minimize();
+		} else {
+			mainWindow.show();
+			mainWindow.focus();
+		}
+	});
 
 	mainWindow.on('ready-to-show', () => {
 		if (!mainWindow) {
@@ -86,6 +106,7 @@ const createWindow = async () => {
 			mainWindow.minimize();
 		} else {
 			mainWindow.show();
+			mainWindow.focus();
 		}
 	});
 
@@ -98,7 +119,7 @@ const createWindow = async () => {
 	// Open urls in the user's browser
 	mainWindow.webContents.setWindowOpenHandler((details) => {
 		shell.openExternal(details.url);
-		return { action: 'deny' };
+		return {action: 'deny'};
 	});
 
 	// Remove this if your app does not use auto updates
@@ -235,15 +256,19 @@ app.on('window-all-closed', () => {
 		app.quit();
 	}
 });
-app
-	.whenReady()
-	.then(() => {
-		createWindow();
-		app.on('activate', () => {
-			// On macOS, it's common to re-create a window in the app when the
-			// dock icon is clicked and there are no other windows openExternal.
-			if (mainWindow === null) createWindow();
-		});
-		registerHandlers();
-	})
-	.catch(() => {});
+
+const run = async () => {
+	await app.whenReady();
+	await createWindow();
+	app.on('activate', () => {
+		// On macOS, it's common to re-create a window in the app when the
+		// dock icon is clicked and there are no other windows openExternal.
+		if (mainWindow === null) createWindow();
+	});
+	registerHandlers();
+
+};
+
+run().catch((e) => {
+	console.error(e);
+});

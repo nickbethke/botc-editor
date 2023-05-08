@@ -1,6 +1,7 @@
 export enum AvailableLanguages {
 	'en',
 	'de',
+	'fr',
 }
 
 export interface LanguageSchema {
@@ -51,7 +52,7 @@ class TranslationHelper {
 	}
 
 	public switchLanguage(lang: AvailableLanguages) {
-		return new Promise<void>((resolve) => {
+		return new Promise<void>((resolve, reject) => {
 			window.electron.file
 				.getTranslation(AvailableLanguages[lang])
 				.then((content) => {
@@ -62,6 +63,7 @@ class TranslationHelper {
 					return null;
 				})
 				.catch(() => {
+					reject();
 				});
 		});
 	}
@@ -73,6 +75,20 @@ class TranslationHelper {
 				return AvailableLanguages.de;
 			case 'en':
 				return AvailableLanguages.en;
+			case 'fr':
+				return AvailableLanguages.fr;
+		}
+	}
+
+	static enumToString(value: AvailableLanguages) {
+		switch (value) {
+			case AvailableLanguages.de:
+			default:
+				return 'de';
+			case AvailableLanguages.en:
+				return 'en';
+			case AvailableLanguages.fr:
+				return 'fr';
 		}
 	}
 }

@@ -149,6 +149,7 @@
 	*::before {
 		user-select: none;
 		box-sizing: border-box;
+		/*outline: rgb(255, 80, 80) dashed 1px;*/
 	}
 
 	body {
@@ -169,30 +170,23 @@
 }
 
 @layer components {
-	.hover {
-		background-image: linear-gradient(to right, #aadbbf, #aadbbf 50%, #fff 50%);
-		background-size: 200% 100%;
-		background-position: -100%;
-		display: inline-block;
-		position: relative;
+	.bg-clip-text {
 		-webkit-background-clip: text;
 		-webkit-text-fill-color: transparent;
-		transition: all 0.3s ease-in-out;
-		width: fit-content;
+	}
 
+	.hover {
+		@apply relative w-fit;
 		&:before {
 			content: '';
-			background: #71c294;
-			display: block;
-			position: absolute;
-			bottom: -3px;
-			left: 0;
-			width: 0;
-			height: 3px;
-			transition: all 0.3s ease-in-out;
+			@apply bg-gradient-to-r from-accent-300 to-amber-300 block absolute bottom-0 left-0 w-0 h-0.5 transition-all ease-in-out;
 		}
 
-		&:hover {
+		&:focus {
+			outline: none;
+		}
+
+		&:hover, &:focus {
 			background-position: 0;
 
 			&::before {
@@ -202,8 +196,6 @@
 	}
 
 	.hover.last {
-		background-image: linear-gradient(to right, white, white 50%, #fff 50%);
-
 		&:before {
 			background: white;
 		}
@@ -247,13 +239,12 @@
 		@apply outline-accent;
 	}
 
+	input[type='range'] {
+		@apply appearance-none w-full relative bg-muted-100/25 dark:bg-muted-900/25 h-2;
+	}
+
 	input[type='range']::-webkit-slider-thumb {
-		-webkit-appearance: none;
-		height: 12px;
-		width: 12px;
-		background: #ffffff;
-		border: 2px solid white;
-		@apply dark:bg-muted-900 bg-muted-200 rounded-3xl;
+		@apply appearance-none border-2 border-white rounded-full cursor-pointer h-4 w-2 dark:bg-accent-400 bg-accent;
 	}
 
 	select option {
@@ -450,5 +441,13 @@
 				@apply bg-white/10;
 			}
 		}
+	}
+
+	.dark\:font-with-gradient {
+		@apply dark:bg-gradient-to-tr dark:from-accent-300 dark:to-amber-300 w-fit dark:text-transparent dark:bg-clip-text;
+	}
+
+	.font-with-gradient {
+		@apply bg-gradient-to-tr from-accent-300 to-amber-300 w-fit text-transparent bg-clip-text;
 	}
 }

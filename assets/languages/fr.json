@@ -1,0 +1,525 @@
+{
+	"lang": "fr",
+	"data": [
+		[
+			"Game-Configurator",
+			"Game-Configurator"
+		],
+		[
+			"Board-Configurator",
+			"Board-Configurator"
+		],
+		[
+			"Validator",
+			"Validator"
+		],
+		[
+			"Exit",
+			"Sortie"
+		],
+		[
+			"Website",
+			"Site Web"
+		],
+		[
+			"Editor Version",
+			"Version de l'éditeur"
+		],
+		[
+			"Empty Board",
+			"Tableau vide"
+		],
+		[
+			"Random",
+			"Aléatoire"
+		],
+		[
+			"Load",
+			"Charger"
+		],
+		[
+			"Board Configuration",
+			"Configuration du tableau"
+		],
+		[
+			"New Game Configuration",
+			"Nouvelle configuration de jeu"
+		],
+		[
+			"Game Configuration",
+			"Configuration du jeu"
+		],
+		[
+			"New",
+			"Nouveau"
+		],
+		[
+			"Open",
+			"Ouvrir"
+		],
+		[
+			"Save",
+			"Enregistrer"
+		],
+		[
+			"Type",
+			"Type"
+		],
+		[
+			"Version",
+			"Version"
+		],
+		[
+			"JSON-Validation",
+			"Validation JSON"
+		],
+		[
+			"Errors",
+			"Erreurs"
+		],
+		[
+			"Save Configuration",
+			"Enregistrer la configuration"
+		],
+		[
+			"Open Configuration",
+			"Ouvrir la configuration"
+		],
+		[
+			"Discard",
+			"Abandonner"
+		],
+		[
+			"Save {0}?",
+			"Enregistrer {0}?"
+		],
+		[
+			"Leave Validator?",
+			"Quitter le validateur?"
+		],
+		[
+			"OK",
+			"OK"
+		],
+		[
+			"Cancel",
+			"Annuler"
+		],
+		[
+			"as Preset",
+			"comme préréglage"
+		],
+		[
+			"as Configuration",
+			"comme configuration"
+		],
+		[
+			"Close",
+			"Fermer"
+		],
+		[
+			"Empty",
+			"Vide"
+		],
+		[
+			"from Random",
+			"de aléatoire"
+		],
+		[
+			"Dark Mode",
+			"Mode sombre"
+		],
+		[
+			"Open Configuration",
+			"Ouvrir la configuration"
+		],
+		[
+			"Open Presets Folder",
+			"Ouvrir le dossier des préréglages"
+		],
+		[
+			"Settings",
+			"Paramètres"
+		],
+		[
+			"Board",
+			"Tableau"
+		],
+		[
+			"Board Settings",
+			"Paramètres du tableau"
+		],
+		[
+			"Board Name",
+			"Nom du tableau"
+		],
+		[
+			"Board Width",
+			"Largeur du tableau"
+		],
+		[
+			"Board Height",
+			"Hauteur du tableau"
+		],
+		[
+			"Fields",
+			"Champs"
+		],
+		[
+			"Presets",
+			"Préréglages"
+		],
+		[
+			"Start",
+			"Début"
+		],
+		[
+			"Checkpoint",
+			"Point de contrôle"
+		],
+		[
+			"Saurons Eye",
+			"Œil de Sauron"
+		],
+		[
+			"Lembas Field",
+			"Champ de Lembas"
+		],
+		[
+			"River",
+			"Rivière"
+		],
+		[
+			"Hole",
+			"Trou"
+		],
+		[
+			"Wall",
+			"Mur"
+		],
+		[
+			"Delete",
+			"Supprimer"
+		],
+		[
+			"Checkpoint Order",
+			"Ordre de contrôle"
+		],
+		[
+			"Warnings",
+			"Avertissements"
+		],
+		[
+			"Ctrl",
+			"Ctrl"
+		],
+		[
+			"Global Settings",
+			"Paramètres globaux"
+		],
+		[
+			"North",
+			"Nord"
+		],
+		[
+			"South",
+			"Sud"
+		],
+		[
+			"East",
+			"Est"
+		],
+		[
+			"West",
+			"Ouest"
+		],
+		[
+			"Direction",
+			"Direction"
+		],
+		[
+			"Amount",
+			"Montant"
+		],
+		[
+			"Configuration Preview",
+			"Aperçu de la configuration"
+		],
+		[
+			"Wall Tool",
+			"Outil de mur"
+		],
+		[
+			"File",
+			"Fichier"
+		],
+		[
+			"View",
+			"Vue"
+		],
+		[
+			"Board-Configurator V2",
+			"Board-Configurator V2"
+		],
+		[
+			"German",
+			"Alemand"
+		],
+		[
+			"English",
+			"Anglais"
+		],
+		[
+			"French",
+			"Français"
+		],
+		[
+			"Language",
+			"Langue"
+		],
+		[
+			"Popups movable",
+			"Popups déplaçables"
+		],
+		[
+			"Edit Field",
+			"Modifier le champ"
+		],
+		[
+			"Mouse",
+			"Souris"
+		],
+		[
+			"Edit",
+			"Modifier"
+		],
+		[
+			"The current file has not yet been saved. Do you want to discard the current changes?",
+			"Le fichier actuel n'a pas encore été enregistré. Voulez-vous abandonner les modifications en cours?"
+		],
+		[
+			"Save as",
+			"Enregistrer sous"
+		],
+		[
+			"Unsaved File",
+			"Fichier non enregistré"
+		],
+		[
+			"Configuration",
+			"Configuration"
+		],
+		[
+			"Empty",
+			"Vide"
+		],
+		[
+			"Close Board Configurator",
+			"Fermer le configurateur de tableau"
+		],
+		[
+			"Random Board - Start Values",
+			"Tableau aléatoire - Valeurs de départ"
+		],
+		[
+			"New Config",
+			"Nouvelle configuration"
+		],
+		[
+			"Checkpoints",
+			"Points de contrôle"
+		],
+		[
+			"Start Fields",
+			"Champs de départ"
+		],
+		[
+			"Lembas Fields",
+			"Champs de Lembas"
+		],
+		[
+			"Lembas Count",
+			"Nombre de Lembas"
+		],
+		[
+			"Rivers",
+			"Rivières"
+		],
+		[
+			"Walls",
+			"Murs"
+		],
+		[
+			"Complex",
+			"Complexe"
+		],
+		[
+			"Iterative",
+			"Itératif"
+		],
+		[
+			"Generate",
+			"Générer"
+		],
+		[
+			"Random Lembas Count between 0 and Lembas Count",
+			"Nombre de Lembas aléatoire entre 0 et le nombre de Lembas"
+		],
+		[
+			"If not checked, the lembas count will be exact the value from above",
+			"Si non coché, le nombre de lembas sera exactement la valeur ci-dessus"
+		],
+		[
+			"possible empty fields / total number of fields",
+			"champs vides possibles / nombre total de champs"
+		],
+		[
+			"The current board state is not playable, because {0} to {1} has no valid path.",
+			"Le tableau actuel n'est pas jouable, car {0} à {1} n'a pas de chemin valide."
+		],
+		[
+			"Pathfinding",
+			"Recherche de chemin"
+		],
+		[
+			"The current board state is not playable.",
+			"Le tableau actuel n'est pas jouable."
+		],
+		[
+			"The current board state is playable.",
+			"Le tableau actuel est jouable."
+		],
+		[
+			"Save as screenshot",
+			"Enregistrer comme capture d'écran"
+		],
+		[
+			"Holes",
+			"Des trous"
+		],
+		[
+			"The current game board state is not playable because there are not enough starting spaces.",
+			"Le tableau de jeu actuel n'est pas jouable car il n'y a pas assez d'espaces de départ."
+		],
+		[
+			"Lembas amount",
+			"Montant de Lembas"
+		],
+		[
+			"Editor",
+			"Éditeur"
+		],
+		[
+			"Start fields",
+			"Champs de départ"
+		],
+		[
+			"Minimum {0}",
+			"Minimum {0}"
+		],
+		[
+			"The current game board state is not playable because there are not enough checkpoints.",
+			"Le tableau de jeu actuel n'est pas jouable car il n'y a pas assez de points de contrôle."
+		],
+		[
+			"Maximum {0}",
+			"Maximum {0}"
+		],
+		[
+			"Logo",
+			"Logo"
+		],
+		[
+			"Preset",
+			"Préréglage"
+		],
+		[
+			"Zoom",
+			"Zoom"
+		],
+		[
+			"Zoom in",
+			"Zoom avant"
+		],
+		[
+			"Zoom out",
+			"Zoom arrière"
+		],
+		[
+			"Alt",
+			"Alt"
+		],
+		[
+			"River Field",
+			"Champ de rivière"
+		],
+		[
+			"Field",
+			"Champ"
+		],
+		[
+			"Close Game Configurator",
+			"Fermer le configurateur de jeu"
+		],
+		[
+			"River-Preset Editor",
+			"Éditeur de préréglage de rivière"
+		],
+		[
+			"River Preset",
+			"Préréglage de rivière"
+		],
+		[
+			"New River Preset",
+			"Nouveau préréglage de rivière"
+		],
+		[
+			"Load River Preset",
+			"Charger le préréglage de rivière"
+		],
+		[
+			"Unsaved Preset",
+			"Préréglage non enregistré"
+		],
+		[
+			"Open River-Preset Editor",
+			"Ouvrir l'éditeur de préréglage de rivière"
+		],
+		[
+			"New Preset",
+			"Nouveau préréglage"
+		],
+		[
+			"Loading...",
+			"Chargement..."
+		],
+		[
+			"Rename",
+			"Renommer"
+		],
+		[
+			"Rename Preset",
+			"Renommer le préréglage"
+		],
+		[
+			"Close River Preset",
+			"Fermer le préréglage de rivière"
+		],
+		[
+			"Save and close",
+			"Enregistrer et fermer"
+		],
+		[
+			"This file has not yet been saved. Do you want to save the current changes before closing?",
+			"Ce fichier n'a pas encore été enregistré. Voulez-vous enregistrer les modifications en cours avant de fermer?"
+		],
+		[
+			"There are still unsaved changes. Do you want to save changes before closing?",
+			"Il reste des modifications non enregistrées. Voulez-vous enregistrer les modifications avant de fermer?"
+		],
+		[
+			"Close River-Preset Editor",
+			"Fermer l'éditeur de préréglage de rivière"
+		]
+	]
+}
