@@ -2,28 +2,72 @@
 	"$schema": "http://json-schema.org/draft-07/schema",
 	"title": "Settings Schema",
 	"type": "object",
-	"additionalProperties": true,
+	"additionalProperties": false,
 	"properties": {
 		"darkMode": {
 			"type": "boolean",
 			"default": true
 		},
 		"language": {
-			"type": "string",
-			"enum": [
-				"de",
-				"en"
-			],
-			"default": "en"
+			"type": "string"
 		},
 		"popupsDraggable": {
 			"type": "boolean",
 			"default": false
+		},
+		"defaultValues": {
+			"type": "object",
+			"additionalProperties": false,
+			"properties": {
+				"defaultBoardName": {
+					"type": "string",
+					"default": "New Board"
+				},
+				"maxBoardSize": {
+					"type": "integer",
+					"minimum": 2,
+					"maximum": 64,
+					"default": 20
+				},
+				"maxCheckpoints": {
+					"type": "integer",
+					"minimum": 1,
+					"maximum": 64,
+					"default": 16
+				},
+				"maxLembasFields": {
+					"type": "integer",
+					"minimum": 1,
+					"maximum": 64,
+					"default": 16
+				},
+				"maxLembasCount": {
+					"type": "integer",
+					"minimum": 1,
+					"maximum": 64,
+					"default": 16
+				},
+				"maxHoles": {
+					"type": "integer",
+					"minimum": 1,
+					"maximum": 64,
+					"default": 16
+				}
+			},
+			"required": [
+				"defaultBoardName",
+				"maxBoardSize",
+				"maxCheckpoints",
+				"maxLembasFields",
+				"maxLembasCount",
+				"maxHoles"
+			]
 		}
 	},
 	"required": [
 		"darkMode",
 		"language",
-		"popupsDraggable"
+		"popupsDraggable",
+		"defaultValues"
 	]
 }

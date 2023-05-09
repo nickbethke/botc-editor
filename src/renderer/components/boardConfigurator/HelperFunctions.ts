@@ -12,7 +12,7 @@ import BoardConfigInterface, {
 	Position,
 	PositionDirection,
 } from '../interfaces/BoardConfigInterface';
-import { FieldsEnum } from '../generator/BoardGenerator';
+import {FieldsEnum} from '../generator/BoardGenerator';
 import DirectionHelper from '../generator/helper/DirectionHelper';
 
 /**
@@ -78,7 +78,7 @@ export function removeCheckpoint(position: BoardPosition, config: BoardConfigInt
 	const filteredCheckpointArray = config.checkPoints.filter((e) => {
 		return position2String(e) !== boardPosition2String(position);
 	});
-	return { ...config, checkPoints: filteredCheckpointArray };
+	return {...config, checkPoints: filteredCheckpointArray};
 }
 
 /**
@@ -90,7 +90,7 @@ export function removeStartField(position: BoardPosition, config: BoardConfigInt
 	const filteredStartFieldsArray = config.startFields.filter((e) => {
 		return position2String(e.position) !== boardPosition2String(position);
 	});
-	return { ...config, startFields: filteredStartFieldsArray };
+	return {...config, startFields: filteredStartFieldsArray};
 }
 
 /**
@@ -102,7 +102,7 @@ export function removeLembasField(position: BoardPosition, config: BoardConfigIn
 	const filteredLembasFieldsArray = config.lembasFields.filter((e) => {
 		return position2String(e.position) !== boardPosition2String(position);
 	});
-	return { ...config, lembasFields: filteredLembasFieldsArray };
+	return {...config, lembasFields: filteredLembasFieldsArray};
 }
 
 /**
@@ -114,7 +114,7 @@ export function removeRiver(position: BoardPosition, config: BoardConfigInterfac
 	const filteredRiverFieldsArray = config.riverFields.filter((e) => {
 		return position2String(e.position) !== boardPosition2String(position);
 	});
-	return { ...config, riverFields: filteredRiverFieldsArray };
+	return {...config, riverFields: filteredRiverFieldsArray};
 }
 
 /**
@@ -124,7 +124,7 @@ export function removeRiver(position: BoardPosition, config: BoardConfigInterfac
  */
 export function removeHole(position: BoardPosition, config: BoardConfigInterface): BoardConfigInterface {
 	const filteredHolesArray = config.holes.filter((e) => position2String(e) !== boardPosition2String(position));
-	return { ...config, holes: filteredHolesArray };
+	return {...config, holes: filteredHolesArray};
 }
 
 /**
@@ -157,7 +157,7 @@ function overrideField(
 	const type = getFieldType(position, config);
 	switch (type) {
 		case FieldsEnum.EYE:
-			return { config, override: false };
+			return {config, override: false};
 		case FieldsEnum.START:
 			return {
 				config: removeStartField(position, config),
@@ -184,7 +184,7 @@ function overrideField(
 				override: true,
 			};
 		default:
-			return { config, override: false };
+			return {config, override: false};
 	}
 }
 
@@ -194,7 +194,7 @@ function overrideField(
  * @param config
  */
 export function moveSauronsEye(position: BoardPosition, config: BoardConfigInterface): BoardConfigInterface {
-	const { config: newConfig } = overrideField(position, config);
+	const {config: newConfig} = overrideField(position, config);
 	return {
 		...newConfig,
 		eye: {
@@ -210,10 +210,10 @@ export function moveSauronsEye(position: BoardPosition, config: BoardConfigInter
  * @param config
  */
 export function addCheckpoint(position: BoardPosition, config: BoardConfigInterface): BoardConfigInterface {
-	const { config: newConfig } = overrideField(position, config);
+	const {config: newConfig} = overrideField(position, config);
 	const newCheckpointsArray = newConfig.checkPoints;
 	newCheckpointsArray.push(boardPosition2Position(position));
-	return { ...newConfig, checkPoints: newCheckpointsArray };
+	return {...newConfig, checkPoints: newCheckpointsArray};
 }
 
 /**
@@ -222,14 +222,14 @@ export function addCheckpoint(position: BoardPosition, config: BoardConfigInterf
  * @param config
  */
 export function addStartField(position: BoardPosition, config: BoardConfigInterface): BoardConfigInterface {
-	const { config: newConfig } = overrideField(position, config);
+	const {config: newConfig} = overrideField(position, config);
 
 	const newStartFieldsArray = newConfig.startFields;
 	newStartFieldsArray.push({
 		position: boardPosition2Position(position),
 		direction: 'NORTH',
 	});
-	return { ...newConfig, startFields: newStartFieldsArray };
+	return {...newConfig, startFields: newStartFieldsArray};
 }
 
 /**
@@ -238,13 +238,13 @@ export function addStartField(position: BoardPosition, config: BoardConfigInterf
  * @param config
  */
 export function addLembasField(position: BoardPosition, config: BoardConfigInterface): BoardConfigInterface {
-	const { config: newConfig } = overrideField(position, config);
+	const {config: newConfig} = overrideField(position, config);
 	const newLembasFieldsArray = newConfig.lembasFields;
 	newLembasFieldsArray.push({
 		position: boardPosition2Position(position),
 		amount: 3,
 	});
-	return { ...newConfig, lembasFields: newLembasFieldsArray };
+	return {...newConfig, lembasFields: newLembasFieldsArray};
 }
 
 /**
@@ -253,13 +253,13 @@ export function addLembasField(position: BoardPosition, config: BoardConfigInter
  * @param config
  */
 export function addRiver(position: BoardPosition, config: BoardConfigInterface): BoardConfigInterface {
-	const { config: newConfig } = overrideField(position, config);
+	const {config: newConfig} = overrideField(position, config);
 	const newRiverFieldsArray = newConfig.riverFields;
 	newRiverFieldsArray.push({
 		position: boardPosition2Position(position),
 		direction: 'NORTH',
 	});
-	return { ...newConfig, riverFields: newRiverFieldsArray };
+	return {...newConfig, riverFields: newRiverFieldsArray};
 }
 
 /**
@@ -268,10 +268,10 @@ export function addRiver(position: BoardPosition, config: BoardConfigInterface):
  * @param config
  */
 export function addHole(position: BoardPosition, config: BoardConfigInterface): BoardConfigInterface {
-	const { config: newConfig } = overrideField(position, config);
+	const {config: newConfig} = overrideField(position, config);
 	const newHolesArray = newConfig.holes;
 	newHolesArray.push(boardPosition2Position(position));
-	return { ...newConfig, holes: newHolesArray };
+	return {...newConfig, holes: newHolesArray};
 }
 
 /**

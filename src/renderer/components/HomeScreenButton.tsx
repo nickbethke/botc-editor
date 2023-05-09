@@ -22,5 +22,5 @@ export function HomeScreenButton(props: { text: string; onClick: () => void; tab
 HomeScreenButton.defaultProps = {last: false};
 
 export function HomeMenuSeparator() {
-	return <hr className="dark:border-muted-600 border-muted-300 my-1"/>;
+	return <hr className="dark:border-muted-600 border-white my-1"/>;
 }

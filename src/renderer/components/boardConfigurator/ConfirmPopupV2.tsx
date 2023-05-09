@@ -1,6 +1,7 @@
 import React, {MouseEventHandler} from 'react';
 import destinyMountainImage from '../../../../assets/textures/schicksalsberg.png';
 import {SettingsInterface} from '../../../interfaces/SettingsInterface';
+import Button from "../Button";
 
 /**
  * The properties of the confirmation popup.
@@ -86,6 +87,21 @@ class ConfirmPopupV2 extends React.Component<ConfirmPopupV2Props, ConfirmPopupV2
 				);
 			}
 		}, 200);
+		const {visible} = this.state;
+		if (visible) {
+			const popup = document.getElementById('popupV2');
+			if (popup) {
+				popup.addEventListener('resize', () => {
+					const {dimension} = this.state;
+					this.setState({
+						dimension: {
+							width: popup.clientWidth + 4,
+							height: popup.clientHeight + 4,
+						},
+					});
+				})
+			}
+		}
 	}
 
 	/**
@@ -243,17 +259,13 @@ class ConfirmPopupV2 extends React.Component<ConfirmPopupV2Props, ConfirmPopupV2
 						<div className="py-2 px-4 mb-2">{children}</div>
 						<div
 							className="py-2 px-4 flex justify-end gap-4 items-center text-sm border-t dark:border-muted-700 border-muted-400">
-							<button className="py-1 px-2 bg-accent-600 rounded hover:bg-accent-500" type="button"
-									onClick={onConfirm}>
+							<Button onClick={onConfirm} buttonType="primary" size="sm">
 								{confirmButtonText}
-							</button>
-							<button
-								className="py-1 px-2 border dark:border-muted-700 border-muted-400 rounded hover:bg-white/25"
-								type="button"
-								onClick={onAbort}
+							</Button>
+							<Button onClick={onAbort} size="sm"
 							>
 								{abortButtonText}
-							</button>
+							</Button>
 						</div>
 					</div>
 				</div>

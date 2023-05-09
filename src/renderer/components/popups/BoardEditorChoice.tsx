@@ -3,6 +3,7 @@ import newBGImage from '../../../../assets/images/new-color.jpg';
 import randomBGImage from '../../../../assets/images/random-color.jpg';
 import loadingBGImage from '../../../../assets/images/bg-color-II.jpg';
 import BoardEditorChoiceCard from './components/BoardEditorChoiceCard';
+import ButtonSwitch from "../ButtonSwitch";
 
 type BoardEditorChoiceProps = {
 	onClose: () => void;
@@ -107,28 +108,16 @@ class BoardEditorChoice extends React.Component<BoardEditorChoiceProps, BoardEdi
 							</div>
 							<div className="flex justify-center">
 								<div className="flex gap-4 items-center justify-center">
-									<button
-										type="button"
-										className={`rounded px-4 py-2 dark:border-muted-700 border-muted-400 ${
-											view === 'default' ? 'dark:bg-accent-600 bg-accent-500' : 'dark:bg-muted-800 bg-muted-500'
-										}`}
-										onClick={() => {
-											this.setState({view: 'default'});
-										}}
-									>
-										{window.t.translate('Configuration')}
-									</button>
-									<button
-										type="button"
-										className={`rounded px-4 py-2 dark:border-muted-700 border-muted-400 ${
-											view === 'riverPreset' ? 'dark:bg-accent-600 bg-accent-500' : 'dark:bg-muted-800 bg-muted-500'
-										}`}
-										onClick={() => {
-											this.setState({view: 'riverPreset'});
-										}}
-									>
-										{window.t.translate('River Preset')}
-									</button>
+									<ButtonSwitch value={view} onChange={
+										(label) => {
+											this.setState({view: label.value as 'default' | 'riverPreset'});
+										}
+									} labels={
+										[
+											new ButtonSwitch.Label(window.t.translate('Configuration'), 'default'),
+											new ButtonSwitch.Label(window.t.translate('River Preset'), "riverPreset")
+										]
+									}/>
 								</div>
 							</div>
 							{/*CSS Carousel with animation between the two elements*/}

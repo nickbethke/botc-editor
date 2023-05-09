@@ -20,6 +20,7 @@ import ConfirmPopupV2 from '../components/boardConfigurator/ConfirmPopupV2';
 import FilePathComponent from '../components/FilePathComponent';
 import KeyCode = monaco.KeyCode;
 import KeyMod = monaco.KeyMod;
+import {JsonViewer} from "@textea/json-viewer";
 
 type JsonValidatorProps = {
 	onClose: () => void;
@@ -505,7 +506,7 @@ class JsonValidator extends React.Component<JsonValidatorProps, JsonValidatorSta
 								label={window.t.translate('Close')}
 							/>
 						</TopMenuItemCollapsable>
-						<div className="flex items-center">
+						<div className="flex items-center gap-4">
 							<SelectComponent
 								value={type}
 								onChange={this.changeType}
@@ -542,7 +543,7 @@ class JsonValidator extends React.Component<JsonValidatorProps, JsonValidatorSta
 							/>
 							<TopMenuItem
 								type="none"
-								label={`${window.t.translate('Version')}: 1.1.21`}
+								label={`${window.t.translate('Version')}: 1.2.81`}
 								icon={<VscVersions/>}
 							/>
 						</div>
@@ -562,28 +563,40 @@ class JsonValidator extends React.Component<JsonValidatorProps, JsonValidatorSta
 							/>
 						</div>
 						<div className="grid xl:grid-cols-4 grid-cols-2">
-							<div
-								className="w-full h-[300px] max-h-[300px] flex flex-col border-r border-gray-600 xl:col-span-3">
-								<div className="text-white flex flex-col justify-center border-b border-gray-600 p-1">
-									<div className="pl-4">{window.t.translate('JSON-Validation')}</div>
-								</div>
-								<div className="w-full bg-white/10 text-white overflow-auto grow">
-									<div className="h-full max-h-full pl-2 font-jetbrains text-sm">{errorMsg}</div>
-								</div>
-							</div>
 							<div className="w-full h-[300px] max-h-[300px] flex flex-col">
 								<div className="text-white flex flex-col justify-center border-b border-gray-600 p-1">
 									<div className="pl-4">{window.t.translate('Errors')}</div>
 								</div>
-								<div className="w-full text-white overflow-auto grow bg-white/10">
-									<div className="h-full max-h-full pl-6 pt-2">
+								<div className="w-full text-white overflow-auto grow dark:bg-white/10 bg-white">
+									<div className="h-full max-h-full pl-5 pt-2">
 										<pre className="user-select">
 											{consoleOutput.map((error) => (
-												<p key={_uniqueId('console-output-')} className="text-red-500">
+												<p key={_uniqueId('console-output-')}
+												   className="dark:text-red-400 text-red-600 text-sm py-1">
 													{error}
 												</p>
 											))}
 										</pre>
+									</div>
+								</div>
+							</div>
+							<div
+								className="w-full h-[300px] max-h-[300px] flex flex-col border-l border-gray-600 xl:col-span-3">
+								<div className="text-white flex flex-col justify-center border-b border-gray-600 p-1">
+									<div className="pl-4">{window.t.translate('JSON-Validation')}</div>
+								</div>
+								<div
+									className="w-full dark:bg-white/10 bg-white dark:text-white text-slate-900 overflow-auto grow">
+									<div className="h-full text-sm">
+										{errorMsg ? (
+											<div>{errorMsg.map((error) => error)}</div>
+										) : (
+											<div className="flex flex-col justify-center items-center h-full">
+												<div className="text-2xl text-white">
+													{window.t.translate('No Errors')}
+												</div>
+											</div>
+										)}
 									</div>
 								</div>
 							</div>
@@ -596,24 +609,31 @@ class JsonValidator extends React.Component<JsonValidatorProps, JsonValidatorSta
 	};
 
 	private genErrorMsg(codeError: string) {
+		const {settings} = this.props;
 		const errorMsg: ReactElement[] | null[] = [];
 		if (codeError === '') {
 			errorMsg[0] = null;
 		} else if (codeError === 'validate') {
 			errorMsg[0] = (
-				<div className="pt-1">
-					<span className="text-red-500">ERROR: </span>Code konnte nicht validiert werden - kein valides JSON
+				<div key={_uniqueId()} className="pt-1">
+					<span className="text-red-500">{window.t.translate('ERROR')}</span>
+					<span className="text-white">: {window.t.translate('Invalid JSON')}</span>
 				</div>
 			);
 		} else {
 			try {
 				let i = 0;
-				const errors = JSON.parse(codeError);
+				const errors: DefinedError[] = JSON.parse(codeError);
 				errors.forEach((e: DefinedError) => {
 					errorMsg[i] = (
-						<div key={_uniqueId()} className={`flex gap-2 ${i < errors.length - 1 ? 'border-b' : ''}`}>
-							<pre className="border-r pr-2">{JsonValidator.numberAddZero(i + 1)}</pre>
-							<pre className="user-select">{JSON.stringify(e, null, 4)}</pre>
+						<div key={_uniqueId()}
+							 className={`h-fit pl-2 flex gap-2 ${i < errors.length - 1 ? 'border-b dark:border-white/10' : ''} ${i % 2 === 1 ? 'bg-slate-100 dark:bg-gray-900/25' : ''}`}>
+							<div
+								className="border-r py-2 dark:border-white/10 pr-2 h-full my-auto">{JsonValidator.numberAddZero(i + 1)}</div>
+							<div className="w-full">
+								<JsonViewer key={_uniqueId()} value={e} theme={settings.darkMode ? 'dark' : 'light'}
+											rootName={window.t.translate("Validation Error")} defaultInspectDepth={1}/>
+							</div>
 						</div>
 					);
 

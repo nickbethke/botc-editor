@@ -4,26 +4,16 @@ import App from './App';
 import TranslationHelper, {AvailableLanguages} from './helper/TranslationHelper';
 import InitialLoader from "./components/InitialLoader";
 
+const container = document.getElementById('root');
+const root = createRoot(container ? container : document.createElement('div'));
 
 const run = async () => {
 	window.t = new TranslationHelper(AvailableLanguages.de);
 	const prefetch = await window.electron.app.prefetch()
-	const container = document.getElementById('root');
-	if (container) {
-		const root = createRoot(container);
-		root.render(<App os={prefetch.os} settings={prefetch.settings}/>);
-		return Promise.resolve();
-	} else {
-		return Promise.reject('No root element found');
-	}
+	root.render(<App os={prefetch.os} settings={prefetch.settings}/>);
+	return Promise.resolve();
 }
-const container = document.getElementById('root');
-if (container) {
-	const root = createRoot(container);
-	root.render(<InitialLoader/>);
-} else {
-	console.error('No root element found');
-}
+root.render(<InitialLoader/>);
 setTimeout(() => {
 	run().catch(console.error);
 }, 1000);

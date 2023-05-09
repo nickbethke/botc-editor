@@ -1,6 +1,7 @@
-import { Component } from 'react';
+import {Component} from 'react';
 import _uniqueId from 'lodash/uniqueId';
-import { VscChevronDown, VscChevronUp } from 'react-icons/vsc';
+import {VscChevronDown, VscChevronUp} from 'react-icons/vsc';
+import Button from "./Button";
 
 type SelectComponentProps = {
 	value: string;
@@ -25,29 +26,30 @@ class SelectComponent extends Component<SelectComponentProps, SelectComponentSta
 
 	componentDidMount() {
 		document.addEventListener('click', (ev) => {
-			const { isOpen } = this.state;
+			const {isOpen} = this.state;
 			if (ev.target instanceof HTMLElement) {
 				if (isOpen && !document.getElementById('custom-select-botc')?.contains(ev.target)) {
-					this.setState({ isOpen: false });
+					this.setState({isOpen: false});
 				}
 			}
 		});
 	}
 
 	render() {
-		const { onChange } = this.props;
-		const { value, options, isOpen } = this.state;
+		const {onChange} = this.props;
+		const {value, options, isOpen} = this.state;
 		const currentValue = options.find((option) => option.value === value);
 		return (
-			<div className="relative" id="custom-select-botc">
-				<div className="flex gap-1 px-2 items-center">
-					<button type="button" className="px-2 py-1 font-medium" onClick={() => this.setState({ isOpen: !isOpen })}>
+			<div className="relative h-full" id="custom-select-botc">
+				<div className="flex gap-1 px-2 items-center hover:cursor-pointer hover:bg-white/10 h-full"
+					 onClick={() => this.setState({isOpen: !isOpen})}>
+					<button type="button" className="px-2 py-1 font-medium">
 						{currentValue?.text}
 					</button>
-					{isOpen ? <VscChevronUp /> : <VscChevronDown />}
+					{isOpen ? <VscChevronUp/> : <VscChevronDown/>}
 				</div>
 				{isOpen && (
-					<div className="absolute min-w-full top-full left-0 z-50 flex flex-col gap-0 px-2">
+					<div className="absolute min-w-full top-full left-0 z-50 flex flex-col gap-0 px-2 w-full">
 						{options.map((option, index) => (
 							<button
 								disabled={option.value === value}
@@ -57,7 +59,7 @@ class SelectComponent extends Component<SelectComponentProps, SelectComponentSta
 									index === options.length - 1 ? 'rounded-b' : ''
 								}  ${option.value === value ? 'text-gray-300' : 'dark:hover:bg-muted hover:bg-muted'}`}
 								onClick={() => {
-									this.setState({ isOpen: false, value: option.value }, () => {
+									this.setState({isOpen: false, value: option.value}, () => {
 										onChange(option.value);
 									});
 								}}

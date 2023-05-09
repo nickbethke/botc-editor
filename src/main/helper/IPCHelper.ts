@@ -23,6 +23,15 @@ class IPCHelper {
 		darkMode: true,
 		language: 'de',
 		popupsDraggable: true,
+		defaultValues: {
+			defaultBoardName: 'New Board',
+			maxBoardSize: 20,
+			maxCheckpoints: 16,
+			maxLembasFields: 16,
+			maxLembasCount: 10,
+			maxHoles: 16,
+		},
+
 	};
 
 	/**
@@ -408,11 +417,13 @@ class IPCHelper {
 					settings: JSON.parse(content) as SettingsInterface,
 				};
 			}
+			fs.writeFileSync(settingsPath, JSON.stringify(IPCHelper.defaultSettings, null, 4));
 			return {
 				os: IPCHelper.getOS(),
 				settings: IPCHelper.defaultSettings,
 			};
 		} catch (e) {
+			fs.writeFileSync(settingsPath, JSON.stringify(IPCHelper.defaultSettings, null, 4));
 			return {
 				os: IPCHelper.getOS(),
 				settings: IPCHelper.defaultSettings,

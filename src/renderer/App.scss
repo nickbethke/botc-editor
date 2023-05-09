@@ -179,7 +179,7 @@
 		@apply relative w-fit;
 		&:before {
 			content: '';
-			@apply bg-gradient-to-r from-accent-300 to-amber-300 block absolute bottom-0 left-0 w-0 h-0.5 transition-all ease-in-out;
+			@apply dark:bg-gradient-to-r dark:from-accent-300 dark:to-amber-300 bg-white block absolute bottom-0 left-0 w-0 h-0.5 transition-all ease-in-out;
 		}
 
 		&:focus {
@@ -364,48 +364,56 @@
 		background-image: url('/assets/textures/wall.png');
 		background-size: cover;
 		background-position: center;
+		background-repeat: no-repeat;
 	}
 
 	.isEye {
 		background-image: url('/assets/textures/eye.png');
 		background-size: contain;
 		background-position: center;
+		background-repeat: no-repeat;
 	}
 
 	.isCheckpoint {
 		background-image: url('/assets/textures/checkpoint.png');
 		background-size: contain;
 		background-position: center;
+		background-repeat: no-repeat;
 	}
 
 	.isDestinyMountain {
 		background-image: url('/assets/textures/schicksalsberg.png');
 		background-size: contain;
 		background-position: center;
+		background-repeat: no-repeat;
 	}
 
 	.isStartField {
 		background-image: url('/assets/textures/start.png');
 		background-size: contain;
 		background-position: center;
+		background-repeat: no-repeat;
 	}
 
 	.isLembasField {
 		background-image: url('/assets/textures/lembas.png');
 		background-size: contain;
 		background-position: center;
+		background-repeat: no-repeat;
 	}
 
 	.isRiver {
 		background-image: url('/assets/textures/river.png');
 		background-size: contain;
 		background-position: center;
+		background-repeat: no-repeat;
 	}
 
 	.isHole {
 		background-image: url('/assets/textures/hole.png');
 		background-size: contain;
 		background-position: center;
+		background-repeat: no-repeat;
 	}
 
 	.popup-warn {
@@ -449,5 +457,13 @@
 
 	.font-with-gradient {
 		@apply bg-gradient-to-tr from-accent-300 to-amber-300 w-fit text-transparent bg-clip-text;
+	}
+
+	.bg-with-gradient {
+		@apply bg-gradient-to-tr from-accent-300 to-amber-300;
+	}
+
+	.dark\:bg-with-gradient {
+		@apply dark:bg-gradient-to-tr dark:from-accent-300 dark:to-amber-300;
 	}
 }

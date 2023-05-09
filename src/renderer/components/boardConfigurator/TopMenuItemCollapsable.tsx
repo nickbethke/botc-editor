@@ -1,5 +1,5 @@
+import {ChevronDownIcon} from '@radix-ui/react-icons';
 import React from 'react';
-import { VscChevronDown } from 'react-icons/vsc';
 
 /**
  * The board configuration top menu item collapsable component properties
@@ -21,26 +21,26 @@ type TopMenuItemCollapsableState = {
 class TopMenuItemCollapsable extends React.Component<TopMenuItemCollapsableProps, TopMenuItemCollapsableState> {
 	constructor(props: TopMenuItemCollapsableProps) {
 		super(props);
-		this.state = { open: false };
+		this.state = {open: false};
 	}
 
 	/**
 	 * Renders the component
 	 */
 	render() {
-		const { label, children } = this.props;
-		const { open } = this.state;
+		const {label, children} = this.props;
+		const {open} = this.state;
 		return (
 			<div
-				className="px-2 py-2 dark:bg-muted-800 bg-muted-500 dark:hover:bg-muted-700 hover:bg-muted-400 hover:cursor-pointer transition transition-colors relative flex gap-2 items-center"
+				className="px-2 py-2 dark:hover:bg-muted-700 hover:bg-muted-400 hover:cursor-pointer transition-colors relative flex gap-2 items-center"
 				onMouseEnter={() => {
-					this.setState({ open: true });
+					this.setState({open: true});
 				}}
 				onMouseLeave={() => {
-					this.setState({ open: false });
+					this.setState({open: false});
 				}}
 			>
-				<span>{label}</span> <VscChevronDown />
+				<span>{label}</span> <ChevronDownIcon/>
 				<div
 					className={`${
 						open ? 'block' : 'hidden'

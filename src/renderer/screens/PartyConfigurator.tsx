@@ -1,6 +1,5 @@
 import React from 'react';
-import {BiChevronLeft} from 'react-icons/bi';
-import {VscAdd, VscColorMode, VscFile, VscSave} from 'react-icons/vsc';
+import {VscAdd, VscColorMode, VscFile, VscNewFile, VscSave} from 'react-icons/vsc';
 import {isBoolean} from 'lodash';
 import Mousetrap from 'mousetrap';
 import backgroundImage from '../../../assets/images/damn_nice_background_color.png';
@@ -17,6 +16,8 @@ import PartieConfigInterface, {
 import ConfirmPopupV2 from '../components/boardConfigurator/ConfirmPopupV2';
 import {SettingsInterface} from '../../interfaces/SettingsInterface';
 import FilePathComponent from '../components/FilePathComponent';
+import Button from "../components/Button";
+import {FaChevronLeft, FaMoon, FaPlus, FaSave, FaSun} from "react-icons/fa";
 
 type PartieKonfiguratorProps = {
 	onClose: () => void;
@@ -229,7 +230,11 @@ class PartyConfigurator extends React.Component<PartieKonfiguratorProps, PartieK
 		const {os, settings, onSettingsUpdate, fullScreen} = this.props;
 		const notWinDragger = !fullScreen ? <div className="dragger w-[100vw] h-8 absolute top-0 left-0"/> : null;
 		return (
-			<div className="dark:bg-muted-800 bg-muted-600 flex flex-col duration-500">
+			<div className="flex flex-col duration-500 w-full h-full overflow-hidden bg-cover bg-no-repeat bg-center"
+				 style={{
+					 backgroundImage: `url(${settings.darkMode ? backgroundImageDark : backgroundImage})`,
+				 }}
+			>
 				{os === 'win32' ? <div className="dragger w-[100vw] h-8 bg-muted"/> : notWinDragger}
 				{popupLeave ? (
 					<ConfirmPopupV2
@@ -268,87 +273,71 @@ class PartyConfigurator extends React.Component<PartieKonfiguratorProps, PartieK
 					</ConfirmPopupV2>
 				) : null}
 				<div
-					className="text-white grid grid-cols-3 2xl:grid-cols-2 gap-0 grow w-[100vw]"
+					className="text-white grid grid-cols-3 2xl:grid-cols-2 gap-0 grow w-[100vw] relative"
 					style={{
-						minHeight: fullScreen && os !== 'win32' ? '100vh' : 'calc(100vh - 32px)',
+						minHeight: os !== 'win32' ? '100vh' : 'calc(100vh - 32px)',
 					}}
 				>
+					<div/>
 					<div
-						className="transition-all duration-500"
-						style={{
-							backgroundImage: `url(${settings.darkMode ? backgroundImageDark : backgroundImage})`,
-							backgroundSize: 'cover',
-						}}
-					/>
-					<div className="col-span-2 2xl:col-span-1 m-8 flex flex-col gap-4 transition">
+						className="dark:bg-gradient-to-br dark:from-slate-800/90 dark:to-slate-900/90 bg-gradient-to-br from-muted-600/90 to-muted-400/90 col-span-2 2xl:col-span-1 flex flex-col gap-4 transition p-8">
 						<div className="flex flex-row justify-start gap-8">
-							<button
-								type="button"
-								className="rounded border dark:border-muted-700 border-muted-400 hover:bg-accent-500 transition"
+							<Button
 								onClick={this.handleBackButton}
-							>
-								<BiChevronLeft className="text-4xl"/>
-							</button>
+								icon={<FaChevronLeft className="text-lg"/>}
+								size="sm"
+							/>
+
 							<div className="text-4xl">{window.t.translate('Game-Configurator')}</div>
-							<button
-								type="button"
-								className="p-1 dark:bg-muted-800 bg-muted-600 dark:hover:bg-muted-700 hover:bg-muted-500 transition flex items-center ml-auto"
+							<Button
+								className="ml-auto"
 								onClick={() => {
 									onSettingsUpdate({
 										...settings,
 										darkMode: !settings.darkMode,
 									});
 								}}
-							>
-								<VscColorMode
-									title={window.t.translate('Dark Mode')}
-									className={`${settings.darkMode ? '' : 'rotate-180'} transition transform-gpu text-lg`}
-								/>
-							</button>
+								icon={settings.darkMode ? <FaSun/> : <FaMoon/>}
+							/>
 						</div>
 						<div className="flex gap-4 items-center">
 							<div>
-								<button
-									type="button"
-									className="flex gap-2 items-center rounded border dark:border-muted-700 border-muted-400 dark:bg-muted-800 bg-muted-500 dark:hover:bg-accent-500 hover:bg-accent-500 transition px-4 py-2"
+								<Button
 									onClick={this.handleNewConfigClick}
+									icon={<VscNewFile/>}
 								>
-									<VscAdd/> {window.t.translate('New')}
-								</button>
+									{window.t.translate('New')}
+								</Button>
 							</div>
 							<div>
-								<button
-									type="button"
-									className="flex gap-2 items-center rounded border dark:border-muted-700 border-muted-400 dark:bg-muted-800 bg-muted-500 dark:hover:bg-accent-500 hover:bg-accent-500 transition px-4 py-2"
+								<Button
+									icon={<VscSave/>}
 									onClick={this.handleSaveClick}
 								>
-									<VscSave/> {window.t.translate('Save')}
-								</button>
+
+									{window.t.translate('Save')}
+								</Button>
 							</div>
 							<div>
-								<button
-									type="button"
-									className="flex gap-2 items-center rounded border dark:border-muted-700 border-muted-400 dark:bg-muted-800 bg-muted-500 dark:hover:bg-accent-500 hover:bg-accent-500 transition px-4 py-2"
+								<Button
+									icon={<VscFile/>}
 									onClick={this.openLoadPartieConfig}
 								>
-									<VscFile/>
 									{window.t.translate('Load')}
-								</button>
+								</Button>
 							</div>
 							<div>
 								{file ? (
-									<div
-										className="rounded border dark:border-muted-700 border-muted-400 dark:bg-muted-800 bg-muted-500 px-4 py-2">
+									<Button>
 										<FilePathComponent file={file.parsedPath} os={os} edited={edited}/>
-									</div>
+									</Button>
 								) : (
-									<div
-										className="rounded border dark:border-muted-700 border-muted-400 dark:bg-muted-800 bg-muted-500 px-4 py-2">
+									<Button>
 										<div className="flex items-center gap-0 h-full">
 											{window.t.translate('Unsaved File')}
 											{!edited ? '' : ` *`}
 										</div>
-									</div>
+									</Button>
 								)}
 							</div>
 						</div>

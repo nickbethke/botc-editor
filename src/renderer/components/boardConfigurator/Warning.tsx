@@ -1,9 +1,9 @@
 import React from 'react';
 import _uniqueId from 'lodash/uniqueId';
-import { VscTrash } from 'react-icons/vsc';
-import { BoardPosition } from '../generator/interfaces/BoardPosition';
-import { Position } from '../interfaces/BoardConfigInterface';
-import { FieldsEnum } from '../generator/BoardGenerator';
+import {BoardPosition} from '../generator/interfaces/BoardPosition';
+import {Position} from '../interfaces/BoardConfigInterface';
+import {FieldsEnum} from '../generator/BoardGenerator';
+import {TrashIcon} from "@radix-ui/react-icons";
 
 /**
  * The board configurator warnings type
@@ -49,7 +49,7 @@ export type WarningProps = {
  * @constructor
  */
 function Warning(props: WarningProps) {
-	const { title, content, helper, fields, onFieldSelect, removeWall, onRemoveWall, removeField, onRemoveField } = props;
+	const {title, content, helper, fields, onFieldSelect, removeWall, onRemoveWall, removeField, onRemoveField} = props;
 
 	const fieldEnumToString = (fieldEnum: FieldsEnum) => {
 		switch (fieldEnum) {
@@ -72,7 +72,8 @@ function Warning(props: WarningProps) {
 	};
 
 	return (
-		<div className="m-2 text-sm border dark:border-muted-700 border-muted-400 rounded flex flex-col dark:bg-muted-800 bg-muted-600">
+		<div
+			className="m-2 text-sm border dark:border-muted-700 border-muted-400 rounded flex flex-col dark:bg-muted-800 bg-muted-600">
 			<div className="border-b dark:border-muted-700 border-muted-400 px-2 py-1">{title}</div>
 			<div className="px-2 py-1">{content}</div>
 			{fields ? (
@@ -113,7 +114,7 @@ function Warning(props: WarningProps) {
 							onRemoveWall(removeWall);
 						}}
 					>
-						<VscTrash /> {window.t.translate('Remove wall')}{' '}
+						<TrashIcon/> {window.t.translate('Remove wall')}{' '}
 					</div>
 				</div>
 			) : null}
@@ -127,7 +128,7 @@ function Warning(props: WarningProps) {
 							onRemoveField(removeField);
 						}}
 					>
-						<VscTrash />{' '}
+						<TrashIcon/>{' '}
 						{window.t.translateVars('Remove {0} field', [fieldEnumToString(removeField.type)])}{' '}
 					</div>
 				</div>

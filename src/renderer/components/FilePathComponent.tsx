@@ -39,7 +39,7 @@ function FilePathComponent(props: FilePathComponentProps) {
 			}}
 		>
 			<span
-				className={`${isHovered ? 'text-white' : 'text-white/50'} transition transition-colors overflow-x-hidden`}>
+				className={`${isHovered ? 'text-white' : 'dark:text-white/50 text-white/75'} transition-colors overflow-x-hidden`}>
 				{dirOpen ? file.dir + fileSep : `...${fileSep}`}
 			</span>
 			<span>
