@@ -116,9 +116,7 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 			const directionField = getDirectionFieldConfig(fieldInEdit, config);
 			return (
 				<div className="flex flex-col">
-					<div className="p-2 border-y dark:border-muted-700 border-muted-400">
-						{window.t.translate('Direction')}
-					</div>
+					<div className="p-2 border-y dark:border-muted-700 border-muted-400">{window.t.translate('Direction')}</div>
 					<div className="p-4 flex flex-col gap-4">
 						<select
 							id="select-direction"
@@ -177,9 +175,7 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 			const amountField = getLembasFieldConfig(fieldInEdit, config);
 			return (
 				<div className="flex flex-col">
-					<div className="p-2 border-y dark:border-muted-700 border-muted-400">
-						{window.t.translate('Amount')}
-					</div>
+					<div className="p-2 border-y dark:border-muted-700 border-muted-400">{window.t.translate('Amount')}</div>
 					<div className="p-4 flex flex-col gap-4">
 						<InputLabel
 							label={window.t.translate('Lembas amount')}
@@ -202,7 +198,7 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 	 * Renders the global settings content
 	 */
 	settingsGlobal = () => {
-		const { config, onConfigUpdate } = this.props;
+		const { config, onConfigUpdate, settings } = this.props;
 		return (
 			<div className="flex flex-col">
 				<div className="p-2 border-b dark:border-muted-700 border-muted-400">
@@ -226,7 +222,7 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 						label={window.t.translate('Board Width')}
 						value={config.width}
 						min={Math.max(config.eye.position[0] + 1, 2)}
-						max={20}
+						max={settings.defaultValues.maxBoardSize}
 						onChange={(width) => {
 							const newConfig = {
 								...config,
@@ -240,7 +236,7 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 						label={window.t.translate('Board Height')}
 						value={config.height}
 						min={Math.max(config.eye.position[1] + 1, 2)}
-						max={20}
+						max={settings.defaultValues.maxBoardSize}
 						onChange={(height) => {
 							const newConfig = {
 								...config,
@@ -294,9 +290,7 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 		const { riverPresets, boardPresets, onAddRiverPresetToBoard } = this.props;
 		return (
 			<div className="flex flex-col">
-				<div className="p-2 border-b dark:border-muted-700 border-muted-400">
-					{window.t.translate('Presets')}
-				</div>
+				<div className="p-2 border-b dark:border-muted-700 border-muted-400">{window.t.translate('Presets')}</div>
 				<div className="overflow-y-auto">
 					<PresetView
 						riverPresets={riverPresets}

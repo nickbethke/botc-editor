@@ -516,6 +516,22 @@
 		[
 			"Close River-Preset Editor",
 			"Fluss-Vorlage Editor schließen"
+		],
+		[
+			"Shift",
+			"Umschalt"
+		],
+		[
+			"OS",
+			"Betr. System"
+		],
+		[
+			"Author",
+			"Autor"
+		],
+		[
+			"About",
+			"Über"
 		]
 	]
 }

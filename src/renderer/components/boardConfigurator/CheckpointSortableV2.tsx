@@ -115,11 +115,13 @@ class CheckpointSortableV2 extends React.Component<CheckpointSortableV2Props, Ch
 								}}
 							>
 								<SortableKnob>
-									<div className="text-white text-xl cursor-grabbing">
-										<div className={`${order === items.length ? 'isDestinyMountain' : 'isCheckpoint'} w-6 h-6`} />
-									</div>
+									<>
+										<div className="text-white text-xl cursor-grabbing">
+											<div className={`${order === items.length ? 'isDestinyMountain' : 'isCheckpoint'} w-6 h-6`} />
+										</div>
+										<span className="flex-grow">{text}</span>
+									</>
 								</SortableKnob>
-								<span className="flex-grow">{text}</span>
 							</div>
 						</SortableItem>
 					);

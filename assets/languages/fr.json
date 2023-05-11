@@ -520,6 +520,22 @@
 		[
 			"Close River-Preset Editor",
 			"Fermer l'éditeur de préréglage de rivière"
+		],
+		[
+			"Shift",
+			"Maj"
+		],
+		[
+			"OS",
+			"OS"
+		],
+		[
+			"Author",
+			"Auteur"
+		],
+		[
+			"About",
+			"À propos de"
 		]
 	]
 }

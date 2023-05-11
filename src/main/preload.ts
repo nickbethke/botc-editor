@@ -25,7 +25,7 @@ const electronHandler = {
 		return ipcRenderer.invoke('validate:json', json, type);
 	},
 	schemas: {
-		partie: () => {
+		party: () => {
 			return ipcRenderer.invoke('schemas:partie');
 		},
 		board: () => {

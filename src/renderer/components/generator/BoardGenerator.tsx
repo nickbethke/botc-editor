@@ -218,6 +218,7 @@ class BoardGenerator {
 		}
 
 		// remove walls between rivers
+		/*
 		this.boardJSON.walls.forEach((wall) => {
 			const [x, y] = wall[0];
 			const [x1, y1] = wall[1];
@@ -233,7 +234,7 @@ class BoardGenerator {
 			) {
 				this.boardJSON.removeWall(wall);
 			}
-		});
+		});*/
 	}
 
 	/**
@@ -597,7 +598,7 @@ class BoardGenerator {
 		return this.board[position.y][position.x];
 	}
 
-	public getNeighbors(position: BoardPosition): Array<BoardPosition> {
+	private getNeighbors(position: BoardPosition): Array<BoardPosition> {
 		const { x, y } = position;
 
 		const neighbors = new Array<BoardPosition>();

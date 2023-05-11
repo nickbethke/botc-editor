@@ -1,11 +1,12 @@
 import React from 'react';
-import {SettingsInterface} from '../../../interfaces/SettingsInterface';
+import { SettingsInterface } from '../../../interfaces/SettingsInterface';
 import ConfirmPopupV2 from '../boardConfigurator/ConfirmPopupV2';
 import InputLabel from '../InputLabel';
 import TranslationHelper from '../../helper/TranslationHelper';
-import {HomeMenuSeparator} from "../HomeScreenButton";
-import Button from "../Button";
-import ButtonSwitch from "../ButtonSwitch";
+import { HomeMenuSeparator } from '../HomeScreenButton';
+import Button from '../Button';
+import ButtonSwitch from '../ButtonSwitch';
+import SelectComponent from '../Select';
 
 interface SettingsPopupProps {
 	settings: SettingsInterface;
@@ -22,7 +23,6 @@ interface SettingsPopupStat {
 }
 
 class SettingsPopup extends React.Component<SettingsPopupProps, SettingsPopupStat> {
-
 	static get defaultSettings(): SettingsInterface {
 		return {
 			language: 'en',
@@ -35,17 +35,15 @@ class SettingsPopup extends React.Component<SettingsPopupProps, SettingsPopupSta
 				maxHoles: 10,
 				maxLembasCount: 10,
 				maxLembasFields: 10,
-			}
-
-
-		}
+			},
+		};
 	}
 
 	constructor(props: SettingsPopupProps) {
 		super(props);
 		this.state = {
 			settings: props.settings,
-			openView: 'settings'
+			openView: 'settings',
 		};
 	}
 
@@ -56,8 +54,8 @@ class SettingsPopup extends React.Component<SettingsPopupProps, SettingsPopupSta
 	}
 
 	render() {
-		const {os, windowDimensions, onAbort, onConfirm, topOffset} = this.props;
-		const {settings} = this.state;
+		const { os, windowDimensions, onAbort, onConfirm, topOffset } = this.props;
+		const { settings } = this.state;
 		return (
 			<ConfirmPopupV2
 				title={window.t.translate('Settings')}
@@ -76,43 +74,42 @@ class SettingsPopup extends React.Component<SettingsPopupProps, SettingsPopupSta
 					<div className="w-full">
 						<div className="flex flex-row justify-between items-center p-4 w-full">
 							<div className="flex flex-row items-center w-full justify-center">
-								<ButtonSwitch value={this.state.openView} onChange={
-									(checkedLabel) => {
+								<ButtonSwitch
+									value={this.state.openView}
+									onChange={(checkedLabel) => {
 										this.setState({
-												openView: checkedLabel.value === 'settings' ? 'settings' : 'defaultValues'
-											}
-										)
-									}
-								}
-											  labels={[
-												  new ButtonSwitch.Label(window.t.translate('Settings'), 'settings'),
-												  new ButtonSwitch.Label(window.t.translate('Default values'), 'defaultValues')
-											  ]}
+											openView: checkedLabel.value === 'settings' ? 'settings' : 'defaultValues',
+										});
+									}}
+									labels={[
+										new ButtonSwitch.Label(window.t.translate('Settings'), 'settings'),
+										new ButtonSwitch.Label(window.t.translate('Default values'), 'defaultValues'),
+									]}
 								/>
 							</div>
 						</div>
 					</div>
 					{this.state.openView === 'settings' ? (
-
 						<div className="flex flex-col gap-4 p-4">
 							<div className="grid grid-cols-2 items-center gap-8">
 								<p>{window.t.translate('Language')}</p>
-								<select
-									className="bg-transparent border-b-2 text-sm px-2 py-1 w-full"
+								<SelectComponent
 									value={settings.language}
-									onChange={(event) => {
+									onChange={(language) => {
 										this.setState({
 											settings: {
 												...settings,
-												language: event.target.value,
+												language: language,
 											},
 										});
 									}}
-								>
-									<option value={'de'}>{window.t.translate('German')}</option>
-									<option value={'en'}>{window.t.translate('English')}</option>
-									<option value={'fr'}>{window.t.translate('French')}</option>
-								</select>
+									options={[
+										{ value: 'de', text: window.t.translate('German') },
+										{ value: 'en', text: window.t.translate('English') },
+										{ value: 'fr', text: window.t.translate('French') },
+									]}
+									containerClassName={'border-b border-gray-300'}
+								/>
 							</div>
 							<div className="grid grid-cols-2 items-center gap-8">
 								<p>{window.t.translate('Dark Mode')}</p>
@@ -159,11 +156,10 @@ class SettingsPopup extends React.Component<SettingsPopupProps, SettingsPopupSta
 												defaultValues: {
 													...settings.defaultValues,
 													defaultBoardName,
-												}
-											}
+												},
+											},
 										});
-									}
-									}
+									}}
 								/>
 							</div>
 							<div className="grid grid-cols-2 items-center gap-8">
@@ -178,8 +174,8 @@ class SettingsPopup extends React.Component<SettingsPopupProps, SettingsPopupSta
 												defaultValues: {
 													...settings.defaultValues,
 													maxBoardSize: maxBoardWidth,
-												}
-											}
+												},
+											},
 										});
 									}}
 									max={64}
@@ -193,17 +189,15 @@ class SettingsPopup extends React.Component<SettingsPopupProps, SettingsPopupSta
 									value={settings.defaultValues.maxCheckpoints}
 									onChange={(maxCheckpoints) => {
 										this.setState({
-												settings: {
-													...settings,
-													defaultValues: {
-														...settings.defaultValues,
-														maxCheckpoints,
-													}
-												}
-											}
-										);
-									}
-									}
+											settings: {
+												...settings,
+												defaultValues: {
+													...settings.defaultValues,
+													maxCheckpoints,
+												},
+											},
+										});
+									}}
 									max={64}
 									min={1}
 								/>
@@ -220,8 +214,8 @@ class SettingsPopup extends React.Component<SettingsPopupProps, SettingsPopupSta
 												defaultValues: {
 													...settings.defaultValues,
 													maxLembasFields,
-												}
-											}
+												},
+											},
 										});
 									}}
 									max={64}
@@ -240,8 +234,8 @@ class SettingsPopup extends React.Component<SettingsPopupProps, SettingsPopupSta
 												defaultValues: {
 													...settings.defaultValues,
 													maxLembasCount,
-												}
-											}
+												},
+											},
 										});
 									}}
 									max={64}
@@ -260,27 +254,28 @@ class SettingsPopup extends React.Component<SettingsPopupProps, SettingsPopupSta
 												defaultValues: {
 													...settings.defaultValues,
 													maxHoles,
-												}
-											}
+												},
+											},
 										});
 									}}
 									max={64}
 									min={1}
 								/>
 							</div>
-							<HomeMenuSeparator/>
+							<HomeMenuSeparator />
 							<div className="grid grid-cols-2 items-center gap-8">
 								<p>{window.t.translate('Reset Default Values')}</p>
-								<Button onClick={() => {
-									this.setState({
-										settings: {
-											...settings,
-											defaultValues: {
-												...SettingsPopup.defaultSettings.defaultValues,
-											}
-										}
-									});
-								}}
+								<Button
+									onClick={() => {
+										this.setState({
+											settings: {
+												...settings,
+												defaultValues: {
+													...SettingsPopup.defaultSettings.defaultValues,
+												},
+											},
+										});
+									}}
 								>
 									{window.t.translate('Reset')}
 								</Button>

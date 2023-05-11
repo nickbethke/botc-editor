@@ -1,16 +1,16 @@
 import React from 'react';
 import './App.scss';
-import {isEqual} from 'lodash';
-import {ParsedPath} from 'path';
+import { isEqual } from 'lodash';
+import { ParsedPath } from 'path';
 import PartyConfigurator from './screens/PartyConfigurator';
 import JsonValidator from './screens/JsonValidator';
-import {PartieConfigWithPath} from './components/interfaces/PartieConfigInterface';
+import { PartieConfigWithPath } from './components/interfaces/PartieConfigInterface';
 import BoardConfigInterface from './components/interfaces/BoardConfigInterface';
-import TranslationHelper, {AvailableLanguages} from './helper/TranslationHelper';
+import TranslationHelper, { AvailableLanguages } from './helper/TranslationHelper';
 import BoardConfiguratorV2 from './screens/BoardConfiguratorV2';
-import {SettingsInterface} from '../interfaces/SettingsInterface';
+import { SettingsInterface } from '../interfaces/SettingsInterface';
 import RiverPresetEditor from './screens/RiverPresetEditor';
-import Home from "./screens/Home";
+import Home from './screens/Home';
 
 export type AppScreens =
 	| 'home'
@@ -58,7 +58,7 @@ class App extends React.Component<AppProps, AppStates> {
 	}
 
 	componentDidMount() {
-		const {settings} = this.state;
+		const { settings } = this.state;
 		if (settings.darkMode) {
 			document.documentElement.classList.add('dark');
 		}
@@ -75,8 +75,8 @@ class App extends React.Component<AppProps, AppStates> {
 	}
 
 	componentDidUpdate(prevProps: Readonly<AppProps>, prevState: Readonly<AppStates>) {
-		const {settings: preSettings} = prevState;
-		const {settings} = this.state;
+		const { settings: preSettings } = prevState;
+		const { settings } = this.state;
 
 		if (!isEqual(preSettings, settings)) {
 			if (settings.darkMode) {
@@ -89,7 +89,7 @@ class App extends React.Component<AppProps, AppStates> {
 	}
 
 	handleCloseChildScreen = () => {
-		this.setState({openScreen: 'home'});
+		this.setState({ openScreen: 'home' });
 	};
 
 	handleSettingsChange = async (settings: SettingsInterface) => {
@@ -101,7 +101,7 @@ class App extends React.Component<AppProps, AppStates> {
 		} else {
 			document.documentElement.classList.remove('dark');
 		}
-		this.setState({settings: newSettings});
+		this.setState({ settings: newSettings });
 	};
 
 	handleLanguageChange = async (lang: AvailableLanguages) => {
@@ -109,7 +109,7 @@ class App extends React.Component<AppProps, AppStates> {
 	};
 
 	render = () => {
-		const {openScreen} = this.state;
+		const { openScreen } = this.state;
 		switch (openScreen) {
 			case 'home':
 				return this.homeScreen();
@@ -131,8 +131,8 @@ class App extends React.Component<AppProps, AppStates> {
 	};
 
 	partieConfigScreen = () => {
-		const {openScreen, settings, fullScreen} = this.state;
-		const {os} = this.props;
+		const { openScreen, settings, fullScreen } = this.state;
+		const { os } = this.props;
 		if (openScreen === 'partieConfigNewScreen') {
 			return (
 				<PartyConfigurator
@@ -146,8 +146,8 @@ class App extends React.Component<AppProps, AppStates> {
 			);
 		}
 		if (openScreen === 'partieConfigLoadScreen') {
-			const {toLoad} = this.state;
-			if (toLoad) this.setState({toLoad: null});
+			const { toLoad } = this.state;
+			if (toLoad) this.setState({ toLoad: null });
 			return (
 				<PartyConfigurator
 					settings={settings}
@@ -163,8 +163,8 @@ class App extends React.Component<AppProps, AppStates> {
 	};
 
 	riverPresetEditor = () => {
-		const {settings} = this.state;
-		const {os} = this.props;
+		const { settings } = this.state;
+		const { os } = this.props;
 		return (
 			<RiverPresetEditor
 				os={os}
@@ -176,8 +176,8 @@ class App extends React.Component<AppProps, AppStates> {
 	};
 
 	boardConfigV2Screen = () => {
-		const {openScreen, toLoad, settings} = this.state;
-		const {os} = this.props;
+		const { openScreen, toLoad, settings } = this.state;
+		const { os } = this.props;
 		switch (openScreen) {
 			case 'boardConfigV2NewScreen':
 				return (
@@ -231,8 +231,8 @@ class App extends React.Component<AppProps, AppStates> {
 	};
 
 	validatorScreen = () => {
-		const {openScreen, settings} = this.state;
-		const {os} = this.props;
+		const { openScreen, settings } = this.state;
+		const { os } = this.props;
 		if (openScreen === 'validator') {
 			return (
 				<JsonValidator
@@ -246,16 +246,22 @@ class App extends React.Component<AppProps, AppStates> {
 		return null;
 	};
 
-
 	homeScreen() {
-		const {os, settings} = this.props;
-		return <Home os={os} settings={settings} onSettingsUpdate={this.handleSettingsChange}
-					 onOpenScreen={this.handleOpenScreen}/>;
+		const { os } = this.props;
+		const { settings } = this.state;
+		return (
+			<Home
+				os={os}
+				settings={settings}
+				onSettingsUpdate={this.handleSettingsChange}
+				onOpenScreen={this.handleOpenScreen}
+			/>
+		);
 	}
 
 	handleOpenScreen = (screen: AppScreens, toLoad: any) => {
-		this.setState({openScreen: screen, toLoad});
-	}
+		this.setState({ openScreen: screen, toLoad });
+	};
 }
 
 export default App;

@@ -1,8 +1,8 @@
 import React from 'react';
-import {TailSpin} from 'react-loader-spinner';
+import { TailSpin } from 'react-loader-spinner';
 import InputLabel from '../InputLabel';
 import BoardGenerator from '../generator/BoardGenerator';
-import {SettingsInterface} from '../../../interfaces/SettingsInterface';
+import { SettingsInterface } from '../../../interfaces/SettingsInterface';
 import ConfirmPopupV2 from '../boardConfigurator/ConfirmPopupV2';
 
 export type RandomBoardStartValuesDialogV2Stats = {
@@ -66,7 +66,7 @@ class RandomBoardStartValuesDialogV2 extends React.Component<
 	constructor(props: RandomBoardStartValuesDialogV2Props) {
 		super(props);
 		this.state = {
-			name: 'THE CENTERLÄND',
+			name: props.settings.defaultValues.defaultBoardName,
 			width: 3,
 			height: 2,
 			startFields: 2,
@@ -81,6 +81,8 @@ class RandomBoardStartValuesDialogV2 extends React.Component<
 			wallsAlgorithm: 'iterative',
 			generating: false,
 		};
+
+		this.dimensionMax = props.settings.defaultValues.maxBoardSize;
 	}
 
 	static get defaultProps() {
@@ -93,7 +95,7 @@ class RandomBoardStartValuesDialogV2 extends React.Component<
 		prevProps: Readonly<RandomBoardStartValuesDialogV2Props>,
 		prevState: Readonly<RandomBoardStartValuesDialogV2Stats>
 	) {
-		const {width, height} = this.state;
+		const { width, height } = this.state;
 		const fieldCountNeeded = this.getNeededFieldCount();
 		if (width > this.dimensionMax) {
 			const neededDimension = Math.ceil(fieldCountNeeded / this.dimensionMax);
@@ -112,7 +114,7 @@ class RandomBoardStartValuesDialogV2 extends React.Component<
 			return;
 		}
 		if (fieldCountNeeded > width * height) {
-			const {height: prevHeight, width: prevWidth} = prevState;
+			const { height: prevHeight, width: prevWidth } = prevState;
 			if (prevHeight !== height || (prevWidth === width && height > width)) {
 				const neededDimension = Math.ceil(fieldCountNeeded / height);
 				this.setState({
@@ -136,12 +138,12 @@ class RandomBoardStartValuesDialogV2 extends React.Component<
 	}
 
 	getNeededFieldCount = () => {
-		const {startFields, checkpoints, lembasFields, holes} = this.state;
+		const { startFields, checkpoints, lembasFields, holes } = this.state;
 		return startFields + checkpoints + lembasFields + holes + 1;
 	};
 
 	generate = () => {
-		this.setState({generating: true}, () => {
+		this.setState({ generating: true }, () => {
 			setTimeout(() => {
 				const {
 					height,
@@ -158,7 +160,7 @@ class RandomBoardStartValuesDialogV2 extends React.Component<
 					name,
 					width,
 				} = this.state;
-				const {onConfirm} = this.props;
+				const { onConfirm } = this.props;
 				const generationValues: RandomBoardStartValuesV2 = {
 					height,
 					startFields,
@@ -175,7 +177,7 @@ class RandomBoardStartValuesDialogV2 extends React.Component<
 					width,
 				};
 				const generator = new BoardGenerator(generationValues);
-				this.setState({generating: false});
+				this.setState({ generating: false });
 				onConfirm(generator);
 			}, 1000);
 		});
@@ -198,18 +200,14 @@ class RandomBoardStartValuesDialogV2 extends React.Component<
 			holes,
 			generating,
 		} = this.state;
-		const {windowDimensions, os, topOffset, onAbort, settings} = this.props;
+		const { windowDimensions, os, topOffset, onAbort, settings } = this.props;
 		return (
 			<ConfirmPopupV2
 				title={window.t.translate('Random Board - Start Values')}
 				abortButtonText={window.t.translate('Cancel')}
 				onAbort={onAbort}
 				confirmButtonText={
-					generating ? (
-						<TailSpin height={16} width={16} color="#ffffff"/>
-					) : (
-						window.t.translate('Generate')
-					)
+					generating ? <TailSpin height={16} width={16} color="#ffffff" /> : window.t.translate('Generate')
 				}
 				onConfirm={this.generate}
 				windowDimensions={windowDimensions}
@@ -270,6 +268,7 @@ class RandomBoardStartValuesDialogV2 extends React.Component<
 								}}
 								type="range"
 								min={2}
+								max={this.dimensionMax}
 							/>
 							<InputLabel
 								label={window.t.translate('Checkpoints')}
@@ -281,11 +280,11 @@ class RandomBoardStartValuesDialogV2 extends React.Component<
 								}}
 								type="range"
 								min={2}
-								max={32}
+								max={settings.defaultValues.maxCheckpoints}
 							/>
 						</div>
 					</div>
-					<hr className="my-4"/>
+					<hr className="my-4" />
 					<div className="relative grid grid-cols-2 gap-8 h-fit">
 						<InputLabel
 							label={window.t.translate('Lembas Fields')}
@@ -297,7 +296,7 @@ class RandomBoardStartValuesDialogV2 extends React.Component<
 							}}
 							type="range"
 							min={0}
-							max={32}
+							max={settings.defaultValues.maxLembasFields}
 						/>
 						<InputLabel
 							label={window.t.translate('Lembas Count')}
@@ -309,7 +308,7 @@ class RandomBoardStartValuesDialogV2 extends React.Component<
 							}}
 							type="range"
 							min={0}
-							max={32}
+							max={settings.defaultValues.maxLembasCount}
 						/>
 						<div className="col-span-2">
 							<InputLabel
@@ -322,10 +321,13 @@ class RandomBoardStartValuesDialogV2 extends React.Component<
 								}}
 								type="switch"
 							/>
-							<p className="text-sm text-gray-300 dark:text-gray-500 text-center"> {window.t.translate('If not checked, the lembas count will be exact the value from above')}</p>
+							<p className="text-sm text-gray-300 dark:text-gray-500 text-center">
+								{' '}
+								{window.t.translate('If not checked, the lembas count will be exact the value from above')}
+							</p>
 						</div>
 					</div>
-					<hr className="my-4"/>
+					<hr className="my-4" />
 					<div className="relative grid gap-8 h-fit mx-auto w-1/2">
 						<InputLabel
 							label={window.t.translate('Holes')}
@@ -337,17 +339,17 @@ class RandomBoardStartValuesDialogV2 extends React.Component<
 								});
 							}}
 							min={0}
-							max={32}
+							max={settings.defaultValues.maxHoles}
 						/>
 					</div>
-					<hr className="my-4"/>
+					<hr className="my-4" />
 					<div className="text-center font-lato flex flex-col">
 						<span>{window.t.translate('possible empty fields / total number of fields')}</span>
 						<span className="text-2xl">
-						{width * height - this.getNeededFieldCount()}/{width * height}
-					</span>
+							{width * height - this.getNeededFieldCount()}/{width * height}
+						</span>
 					</div>
-					<hr className="my-4"/>
+					<hr className="my-4" />
 					<div className="relative grid grid-cols-2 gap-8 h-fit">
 						<InputLabel
 							type="switch"
@@ -376,7 +378,7 @@ class RandomBoardStartValuesDialogV2 extends React.Component<
 							</div>
 						) : null}
 					</div>
-					<hr className="my-4"/>
+					<hr className="my-4" />
 					<div className="relative grid grid-cols-2 gap-8 h-fit">
 						<InputLabel
 							label={window.t.translate('Walls')}

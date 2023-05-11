@@ -118,9 +118,14 @@ class PopupV2 extends React.Component<PopupV2Props, PopupV2State> {
 	/**
 	 * Handles offClick events
 	 */
-	handleOffClick: MouseEventHandler<HTMLDivElement> = () => {
-		const { onClose } = this.props;
-		onClose();
+	handleOffClick: MouseEventHandler<HTMLDivElement> = (event) => {
+		// @ts-ignore
+		if (event.target instanceof HTMLElement) {
+			if (!document.getElementById('popupV2Popup-container')?.contains(event.target)) {
+				const { onClose } = this.props;
+				onClose();
+			}
+		}
 	};
 
 	/**
