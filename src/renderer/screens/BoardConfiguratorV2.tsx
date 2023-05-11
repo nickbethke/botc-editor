@@ -42,6 +42,7 @@ import AStar from '../components/generator/helper/AStar';
 import { Warnings, WarningsMap } from '../components/boardConfigurator/Warning';
 import { BoardPresetWithFile, RiverPresetWithFile } from '../../main/helper/PresetsLoader';
 import AddRiverPresetConfirmPopup from '../components/boardConfigurator/AddRiverPresetConfirmPopup';
+import Dragger from '../components/Dragger';
 
 window.electron.schemas
 	.board()
@@ -1082,16 +1083,12 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 		const mainWidth = windowDimensions.width - (sidebars.left + sidebars.right);
 		return (
 			<section className="text-white font-lato dark:bg-muted-800 bg-muted-600">
-				{os === 'win32' ? (
-					<div className="dragger w-[100vw] h-8 bg-muted flex items-center px-2 text-sm">
-						{window.t.translate('Board-Configurator')}
-						{' - '}
-						{file ? file.path : window.t.translate('Unsaved File')}
-						{fileSaved ? '' : ` *`}
-					</div>
-				) : (
-					<div className="fixed top-0 right-0 dragger h-8" style={{ width: window.innerWidth - 285 }} />
-				)}
+				<Dragger os={os}>
+					{window.t.translate('Board-Configurator')}
+					{' - '}
+					{file ? file.path : window.t.translate('Unsaved File')}
+					{fileSaved ? '' : ` *`}
+				</Dragger>
 				<div className={`${popup !== null && 'blur'} transition`}>
 					<div
 						className={`dark:bg-muted-800 bg-muted-500 dark:border-0 border-t border-muted-400 px-1 ${

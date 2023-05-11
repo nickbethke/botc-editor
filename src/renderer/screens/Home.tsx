@@ -13,6 +13,7 @@ import { isBoolean } from 'lodash';
 import BoardGenerator from '../components/generator/BoardGenerator';
 import { AppScreens } from '../App';
 import { AboutPopup } from '../components/popups/AboutPopup';
+import Dragger from '../components/Dragger';
 
 type HomePopups =
 	| 'boardEditorChoiceV2'
@@ -287,13 +288,7 @@ export default class Home extends Component<HomeProps, HomeState> {
 		return (
 			<div className="text-white transition duration-500 dark:bg-gradient-to-br dark:from-slate-900 dark:to-muted-800 bg-with-gradient overflow-hidden relative">
 				<div id="home" className={`${popup ? 'blur' : ''} flex flex-col`}>
-					{os === 'win32' ? (
-						<div className="dragger w-[100vw] h-8 bg-muted flex items-center px-2 text-sm">
-							{window.t.translate('Battle of the Centerländ - Editor')}
-						</div>
-					) : (
-						<div className="fixed top-0 left-0 dragger w-[100vw] h-8" />
-					)}
+					<Dragger os={os}>{window.t.translate('Battle of the Centerländ - Editor')}</Dragger>
 					<div className="grid grid-cols-2 grow">
 						<div className="flex flex-col pb-8" style={{ height: window.innerHeight - (os === 'win32' ? 32 : 0) }}>
 							<div className="flex flex-col pt-8 justify-between grow">

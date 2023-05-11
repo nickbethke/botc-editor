@@ -298,7 +298,7 @@ class PresetEditorMain extends React.Component<PresetEditorMainProps, PresetEdit
 						<MonacoEditor
 							value={config ? JSON.stringify(config, null, 4) : ''}
 							width={previewFull ? window.innerWidth - 506 : 450}
-							height={windowDimensions.height - (os === 'win32' ? winHeight : 41)}
+							height={windowDimensions.height - (os === 'win32' ? winHeight : 88)}
 							language="json"
 							theme={settings.darkMode ? 'vs-dark' : 'vs'}
 							onChange={(value) => {

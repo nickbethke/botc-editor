@@ -1,0 +1,84 @@
+{
+    "width": 6,
+    "height": 6,
+    "data": [
+        {
+            "position": [
+                0,
+                0
+            ],
+            "direction": "SOUTH"
+        },
+        {
+            "position": [
+                0,
+                1
+            ],
+            "direction": "SOUTH"
+        },
+        {
+            "position": [
+                0,
+                2
+            ],
+            "direction": "SOUTH"
+        },
+        {
+            "position": [
+                0,
+                3
+            ],
+            "direction": "SOUTH"
+        },
+        {
+            "position": [
+                0,
+                4
+            ],
+            "direction": "SOUTH"
+        },
+        {
+            "position": [
+                0,
+                5
+            ],
+            "direction": "EAST"
+        },
+        {
+            "position": [
+                1,
+                5
+            ],
+            "direction": "EAST"
+        },
+        {
+            "position": [
+                2,
+                5
+            ],
+            "direction": "EAST"
+        },
+        {
+            "position": [
+                3,
+                5
+            ],
+            "direction": "EAST"
+        },
+        {
+            "position": [
+                4,
+                5
+            ],
+            "direction": "EAST"
+        },
+        {
+            "position": [
+                5,
+                5
+            ],
+            "direction": "EAST"
+        }
+    ],
+    "name": "L  6x6"
+}

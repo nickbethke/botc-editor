@@ -1,4 +1,4 @@
-import {toNumber} from 'lodash';
+import { toNumber } from 'lodash';
 
 type InputValidatorValidateAnswer = {
 	valid: { is: boolean; text: string[] };
@@ -12,35 +12,40 @@ export enum InputValidatorType {
 
 type InputValidatorArgs =
 	| {
-	type: InputValidatorType.TYPE_STRING;
-	options: {
-		longerThan?: {
-			number: number;
-			error: string;
-		};
-		regex?: {
-			expression: RegExp;
-			error: string;
-		};
-		notEmpty?: {
-			error: string;
-		};
-	};
-}
+			type: InputValidatorType.TYPE_STRING;
+			options: {
+				longerThan?: {
+					number: number;
+					error: string;
+				};
+				regex?: {
+					expression: RegExp;
+					error: string;
+				};
+				notEmpty?: {
+					error: string;
+				};
+			};
+	  }
 	| {
-	type: InputValidatorType.TYPE_NUMBER;
-	options: {
-		ifBiggerThen?: {
-			number: number;
-			error: string;
-		};
-		ifSmallerThen?: {
-			number: number;
-			error: string;
-			except?: number;
-		};
-	};
-};
+			type: InputValidatorType.TYPE_NUMBER;
+			options: {
+				ifBiggerThen?: {
+					number: number;
+					error: string;
+				};
+				ifSmallerThen?: {
+					number: number;
+					error: string;
+					except?: number;
+					isError?: boolean;
+				};
+				exact?: {
+					number: number;
+					error: string;
+				};
+			};
+	  };
 
 class InputValidator {
 	readonly args: InputValidatorArgs;
@@ -51,8 +56,8 @@ class InputValidator {
 
 	validate(value: string): InputValidatorValidateAnswer {
 		const answer = {
-			valid: {is: true, text: new Array<string>()},
-			warning: {has: false, text: new Array<string>()},
+			valid: { is: true, text: new Array<string>() },
+			warning: { has: false, text: new Array<string>() },
 		};
 		if (this.args.type === InputValidatorType.TYPE_STRING) {
 			if (this.args.options.longerThan && value.length > (this.args.options.longerThan.number || 0)) {
@@ -75,10 +80,19 @@ class InputValidator {
 			if (this.args.options.ifSmallerThen) {
 				if (!(this.args.options.ifSmallerThen.except && toNumber(value) === this.args.options.ifSmallerThen.except)) {
 					if (toNumber(value) < this.args.options.ifSmallerThen.number) {
-						answer.warning.has = true;
-						answer.warning.text.push(this.args.options.ifSmallerThen.error);
+						if (this.args.options.ifSmallerThen.isError) {
+							answer.valid.is = false;
+							answer.valid.text.push(this.args.options.ifSmallerThen.error);
+						} else {
+							answer.warning.has = true;
+							answer.warning.text.push(this.args.options.ifSmallerThen.error);
+						}
 					}
 				}
+			}
+			if (this.args.options.exact && toNumber(value) === this.args.options.exact.number) {
+				answer.warning.has = true;
+				answer.warning.text.push(this.args.options.exact.error);
 			}
 		}
 		return answer;

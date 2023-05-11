@@ -1,5 +1,5 @@
-import {ParsedPath} from 'path';
-import {useState} from 'react';
+import { ParsedPath } from 'path';
+import { useState } from 'react';
 
 type FilePathComponentProps = {
 	file: ParsedPath;
@@ -8,7 +8,7 @@ type FilePathComponentProps = {
 };
 
 function FilePathComponent(props: FilePathComponentProps) {
-	const {file, os, edited} = props;
+	const { file, os, edited } = props;
 	const [dirOpen, setDirOpen] = useState(true);
 	const [isHovered, setIsHovered] = useState(false);
 	const fileSep = os === 'win32' ? '\\' : '/';
@@ -39,7 +39,10 @@ function FilePathComponent(props: FilePathComponentProps) {
 			}}
 		>
 			<span
-				className={`${isHovered ? 'text-white' : 'dark:text-white/50 text-white/75'} transition-colors overflow-x-hidden`}>
+				className={`${
+					isHovered ? 'text-white' : 'dark:text-white/50 text-white/75'
+				} transition-colors overflow-x-hidden`}
+			>
 				{dirOpen ? file.dir + fileSep : `...${fileSep}`}
 			</span>
 			<span>

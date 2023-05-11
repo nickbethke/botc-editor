@@ -1,7 +1,8 @@
-import React, {ChangeEvent, Validator} from 'react';
+import React, { ChangeEvent, Validator } from 'react';
 import _uniqueId from 'lodash/uniqueId';
 import InputValidator from '../helper/InputValidator';
 import DblClickInput from './DblClickInput';
+import { VscError, VscWarning } from 'react-icons/vsc';
 
 type InputLabelStringProps = {
 	type: 'text';
@@ -87,13 +88,22 @@ class InputLabel extends React.Component<InputLabelProps, InputLabelState> {
 		};
 	}
 
+	// methode if the props change
+	componentDidUpdate(prevProps: InputLabelProps) {
+		const { value, validator } = this.props;
+		if (prevProps.value !== value) {
+			this.update(value.toString(), validator);
+		}
+	}
+
+	componentDidMount() {
+		const { value } = this.props;
+		this.update(value.toString(), this.props.validator);
+	}
+
 	handleOnChange(e: ChangeEvent<HTMLInputElement>) {
-		const {value} = e.target;
-		const {
-			validator,
-			onChange,
-			type
-		} = this.props;
+		const { value } = e.target;
+		const { validator, onChange, type } = this.props;
 		if (type === 'text') {
 			this.update(value, validator);
 			onChange(value);
@@ -110,15 +120,15 @@ class InputLabel extends React.Component<InputLabelProps, InputLabelState> {
 			else onChange(0);
 		}
 		if (type === 'switch') {
-			const {checked} = e.target;
-			this.setState({value: checked});
+			const { checked } = e.target;
+			this.setState({ value: checked });
 			onChange(checked);
 		}
 	}
 
 	update = (value: string, validator: InputValidator | undefined) => {
 		if (validator) {
-			const {valid, warning} = validator.validate(value);
+			const { valid, warning } = validator.validate(value);
 			this.setState({
 				warningText: warning.text,
 				isValid: valid.is,
@@ -127,42 +137,52 @@ class InputLabel extends React.Component<InputLabelProps, InputLabelState> {
 				value,
 			});
 		} else {
-			this.setState({value});
+			this.setState({ value });
 		}
-	}
+	};
 
 	render() {
 		let helper: string | JSX.Element = '';
 
-		const {helperText, label, type, placeholder, labelClass, value: propsValue, onChange} = this.props;
-		const {value} = this.state;
+		const { helperText, label, type, placeholder, labelClass, value: propsValue, onChange } = this.props;
+		const { value } = this.state;
 
 		if (propsValue !== value) {
-			this.setState({value: propsValue});
+			this.setState({ value: propsValue });
 		}
 
 		if (helperText) {
-			helper = <div>{helperText}</div>;
+			helper = <p className="text-sm pl-2">{helperText}</p>;
 		}
-		const {isValid, hasWarning, warningText, errorMsg} = this.state;
+		const { isValid, hasWarning, warningText, errorMsg } = this.state;
 		let warningHelper: string | JSX.Element = '';
 		let invalidHelper: string | JSX.Element = '';
 		if (hasWarning) {
-			warningHelper = <div className="text-sm text-orange-400 pl-4">{warningText.join(' | ')}</div>;
+			warningHelper = (
+				<div className="text-sm dark:text-orange-300 text-amber-500 flex gap-2 items-center pl-2">
+					<VscWarning />
+					{warningText.join(' | ')}
+				</div>
+			);
 		}
 		if (!isValid && errorMsg) {
-			invalidHelper = <div className="text-sm text-red-400 pl-4">{errorMsg.join(' | ')}</div>;
+			invalidHelper = (
+				<div className="text-sm dark:text-red-300 text-red-400 flex gap-2 items-center pl-2">
+					<VscError />
+					{errorMsg.join(' | ')}
+				</div>
+			);
 		}
-		let validClass = '';
+		let validClass = 'border-b-0 border-b-transparent';
 		if (isValid) {
 			if (hasWarning) {
-				validClass = ' border-b-orange-400';
+				validClass = 'border-b-orange-400 border-b-4';
 			}
 		} else {
-			validClass = ' border-b-red-400';
+			validClass = 'border-b-red-400 border-b-4';
 		}
 		if (type === 'text' || type === 'number') {
-			const {max, min, onEnter, small} = this.props;
+			const { max, min, onEnter, small } = this.props;
 			return (
 				<div className={`flex flex-col ${label ? 'gap-2' : ''} ${small ? 'text-sm' : ''} max-w-full`}>
 					<label htmlFor={this.id} className={`${labelClass}`}>
@@ -170,7 +190,7 @@ class InputLabel extends React.Component<InputLabelProps, InputLabelState> {
 					</label>
 					<input
 						id={this.id}
-						className={`rounded dark:bg-muted-900/25 bg-muted-100/25 px-4 py-2 focus:outline-none${validClass}`}
+						className={`rounded dark:bg-muted-900/25 bg-muted-100/25 px-4 py-2 focus:outline-none transition-all ${validClass}`}
 						type={type}
 						placeholder={placeholder || label || ''}
 						onChange={this.handleOnChange}
@@ -190,7 +210,7 @@ class InputLabel extends React.Component<InputLabelProps, InputLabelState> {
 			);
 		}
 		if (type === 'range') {
-			const {max, min} = this.props;
+			const { max, min } = this.props;
 			return (
 				<div className="flex flex-col">
 					<div>
@@ -199,7 +219,7 @@ class InputLabel extends React.Component<InputLabelProps, InputLabelState> {
 							<DblClickInput
 								value={Number.parseInt(value.toString() ? value.toString() : '0', 10)}
 								onChange={(v) => {
-									this.setState({value: v});
+									this.setState({ value: v });
 									onChange(v);
 								}}
 								min={min || 0}
@@ -225,15 +245,14 @@ class InputLabel extends React.Component<InputLabelProps, InputLabelState> {
 			);
 		}
 		if (type === 'switch') {
-			const {bothSides} = this.props;
+			const { bothSides } = this.props;
 			return (
 				<div>
-					<label htmlFor={this.id}
-						   className={`${labelClass} flex flex-row gap-2 justify-center items-center`}>
+					<label htmlFor={this.id} className={`${labelClass} flex flex-row gap-2 justify-center items-center`}>
 						{label ? <span className="min-h-8">{label}</span> : null}
 						<div className="switch">
-							<input type="checkbox" id={this.id} checked={!!value} onChange={this.handleOnChange}/>
-							<span className={`${bothSides ? 'slider-both' : ''} slider round`}/>
+							<input type="checkbox" id={this.id} checked={!!value} onChange={this.handleOnChange} />
+							<span className={`${bothSides ? 'slider-both' : ''} slider round`} />
 						</div>
 					</label>
 				</div>

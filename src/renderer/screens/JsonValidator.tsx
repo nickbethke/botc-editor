@@ -22,6 +22,7 @@ import KeyCode = monaco.KeyCode;
 import KeyMod = monaco.KeyMod;
 import { JsonViewer } from '@textea/json-viewer';
 import SettingsPopup from '../components/popups/SettingsPopup';
+import Dragger from '../components/Dragger';
 
 type JsonValidatorProps = {
 	onClose: () => void;
@@ -481,16 +482,14 @@ class JsonValidator extends React.Component<JsonValidatorProps, JsonValidatorSta
 
 		return (
 			<div className="dark:bg-muted-800 bg-muted-500 text-white h-[100vh] w-[100vw]">
-				{os === 'win32' ? (
-					<div className="dragger w-[100vw] h-8 bg-muted flex items-center px-2 text-sm">
+				<Dragger os={os}>
+					<>
 						{window.t.translate('Validator')}
 						{` - `}
 						{currentFile ? currentFile.parsed.base : window.t.translate('Unsaved Configuration')}
 						{fileHasBeenEdited ? ' *' : ''}
-					</div>
-				) : (
-					<div className="fixed top-0 right-0 dragger h-8 w-[100vw]" />
-				)}
+					</>
+				</Dragger>
 				<div className="flex flex-col w-full" style={{ height: windowDimensions.height - (os === 'win32' ? 32 : 0) }}>
 					<div
 						className={`flex text-white items-center  dark:border-0 border-t border-muted-400 ${

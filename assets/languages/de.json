@@ -532,6 +532,70 @@
 		[
 			"About",
 			"Über"
+		],
+		[
+			"University Ulm",
+			"Universität Ulm"
+		],
+		[
+			"Editor for the game Battle of the Centerländ",
+			"Editor für das Spiel Battle of the Centerländ"
+		],
+		[
+			"Unfavorable start lembas number.",
+			"Ungünstige Start Lembas Anzahl."
+		],
+		[
+			"Unfavorable number of laps. The game would be over very quickly!",
+			"Ungünstige Anzahl an Runden. Das Spiel wäre sehr schnell vorbei!"
+		],
+		[
+			"Unfavorable number of laps. The game would take a long time!",
+			"Ungünstige Anzahl an Runden. Das Spiel würde sehr lange dauern!"
+		],
+		[
+			"Unfavorable river move count. Negative numbers are not allowed!",
+			"Ungünstige Flusszug Anzahl. Negative Zahlen sind nicht erlaubt!"
+		],
+		[
+			"Unfavorable river move count. The river moves would be very unpredictable!",
+			"Ungünstige Flussbewegungsschritte-Anzahl. Die Flussbewegungen wären sehr unvorhersehbar!"
+		],
+		[
+			"Unfavorable river move count. The river would not move the characters!",
+			"Ungünstige Flussbewegungsschritte-Anzahl. Der Fluss würde die Charakter nicht bewegen!"
+		],
+		[
+			"-1 = no revive",
+			"-1 = keine Wiederbelebung"
+		],
+		[
+			"Unfavorable revive rounds. The player would have to wait too long to play again!",
+			"Ungünstige Wiederbelebungsrunden Anzahl. Der Spieler müsste zu lange warten um wieder spielen zu können!"
+		],
+		[
+			"Unfavorable character choice timeout. It would be too long to wait for the player to choose a character!",
+			"Ungünstige Charakterwahl Verzögerung. Es wäre zu lange um auf den Spieler zu warten, um einen Charakter zu wählen!"
+		],
+		[
+			"Unfavorable character choice timeout. It would be too short to wait for the player to choose a character!",
+			"Ungünstige Charakterwahl Verzögerung. Es wäre zu kurz um auf den Spieler zu warten, um einen Charakter zu wählen!"
+		],
+		[
+			"Unfavorable card choice timeout. It would be too long to wait for the player to choose a card!",
+			"Ungünstige Kartenwahl Verzögerung. Es wäre zu lange um auf den Spieler zu warten, um eine Karte zu wählen!"
+		],
+		[
+			"Unfavorable card choice timeout. It would be too short to wait for the player to choose a card!",
+			"Ungünstige Kartenwahl Verzögerung. Es wäre zu kurz um auf den Spieler zu warten, um eine Karte zu wählen!"
+		],
+		[
+			"Unfavorable server ingame delay. It would be too long to wait for the server to process the game!",
+			"Ungünstige Server Ingame Verzögerung. Es wäre zu lange um auf den Server zu warten, um das Spiel zu animieren!"
+		],
+		[
+			"Unfavorable server ingame delay. It would be too short to wait for the clients to animate the game!",
+			"Ungünstige Server Ingame Verzögerung. Es wäre zu kurz um auf die Clients zu warten, um das Spiel zu animieren!"
 		]
 	]
 }

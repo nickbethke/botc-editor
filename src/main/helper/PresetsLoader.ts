@@ -5,6 +5,7 @@ import * as RiverPresetSchema from '../../schema/riverPreset.schema.json';
 import * as BoardPresetSchema from '../../schema/boardPreset.schema.json';
 import { getAppDataPath } from './functions';
 import { Position } from '../../renderer/components/interfaces/BoardConfigInterface';
+import IPCHelper from './IPCHelper';
 
 /**
  * River preset directions
@@ -70,6 +71,12 @@ class PresetsLoader {
 		}
 		if (!fs.existsSync(PresetsLoader.riverPresetFolder)) {
 			fs.mkdirSync(getAppDataPath('presets/rivers'));
+			fs.readdirSync(IPCHelper.getAssetPath('defaultPresets/rivers')).forEach((file) => {
+				fs.copyFileSync(
+					IPCHelper.getAssetPath('defaultPresets/rivers/' + file),
+					getAppDataPath('presets/rivers/' + file)
+				);
+			});
 		}
 		if (!fs.existsSync(PresetsLoader.boardPresetFolder)) {
 			fs.mkdirSync(getAppDataPath('presets/boards'));
