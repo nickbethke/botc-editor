@@ -1,6 +1,6 @@
 import React from 'react';
 import { SettingsInterface } from '../../../interfaces/SettingsInterface';
-import ConfirmPopupV2 from '../boardConfigurator/ConfirmPopupV2';
+import ConfirmPopupV2 from './ConfirmPopupV2';
 import InputLabel from '../InputLabel';
 import TranslationHelper from '../../helper/TranslationHelper';
 import { HomeMenuSeparator } from '../HomeScreenButton';
@@ -93,7 +93,7 @@ class SettingsPopup extends React.Component<SettingsPopupProps, SettingsPopupSta
 						<div className="flex flex-col gap-4 p-4">
 							<div className="grid grid-cols-2 items-center gap-8">
 								<p>{window.t.translate('Language')}</p>
-								<SelectComponent
+								<SelectComponent<string>
 									value={settings.language}
 									onChange={(language) => {
 										this.setState({
@@ -163,7 +163,12 @@ class SettingsPopup extends React.Component<SettingsPopupProps, SettingsPopupSta
 								/>
 							</div>
 							<div className="grid grid-cols-2 items-center gap-8">
-								<p>{window.t.translate('Maximum Board Dimension')}</p>
+								<div>
+									<p>{window.t.translate('Maximum Board Dimension')}</p>
+									<small className="dark:text-gray-500 text-gray-200">
+										{window.t.translate('Does not apply to river presets!')}
+									</small>
+								</div>
 								<InputLabel
 									type="number"
 									value={settings.defaultValues.maxBoardSize}

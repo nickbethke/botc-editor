@@ -3,21 +3,21 @@ import _uniqueId from 'lodash/uniqueId';
 import { VscChevronDown, VscChevronUp } from 'react-icons/vsc';
 import Button from './Button';
 
-type SelectComponentProps = {
-	value: string;
-	onChange: (value: string) => void;
-	options: Array<{ value: string; text: string }>;
+type SelectComponentProps<T> = {
+	value: T;
+	onChange: (value: T) => void;
+	options: Array<{ value: T; text: string; icon?: JSX.Element }>;
 	containerClassName?: string;
 };
-type SelectComponentState = {
-	value: string;
-	options: Array<{ value: string; text: string }>;
+type SelectComponentState<T> = {
+	value: T;
+	options: Array<{ value: T; text: string; icon?: JSX.Element }>;
 	isOpen: boolean;
 	id: string;
 };
 
-class SelectComponent extends Component<SelectComponentProps, SelectComponentState> {
-	constructor(props: SelectComponentProps) {
+class SelectComponent<T> extends Component<SelectComponentProps<T>, SelectComponentState<T>> {
+	constructor(props: SelectComponentProps<T>) {
 		super(props);
 		this.state = {
 			value: props.value,
@@ -57,32 +57,36 @@ class SelectComponent extends Component<SelectComponentProps, SelectComponentSta
 					}
 					onClick={() => this.setState({ isOpen: !isOpen })}
 				>
-					<button type="button" className="px-2 py-1 font-medium">
-						{currentValue?.text}
+					<button type="button" className="px-2 py-1 font-medium flex gap-2 items-center">
+						{currentValue?.icon}
+						<span>{currentValue?.text}</span>
 					</button>
-					{isOpen ? <VscChevronUp /> : <VscChevronDown />}
+					<VscChevronUp className={`transition-transform ${isOpen ? 'rotate-0' : 'rotate-180'}`} />
 				</div>
-				{isOpen && (
-					<div className="absolute min-w-full top-full left-0 z-50 flex flex-col gap-0 px-2 w-full max-h-32 overflow-y-auto shadow-lg">
-						{options.map((option, index) => (
-							<button
-								disabled={option.value === value}
-								type="button"
-								key={_uniqueId()}
-								className={`px-2 py-1 dark:bg-muted-600 bg-muted-400 text-left ${
-									index === options.length - 1 ? 'rounded-b' : ''
-								}  ${option.value === value ? 'text-gray-300' : 'dark:hover:bg-muted hover:bg-muted'}`}
-								onClick={() => {
-									this.setState({ isOpen: false, value: option.value }, () => {
-										onChange(option.value);
-									});
-								}}
-							>
-								{option.text}
-							</button>
-						))}
-					</div>
-				)}
+				<div
+					className={`absolute min-w-full top-full left-0 z-50 flex flex-col gap-0 px-2 w-full max-h-32 overflow-y-auto shadow-lg transition-all ${
+						isOpen ? 'visible opacity-1' : 'hidden opacity-0'
+					}`}
+				>
+					{options.map((option, index) => (
+						<button
+							disabled={option.value === value}
+							type="button"
+							key={_uniqueId()}
+							className={`px-2 py-1 dark:bg-muted-600 bg-muted-400 text-left flex gap-2 items-center ${
+								index === options.length - 1 ? 'rounded-b' : ''
+							}  ${option.value === value ? 'text-gray-300' : 'dark:hover:bg-muted hover:bg-muted'}`}
+							onClick={() => {
+								this.setState({ isOpen: false, value: option.value }, () => {
+									onChange(option.value);
+								});
+							}}
+						>
+							{option.icon}
+							<span>{option.text}</span>
+						</button>
+					))}
+				</div>
 			</div>
 		);
 	}

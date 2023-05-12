@@ -5,6 +5,7 @@ import { BoardPresetWithFile, RiverPresetWithFile } from '../../../main/helper/P
 import { getDirectionArrow } from '../presetEditor/RiverFieldPreset';
 import ContextMenuV2 from './ContextMenuV2';
 import ContextMenuItemV2 from './ContextMenuItemV2';
+import Button from '../Button';
 
 /**
  * The preset view component properties
@@ -21,6 +22,7 @@ type PresetViewState = {
 	open: 'riverPresets' | 'boardPresets';
 	activePreset: string | null;
 	contextMenu: JSX.Element | null;
+	windowDimensions: { width: number; height: number };
 };
 /**
  * The preset view component
@@ -32,6 +34,7 @@ export default class PresetView extends Component<PresetViewProps, PresetViewSta
 			open: 'riverPresets',
 			activePreset: null,
 			contextMenu: null,
+			windowDimensions: { width: window.innerWidth, height: window.innerHeight },
 		};
 	}
 
@@ -39,12 +42,26 @@ export default class PresetView extends Component<PresetViewProps, PresetViewSta
 	 * Fires when the component is mounted
 	 */
 	componentDidMount() {
-		window.addEventListener('click', () => {
-			this.setState({
-				contextMenu: null,
-			});
-		});
+		window.addEventListener('resize', this.resizeListener);
+		window.addEventListener('click', this.clickListener);
 	}
+
+	componentWillUnmount() {
+		window.removeEventListener('resize', this.resizeListener);
+		window.removeEventListener('click', this.clickListener);
+	}
+
+	resizeListener = () => {
+		this.setState({
+			windowDimensions: { width: window.innerWidth, height: window.innerHeight },
+		});
+	};
+
+	clickListener = () => {
+		this.setState({
+			contextMenu: null,
+		});
+	};
 
 	/**
 	 * Renders the preset preview
@@ -63,7 +80,7 @@ export default class PresetView extends Component<PresetViewProps, PresetViewSta
 							key={_uniqueId()}
 							className={`w-3.5 h-3.5 ${
 								isRiver ? 'isRiver' : 'bg-white/5'
-							} border border dark:border-muted-700 border-muted-400 text-[10px] flex justify-center items-center`}
+							} border dark:border-muted-700 border-muted-400 text-[10px] flex justify-center items-center`}
 						>
 							{isRiver ? getDirectionArrow(river[0].direction) : null}
 						</div>
@@ -89,17 +106,17 @@ export default class PresetView extends Component<PresetViewProps, PresetViewSta
 						</div>
 					</div>
 					<div className="flex items-center justify-center text-sm">
-						<button
-							className="dark:bg-muted-800 bg-muted-400 px-2 py-1 rounded flex gap-2 items-center"
-							type="button"
+						<Button
+							className="dark:bg-slate-600 dark:hover:bg-slate-700"
 							onClick={() => {
 								const { onAddRiverPresetToBoard } = this.props;
 								onAddRiverPresetToBoard(riverPreset);
 							}}
+							size="sm"
 						>
 							<VscAdd />
 							<p className="whitespace-nowrap">{window.t.translate('Add to board')}</p>
-						</button>
+						</Button>
 					</div>
 				</div>
 			);
@@ -112,13 +129,18 @@ export default class PresetView extends Component<PresetViewProps, PresetViewSta
 	 */
 	render() {
 		const { riverPresets, boardPresets } = this.props;
-		const { open, activePreset, contextMenu } = this.state;
+		const { open, activePreset, contextMenu, windowDimensions } = this.state;
 		return (
 			<div>
 				<div className="flex justify-around items-center border-b dark:border-muted-700 border-muted-400 preset-view-switch">
 					<button
 						type="button"
-						onClick={() => this.setState({ open: 'riverPresets' })}
+						onClick={() => {
+							const { open } = this.state;
+							if (open === 'boardPresets') {
+								this.setState({ open: 'riverPresets', activePreset: null });
+							}
+						}}
 						className={`border-r dark:border-muted-700 border-muted-400 w-full p-2 ${
 							open === 'riverPresets' ? 'active' : ''
 						}`}
@@ -127,7 +149,12 @@ export default class PresetView extends Component<PresetViewProps, PresetViewSta
 					</button>
 					<button
 						type="button"
-						onClick={() => this.setState({ open: 'boardPresets' })}
+						onClick={() => {
+							const { open } = this.state;
+							if (open === 'riverPresets') {
+								this.setState({ open: 'boardPresets', activePreset: null });
+							}
+						}}
 						className={`w-full p-2 ${open === 'boardPresets' ? 'active' : ''}`}
 					>
 						{window.t.translate('Board Presets')}
@@ -148,7 +175,10 @@ export default class PresetView extends Component<PresetViewProps, PresetViewSta
 						  )
 						: null}
 				</div>
-				<div className="grid grid-cols-2 items-stretch gap-1 m-2 border dark:border-muted-700 border-muted-400 p-2">
+				<div
+					className="grid grid-cols-2 items-stretch gap-1 m-2 border dark:border-muted-700 border-muted-400 p-2 overflow-x-auto transition-all"
+					style={{ maxHeight: windowDimensions.height - (138 + (activePreset ? 372 : 0)) }}
+				>
 					{open === 'riverPresets' ? (
 						<>
 							{riverPresets.map((preset) => (

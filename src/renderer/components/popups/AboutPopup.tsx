@@ -1,4 +1,4 @@
-import PopupV2 from '../boardConfigurator/PopupV2';
+import PopupV2 from './PopupV2';
 import { SettingsInterface } from '../../../interfaces/SettingsInterface';
 import logo from '../../../../assets/icons/192x192.png';
 

@@ -5,9 +5,12 @@ import _uniqueId from 'lodash/uniqueId';
 import { monaco } from 'react-monaco-editor';
 import TopMenu, { TopMenuActions } from '../components/boardConfigurator/TopMenu';
 import BoardConfigInterface, { Position, PositionDirection } from '../components/interfaces/BoardConfigInterface';
-import LeftSidebar, { LeftSidebarConfigType, LeftSidebarOpenTab } from '../components/boardConfigurator/LeftSidebar';
+import LeftSidebar, {
+	LeftSidebarConfigType,
+	LeftSidebarOpenTab,
+} from '../components/boardConfigurator/sidebars/LeftSidebar';
 import BoardGenerator, { FieldsEnum } from '../components/generator/BoardGenerator';
-import RightSidebar, { RightSidebarOpenTab } from '../components/boardConfigurator/RightSidebar';
+import RightSidebar, { RightSidebarOpenTab } from '../components/boardConfigurator/sidebars/RightSidebar';
 import MainEditor, { FieldTypeOnClick } from '../components/boardConfigurator/MainEditor';
 import {
 	BoardPosition,
@@ -34,14 +37,14 @@ import {
 	removeStartField,
 	removeWall,
 } from '../components/boardConfigurator/HelperFunctions';
-import ConfirmPopupV2 from '../components/boardConfigurator/ConfirmPopupV2';
+import ConfirmPopupV2 from '../components/popups/ConfirmPopupV2';
 import { SettingsInterface } from '../../interfaces/SettingsInterface';
 import SettingsPopup from '../components/popups/SettingsPopup';
 import RandomBoardStartValuesDialogV2 from '../components/popups/RandomBoardStartValuesDialogV2';
 import AStar from '../components/generator/helper/AStar';
 import { Warnings, WarningsMap } from '../components/boardConfigurator/Warning';
 import { BoardPresetWithFile, RiverPresetWithFile } from '../../main/helper/PresetsLoader';
-import AddRiverPresetConfirmPopup from '../components/boardConfigurator/AddRiverPresetConfirmPopup';
+import AddRiverPresetConfirmPopup from '../components/popups/AddRiverPresetConfirmPopup';
 import Dragger from '../components/Dragger';
 
 window.electron.schemas
@@ -1161,6 +1164,10 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 								onFieldOrWallClick={this.handleOnFieldOrWallClick}
 								fieldInEdit={fieldInEdit}
 								onChangeToEdit={(position) => {
+									if (position === null) {
+										this.setState({ currentTool: null });
+										return;
+									}
 									this.setState(
 										{
 											currentTool: 'edit',

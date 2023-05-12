@@ -7,6 +7,7 @@ import ConfirmPopupV2 from './ConfirmPopupV2';
 import BoardConfigInterface from '../interfaces/BoardConfigInterface';
 import InputLabel from '../InputLabel';
 import { getDirectionArrow } from '../presetEditor/RiverFieldPreset';
+import { HomeMenuSeparator } from '../HomeScreenButton';
 
 /**
  * The properties for the river preset component.
@@ -63,10 +64,22 @@ export default class AddRiverPresetConfirmPopup extends Component<
 				const possibleRiver = preset.data.filter((river) => {
 					return river.position[0] + position.x === x && river.position[1] + position.y === y;
 				});
+
+				const isStart = configuration.startFields.some((start) => start.position[0] === x && start.position[1] === y);
+				const isCheckpoint = configuration.checkPoints.some((value) => value[0] === x && value[1] === y);
+				const isLembas = configuration.lembasFields.some((value) => value.position[0] === x && value.position[1] === y);
+				const isHole = configuration.holes.some((value) => value[0] === x && value[1] === y);
+
 				const isEye = configuration.eye.position[0] === x && configuration.eye.position[1] === y;
 				const isRiver = !isEye && possibleRiver.length > 0;
-				const riverClass = isRiver ? 'isRiver' : '';
-				const className = isEye ? 'isEye' : riverClass;
+				const newRiverClass = isRiver ? 'isRiver' : '';
+				const isStartClass = isStart ? 'isStartField' : '';
+				const isCheckpointClass = isCheckpoint ? 'isCheckpoint' : '';
+				const isLembasClass = isLembas ? 'isLembasField' : '';
+				const isHoleClass = isHole ? 'isHole' : '';
+				const isEyeClass = isEye ? 'isEye' : newRiverClass;
+				const className = isCheckpointClass || isStartClass || isEyeClass || isLembasClass || isHoleClass || '';
+
 				row.push(
 					<div className={`w-8 h-8 relative border dark:border-muted-700 border-muted-400 ${className}`}>
 						<div
@@ -127,7 +140,12 @@ export default class AddRiverPresetConfirmPopup extends Component<
 				windowDimensions={windowDimensions}
 			>
 				<div className="flex flex-col gap-4">
-					<p>{window.t.translateVars('Add {0} river preset.', [`"${preset.name}"`])}</p>
+					<div className="flex justify-center flex-col gap-2 items-center">
+						<p>{window.t.translateVars('Add {0} river preset.', [`"${preset.name}"`])}</p>
+						<small>{window.t.translate('Click on the board to place the river.')}</small>
+						<small>{window.t.translate('Already occupied fields will be overridden, except for the eye.')}</small>
+					</div>
+					<HomeMenuSeparator />
 					<div className="flex gap-2 justify-center items-center">
 						<InputLabel
 							type="switch"

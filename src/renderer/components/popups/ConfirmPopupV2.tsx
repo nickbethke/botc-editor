@@ -1,7 +1,7 @@
-import React, {MouseEventHandler} from 'react';
+import React, { MouseEventHandler } from 'react';
 import destinyMountainImage from '../../../../assets/textures/schicksalsberg.png';
-import {SettingsInterface} from '../../../interfaces/SettingsInterface';
-import Button from "../Button";
+import { SettingsInterface } from '../../../interfaces/SettingsInterface';
+import Button from '../Button';
 
 /**
  * The properties of the confirmation popup.
@@ -40,11 +40,11 @@ class ConfirmPopupV2 extends React.Component<ConfirmPopupV2Props, ConfirmPopupV2
 		super(props);
 		this.state = {
 			isDragged: false,
-			rel: {x: 0, y: 0},
+			rel: { x: 0, y: 0 },
 			visible: false,
 			offClick: false,
-			position: {x: window.innerWidth / 2, y: window.innerHeight / 2},
-			dimension: {width: 0, height: 0},
+			position: { x: window.innerWidth / 2, y: window.innerHeight / 2 },
+			dimension: { width: 0, height: 0 },
 		};
 		this.handleOffClick = this.handleOffClick.bind(this);
 	}
@@ -66,7 +66,7 @@ class ConfirmPopupV2 extends React.Component<ConfirmPopupV2Props, ConfirmPopupV2
 	componentDidMount() {
 		setTimeout(() => {
 			const popup = document.getElementById('popupV2');
-			const {position} = this.state;
+			const { position } = this.state;
 			if (popup) {
 				this.setState(
 					{
@@ -81,25 +81,25 @@ class ConfirmPopupV2 extends React.Component<ConfirmPopupV2Props, ConfirmPopupV2
 					},
 					() => {
 						setTimeout(() => {
-							this.setState({visible: true});
+							this.setState({ visible: true });
 						}, 200);
 					}
 				);
 			}
 		}, 200);
-		const {visible} = this.state;
+		const { visible } = this.state;
 		if (visible) {
 			const popup = document.getElementById('popupV2');
 			if (popup) {
 				popup.addEventListener('resize', () => {
-					const {dimension} = this.state;
+					const { dimension } = this.state;
 					this.setState({
 						dimension: {
 							width: popup.clientWidth + 4,
 							height: popup.clientHeight + 4,
 						},
 					});
-				})
+				});
 			}
 		}
 	}
@@ -110,8 +110,8 @@ class ConfirmPopupV2 extends React.Component<ConfirmPopupV2Props, ConfirmPopupV2
 	 * @param prevState
 	 */
 	componentDidUpdate(prevProps: Readonly<ConfirmPopupV2Props>, prevState: Readonly<ConfirmPopupV2State>) {
-		const {offClick: preOffClick, dimension: preDimension} = prevState;
-		const {visible} = this.state;
+		const { offClick: preOffClick, dimension: preDimension } = prevState;
+		const { visible } = this.state;
 		const popup = document.getElementById('popupV2');
 		if (visible) {
 			if (popup) {
@@ -120,21 +120,20 @@ class ConfirmPopupV2 extends React.Component<ConfirmPopupV2Props, ConfirmPopupV2
 					height: popup.clientHeight + 4,
 				};
 				if (dimension.width !== preDimension.width || dimension.height !== preDimension.height) {
-					this.setState({dimension});
+					this.setState({ dimension });
 				}
 			}
 
-			const {offClick, position, dimension} = this.state;
-			const {windowDimensions, os} = this.props;
+			const { offClick, position, dimension } = this.state;
+			const { windowDimensions, os } = this.props;
 			if (offClick !== preOffClick && !preOffClick) {
-				window.electron.app.beep().catch(() => {
-				});
+				window.electron.app.beep().catch(() => {});
 				setTimeout(() => {
-					this.setState({offClick: false});
+					this.setState({ offClick: false });
 				}, 500);
 			}
 			if (position.x < 0) {
-				this.setState({position: {x: 0, y: position.y}});
+				this.setState({ position: { x: 0, y: position.y } });
 			}
 			if (position.y < (os === 'win32' ? 32 : 0)) {
 				this.setState({
@@ -169,16 +168,16 @@ class ConfirmPopupV2 extends React.Component<ConfirmPopupV2Props, ConfirmPopupV2
 	 */
 	handleOffClick: MouseEventHandler<HTMLDivElement> = (e) => {
 		const trigger = document.querySelector('#popupV2-container');
-		if (trigger && trigger === e.target) this.setState({offClick: true});
+		if (trigger && trigger === e.target) this.setState({ offClick: true });
 	};
 
 	/**
 	 * Renders the component.
 	 */
 	render() {
-		const {confirmButtonText, abortButtonText, onConfirm, onAbort, children, title, os, topOffset, maxWidth, big} =
+		const { confirmButtonText, abortButtonText, onConfirm, onAbort, children, title, os, topOffset, maxWidth, big } =
 			this.props;
-		const {visible, offClick, position} = this.state;
+		const { visible, offClick, position } = this.state;
 		return (
 			<div
 				role="presentation"
@@ -202,15 +201,14 @@ class ConfirmPopupV2 extends React.Component<ConfirmPopupV2Props, ConfirmPopupV2
 						maxWidth: `${maxWidth}px` || (big ? '50vw' : '33.333vw'),
 					}}
 				>
-					<div
-						className="dark:bg-muted-800 bg-muted-600 rounded shadow-xl box-shadow-xl border dark:border-muted-700 border-muted-400">
+					<div className="dark:bg-muted-800 bg-muted-600 rounded shadow-xl box-shadow-xl border dark:border-muted-700 border-muted-400">
 						<div
 							role="presentation"
 							className="p-2 flex justify-start gap-4 items-center text-lg border-b dark:border-muted-700 border-muted-400"
 							draggable="true"
 							onMouseDown={(e) => {
-								const {isDragged} = this.state;
-								const {settings} = this.props;
+								const { isDragged } = this.state;
+								const { settings } = this.props;
 								if (!isDragged && settings.popupsDraggable) {
 									this.setState({
 										isDragged: true,
@@ -224,8 +222,8 @@ class ConfirmPopupV2 extends React.Component<ConfirmPopupV2Props, ConfirmPopupV2
 								e.preventDefault();
 							}}
 							onMouseMove={(event) => {
-								const {isDragged, rel} = this.state;
-								const {settings} = this.props;
+								const { isDragged, rel } = this.state;
+								const { settings } = this.props;
 								if (!isDragged || !settings.popupsDraggable) return;
 								this.setState({
 									position: {
@@ -237,33 +235,31 @@ class ConfirmPopupV2 extends React.Component<ConfirmPopupV2Props, ConfirmPopupV2
 								event.preventDefault();
 							}}
 							onMouseUp={(e) => {
-								const {settings} = this.props;
+								const { settings } = this.props;
 								if (settings.popupsDraggable) {
-									this.setState({isDragged: false});
+									this.setState({ isDragged: false });
 								}
 								e.stopPropagation();
 								e.preventDefault();
 							}}
 							onMouseLeave={(e) => {
-								const {settings} = this.props;
+								const { settings } = this.props;
 								if (settings.popupsDraggable) {
-									this.setState({isDragged: false});
+									this.setState({ isDragged: false });
 								}
 								e.stopPropagation();
 								e.preventDefault();
 							}}
 						>
-							<img className="h-6" src={destinyMountainImage} alt={window.t.translate('Logo')}/>
+							<img className="h-6" src={destinyMountainImage} alt={window.t.translate('Logo')} />
 							<span className="font-flicker tracking-widest">{title}</span>
 						</div>
 						<div className="py-2 px-4 mb-2">{children}</div>
-						<div
-							className="py-2 px-4 flex justify-end gap-4 items-center text-sm border-t dark:border-muted-700 border-muted-400">
+						<div className="py-2 px-4 flex justify-end gap-4 items-center text-sm border-t dark:border-muted-700 border-muted-400">
 							<Button onClick={onConfirm} buttonType="primary" size="sm">
 								{confirmButtonText}
 							</Button>
-							<Button onClick={onAbort} size="sm"
-							>
+							<Button onClick={onAbort} size="sm">
 								{abortButtonText}
 							</Button>
 						</div>

@@ -15,14 +15,16 @@ import TopMenuItem, { TopMenuSeparator } from '../components/boardConfigurator/T
 import SelectComponent from '../components/Select';
 import destinyMountainImage from '../../../assets/textures/schicksalsberg.png';
 import TopMenuItemCollapsable from '../components/boardConfigurator/TopMenuItemCollapsable';
-import PopupV2 from '../components/boardConfigurator/PopupV2';
-import ConfirmPopupV2 from '../components/boardConfigurator/ConfirmPopupV2';
+import PopupV2 from '../components/popups/PopupV2';
+import ConfirmPopupV2 from '../components/popups/ConfirmPopupV2';
 import FilePathComponent from '../components/FilePathComponent';
 import KeyCode = monaco.KeyCode;
 import KeyMod = monaco.KeyMod;
 import { JsonViewer } from '@textea/json-viewer';
 import SettingsPopup from '../components/popups/SettingsPopup';
 import Dragger from '../components/Dragger';
+
+type JsonValidatorType = 'board' | 'partie';
 
 type JsonValidatorProps = {
 	onClose: () => void;
@@ -34,7 +36,7 @@ type JsonValidatorState = {
 	popup: JSX.Element | null;
 	code: string;
 	codeError: string;
-	type: 'board' | 'partie';
+	type: JsonValidatorType;
 	consoleOutput: string[];
 	currentFile: { parsed: ParsedPath; path: string } | null;
 	fileHasBeenEdited: boolean;
@@ -523,13 +525,13 @@ class JsonValidator extends React.Component<JsonValidatorProps, JsonValidatorSta
 							<TopMenuItem type="none" onAction={this.handleBackButton} label={window.t.translate('Close')} />
 						</TopMenuItemCollapsable>
 						<div className="flex items-center gap-4">
-							<SelectComponent
+							<SelectComponent<JsonValidatorType>
 								value={type}
 								onChange={this.changeType}
 								options={[
 									{
 										value: 'partie',
-										text: window.t.translate('Party Configuration'),
+										text: window.t.translate('Game Configuration'),
 									},
 									{ value: 'board', text: window.t.translate('Board Configuration') },
 								]}
@@ -565,7 +567,7 @@ class JsonValidator extends React.Component<JsonValidatorProps, JsonValidatorSta
 							<MonacoEditor
 								value={code}
 								language="json"
-								height={windowDimensions.height - (settings.darkMode ? 372 : 373)}
+								height={windowDimensions.height - (settings.darkMode ? 372 : 373) + (os === 'win32' ? 0 : 32)}
 								width={windowDimensions.width}
 								theme="vs-dark"
 								onChange={async (value) => {
@@ -574,7 +576,7 @@ class JsonValidator extends React.Component<JsonValidatorProps, JsonValidatorSta
 								}}
 							/>
 						</div>
-						<div className="grid xl:grid-cols-4 grid-cols-2">
+						<div className="grid 2xl:grid-cols-4 grid-cols-2">
 							<div className="w-full h-[300px] max-h-[300px] flex flex-col">
 								<div className="text-white flex flex-col justify-center border-b border-gray-600 p-1">
 									<div className="pl-4">{window.t.translate('Errors')}</div>
@@ -591,7 +593,7 @@ class JsonValidator extends React.Component<JsonValidatorProps, JsonValidatorSta
 									</div>
 								</div>
 							</div>
-							<div className="w-full h-[300px] max-h-[300px] flex flex-col border-l border-gray-600 xl:col-span-3">
+							<div className="w-full h-[300px] max-h-[300px] flex flex-col border-l border-gray-600 2xl:col-span-3">
 								<div className="text-white flex flex-col justify-center border-b border-gray-600 p-1">
 									<div className="pl-4">{window.t.translate('JSON-Validation')}</div>
 								</div>

@@ -4,12 +4,12 @@ import _uniqueId from 'lodash/uniqueId';
 import { TbScreenShare } from 'react-icons/tb';
 import html2canvas from 'html2canvas';
 import MonacoEditor from 'react-monaco-editor';
-import SidebarMenuItem from './SidebarMenuItem';
-import BoardConfigInterface, { Position } from '../interfaces/BoardConfigInterface';
-import Warning, { WarningsMap } from './Warning';
-import { BoardPosition } from '../generator/interfaces/BoardPosition';
-import { SettingsInterface } from '../../../interfaces/SettingsInterface';
-import { FieldsEnum } from '../generator/BoardGenerator';
+import SidebarMenuItem from '../SidebarMenuItem';
+import BoardConfigInterface, { Position } from '../../interfaces/BoardConfigInterface';
+import Warning, { WarningsMap } from '../Warning';
+import { BoardPosition } from '../../generator/interfaces/BoardPosition';
+import { SettingsInterface } from '../../../../interfaces/SettingsInterface';
+import { FieldsEnum } from '../../generator/BoardGenerator';
 
 /**
  * The board configuration right sidebar component properties
@@ -73,9 +73,7 @@ class RightSidebar extends React.Component<RightSidebarProps, unknown> {
 		const { warnings, onFieldSelect, onRemoveWall, onRemoveField } = this.props;
 		return (
 			<div className="flex flex-col h-full">
-				<div className="p-2 border-b dark:border-muted-700 border-muted-400">
-					{window.t.translate('Warnings')}
-				</div>
+				<div className="p-2 border-b dark:border-muted-700 border-muted-400">{window.t.translate('Warnings')}</div>
 				<div className="flex bg-muted-900/25 flex-col gap-1 flex-grow max-h-full overflow-y-auto">
 					{Array.from(warnings).map((value) => (
 						<Warning

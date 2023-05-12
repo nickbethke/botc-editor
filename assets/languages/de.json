@@ -596,6 +596,90 @@
 		[
 			"Unfavorable server ingame delay. It would be too short to wait for the clients to animate the game!",
 			"Ungünstige Server Ingame Verzögerung. Es wäre zu kurz um auf die Clients zu warten, um das Spiel zu animieren!"
+		],
+		[
+			"Add to board",
+			"Zum Spielfeld hinzufügen"
+		],
+		[
+			"River Presets",
+			"Fluss Vorlagen"
+		],
+		[
+			"Board Presets",
+			"Spielfeld Vorlagen"
+		],
+		[
+			"Add {0} river preset.",
+			"{0} Fluss Vorlage hinzufügen."
+		],
+		[
+			"Click on the board to place the river.",
+			"Klicken Sie auf das Spielfeld um den Fluss zu platzieren."
+		],
+		[
+			"Already occupied fields will be overridden, except for the eye.",
+			"Bereits belegte Felder werden überschrieben, außer das Auge."
+		],
+		[
+			"Adjust board size",
+			"Größe des Spielfelds anpassen"
+		],
+		[
+			"Add",
+			"Hinzufügen"
+		],
+		[
+			"Add River Preset",
+			"Fluss Vorlage hinzufügen"
+		],
+		[
+			"Default values",
+			"Standardwerte"
+		],
+		[
+			"Default Board Name",
+			"Standard Spielfeld Name"
+		],
+		[
+			"Maximum Board Dimension",
+			"Maximale Spielfeld Dimension"
+		],
+		[
+			"Does not apply to river presets!",
+			"Gilt nicht für Fluss Vorlagen!"
+		],
+		[
+			"Maximum Checkpoints",
+			"Maximale Kontrollpunkte"
+		],
+		[
+			"Maximum Lembas Fields",
+			"Maximale Lembas Felder"
+		],
+		[
+			"Maximum Lembas Count",
+			"Maximale Lembas Anzahl"
+		],
+		[
+			"Maximum Holes",
+			"Maximale Löcher"
+		],
+		[
+			"Reset Default Values",
+			"Standardwerte zurücksetzen"
+		],
+		[
+			"Reset",
+			"Zurücksetzen"
+		],
+		[
+			"You can also use the arrow keys and W, A, S, D to change the direction",
+			"Sie können auch die Pfeiltasten und W, A, S, D verwenden um die Richtung zu ändern"
+		],
+		[
+			"End Edit",
+			"Editieren beenden"
 		]
 	]
 }

@@ -13,7 +13,7 @@ import PartieConfigInterface, {
 	PartieConfigWithPath,
 	PathInterface,
 } from '../components/interfaces/PartieConfigInterface';
-import ConfirmPopupV2 from '../components/boardConfigurator/ConfirmPopupV2';
+import ConfirmPopupV2 from '../components/popups/ConfirmPopupV2';
 import { SettingsInterface } from '../../interfaces/SettingsInterface';
 import FilePathComponent from '../components/FilePathComponent';
 import Button from '../components/Button';
@@ -599,7 +599,7 @@ class PartyConfigurator extends React.Component<PartieKonfiguratorProps, PartieK
 													),
 												},
 												ifSmallerThen: {
-													number: 1000,
+													number: 500,
 													error: window.t.translate(
 														'Unfavorable server ingame delay. It would be too short to wait for the clients to animate the game!'
 													),

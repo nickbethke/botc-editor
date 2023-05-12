@@ -1,5 +1,9 @@
 import React from 'react';
 import {
+	VscChevronDown,
+	VscChevronLeft,
+	VscChevronRight,
+	VscChevronUp,
 	VscCircleLarge,
 	VscEdit,
 	VscEye,
@@ -13,12 +17,12 @@ import {
 import { MdBorderStyle, MdOutlineFastfood } from 'react-icons/md';
 import { BiWater } from 'react-icons/bi';
 import { BsCursor } from 'react-icons/bs';
-import { FieldsEnum } from '../generator/BoardGenerator';
-import SidebarMenuItem, { SidebarMenuItemSeparator } from './SidebarMenuItem';
-import BoardConfigInterface, { DirectionEnum } from '../interfaces/BoardConfigInterface';
-import InputLabel from '../InputLabel';
-import { EditorToolType } from '../../screens/BoardConfiguratorV2';
-import { BoardPosition } from '../generator/interfaces/BoardPosition';
+import { FieldsEnum } from '../../generator/BoardGenerator';
+import SidebarMenuItem, { SidebarMenuItemSeparator } from '../SidebarMenuItem';
+import BoardConfigInterface, { DirectionEnum } from '../../interfaces/BoardConfigInterface';
+import InputLabel from '../../InputLabel';
+import { EditorToolType } from '../../../screens/BoardConfiguratorV2';
+import { BoardPosition } from '../../generator/interfaces/BoardPosition';
 import {
 	getDirectionFieldConfig,
 	getFieldType,
@@ -26,12 +30,14 @@ import {
 	updateLembasFieldAmount,
 	updateRiverFieldDirection,
 	updateStartFieldDirection,
-} from './HelperFunctions';
-import DirectionHelper from '../generator/helper/DirectionHelper';
-import CheckpointSortableV2 from './CheckpointSortableV2';
-import { SettingsInterface } from '../../../interfaces/SettingsInterface';
-import { BoardPresetWithFile, RiverPresetWithFile } from '../../../main/helper/PresetsLoader';
-import PresetView from './PresetView';
+} from '../HelperFunctions';
+import DirectionHelper from '../../generator/helper/DirectionHelper';
+import CheckpointSortableV2 from '../CheckpointSortableV2';
+import { SettingsInterface } from '../../../../interfaces/SettingsInterface';
+import { BoardPresetWithFile, RiverPresetWithFile } from '../../../../main/helper/PresetsLoader';
+import PresetView from '../PresetView';
+import SelectComponent from '../../Select';
+import Mousetrap from 'mousetrap';
 
 /**
  * The board configurator left sidebar properties
@@ -85,6 +91,14 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 	 */
 	settings = () => {
 		const { configType } = this.props;
+
+		if (configType === 'direction') {
+			Mousetrap.bind(['up', 'w'], () => this.onDirectionChange(DirectionEnum.NORTH));
+			Mousetrap.bind(['right', 'd'], () => this.onDirectionChange(DirectionEnum.EAST));
+			Mousetrap.bind(['down', 's'], () => this.onDirectionChange(DirectionEnum.SOUTH));
+			Mousetrap.bind(['left', 'a'], () => this.onDirectionChange(DirectionEnum.WEST));
+		}
+
 		switch (configType) {
 			case 'global':
 				return this.settingsGlobal();
@@ -118,19 +132,38 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 				<div className="flex flex-col">
 					<div className="p-2 border-y dark:border-muted-700 border-muted-400">{window.t.translate('Direction')}</div>
 					<div className="p-4 flex flex-col gap-4">
-						<select
-							id="select-direction"
-							className="bg-transparent border-b-2 text-lg px-4 py-2 w-full"
+						<SelectComponent<DirectionEnum>
+							containerClassName="border-b dark:border-muted-700 border-muted-400"
 							value={DirectionHelper.directionToDirEnum(directionField?.direction || 'NORTH')}
-							onChange={(event) => {
-								this.onDirectionChange(event);
+							onChange={(value) => {
+								this.onDirectionChange(value);
 							}}
-						>
-							<option value={DirectionEnum.NORTH}>{window.t.translate('North')}</option>
-							<option value={DirectionEnum.EAST}>{window.t.translate('East')}</option>
-							<option value={DirectionEnum.SOUTH}>{window.t.translate('South')}</option>
-							<option value={DirectionEnum.WEST}>{window.t.translate('West')}</option>
-						</select>
+							options={[
+								{
+									value: DirectionEnum.NORTH,
+									text: window.t.translate('North'),
+									icon: <VscChevronUp />,
+								},
+								{
+									value: DirectionEnum.EAST,
+									text: window.t.translate('East'),
+									icon: <VscChevronRight />,
+								},
+								{
+									value: DirectionEnum.SOUTH,
+									text: window.t.translate('South'),
+									icon: <VscChevronDown />,
+								},
+								{
+									value: DirectionEnum.WEST,
+									text: window.t.translate('West'),
+									icon: <VscChevronLeft />,
+								},
+							]}
+						/>
+						<small>
+							{window.t.translate('You can also use the arrow keys and W, A, S, D to change the direction')}
+						</small>
 					</div>
 				</div>
 			);
@@ -140,28 +173,27 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 
 	/**
 	 * Handle direction change
-	 * @param event
+	 * @param value
 	 */
-	onDirectionChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+	onDirectionChange = (value: DirectionEnum) => {
 		const { config, onConfigUpdate, fieldInEdit } = this.props;
 		if (fieldInEdit) {
 			const type = getFieldType(fieldInEdit, config);
-			const direction = Number.parseInt(event.target.value, 10) as DirectionEnum;
 
 			if (type === FieldsEnum.EYE) {
 				onConfigUpdate({
 					...config,
 					eye: {
 						...config.eye,
-						direction: DirectionHelper.dirEnumToString(direction),
+						direction: DirectionHelper.dirEnumToString(value),
 					},
 				});
 			}
 			if (type === FieldsEnum.RIVER) {
-				onConfigUpdate(updateRiverFieldDirection(config, fieldInEdit, direction));
+				onConfigUpdate(updateRiverFieldDirection(config, fieldInEdit, value));
 			}
 			if (type === FieldsEnum.START) {
-				onConfigUpdate(updateStartFieldDirection(config, fieldInEdit, direction));
+				onConfigUpdate(updateStartFieldDirection(config, fieldInEdit, value));
 			}
 		}
 	};
@@ -321,6 +353,12 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 			tabChange(null);
 		} else {
 			tabChange(openTab);
+		}
+		if (openTab !== 'settings') {
+			Mousetrap.unbind(['up', 'w']);
+			Mousetrap.unbind(['right', 'd']);
+			Mousetrap.unbind(['down', 's']);
+			Mousetrap.unbind(['left', 'a']);
 		}
 	};
 

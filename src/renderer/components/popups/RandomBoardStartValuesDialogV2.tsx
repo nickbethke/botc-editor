@@ -3,7 +3,7 @@ import { TailSpin } from 'react-loader-spinner';
 import InputLabel from '../InputLabel';
 import BoardGenerator from '../generator/BoardGenerator';
 import { SettingsInterface } from '../../../interfaces/SettingsInterface';
-import ConfirmPopupV2 from '../boardConfigurator/ConfirmPopupV2';
+import ConfirmPopupV2 from './ConfirmPopupV2';
 
 export type RandomBoardStartValuesDialogV2Stats = {
 	name: string;

@@ -9,9 +9,9 @@ import AStarRiverPreset from '../components/presetEditor/AStar';
 import PresetEditSidebar from '../components/presetEditor/PresetEditSidebar';
 import { getBoardMaxDimension, removeRiver } from '../components/presetEditor/Helper';
 import EditorCache from '../components/presetEditor/EditorCache';
-import PromptPopupV2 from '../components/boardConfigurator/PromptPopupV2';
+import PromptPopupV2 from '../components/popups/PromptPopupV2';
 import PresetEditorMain from '../components/presetEditor/PresetEditorMain';
-import ConfirmPopupV2 from '../components/boardConfigurator/ConfirmPopupV2';
+import ConfirmPopupV2 from '../components/popups/ConfirmPopupV2';
 import destinyMountainImage from '../../../assets/textures/schicksalsberg.png';
 import SidebarMenuItem from '../components/boardConfigurator/SidebarMenuItem';
 import TopMenuItem, { TopMenuSeparator } from '../components/boardConfigurator/TopMenuItem';
@@ -317,7 +317,6 @@ class RiverPresetEditor extends React.Component<RiverPresetEditorProps, RiverPre
 				break;
 			case TopMenuActions.CLOSE:
 				if (editorCache.hasUnsavedFiles()) {
-					// TODO: Save Unsaved files prompt
 					this.setState({
 						popup: (
 							<ConfirmPopupV2

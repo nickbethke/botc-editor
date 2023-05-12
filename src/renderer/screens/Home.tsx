@@ -8,7 +8,7 @@ import BoardEditorChoice from '../components/popups/BoardEditorChoice';
 import RandomBoardStartValuesDialogV2 from '../components/popups/RandomBoardStartValuesDialogV2';
 import PartieEditorChoice from '../components/popups/PartieEditorChoice';
 import SettingsPopup from '../components/popups/SettingsPopup';
-import PopupV2 from '../components/boardConfigurator/PopupV2';
+import PopupV2 from '../components/popups/PopupV2';
 import { isBoolean } from 'lodash';
 import BoardGenerator from '../components/generator/BoardGenerator';
 import { AppScreens } from '../App';

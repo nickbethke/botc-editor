@@ -600,6 +600,90 @@
 		[
 			"Unfavorable server ingame delay. It would be too short to wait for the clients to animate the game!",
 			"Délai de jeu défavorable du serveur. Ce serait trop court d'attendre que les clients animent le jeu!"
+		],
+		[
+			"Add to board",
+			"Ajouter au plateau"
+		],
+		[
+			"River Presets",
+			"Préréglages de rivière"
+		],
+		[
+			"Board Presets",
+			"Préréglages de plateau"
+		],
+		[
+			"Add {0} river preset.",
+			"Ajouter {0} préréglage de rivière."
+		],
+		[
+			"Click on the board to place the river.",
+			"Cliquez sur le plateau pour placer la rivière."
+		],
+		[
+			"Already occupied fields will be overridden, except for the eye.",
+			"Les champs déjà occupés seront remplacés, sauf pour l'œil."
+		],
+		[
+			"Adjust board size",
+			"Ajuster la taille du plateau"
+		],
+		[
+			"Add",
+			"Ajouter"
+		],
+		[
+			"Add River Preset",
+			"Ajouter un préréglage de rivière"
+		],
+		[
+			"Default values",
+			"Valeurs par défaut"
+		],
+		[
+			"Default Board Name",
+			"Nom du plateau par défaut"
+		],
+		[
+			"Maximum Board Dimension",
+			"Dimension maximale du plateau"
+		],
+		[
+			"Does not apply to river presets!",
+			"Ne s'applique pas aux préréglages de rivière!"
+		],
+		[
+			"Maximum Checkpoints",
+			"Nombre maximal de points de contrôle"
+		],
+		[
+			"Maximum Lembas Fields",
+			"Nombre maximal de champs de lembas"
+		],
+		[
+			"Maximum Lembas Count",
+			"Nombre maximal de lembas"
+		],
+		[
+			"Maximum Holes",
+			"Nombre maximal de trous"
+		],
+		[
+			"Reset Default Values",
+			"Réinitialiser les valeurs par défaut"
+		],
+		[
+			"Reset",
+			"Réinitialiser"
+		],
+		[
+			"You can also use the arrow keys and W, A, S, D to change the direction",
+			"Vous pouvez également utiliser les touches fléchées et W, A, S, D pour changer la direction"
+		],
+		[
+			"End Edit",
+			"Fin de l'édition"
 		]
 	]
 }
