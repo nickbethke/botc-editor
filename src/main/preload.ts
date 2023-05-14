@@ -1,9 +1,10 @@
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 import { ParsedPath } from 'path';
-import BoardConfigInterface from '../renderer/components/interfaces/BoardConfigInterface';
-import PartieConfigInterface from '../renderer/components/interfaces/PartieConfigInterface';
+import BoardConfigInterface from '../interfaces/BoardConfigInterface';
+import GameConfigInterface from '../interfaces/GameConfigInterface';
 import { RiverPresetWithFile } from './helper/PresetsLoader';
 import { SettingsInterface } from '../interfaces/SettingsInterface';
+import { ConfigType } from '../interfaces/Types';
 
 export type Channels = 'enter-full-screen' | 'leave-full-screen';
 
@@ -21,12 +22,12 @@ const electronHandler = {
 			ipcRenderer.once(channel, (_event, ...args) => func(...args));
 		},
 	},
-	validate: (json: object, type: 'partie' | 'board'): Promise<boolean | string> => {
+	validate: (json: object, type: ConfigType): Promise<boolean | string> => {
 		return ipcRenderer.invoke('validate:json', json, type);
 	},
 	schemas: {
-		party: () => {
-			return ipcRenderer.invoke('schemas:partie');
+		game: () => {
+			return ipcRenderer.invoke('schemas:game');
 		},
 		board: () => {
 			return ipcRenderer.invoke('schemas:board');
@@ -35,52 +36,52 @@ const electronHandler = {
 	dialog: {
 		openConfig: (): Promise<
 			| {
-					parsedPath: ParsedPath;
-					path: string;
-					config: BoardConfigInterface;
-			  }
+			parsedPath: ParsedPath;
+			path: string;
+			config: BoardConfigInterface;
+		}
 			| false
 		> => {
 			return ipcRenderer.invoke('dialog:openConfig');
 		},
 		openBoardConfig: (): Promise<
 			| {
-					parsedPath: ParsedPath;
-					path: string;
-					config: BoardConfigInterface;
-			  }
+			parsedPath: ParsedPath;
+			path: string;
+			config: BoardConfigInterface;
+		}
 			| false
 		> => {
 			return ipcRenderer.invoke('dialog:openBoardConfig');
 		},
-		openPartieConfig: (): Promise<
+		openGameConfiguration: (): Promise<
 			| {
-					parsedPath: ParsedPath;
-					path: string;
-					config: PartieConfigInterface;
-			  }
+			parsedPath: ParsedPath;
+			path: string;
+			config: GameConfigInterface;
+		}
 			| false
 		> => {
-			return ipcRenderer.invoke('dialog:openPartieConfig');
+			return ipcRenderer.invoke('dialog:openGameConfig');
 		},
-		savePartieConfig: (
-			json: string
+		saveGameConfiguration: (
+			json: string,
 		): Promise<
 			| {
-					parsedPath: ParsedPath;
-					path: string;
-			  }
-			| false
+			parsedPath: ParsedPath;
+			path: string;
+		}
+			| false | 'canceled'
 		> => {
-			return ipcRenderer.invoke('dialog:savePartieConfig', json);
+			return ipcRenderer.invoke('dialog:saveGameConfig', json);
 		},
 		saveBoardConfig: (
-			json: string
+			json: string,
 		): Promise<
 			| {
-					parsedPath: ParsedPath;
-					path: string;
-			  }
+			parsedPath: ParsedPath;
+			path: string;
+		}
 			| false
 		> => {
 			return ipcRenderer.invoke('dialog:saveBoardConfig', json);

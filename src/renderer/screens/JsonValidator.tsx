@@ -7,9 +7,9 @@ import { VscColorMode, VscFolder, VscNewFile, VscSave, VscVersions } from 'react
 import { ProgressBar } from 'react-loader-spinner';
 import _uniqueId from 'lodash/uniqueId';
 import BoardConfigValidator from '../helper/BoardConfigValidator';
-import BoardConfigInterface from '../components/interfaces/BoardConfigInterface';
-import PartieConfigValidator from '../helper/PartieConfigValidator';
-import PartieConfigInterface from '../components/interfaces/PartieConfigInterface';
+import BoardConfigInterface from '../../interfaces/BoardConfigInterface';
+import GameConfigValidator from '../helper/GameConfigValidator';
+import GameConfigInterface from '../../interfaces/GameConfigInterface';
 import { SettingsInterface } from '../../interfaces/SettingsInterface';
 import TopMenuItem, { TopMenuSeparator } from '../components/boardConfigurator/TopMenuItem';
 import SelectComponent from '../components/Select';
@@ -23,8 +23,7 @@ import KeyMod = monaco.KeyMod;
 import { JsonViewer } from '@textea/json-viewer';
 import SettingsPopup from '../components/popups/SettingsPopup';
 import Dragger from '../components/Dragger';
-
-type JsonValidatorType = 'board' | 'partie';
+import { ConfigType } from '../../interfaces/Types';
 
 type JsonValidatorProps = {
 	onClose: () => void;
@@ -36,7 +35,7 @@ type JsonValidatorState = {
 	popup: JSX.Element | null;
 	code: string;
 	codeError: string;
-	type: JsonValidatorType;
+	type: ConfigType;
 	consoleOutput: string[];
 	currentFile: { parsed: ParsedPath; path: string } | null;
 	fileHasBeenEdited: boolean;
@@ -62,20 +61,21 @@ class JsonValidator extends React.Component<JsonValidatorProps, JsonValidatorSta
 		super(props);
 
 		window.electron.schemas
-			.party()
-			.then((partieSchema) => {
+			.game()
+			.then((gameSchema) => {
 				return monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
 					validate: true,
 					schemas: [
 						{
 							uri: '#',
 							fileMatch: ['*'],
-							schema: partieSchema,
+							schema: gameSchema,
 						},
 					],
 				});
 			})
-			.catch(() => {});
+			.catch(() => {
+			});
 
 		this.handleBackButton = this.handleBackButton.bind(this);
 		this.backToHomeScreen = this.backToHomeScreen.bind(this);
@@ -89,7 +89,7 @@ class JsonValidator extends React.Component<JsonValidatorProps, JsonValidatorSta
 			code: JSON.stringify({}, null, 4),
 			codeError: '',
 			popup: null,
-			type: 'partie',
+			type: 'game',
 			consoleOutput: [],
 			currentFile: null,
 			fileHasBeenEdited: false,
@@ -102,7 +102,8 @@ class JsonValidator extends React.Component<JsonValidatorProps, JsonValidatorSta
 
 	componentDidMount() {
 		Mousetrap.bind(['command+s', 'ctrl+s'], () => {
-			this.saveFile().catch(() => {});
+			this.saveFile().catch(() => {
+			});
 		});
 
 		monaco.editor.addEditorAction({
@@ -111,7 +112,8 @@ class JsonValidator extends React.Component<JsonValidatorProps, JsonValidatorSta
 			// eslint-disable-next-line no-bitwise
 			keybindings: [KeyMod.CtrlCmd | KeyCode.KeyS],
 			run: () => {
-				this.saveFile().catch(() => {});
+				this.saveFile().catch(() => {
+				});
 			},
 		});
 
@@ -121,11 +123,13 @@ class JsonValidator extends React.Component<JsonValidatorProps, JsonValidatorSta
 			// eslint-disable-next-line no-bitwise
 			keybindings: [KeyMod.CtrlCmd | KeyCode.KeyO],
 			run: () => {
-				this.openFile().catch(() => {});
+				this.openFile().catch(() => {
+				});
 			},
 		});
 		window.addEventListener('resize', this.handleResize);
-		this.onChange('{}').catch(() => {});
+		this.onChange('{}').catch(() => {
+		});
 	}
 
 	componentWillUnmount() {
@@ -170,41 +174,44 @@ class JsonValidator extends React.Component<JsonValidatorProps, JsonValidatorSta
 			if (type === 'board') {
 				window.electron.schemas
 					.board()
-					.then((partieSchema) => {
+					.then((gameSchema) => {
 						return monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
 							validate: true,
 							schemas: [
 								{
 									uri: '#',
 									fileMatch: ['*'],
-									schema: partieSchema,
+									schema: gameSchema,
 								},
 							],
 						});
 					})
-					.catch(() => {});
+					.catch(() => {
+					});
 			} else {
 				window.electron.schemas
-					.party()
-					.then((partieSchema) => {
+					.game()
+					.then((gameSchema) => {
 						return monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
 							validate: true,
 							schemas: [
 								{
 									uri: '#',
 									fileMatch: ['*'],
-									schema: partieSchema,
+									schema: gameSchema,
 								},
 							],
 						});
 					})
-					.catch(() => {});
+					.catch(() => {
+					});
 			}
 		}
 		const { code } = this.state;
 		if (code === '{' || code === '}' || code === '') {
 			this.setState({ code: '{}' });
 		}
+
 	}
 
 	handleBackButton = () => {
@@ -256,9 +263,9 @@ class JsonValidator extends React.Component<JsonValidatorProps, JsonValidatorSta
 						consoleOutput: [...consoleOutput, `${error.message}`],
 					});
 			}
-		} else {
+		} else if (type === 'game') {
 			try {
-				validator = new PartieConfigValidator(JSON.parse(newValue) as PartieConfigInterface);
+				validator = new GameConfigValidator(JSON.parse(newValue) as GameConfigInterface);
 				this.setState({
 					consoleOutput: validator.errors,
 				});
@@ -309,7 +316,8 @@ class JsonValidator extends React.Component<JsonValidatorProps, JsonValidatorSta
 							});
 							return false;
 						})
-						.catch(() => {});
+						.catch(() => {
+						});
 				}}
 				onAbort={() => {
 					this.setState({
@@ -345,10 +353,10 @@ class JsonValidator extends React.Component<JsonValidatorProps, JsonValidatorSta
 				closeButtonText={window.t.translate('Close')}
 			>
 				<ProgressBar
-					wrapperClass="text-center mx-auto justify-center"
-					borderColor="#ffffff"
-					barColor="#71C294"
-					width="80"
+					wrapperClass='text-center mx-auto justify-center'
+					borderColor='#ffffff'
+					barColor='#71C294'
+					width='80'
 				/>
 			</PopupV2>
 		);
@@ -368,7 +376,7 @@ class JsonValidator extends React.Component<JsonValidatorProps, JsonValidatorSta
 				async () => {
 					const { code } = this.state;
 					await this.onChange(code);
-				}
+				},
 			);
 		}
 	};
@@ -379,7 +387,6 @@ class JsonValidator extends React.Component<JsonValidatorProps, JsonValidatorSta
 		if (file) {
 			try {
 				const code = JSON.stringify(file.config, null, 4);
-
 				this.setState(
 					{
 						codeError: '',
@@ -391,12 +398,12 @@ class JsonValidator extends React.Component<JsonValidatorProps, JsonValidatorSta
 							path: file.path,
 						},
 						fileHasBeenEdited: false,
-						type: this.predictIfConfigurationIsPartyConfiguration(file.config) ? 'partie' : 'board',
+						type: this.predictIfConfigurationIsPartyConfiguration(file.config) ? 'game' : 'board',
 					},
 					async () => {
 						const { code } = this.state;
 						await this.onChange(code);
-					}
+					},
 				);
 			} catch (error) {
 				if (error instanceof Error) this.setState({ consoleOutput: [...[error.message]] });
@@ -441,9 +448,9 @@ class JsonValidator extends React.Component<JsonValidatorProps, JsonValidatorSta
 						});
 					}
 					break;
-				case 'partie':
+				case 'game':
 				default:
-					save = await window.electron.dialog.savePartieConfig(code);
+					save = await window.electron.dialog.saveGameConfiguration(code);
 					if (save) {
 						this.setState({
 							currentFile: {
@@ -459,21 +466,11 @@ class JsonValidator extends React.Component<JsonValidatorProps, JsonValidatorSta
 		this.setState({ fileHasBeenEdited: false, popup: null });
 	};
 
-	changeType = (value: string) => {
-		switch (value) {
-			case 'board':
-				this.setState({ type: 'board' }, async () => {
-					const { code } = this.state;
-					await this.onChange(code);
-				});
-				break;
-			case 'partie':
-			default:
-				this.setState({ type: 'partie' }, async () => {
-					const { code } = this.state;
-					await this.onChange(code);
-				});
-		}
+	changeType = (type: ConfigType) => {
+		this.setState({ type }, async () => {
+			const { code } = this.state;
+			await this.onChange(code);
+		});
 	};
 
 	render = () => {
@@ -483,7 +480,7 @@ class JsonValidator extends React.Component<JsonValidatorProps, JsonValidatorSta
 		const errorMsg = this.genErrorMsg(codeError);
 
 		return (
-			<div className="dark:bg-muted-800 bg-muted-500 text-white h-[100vh] w-[100vw]">
+			<div className='dark:bg-muted-800 bg-muted-500 text-white h-[100vh] w-[100vw]'>
 				<Dragger os={os}>
 					<>
 						{window.t.translate('Validator')}
@@ -492,45 +489,48 @@ class JsonValidator extends React.Component<JsonValidatorProps, JsonValidatorSta
 						{fileHasBeenEdited ? ' *' : ''}
 					</>
 				</Dragger>
-				<div className="flex flex-col w-full" style={{ height: windowDimensions.height - (os === 'win32' ? 32 : 0) }}>
+				<div className='flex flex-col w-full'
+					 style={{ height: windowDimensions.height - (os === 'win32' ? 32 : 0) }}>
 					<div
 						className={`flex text-white items-center  dark:border-0 border-t border-muted-400 ${
 							os === 'darwin' ? 'pl-20' : ''
 						} `}
 					>
-						<img className="h-6 ml-2 mr-4" src={destinyMountainImage} alt={window.t.translate('Logo')} />
+						<img className='h-6 ml-2 mr-4' src={destinyMountainImage} alt={window.t.translate('Logo')} />
 						<TopMenuItemCollapsable label={window.t.translate('Validator')}>
 							<TopMenuItem
-								type="none"
+								type='none'
 								onAction={this.openNewFile}
 								label={window.t.translate('New')}
 								icon={<VscNewFile />}
 							/>
 							<TopMenuItem
-								type="none"
+								type='none'
 								onAction={this.openFile}
 								label={window.t.translate('Open')}
 								icon={<VscFolder />}
 							/>
 							<TopMenuSeparator />
 							<TopMenuItem
-								type="none"
+								type='none'
 								onAction={this.saveFile}
 								label={`${currentFile ? window.t.translate('Save') : window.t.translate('Save as')}...`}
 								icon={<VscSave />}
 							/>
 							<TopMenuSeparator />
-							<TopMenuItem type="none" onAction={this.openSettings} label={window.t.translate('Settings')} />
+							<TopMenuItem type='none' onAction={this.openSettings}
+										 label={window.t.translate('Settings')} />
 							<TopMenuSeparator />
-							<TopMenuItem type="none" onAction={this.handleBackButton} label={window.t.translate('Close')} />
+							<TopMenuItem type='none' onAction={this.handleBackButton}
+										 label={window.t.translate('Close')} />
 						</TopMenuItemCollapsable>
-						<div className="flex items-center gap-4">
-							<SelectComponent<JsonValidatorType>
+						<div className='flex items-center gap-4'>
+							<SelectComponent<ConfigType>
 								value={type}
 								onChange={this.changeType}
 								options={[
 									{
-										value: 'partie',
+										value: 'game',
 										text: window.t.translate('Game Configuration'),
 									},
 									{ value: 'board', text: window.t.translate('Board Configuration') },
@@ -539,15 +539,15 @@ class JsonValidator extends React.Component<JsonValidatorProps, JsonValidatorSta
 							{currentFile ? (
 								<FilePathComponent os={os} file={currentFile.parsed} edited={fileHasBeenEdited} />
 							) : (
-								<span className="italic">
+								<span className='italic'>
 									{window.t.translate('Unsaved Configuration')}
 									{fileHasBeenEdited ? ' *' : ''}
 								</span>
 							)}
 						</div>
-						<div className="ml-auto flex items-center">
+						<div className='ml-auto flex items-center'>
 							<TopMenuItem
-								type="none"
+								type='none'
 								onAction={() => {
 									onSettingsUpdated({ ...settings, darkMode: !settings.darkMode });
 								}}
@@ -559,33 +559,35 @@ class JsonValidator extends React.Component<JsonValidatorProps, JsonValidatorSta
 									/>
 								}
 							/>
-							<TopMenuItem type="none" label={`${window.t.translate('Version')}: 1.2.81`} icon={<VscVersions />} />
+							<TopMenuItem type='none' label={`${window.t.translate('Version')}: 1.2.81`}
+										 icon={<VscVersions />} />
 						</div>
 					</div>
-					<div className="grow relative h-full">
+					<div className='grow relative h-full'>
 						<div>
 							<MonacoEditor
 								value={code}
-								language="json"
+								language='json'
 								height={windowDimensions.height - (settings.darkMode ? 372 : 373) + (os === 'win32' ? 0 : 32)}
 								width={windowDimensions.width}
-								theme="vs-dark"
+								theme='vs-dark'
 								onChange={async (value) => {
 									await this.onChange(value);
 									this.setState({ fileHasBeenEdited: true });
 								}}
 							/>
 						</div>
-						<div className="grid 2xl:grid-cols-4 grid-cols-2">
-							<div className="w-full h-[300px] max-h-[300px] flex flex-col">
-								<div className="text-white flex flex-col justify-center border-b border-gray-600 p-1">
-									<div className="pl-4">{window.t.translate('Errors')}</div>
+						<div className='grid 2xl:grid-cols-4 grid-cols-2'>
+							<div className='w-full h-[300px] max-h-[300px] flex flex-col'>
+								<div className='text-white flex flex-col justify-center border-b border-gray-600 p-1'>
+									<div className='pl-4'>{window.t.translate('Errors')}</div>
 								</div>
-								<div className="w-full text-white overflow-auto grow dark:bg-white/10 bg-white">
-									<div className="h-full max-h-full pl-5 pt-2">
-										<pre className="user-select">
+								<div className='w-full text-white overflow-auto grow dark:bg-white/10 bg-white'>
+									<div className='h-full max-h-full pl-5 pt-2'>
+										<pre className='user-select'>
 											{consoleOutput.map((error) => (
-												<p key={_uniqueId('console-output-')} className="dark:text-red-400 text-red-600 text-sm py-1">
+												<p key={_uniqueId('console-output-')}
+												   className='dark:text-red-400 text-red-600 text-sm py-1'>
 													{error}
 												</p>
 											))}
@@ -593,17 +595,20 @@ class JsonValidator extends React.Component<JsonValidatorProps, JsonValidatorSta
 									</div>
 								</div>
 							</div>
-							<div className="w-full h-[300px] max-h-[300px] flex flex-col border-l border-gray-600 2xl:col-span-3">
-								<div className="text-white flex flex-col justify-center border-b border-gray-600 p-1">
-									<div className="pl-4">{window.t.translate('JSON-Validation')}</div>
+							<div
+								className='w-full h-[300px] max-h-[300px] flex flex-col border-l border-gray-600 2xl:col-span-3'>
+								<div className='text-white flex flex-col justify-center border-b border-gray-600 p-1'>
+									<div className='pl-4'>{window.t.translate('JSON-Validation')}</div>
 								</div>
-								<div className="w-full dark:bg-white/10 bg-white dark:text-white text-slate-900 overflow-auto grow">
-									<div className="h-full text-sm">
+								<div
+									className='w-full dark:bg-white/10 bg-white dark:text-white text-slate-900 overflow-auto grow'>
+									<div className='h-full text-sm'>
 										{errorMsg ? (
 											<div>{errorMsg.map((error) => error)}</div>
 										) : (
-											<div className="flex flex-col justify-center items-center h-full">
-												<div className="text-2xl text-white">{window.t.translate('No Errors')}</div>
+											<div className='flex flex-col justify-center items-center h-full'>
+												<div
+													className='text-2xl text-white'>{window.t.translate('No Errors')}</div>
 											</div>
 										)}
 									</div>
@@ -624,9 +629,9 @@ class JsonValidator extends React.Component<JsonValidatorProps, JsonValidatorSta
 			errorMsg[0] = null;
 		} else if (codeError === 'validate') {
 			errorMsg[0] = (
-				<div key={_uniqueId()} className="pt-1">
-					<span className="text-red-500">{window.t.translate('ERROR')}</span>
-					<span className="text-white">: {window.t.translate('Invalid JSON')}</span>
+				<div key={_uniqueId()} className='pt-1'>
+					<span className='text-red-500'>{window.t.translate('ERROR')}</span>
+					<span className='text-white'>: {window.t.translate('Invalid JSON')}</span>
 				</div>
 			);
 		} else {
@@ -641,10 +646,10 @@ class JsonValidator extends React.Component<JsonValidatorProps, JsonValidatorSta
 								i % 2 === 1 ? 'bg-slate-100 dark:bg-gray-900/25' : ''
 							}`}
 						>
-							<div className="border-r py-2 dark:border-white/10 pr-2 h-full my-auto">
+							<div className='border-r py-2 dark:border-white/10 pr-2 h-full my-auto'>
 								{JsonValidator.numberAddZero(i + 1)}
 							</div>
-							<div className="w-full">
+							<div className='w-full'>
 								<JsonViewer
 									key={_uniqueId()}
 									value={e}

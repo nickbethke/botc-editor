@@ -2,10 +2,10 @@ import React from 'react';
 import './App.scss';
 import { isEqual } from 'lodash';
 import { ParsedPath } from 'path';
-import PartyConfigurator from './screens/PartyConfigurator';
+import GameConfigurator from './screens/GameConfigurator';
 import JsonValidator from './screens/JsonValidator';
-import { PartieConfigWithPath } from './components/interfaces/PartieConfigInterface';
-import BoardConfigInterface from './components/interfaces/BoardConfigInterface';
+import { GameConfigWithPath } from '../interfaces/GameConfigInterface';
+import BoardConfigInterface from '../interfaces/BoardConfigInterface';
 import TranslationHelper, { AvailableLanguages } from './helper/TranslationHelper';
 import BoardConfiguratorV2 from './screens/BoardConfiguratorV2';
 import { SettingsInterface } from '../interfaces/SettingsInterface';
@@ -16,8 +16,8 @@ export type AppScreens =
 	| 'home'
 	| 'validator'
 	| 'boardConfigV2FromRandomScreen'
-	| 'partieConfigNewScreen'
-	| 'partieConfigLoadScreen'
+	| 'gameConfigNewScreen'
+	| 'gameConfigLoadScreen'
 	| 'boardConfigV2LoadScreen'
 	| 'boardConfigV2NewScreen'
 	| 'riverPresetEditor';
@@ -113,9 +113,9 @@ class App extends React.Component<AppProps, AppStates> {
 		switch (openScreen) {
 			case 'home':
 				return this.homeScreen();
-			case 'partieConfigNewScreen':
-			case 'partieConfigLoadScreen':
-				return this.partieConfigScreen();
+			case 'gameConfigNewScreen':
+			case 'gameConfigLoadScreen':
+				return this.gameConfigScreen();
 			case 'boardConfigV2NewScreen':
 			case 'boardConfigV2LoadScreen':
 				return this.boardConfigV2Screen();
@@ -130,12 +130,12 @@ class App extends React.Component<AppProps, AppStates> {
 		}
 	};
 
-	partieConfigScreen = () => {
+	gameConfigScreen = () => {
 		const { openScreen, settings, fullScreen } = this.state;
 		const { os } = this.props;
-		if (openScreen === 'partieConfigNewScreen') {
+		if (openScreen === 'gameConfigNewScreen') {
 			return (
-				<PartyConfigurator
+				<GameConfigurator
 					onClose={this.handleCloseChildScreen}
 					loadedValues={null}
 					settings={settings}
@@ -145,15 +145,15 @@ class App extends React.Component<AppProps, AppStates> {
 				/>
 			);
 		}
-		if (openScreen === 'partieConfigLoadScreen') {
+		if (openScreen === 'gameConfigLoadScreen') {
 			const { toLoad } = this.state;
 			if (toLoad) this.setState({ toLoad: null });
 			return (
-				<PartyConfigurator
+				<GameConfigurator
 					settings={settings}
 					os={os}
 					onClose={this.handleCloseChildScreen}
-					loadedValues={toLoad as PartieConfigWithPath}
+					loadedValues={toLoad as GameConfigWithPath}
 					onSettingsUpdate={this.handleSettingsChange}
 					fullScreen={fullScreen}
 				/>

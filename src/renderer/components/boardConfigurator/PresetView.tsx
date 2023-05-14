@@ -83,39 +83,39 @@ export default class PresetView extends Component<PresetViewProps, PresetViewSta
 							} border dark:border-muted-700 border-muted-400 text-[10px] flex justify-center items-center`}
 						>
 							{isRiver ? getDirectionArrow(river[0].direction) : null}
-						</div>
+						</div>,
 					);
 				}
 				board.push(row);
 			}
 			return (
-				<div className="flex flex-col h-full">
-					<div className="grow flex flex-col justify-center items-center">
-						<div className="flex flex-col items-center justify-center text-[12px]">
+				<div className='flex flex-col h-full'>
+					<div className='grow flex flex-col justify-center items-center'>
+						<div className='flex flex-col items-center justify-center text-[12px]'>
 							<p>{riverPreset.name}</p>
 						</div>
-						<div className="flex">
+						<div className='flex'>
 							{board.map((row) => (
-								<div className="flex flex-col">{row.map((cell) => cell)}</div>
+								<div className='flex flex-col'>{row.map((cell) => cell)}</div>
 							))}
 						</div>
-						<div className="flex flex-col items-center justify-center text-[12px]">
+						<div className='flex flex-col items-center justify-center text-[12px]'>
 							<p>
 								{riverPreset.width}x{riverPreset.height}
 							</p>
 						</div>
 					</div>
-					<div className="flex items-center justify-center text-sm">
+					<div className='flex items-center justify-center text-sm'>
 						<Button
-							className="dark:bg-slate-600 dark:hover:bg-slate-700"
+							className='dark:bg-slate-600 dark:hover:bg-slate-700'
 							onClick={() => {
 								const { onAddRiverPresetToBoard } = this.props;
 								onAddRiverPresetToBoard(riverPreset);
 							}}
-							size="sm"
+							size='sm'
 						>
 							<VscAdd />
-							<p className="whitespace-nowrap">{window.t.translate('Add to board')}</p>
+							<p className='whitespace-nowrap'>{window.t.translate('Add to board')}</p>
 						</Button>
 					</div>
 				</div>
@@ -132,9 +132,10 @@ export default class PresetView extends Component<PresetViewProps, PresetViewSta
 		const { open, activePreset, contextMenu, windowDimensions } = this.state;
 		return (
 			<div>
-				<div className="flex justify-around items-center border-b dark:border-muted-700 border-muted-400 preset-view-switch">
+				<div
+					className='flex justify-around items-center border-b dark:border-muted-700 border-muted-400 preset-view-switch'>
 					<button
-						type="button"
+						type='button'
 						onClick={() => {
 							const { open } = this.state;
 							if (open === 'boardPresets') {
@@ -147,7 +148,7 @@ export default class PresetView extends Component<PresetViewProps, PresetViewSta
 					>
 						{window.t.translate('River Presets')}
 					</button>
-					<button
+					{/*<button
 						type="button"
 						onClick={() => {
 							const { open } = this.state;
@@ -158,7 +159,7 @@ export default class PresetView extends Component<PresetViewProps, PresetViewSta
 						className={`w-full p-2 ${open === 'boardPresets' ? 'active' : ''}`}
 					>
 						{window.t.translate('Board Presets')}
-					</button>
+					</button>*/}
 				</div>
 				<div
 					className={`flex justify-center dark:bg-muted-700 bg-muted-500 transition-all overflow-hidden ${
@@ -169,21 +170,21 @@ export default class PresetView extends Component<PresetViewProps, PresetViewSta
 				>
 					{open === 'riverPresets'
 						? this.previewRiverPreset(
-								riverPresets.find((preset) => {
-									return preset.file.base === activePreset;
-								})
-						  )
+							riverPresets.find((preset) => {
+								return preset.file.base === activePreset;
+							}),
+						)
 						: null}
 				</div>
 				<div
-					className="grid grid-cols-2 items-stretch gap-1 m-2 border dark:border-muted-700 border-muted-400 p-2 overflow-x-auto transition-all"
+					className='grid grid-cols-2 items-stretch gap-1 m-2 border dark:border-muted-700 border-muted-400 p-2 overflow-x-auto transition-all'
 					style={{ maxHeight: windowDimensions.height - (138 + (activePreset ? 372 : 0)) }}
 				>
 					{open === 'riverPresets' ? (
 						<>
 							{riverPresets.map((preset) => (
 								<div
-									role="presentation"
+									role='presentation'
 									key={_uniqueId()}
 									className={`p-2 flex flex-col w-full hover:cursor-pointer ${
 										activePreset === preset.file.base ? 'bg-white/10 shadow' : ' hover:bg-white/5'
@@ -211,7 +212,7 @@ export default class PresetView extends Component<PresetViewProps, PresetViewSta
 									}}
 								>
 									<p className={activePreset === preset.file.base ? 'text-accent-300' : ''}>{preset.name}</p>
-									<p className="text-[10px] text-white/50">{preset.file.base}</p>
+									<p className='text-[10px] text-white/50'>{preset.file.base}</p>
 								</div>
 							))}
 						</>
@@ -219,15 +220,15 @@ export default class PresetView extends Component<PresetViewProps, PresetViewSta
 						<>
 							{boardPresets.map((preset) => (
 								<button
-									type="button"
+									type='button'
 									key={_uniqueId()}
-									className="p-2 flex flex-col"
+									className='p-2 flex flex-col'
 									onClick={() => {
 										this.setState({ activePreset: preset.file.base });
 									}}
 								>
 									<p>{preset.name}</p>
-									<p className="text-[10px] text-white/50">{preset.file.base}</p>
+									<p className='text-[10px] text-white/50'>{preset.file.base}</p>
 								</button>
 							))}
 						</>

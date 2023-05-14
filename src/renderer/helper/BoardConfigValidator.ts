@@ -1,4 +1,4 @@
-import BoardConfigInterface, {Position} from '../components/interfaces/BoardConfigInterface';
+import BoardConfigInterface, {Position} from '../../interfaces/BoardConfigInterface';
 import BoardGenerator from '../components/generator/BoardGenerator';
 import {wallPosition2String} from '../components/generator/interfaces/BoardPosition';
 

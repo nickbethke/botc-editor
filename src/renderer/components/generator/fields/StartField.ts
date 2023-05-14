@@ -1,5 +1,5 @@
 import FieldWithPositionAndDirectionInterface from '../interfaces/FieldWithPositionAndDirectionInterface';
-import { DirectionEnum } from '../../interfaces/BoardConfigInterface';
+import { DirectionEnum } from '../../../../interfaces/BoardConfigInterface';
 import { BoardPosition } from '../interfaces/BoardPosition';
 import { FieldsEnum } from '../BoardGenerator';
 

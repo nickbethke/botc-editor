@@ -3,7 +3,7 @@ import { ParsedPath } from 'path';
 /**
  * The party configuration type
  */
-interface PartieConfigInterface {
+interface GameConfigInterface {
 	startLembas: number;
 	shotLembas: number;
 	cardSelectionTimeout: number;
@@ -20,8 +20,8 @@ export type PathInterface = {
 	parsedPath: ParsedPath;
 	path: string;
 };
-export type PartieConfigWithPath = PathInterface & {
-	config: PartieConfigInterface;
+export type GameConfigWithPath = PathInterface & {
+	config: GameConfigInterface;
 };
 
-export default PartieConfigInterface;
+export default GameConfigInterface;

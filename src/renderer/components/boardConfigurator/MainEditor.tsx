@@ -18,7 +18,7 @@ import {
 	VscTriangleUp,
 } from 'react-icons/vsc';
 import { ParsedPath } from 'path';
-import BoardConfigInterface, { Direction } from '../interfaces/BoardConfigInterface';
+import BoardConfigInterface, { Direction } from '../../../interfaces/BoardConfigInterface';
 import {
 	BoardPosition,
 	boardPosition2String,

@@ -19,7 +19,7 @@ import { BiWater } from 'react-icons/bi';
 import { BsCursor } from 'react-icons/bs';
 import { FieldsEnum } from '../../generator/BoardGenerator';
 import SidebarMenuItem, { SidebarMenuItemSeparator } from '../SidebarMenuItem';
-import BoardConfigInterface, { DirectionEnum } from '../../interfaces/BoardConfigInterface';
+import BoardConfigInterface, { DirectionEnum } from '../../../../interfaces/BoardConfigInterface';
 import InputLabel from '../../InputLabel';
 import { EditorToolType } from '../../../screens/BoardConfiguratorV2';
 import { BoardPosition } from '../../generator/interfaces/BoardPosition';

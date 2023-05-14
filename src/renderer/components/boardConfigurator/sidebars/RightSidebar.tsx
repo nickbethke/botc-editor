@@ -5,7 +5,7 @@ import { TbScreenShare } from 'react-icons/tb';
 import html2canvas from 'html2canvas';
 import MonacoEditor from 'react-monaco-editor';
 import SidebarMenuItem from '../SidebarMenuItem';
-import BoardConfigInterface, { Position } from '../../interfaces/BoardConfigInterface';
+import BoardConfigInterface, { Position } from '../../../../interfaces/BoardConfigInterface';
 import Warning, { WarningsMap } from '../Warning';
 import { BoardPosition } from '../../generator/interfaces/BoardPosition';
 import { SettingsInterface } from '../../../../interfaces/SettingsInterface';

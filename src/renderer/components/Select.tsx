@@ -27,6 +27,13 @@ class SelectComponent<T> extends Component<SelectComponentProps<T>, SelectCompon
 		};
 	}
 
+	componentDidUpdate(prevProps: Readonly<SelectComponentProps<T>>) {
+		const { value, options } = this.props;
+		if (prevProps.value !== value || prevProps.options !== options) {
+			this.setState({ value, options });
+		}
+	}
+
 	componentDidMount() {
 		document.addEventListener('click', this.handleOffClick);
 	}
@@ -49,7 +56,7 @@ class SelectComponent<T> extends Component<SelectComponentProps<T>, SelectCompon
 		const { value, options, isOpen, id } = this.state;
 		const currentValue = options.find((option) => option.value === value);
 		return (
-			<div className="relative h-full" id={id}>
+			<div className='relative h-full' id={id}>
 				<div
 					className={
 						'flex gap-1 justify-between px-2 items-center hover:cursor-pointer hover:bg-white/10 h-full ' +
@@ -57,7 +64,7 @@ class SelectComponent<T> extends Component<SelectComponentProps<T>, SelectCompon
 					}
 					onClick={() => this.setState({ isOpen: !isOpen })}
 				>
-					<button type="button" className="px-2 py-1 font-medium flex gap-2 items-center">
+					<button type='button' className='px-2 py-1 font-medium flex gap-2 items-center'>
 						{currentValue?.icon}
 						<span>{currentValue?.text}</span>
 					</button>
@@ -71,7 +78,7 @@ class SelectComponent<T> extends Component<SelectComponentProps<T>, SelectCompon
 					{options.map((option, index) => (
 						<button
 							disabled={option.value === value}
-							type="button"
+							type='button'
 							key={_uniqueId()}
 							className={`px-2 py-1 dark:bg-muted-600 bg-muted-400 text-left flex gap-2 items-center ${
 								index === options.length - 1 ? 'rounded-b' : ''

@@ -1,5 +1,5 @@
 import React from 'react';
-import { VscAdd, VscColorMode, VscFile, VscNewFile, VscSave } from 'react-icons/vsc';
+import { VscFile, VscNewFile, VscSave } from 'react-icons/vsc';
 import { isBoolean } from 'lodash';
 import Mousetrap from 'mousetrap';
 import backgroundImage from '../../../assets/images/damn_nice_background_color.png';
@@ -9,27 +9,27 @@ import Notification from '../components/Notification';
 import Error from '../components/Error';
 import InputValidator, { InputValidatorType } from '../helper/InputValidator';
 
-import PartieConfigInterface, {
-	PartieConfigWithPath,
+import GameConfigInterface, {
+	GameConfigWithPath,
 	PathInterface,
-} from '../components/interfaces/PartieConfigInterface';
+} from '../../interfaces/GameConfigInterface';
 import ConfirmPopupV2 from '../components/popups/ConfirmPopupV2';
 import { SettingsInterface } from '../../interfaces/SettingsInterface';
 import FilePathComponent from '../components/FilePathComponent';
 import Button from '../components/Button';
-import { FaChevronLeft, FaMoon, FaPlus, FaSave, FaSun } from 'react-icons/fa';
+import { FaChevronLeft, FaMoon, FaSun } from 'react-icons/fa';
 import Dragger from '../components/Dragger';
 
-type PartieKonfiguratorProps = {
+type GameConfiguratorProps = {
 	onClose: () => void;
-	loadedValues: PartieConfigWithPath | null;
+	loadedValues: GameConfigWithPath | null;
 	os: NodeJS.Platform;
 	settings: SettingsInterface;
 	onSettingsUpdate: (settings: SettingsInterface) => void;
 	fullScreen: boolean;
 };
-type PartieKonfiguratorState = {
-	configuration: PartieConfigInterface;
+type GameConfiguratorState = {
+	configuration: GameConfigInterface;
 	popupLeave: boolean;
 	popupNew: boolean;
 	windowDimensions: {
@@ -41,24 +41,23 @@ type PartieKonfiguratorState = {
 	edited: boolean;
 };
 
-// TODO: Translations
-class PartyConfigurator extends React.Component<PartieKonfiguratorProps, PartieKonfiguratorState> {
-	private default: PartieConfigInterface = {
-		maxRounds: 0,
+class GameConfigurator extends React.Component<GameConfiguratorProps, GameConfiguratorState> {
+	private default: GameConfigInterface = {
+		maxRounds: -1,
 		reviveRounds: 0,
-		serverIngameDelay: 0,
-		riverMoveCount: 0,
-		cardSelectionTimeout: 0,
-		characterChoiceTimeout: 0,
-		shotLembas: 0,
-		startLembas: 0,
+		serverIngameDelay: 500,
+		riverMoveCount: 2,
+		cardSelectionTimeout: 30000,
+		characterChoiceTimeout: 30000,
+		shotLembas: 3,
+		startLembas: 3,
 	};
 
-	constructor(props: PartieKonfiguratorProps) {
+	constructor(props: GameConfiguratorProps) {
 		super(props);
 		this.handleBackButton = this.handleBackButton.bind(this);
 		this.handleSaveClick = this.handleSaveClick.bind(this);
-		this.openLoadPartieConfig = this.openLoadPartieConfig.bind(this);
+		this.openLoadGameConfig = this.openLoadGameConfig.bind(this);
 		this.abortBackToHomeScreen = this.abortBackToHomeScreen.bind(this);
 		this.state = {
 			configuration: this.default,
@@ -76,19 +75,27 @@ class PartyConfigurator extends React.Component<PartieKonfiguratorProps, PartieK
 
 	componentDidMount() {
 		Mousetrap.bind('ctrl+s', () => {
-			this.handleSaveClick().catch(() => {});
+			this.handleSaveClick().catch(() => {
+			});
 		});
-		Mousetrap.bind('ctrl+n', () => {
-			this.handleNewConfigClick();
-		});
+		Mousetrap.bind('ctrl+n', this.handleNewConfigClick);
 		window.addEventListener('resize', this.handleResize);
 
 		const { loadedValues } = this.props;
 		const { file } = this.state;
-		if (loadedValues && file == null && this.predictIfConfigurationIsPartyConfiguration(loadedValues.config)) {
-			const configuration: PartieConfigInterface = { ...this.default, ...loadedValues.config };
+		if (loadedValues && file == null) {
+			if (!this.predictIfConfigurationIsPartyConfiguration(loadedValues.config)) {
+				this.setState({
+					file: null,
+					notification: <Error
+						label={window.t.translate('Failed to load file! Not a valid game configuration file')} />,
+				});
+				return;
+			}
+
+			const configuration: GameConfigInterface = { ...this.default, ...loadedValues.config };
 			window.electron
-				.validate(loadedValues.config, 'partie')
+				.validate(loadedValues.config, 'game')
 				.then((valid) => {
 					if (isBoolean(valid) && valid) {
 						this.setState({
@@ -96,7 +103,6 @@ class PartyConfigurator extends React.Component<PartieKonfiguratorProps, PartieK
 							notification: <Notification label={window.t.translate('Loaded successfully')} />,
 							file: loadedValues as PathInterface,
 						});
-
 						return null;
 					}
 					this.setState({
@@ -105,7 +111,8 @@ class PartyConfigurator extends React.Component<PartieKonfiguratorProps, PartieK
 					});
 					return null;
 				})
-				.catch(() => {});
+				.catch(() => {
+				});
 		}
 	}
 
@@ -162,41 +169,48 @@ class PartyConfigurator extends React.Component<PartieKonfiguratorProps, PartieK
 
 		if (file) {
 			const answer = await window.electron.file.save(file.path, json);
-			if (answer)
+			if (isBoolean(answer) && answer)
 				this.setState({
 					edited: false,
-					notification: <Notification label="Erfolgreich gespeichert" />,
+					notification: <Notification label={window.t.translate('Saved successfully')} />,
 				});
-			else
+			else {
 				this.setState({
-					notification: <Error label="Speichern fehlgeschlagen!" />,
+					notification: <Error label={window.t.translate(answer)} />,
+					file: null,
+					edited: false,
+					configuration: this.default,
 				});
+			}
 		} else {
-			const answer = await window.electron.dialog.savePartieConfig(json);
-			if (answer)
+			const answer = await window.electron.dialog.saveGameConfiguration(json);
+			if (answer) {
+				if (answer === 'canceled') {
+					return;
+				}
 				this.setState({
 					file: answer as PathInterface,
 					edited: false,
-					notification: <Notification label="Erfolgreich gespeichert" />,
+					notification: <Notification label={window.t.translate('Saved successfully')} />,
 				});
-			else
+			} else
 				this.setState({
-					notification: <Error label="Speichern fehlgeschlagen!" />,
+					notification: <Error label={window.t.translate('Failed to save file!')} />,
 				});
 		}
 	};
 
-	openLoadPartieConfig = async () => {
+	openLoadGameConfig = async () => {
 		this.setState({
 			notification: null,
 		});
-		const partieJSON = await window.electron.dialog.openPartieConfig();
-		if (partieJSON) {
-			if (this.predictIfConfigurationIsPartyConfiguration(partieJSON.config)) {
+		const gameJSON = await window.electron.dialog.openGameConfiguration();
+		if (gameJSON) {
+			if (this.predictIfConfigurationIsPartyConfiguration(gameJSON.config)) {
 				this.setState({
-					configuration: { ...partieJSON.config },
-					file: partieJSON as PathInterface,
-					notification: <Notification label="Erfolgreich geladen" />,
+					configuration: { ...gameJSON.config },
+					file: gameJSON as PathInterface,
+					notification: <Notification label={window.t.translate('Loaded successfully')} />,
 					edited: false,
 				});
 				return;
@@ -225,7 +239,7 @@ class PartyConfigurator extends React.Component<PartieKonfiguratorProps, PartieK
 		const { os, settings, onSettingsUpdate } = this.props;
 		return (
 			<div
-				className="flex flex-col duration-500 w-full h-full overflow-hidden bg-cover bg-no-repeat bg-center"
+				className='flex flex-col duration-500 w-full h-full overflow-hidden bg-cover bg-no-repeat bg-center'
 				style={{
 					backgroundImage: `url(${settings.darkMode ? backgroundImageDark : backgroundImage})`,
 				}}
@@ -261,24 +275,26 @@ class PartyConfigurator extends React.Component<PartieKonfiguratorProps, PartieK
 						abortButtonText={window.t.translate('Cancel')}
 					>
 						{window.t.translate(
-							'The current changes had not yet been saved. Do you want to discard the current changes?'
+							'The current changes had not yet been saved. Do you want to discard the current changes?',
 						)}
 					</ConfirmPopupV2>
 				) : null}
 				<div
-					className="text-white grid grid-cols-3 2xl:grid-cols-2 gap-0 grow w-[100vw] relative"
+					className='text-white grid grid-cols-3 2xl:grid-cols-2 gap-0 grow w-[100vw] relative'
 					style={{
 						minHeight: os !== 'win32' ? '100vh' : 'calc(100vh - 32px)',
 					}}
 				>
 					<div />
-					<div className="dark:bg-gradient-to-br dark:from-slate-800/90 dark:to-slate-900/90 bg-gradient-to-br from-muted-700/95 to-muted-500/95 col-span-2 2xl:col-span-1 flex flex-col gap-4 transition p-8">
-						<div className="flex flex-row justify-start gap-8">
-							<Button onClick={this.handleBackButton} icon={<FaChevronLeft className="text-lg" />} size="sm" />
+					<div
+						className='dark:bg-gradient-to-br dark:from-slate-800/90 dark:to-slate-900/90 bg-gradient-to-br from-muted-700/95 to-muted-500/95 col-span-2 2xl:col-span-1 flex flex-col gap-4 transition p-8'>
+						<div className='flex flex-row justify-start gap-8'>
+							<Button onClick={this.handleBackButton} icon={<FaChevronLeft className='text-lg' />}
+									size='sm' />
 
-							<div className="text-4xl">{window.t.translate('Game-Configurator')}</div>
+							<div className='text-4xl'>{window.t.translate('Game-Configurator')}</div>
 							<Button
-								className="ml-auto"
+								className='ml-auto'
 								onClick={() => {
 									onSettingsUpdate({
 										...settings,
@@ -288,7 +304,7 @@ class PartyConfigurator extends React.Component<PartieKonfiguratorProps, PartieK
 								icon={settings.darkMode ? <FaSun /> : <FaMoon />}
 							/>
 						</div>
-						<div className="flex gap-4 items-center">
+						<div className='flex gap-4 items-center'>
 							<div>
 								<Button onClick={this.handleNewConfigClick} icon={<VscNewFile />}>
 									{window.t.translate('New')}
@@ -300,7 +316,7 @@ class PartyConfigurator extends React.Component<PartieKonfiguratorProps, PartieK
 								</Button>
 							</div>
 							<div>
-								<Button icon={<VscFile />} onClick={this.openLoadPartieConfig}>
+								<Button icon={<VscFile />} onClick={this.openLoadGameConfig}>
 									{window.t.translate('Load')}
 								</Button>
 							</div>
@@ -311,7 +327,7 @@ class PartyConfigurator extends React.Component<PartieKonfiguratorProps, PartieK
 									</Button>
 								) : (
 									<Button>
-										<div className="flex items-center gap-0 h-full">
+										<div className='flex items-center gap-0 h-full'>
 											{window.t.translate('Unsaved File')}
 											{!edited ? '' : ` *`}
 										</div>
@@ -320,12 +336,13 @@ class PartyConfigurator extends React.Component<PartieKonfiguratorProps, PartieK
 							</div>
 						</div>
 						{notification ? <div>{notification}</div> : null}
-						<div className="grid grid-cols-2 gap-8">
+						<div className='grid grid-cols-2 gap-8'>
 							<div>
 								<InputLabel
-									label="Maximale Rundenanzahl"
-									type="number"
-									min={0}
+									label={window.t.translate('Maximal number of rounds')}
+									type='number'
+									helperText={window.t.translate('The game ends after the specified number of rounds. -1 means no limit.')}
+									min={-1}
 									max={200}
 									value={configuration.maxRounds}
 									validator={
@@ -333,13 +350,14 @@ class PartyConfigurator extends React.Component<PartieKonfiguratorProps, PartieK
 											type: InputValidatorType.TYPE_NUMBER,
 											options: {
 												ifSmallerThen: {
-													number: 3,
-													error: window.t.translate('Unfavorable number of laps. The game would be over very quickly!'),
+													number: 5,
+													error: window.t.translate('Unfavorable number of rounds. The game would be over very quickly!'),
 													isError: true,
+													except: -1,
 												},
 												ifBiggerThen: {
 													number: 50,
-													error: window.t.translate('Unfavorable number of laps. The game would take a long time!'),
+													error: window.t.translate('Unfavorable number of rounds. The game would take a long time!'),
 												},
 											},
 										})
@@ -357,17 +375,18 @@ class PartyConfigurator extends React.Component<PartieKonfiguratorProps, PartieK
 							</div>
 							<div>
 								<InputLabel
-									label="Start Lembas"
-									type="number"
+									label={window.t.translate('Start Lembas')}
+									type='number'
 									value={configuration.startLembas}
+									min={0}
+									max={32}
 									validator={
 										new InputValidator({
 											type: InputValidatorType.TYPE_NUMBER,
 											options: {
-												ifSmallerThen: {
-													number: 5,
-													error: window.t.translate('Unfavorable start lembas number.'),
-													except: -1,
+												ifBiggerThen: {
+													number: 10,
+													error: window.t.translate('Your choice is not recommended. The characters would be too strong at the beginning!'),
 												},
 											},
 										})
@@ -384,11 +403,13 @@ class PartyConfigurator extends React.Component<PartieKonfiguratorProps, PartieK
 								/>
 							</div>
 						</div>
-						<div className="grid grid-cols-2 gap-8">
+						<div className='grid grid-cols-2 gap-8'>
 							<div>
 								<InputLabel
-									label="Schuss Lembas"
-									type="number"
+									label={window.t.translate('Shot Lembas')}
+									type='number'
+									min={0}
+									max={32}
 									onChange={(value) => {
 										this.setState({
 											edited: true,
@@ -403,16 +424,10 @@ class PartyConfigurator extends React.Component<PartieKonfiguratorProps, PartieK
 										new InputValidator({
 											type: InputValidatorType.TYPE_NUMBER,
 											options: {
-												ifSmallerThen: {
-													number: 0,
-													error: window.t.translate(
-														'Unfavorable shot lembas number. Negative numbers are not allowed!'
-													),
-												},
 												ifBiggerThen: {
-													number: 5,
+													number: 9,
 													error: window.t.translate(
-														'Unfavorable shot lembas number. It would be nearly impossible to shoot!'
+														'Unfavorable shot lembas number. It would be nearly impossible to shoot!',
 													),
 												},
 											},
@@ -422,8 +437,10 @@ class PartyConfigurator extends React.Component<PartieKonfiguratorProps, PartieK
 							</div>
 							<div>
 								<InputLabel
-									label="Flussbewegungsschritte"
-									type="number"
+									label={window.t.translate('River Move Count')}
+									type='number'
+									min={0}
+									max={32}
 									onChange={(value) => {
 										this.setState({
 											edited: true,
@@ -438,20 +455,16 @@ class PartyConfigurator extends React.Component<PartieKonfiguratorProps, PartieK
 										new InputValidator({
 											type: InputValidatorType.TYPE_NUMBER,
 											options: {
-												ifSmallerThen: {
-													number: 0,
-													error: window.t.translate('Unfavorable river move count. Negative numbers are not allowed!'),
-												},
 												ifBiggerThen: {
 													number: 5,
 													error: window.t.translate(
-														'Unfavorable river move count. The river moves would be very unpredictable!'
+														'Unfavorable river move count. The river moves would be very unpredictable!',
 													),
 												},
 												exact: {
 													number: 0,
 													error: window.t.translate(
-														'Unfavorable river move count. The river would not move the characters!'
+														'Unfavorable river move count. The river would not move the characters!',
 													),
 												},
 											},
@@ -460,11 +473,12 @@ class PartyConfigurator extends React.Component<PartieKonfiguratorProps, PartieK
 								/>
 							</div>
 						</div>
-						<div className="grid grid-cols-2 gap-8">
+						<div className='grid grid-cols-2 gap-8'>
 							<div>
 								<InputLabel
-									label="Runden bis zur Wiederbelebung"
-									type="number"
+									label={window.t.translate('Revive Rounds')}
+									type='number'
+									min={-1}
 									helperText={window.t.translate('-1 = no revive')}
 									onChange={(value) => {
 										this.setState({
@@ -483,7 +497,7 @@ class PartyConfigurator extends React.Component<PartieKonfiguratorProps, PartieK
 												ifBiggerThen: {
 													number: 5,
 													error: window.t.translate(
-														'Unfavorable revive rounds. The player would have to wait too long to play again!'
+														'Unfavorable revive rounds. The player would have to wait too long to play again!',
 													),
 												},
 											},
@@ -493,9 +507,9 @@ class PartyConfigurator extends React.Component<PartieKonfiguratorProps, PartieK
 							</div>
 							<div>
 								<InputLabel
-									label="TimeOut für Charakterauswahl"
-									type="number"
-									helperText="in ms"
+									label={window.t.translate('Character Choice Timeout')}
+									type='number'
+									helperText={window.t.translate('in milliseconds')}
 									min={0}
 									max={10 ** 6}
 									onChange={(value) => {
@@ -515,13 +529,13 @@ class PartyConfigurator extends React.Component<PartieKonfiguratorProps, PartieK
 												ifBiggerThen: {
 													number: 30000,
 													error: window.t.translate(
-														'Unfavorable character choice timeout. It would be too long to wait for the player to choose a character!'
+														'Unfavorable character choice timeout. It would be too long to wait for the player to choose a character!',
 													),
 												},
 												ifSmallerThen: {
 													number: 10000,
 													error: window.t.translate(
-														'Unfavorable character choice timeout. It would be too short to wait for the player to choose a character!'
+														'Unfavorable character choice timeout. It would be too short to wait for the player to choose a character!',
 													),
 													isError: true,
 												},
@@ -531,12 +545,12 @@ class PartyConfigurator extends React.Component<PartieKonfiguratorProps, PartieK
 								/>
 							</div>
 						</div>
-						<div className="grid grid-cols-2 gap-8">
+						<div className='grid grid-cols-2 gap-8'>
 							<div>
 								<InputLabel
-									label="TimeOut für Kartenauswahl"
-									type="number"
-									helperText="in ms"
+									label={window.t.translate('Card Selection Timeout')}
+									type='number'
+									helperText={window.t.translate('in milliseconds')}
 									min={0}
 									max={10 ** 6}
 									onChange={(value) => {
@@ -556,13 +570,13 @@ class PartyConfigurator extends React.Component<PartieKonfiguratorProps, PartieK
 												ifBiggerThen: {
 													number: 30000,
 													error: window.t.translate(
-														'Unfavorable card choice timeout. It would be too long to wait for the player to choose a card!'
+														'Unfavorable card choice timeout. It would be too long to wait for the player to choose a card!',
 													),
 												},
 												ifSmallerThen: {
 													number: 10000,
 													error: window.t.translate(
-														'Unfavorable card choice timeout. It would be too short to wait for the player to choose a card!'
+														'Unfavorable card choice timeout. It would be too short to wait for the player to choose a card!',
 													),
 													isError: true,
 												},
@@ -573,9 +587,9 @@ class PartyConfigurator extends React.Component<PartieKonfiguratorProps, PartieK
 							</div>
 							<div>
 								<InputLabel
-									label="Server-Ingame-Delay"
-									type="number"
-									helperText="in ms"
+									label={window.t.translate('Server Ingame Delay')}
+									type='number'
+									helperText={window.t.translate('in milliseconds')}
 									min={0}
 									max={10 ** 6}
 									onChange={(value) => {
@@ -595,13 +609,13 @@ class PartyConfigurator extends React.Component<PartieKonfiguratorProps, PartieK
 												ifBiggerThen: {
 													number: 5000,
 													error: window.t.translate(
-														'Unfavorable server ingame delay. It would be too long to wait for the server to process the game!'
+														'Unfavorable server ingame delay. It would be too long to wait for the server to process the game!',
 													),
 												},
 												ifSmallerThen: {
 													number: 500,
 													error: window.t.translate(
-														'Unfavorable server ingame delay. It would be too short to wait for the clients to animate the game!'
+														'Unfavorable server ingame delay. It would be too short to wait for the clients to animate the game!',
 													),
 													isError: true,
 												},
@@ -618,4 +632,4 @@ class PartyConfigurator extends React.Component<PartieKonfiguratorProps, PartieK
 	};
 }
 
-export default PartyConfigurator;
+export default GameConfigurator;

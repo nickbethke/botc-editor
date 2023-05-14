@@ -1,18 +1,18 @@
 /* eslint-disable jsx-a11y/no-autofocus */
 import React, { MouseEventHandler } from 'react';
 
-type PartieEditorChoiceCardProps = {
+type GameConfiguratorChoiceCardProps = {
 	text: string;
 	bgImage: string;
 	onClickAction: MouseEventHandler<HTMLButtonElement>;
 };
 
-type PartieEditorChoiceCardState = {
+type GameConfiguratorChoiceCardState = {
 	hover: boolean;
 };
 
-class PartieEditorChoiceCard extends React.Component<PartieEditorChoiceCardProps, PartieEditorChoiceCardState> {
-	constructor(props: PartieEditorChoiceCardProps) {
+class GameConfiguratorChoiceCard extends React.Component<GameConfiguratorChoiceCardProps, GameConfiguratorChoiceCardState> {
+	constructor(props: GameConfiguratorChoiceCardProps) {
 		super(props);
 		this.state = { hover: false };
 		this.handleHover = this.handleHover.bind(this);
@@ -65,4 +65,4 @@ class PartieEditorChoiceCard extends React.Component<PartieEditorChoiceCardProps
 	}
 }
 
-export default PartieEditorChoiceCard;
+export default GameConfiguratorChoiceCard;

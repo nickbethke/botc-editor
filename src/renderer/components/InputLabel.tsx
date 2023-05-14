@@ -1,4 +1,4 @@
-import React, { ChangeEvent, Validator } from 'react';
+import React, { ChangeEvent } from 'react';
 import _uniqueId from 'lodash/uniqueId';
 import InputValidator from '../helper/InputValidator';
 import DblClickInput from './DblClickInput';
@@ -109,9 +109,30 @@ class InputLabel extends React.Component<InputLabelProps, InputLabelState> {
 			onChange(value);
 		}
 		if (type === 'number') {
+			const { min, max } = this.props;
+			if (value === '') {
+				if (min != undefined && min > 0) {
+					this.update(min.toString(), validator);
+					onChange(min);
+					return;
+				} else {
+					this.update('0', validator);
+					onChange(0);
+					return;
+				}
+			}
+			if (min != undefined && Number.parseInt(value, 10) < min) {
+				this.update(min.toString(), validator);
+				onChange(min);
+				return;
+			}
+			if (max != undefined && Number.parseInt(value, 10) > max) {
+				this.update(max.toString(), validator);
+				onChange(max);
+				return;
+			}
 			this.update(value, validator);
-			if (value !== '') onChange(Number.parseInt(value, 10));
-			else onChange(0);
+			onChange(Number.parseInt(value, 10));
 		}
 
 		if (type === 'range') {
@@ -147,19 +168,15 @@ class InputLabel extends React.Component<InputLabelProps, InputLabelState> {
 		const { helperText, label, type, placeholder, labelClass, value: propsValue, onChange } = this.props;
 		const { value } = this.state;
 
-		if (propsValue !== value) {
-			this.setState({ value: propsValue });
-		}
-
 		if (helperText) {
-			helper = <p className="text-sm pl-2">{helperText}</p>;
+			helper = <p className='text-sm pl-2'>{helperText}</p>;
 		}
 		const { isValid, hasWarning, warningText, errorMsg } = this.state;
 		let warningHelper: string | JSX.Element = '';
 		let invalidHelper: string | JSX.Element = '';
 		if (hasWarning) {
 			warningHelper = (
-				<div className="text-sm dark:text-orange-300 text-amber-500 flex gap-2 items-center pl-2">
+				<div className='text-sm dark:text-orange-300 text-amber-500 flex gap-2 items-center pl-2'>
 					<VscWarning />
 					{warningText.join(' | ')}
 				</div>
@@ -167,7 +184,7 @@ class InputLabel extends React.Component<InputLabelProps, InputLabelState> {
 		}
 		if (!isValid && errorMsg) {
 			invalidHelper = (
-				<div className="text-sm dark:text-red-300 text-red-400 flex gap-2 items-center pl-2">
+				<div className='text-sm dark:text-red-300 text-red-400 flex gap-2 items-center pl-2'>
 					<VscError />
 					{errorMsg.join(' | ')}
 				</div>
@@ -212,7 +229,7 @@ class InputLabel extends React.Component<InputLabelProps, InputLabelState> {
 		if (type === 'range') {
 			const { max, min } = this.props;
 			return (
-				<div className="flex flex-col">
+				<div className='flex flex-col'>
 					<div>
 						<label htmlFor={this.id} className={`${labelClass} flex flex-row gap-2`}>
 							<span>{label ? `${label}:` : ''}</span>
@@ -230,7 +247,7 @@ class InputLabel extends React.Component<InputLabelProps, InputLabelState> {
 					<div>
 						<input
 							id={this.id}
-							type="range"
+							type='range'
 							value={Number.parseInt(value.toString(), 10)}
 							min={min || 0}
 							max={max || 20}
@@ -246,12 +263,14 @@ class InputLabel extends React.Component<InputLabelProps, InputLabelState> {
 		}
 		if (type === 'switch') {
 			const { bothSides } = this.props;
+			const checked = value === true || value === 'true';
 			return (
 				<div>
-					<label htmlFor={this.id} className={`${labelClass} flex flex-row gap-2 justify-center items-center`}>
-						{label ? <span className="min-h-8">{label}</span> : null}
-						<div className="switch">
-							<input type="checkbox" id={this.id} checked={!!value} onChange={this.handleOnChange} />
+					<label htmlFor={this.id}
+						   className={`${labelClass} flex flex-row gap-2 justify-center items-center`}>
+						{label ? <span className='min-h-8'>{label}</span> : null}
+						<div className='switch'>
+							<input type='checkbox' id={this.id} checked={checked} onChange={this.handleOnChange} />
 							<span className={`${bothSides ? 'slider-both' : ''} slider round`} />
 						</div>
 					</label>

@@ -28,6 +28,12 @@ class TranslationHelper {
 			return this.loadedLanguage.get(str) || str;
 		}
 		this.missingTranslations.set(str, true);
+		console.warn(`Missing translation for "${str}"`);
+		let missing = '';
+		this.missingTranslations.forEach((v, k) => {
+			missing += `["${k}", ""],\n`;
+		});
+		console.log(missing);
 		return str;
 	}
 

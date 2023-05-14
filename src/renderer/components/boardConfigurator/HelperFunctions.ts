@@ -7,13 +7,16 @@ import {
 	wallPosition2String,
 } from '../generator/interfaces/BoardPosition';
 import BoardConfigInterface, {
+	Direction,
 	DirectionEnum,
 	LembasField,
 	Position,
 	PositionDirection,
-} from '../interfaces/BoardConfigInterface';
-import {FieldsEnum} from '../generator/BoardGenerator';
+} from '../../../interfaces/BoardConfigInterface';
+import { FieldsEnum } from '../generator/BoardGenerator';
 import DirectionHelper from '../generator/helper/DirectionHelper';
+import { Rotation } from '../../../interfaces/Types';
+import { SettingsInterface } from '../../../interfaces/SettingsInterface';
 
 /**
  * The getFieldType return value type
@@ -78,7 +81,7 @@ export function removeCheckpoint(position: BoardPosition, config: BoardConfigInt
 	const filteredCheckpointArray = config.checkPoints.filter((e) => {
 		return position2String(e) !== boardPosition2String(position);
 	});
-	return {...config, checkPoints: filteredCheckpointArray};
+	return { ...config, checkPoints: filteredCheckpointArray };
 }
 
 /**
@@ -90,7 +93,7 @@ export function removeStartField(position: BoardPosition, config: BoardConfigInt
 	const filteredStartFieldsArray = config.startFields.filter((e) => {
 		return position2String(e.position) !== boardPosition2String(position);
 	});
-	return {...config, startFields: filteredStartFieldsArray};
+	return { ...config, startFields: filteredStartFieldsArray };
 }
 
 /**
@@ -102,7 +105,7 @@ export function removeLembasField(position: BoardPosition, config: BoardConfigIn
 	const filteredLembasFieldsArray = config.lembasFields.filter((e) => {
 		return position2String(e.position) !== boardPosition2String(position);
 	});
-	return {...config, lembasFields: filteredLembasFieldsArray};
+	return { ...config, lembasFields: filteredLembasFieldsArray };
 }
 
 /**
@@ -114,7 +117,7 @@ export function removeRiver(position: BoardPosition, config: BoardConfigInterfac
 	const filteredRiverFieldsArray = config.riverFields.filter((e) => {
 		return position2String(e.position) !== boardPosition2String(position);
 	});
-	return {...config, riverFields: filteredRiverFieldsArray};
+	return { ...config, riverFields: filteredRiverFieldsArray };
 }
 
 /**
@@ -124,7 +127,7 @@ export function removeRiver(position: BoardPosition, config: BoardConfigInterfac
  */
 export function removeHole(position: BoardPosition, config: BoardConfigInterface): BoardConfigInterface {
 	const filteredHolesArray = config.holes.filter((e) => position2String(e) !== boardPosition2String(position));
-	return {...config, holes: filteredHolesArray};
+	return { ...config, holes: filteredHolesArray };
 }
 
 /**
@@ -134,10 +137,10 @@ export function removeHole(position: BoardPosition, config: BoardConfigInterface
  */
 export function removeWall(
 	position: [BoardPosition, BoardPosition],
-	config: BoardConfigInterface
+	config: BoardConfigInterface,
 ): BoardConfigInterface {
 	const filteredWallArray = config.walls.filter(
-		(e) => wallPosition2String(e as [Position, Position]) !== wallBoardPosition2String(position)
+		(e) => wallPosition2String(e as [Position, Position]) !== wallBoardPosition2String(position),
 	);
 	return {
 		...config,
@@ -152,12 +155,12 @@ export function removeWall(
  */
 function overrideField(
 	position: BoardPosition,
-	config: BoardConfigInterface
+	config: BoardConfigInterface,
 ): { override: boolean; config: BoardConfigInterface } {
 	const type = getFieldType(position, config);
 	switch (type) {
 		case FieldsEnum.EYE:
-			return {config, override: false};
+			return { config, override: false };
 		case FieldsEnum.START:
 			return {
 				config: removeStartField(position, config),
@@ -184,7 +187,7 @@ function overrideField(
 				override: true,
 			};
 		default:
-			return {config, override: false};
+			return { config, override: false };
 	}
 }
 
@@ -194,7 +197,7 @@ function overrideField(
  * @param config
  */
 export function moveSauronsEye(position: BoardPosition, config: BoardConfigInterface): BoardConfigInterface {
-	const {config: newConfig} = overrideField(position, config);
+	const { config: newConfig } = overrideField(position, config);
 	return {
 		...newConfig,
 		eye: {
@@ -210,10 +213,10 @@ export function moveSauronsEye(position: BoardPosition, config: BoardConfigInter
  * @param config
  */
 export function addCheckpoint(position: BoardPosition, config: BoardConfigInterface): BoardConfigInterface {
-	const {config: newConfig} = overrideField(position, config);
+	const { config: newConfig } = overrideField(position, config);
 	const newCheckpointsArray = newConfig.checkPoints;
 	newCheckpointsArray.push(boardPosition2Position(position));
-	return {...newConfig, checkPoints: newCheckpointsArray};
+	return { ...newConfig, checkPoints: newCheckpointsArray };
 }
 
 /**
@@ -222,14 +225,14 @@ export function addCheckpoint(position: BoardPosition, config: BoardConfigInterf
  * @param config
  */
 export function addStartField(position: BoardPosition, config: BoardConfigInterface): BoardConfigInterface {
-	const {config: newConfig} = overrideField(position, config);
+	const { config: newConfig } = overrideField(position, config);
 
 	const newStartFieldsArray = newConfig.startFields;
 	newStartFieldsArray.push({
 		position: boardPosition2Position(position),
 		direction: 'NORTH',
 	});
-	return {...newConfig, startFields: newStartFieldsArray};
+	return { ...newConfig, startFields: newStartFieldsArray };
 }
 
 /**
@@ -238,13 +241,13 @@ export function addStartField(position: BoardPosition, config: BoardConfigInterf
  * @param config
  */
 export function addLembasField(position: BoardPosition, config: BoardConfigInterface): BoardConfigInterface {
-	const {config: newConfig} = overrideField(position, config);
+	const { config: newConfig } = overrideField(position, config);
 	const newLembasFieldsArray = newConfig.lembasFields;
 	newLembasFieldsArray.push({
 		position: boardPosition2Position(position),
 		amount: 3,
 	});
-	return {...newConfig, lembasFields: newLembasFieldsArray};
+	return { ...newConfig, lembasFields: newLembasFieldsArray };
 }
 
 /**
@@ -253,13 +256,13 @@ export function addLembasField(position: BoardPosition, config: BoardConfigInter
  * @param config
  */
 export function addRiver(position: BoardPosition, config: BoardConfigInterface): BoardConfigInterface {
-	const {config: newConfig} = overrideField(position, config);
+	const { config: newConfig } = overrideField(position, config);
 	const newRiverFieldsArray = newConfig.riverFields;
 	newRiverFieldsArray.push({
 		position: boardPosition2Position(position),
 		direction: 'NORTH',
 	});
-	return {...newConfig, riverFields: newRiverFieldsArray};
+	return { ...newConfig, riverFields: newRiverFieldsArray };
 }
 
 /**
@@ -268,10 +271,10 @@ export function addRiver(position: BoardPosition, config: BoardConfigInterface):
  * @param config
  */
 export function addHole(position: BoardPosition, config: BoardConfigInterface): BoardConfigInterface {
-	const {config: newConfig} = overrideField(position, config);
+	const { config: newConfig } = overrideField(position, config);
 	const newHolesArray = newConfig.holes;
 	newHolesArray.push(boardPosition2Position(position));
-	return {...newConfig, holes: newHolesArray};
+	return { ...newConfig, holes: newHolesArray };
 }
 
 /**
@@ -281,7 +284,7 @@ export function addHole(position: BoardPosition, config: BoardConfigInterface): 
  */
 export function getDirectionFieldConfig(
 	position: BoardPosition,
-	config: BoardConfigInterface
+	config: BoardConfigInterface,
 ): PositionDirection | null {
 	const type = getFieldType(position, config);
 	if (type === FieldsEnum.EYE) {
@@ -313,7 +316,7 @@ export function getDirectionFieldConfig(
 export function updateStartFieldDirection(
 	config: BoardConfigInterface,
 	position: BoardPosition,
-	direction: DirectionEnum
+	direction: DirectionEnum,
 ): BoardConfigInterface {
 	if (getFieldType(position, config) !== FieldsEnum.START) {
 		return config;
@@ -338,7 +341,7 @@ export function updateStartFieldDirection(
 export function updateRiverFieldDirection(
 	config: BoardConfigInterface,
 	position: BoardPosition,
-	direction: DirectionEnum
+	direction: DirectionEnum,
 ): BoardConfigInterface {
 	if (getFieldType(position, config) !== FieldsEnum.RIVER) {
 		return config;
@@ -363,7 +366,7 @@ export function updateRiverFieldDirection(
 export function updateLembasFieldAmount(
 	config: BoardConfigInterface,
 	position: BoardPosition,
-	amount: number
+	amount: number,
 ): BoardConfigInterface {
 	if (getFieldType(position, config) !== FieldsEnum.LEMBAS) {
 		return config;
@@ -399,4 +402,102 @@ export function getLembasFieldConfig(position: BoardPosition, config: BoardConfi
  */
 export function getCheckpointIndexConfig(position: BoardPosition, config: BoardConfigInterface): number | null {
 	return config.checkPoints.findIndex((e) => position2String(e) === boardPosition2String(position));
+}
+
+/**
+ * predicts if a configuration is a board configuration
+ * @param config
+ */
+export function predictIfConfigurationIsBoardConfiguration(config: any): config is BoardConfigInterface {
+	if ('width' in config)
+		return true;
+	if ('height' in config)
+		return true;
+	if ('name' in config)
+		return true;
+	if ('checkPoints' in config)
+		return true;
+	if ('eye' in config)
+		return true;
+	if ('holes' in config)
+		return true;
+	if ('lembasFields' in config)
+		return true;
+	if ('riverFields' in config)
+		return true;
+	if ('startFields' in config)
+		return true;
+	return 'walls' in config;
+}
+
+/**
+ * calculates the next rotation value
+ * @param rotation
+ */
+export function getNextRotation(rotation: Rotation): Rotation {
+	switch (rotation) {
+		case '0':
+			return '90';
+		case '90':
+			return '180';
+		case '180':
+			return '270';
+		case '270':
+			return '0';
+		default:
+			return '0';
+	}
+}
+
+/**
+ * calculates the previous rotation value
+ * @param rotation
+ */
+export function getPreviousRotation(rotation: Rotation): Rotation {
+	switch (rotation) {
+		case '0':
+			return '270';
+		case '90':
+			return '0';
+		case '180':
+			return '90';
+		case '270':
+			return '180';
+	}
+}
+
+export function rotateDirection(direction: Direction, rotation: Rotation): Direction {
+	switch (rotation) {
+		case '0':
+			return direction;
+		case '90':
+			return DirectionHelper.getNextDirection(direction);
+		case '180':
+			return DirectionHelper.getNextDirection(DirectionHelper.getNextDirection(direction));
+		case '270':
+			return DirectionHelper.getPreviousDirection(direction);
+	}
+}
+
+export function calculateRiverPresetFieldPositionWithRotation(position: [number, number], rotation: '0' | '90' | '180' | '270', settings: SettingsInterface, configuration: BoardConfigInterface, adjustBoardSize: boolean): BoardPosition {
+	const h = adjustBoardSize ? settings.defaultValues.maxBoardSize : configuration.height;
+	const w = adjustBoardSize ? settings.defaultValues.maxBoardSize : configuration.width;
+	const [positionX, positionY] = position;
+
+	let x = positionX;
+	let y = positionY;
+	if (rotation === '90') {
+		x = -positionY;
+		y = positionX;
+	} else if (rotation === '180') {
+		x = -positionX;
+		y = -positionY;
+	} else if (rotation === '270') {
+		x = positionY;
+		y = -positionX;
+	}
+	return {
+		x,
+		y,
+	};
 }

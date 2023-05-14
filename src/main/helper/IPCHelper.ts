@@ -1,16 +1,17 @@
-import {app, BrowserWindow, clipboard, dialog, shell} from 'electron';
+import { app, BrowserWindow, clipboard, dialog, shell } from 'electron';
 import fs from 'fs';
-import Ajv, {JSONSchemaType} from 'ajv';
+import Ajv, { JSONSchemaType } from 'ajv';
 import * as os from 'os';
-import path, {ParsedPath} from 'path';
-import * as PartieConfigSchema from '../../schema/partieConfigSchema.json';
+import path, { ParsedPath } from 'path';
+import * as GameConfigSchema from '../../schema/gameConfigSchema.json';
 import * as BoardConfigSchema from '../../schema/boardConfigSchema.json';
-import PresetsLoader, {BoardPresetWithFile, RiverPresetWithFile} from './PresetsLoader';
-import PartieConfigInterface from '../../renderer/components/interfaces/PartieConfigInterface';
-import BoardConfigInterface from '../../renderer/components/interfaces/BoardConfigInterface';
+import PresetsLoader, { BoardPresetWithFile, RiverPresetWithFile } from './PresetsLoader';
+import GameConfigInterface from '../../interfaces/GameConfigInterface';
+import BoardConfigInterface from '../../interfaces/BoardConfigInterface';
 import * as SettingsSchema from '../../schema/settings.schema.json';
-import {SettingsInterface} from '../../interfaces/SettingsInterface';
-import {getAppDataPath} from './functions';
+import { SettingsInterface } from '../../interfaces/SettingsInterface';
+import { getAppDataPath } from './functions';
+import { ConfigType } from '../../interfaces/Types';
 
 /**
  * The ipc helper class.
@@ -39,35 +40,35 @@ class IPCHelper {
 	 * @param json The party configuration to save.
 	 * @param window
 	 */
-	static handleSavePartieConfig = async (
+	static handleSaveGameConfig = async (
 		json: string,
-		window: BrowserWindow | null
+		window: BrowserWindow | null,
 	): Promise<
 		| {
 		parsedPath: ParsedPath;
 		path: string;
 	}
-		| false
+		| false | 'canceled'
 	> => {
 		let currentCanceled;
 		let currentFilePath;
 		if (window) {
-			const {canceled, filePath} = await dialog.showSaveDialog(window, {
-				title: 'Partie-Konfiguration speichern',
-				filters: [{name: 'Partie-Konfig', extensions: ['json']}],
+			const { canceled, filePath } = await dialog.showSaveDialog(window, {
+				title: 'Save Game-Configuration',
+				filters: [{ name: 'Game-Configuration', extensions: ['json'] }],
 			});
 			currentCanceled = canceled;
 			currentFilePath = filePath;
 		} else {
-			const {canceled, filePath} = await dialog.showSaveDialog({
-				title: 'Partie-Konfiguration speichern',
-				filters: [{name: 'Partie-Konfig', extensions: ['json']}],
+			const { canceled, filePath } = await dialog.showSaveDialog({
+				title: 'Save Game-Configuration',
+				filters: [{ name: 'Game-Configuration', extensions: ['json'] }],
 			});
 			currentCanceled = canceled;
 			currentFilePath = filePath;
 		}
 		if (currentCanceled) {
-			return false;
+			return 'canceled';
 		}
 		if (currentFilePath) {
 			fs.writeFileSync(currentFilePath, json, {
@@ -83,13 +84,13 @@ class IPCHelper {
 	};
 
 	static handleFileOpen = async (
-		type: '' | 'board' | 'partie' = '',
-		window: BrowserWindow | null
+		type: '' | ConfigType = '',
+		window: BrowserWindow | null,
 	): Promise<
 		| {
 		parsedPath: ParsedPath;
 		path: string;
-		config: PartieConfigInterface;
+		config: GameConfigInterface;
 	}
 		| {
 		parsedPath: ParsedPath;
@@ -107,18 +108,18 @@ class IPCHelper {
 			let currentCanceled;
 			let currentFilePaths;
 			if (window) {
-				const {canceled, filePaths} = await dialog.showOpenDialog(window, {
+				const { canceled, filePaths } = await dialog.showOpenDialog(window, {
 					title: 'Select Board-Configuration',
 					properties: ['openFile'],
-					filters: [{name: 'Board-configuration', extensions: ['json']}],
+					filters: [{ name: 'Board-Configuration', extensions: ['json'] }],
 				});
 				currentCanceled = canceled;
 				currentFilePaths = filePaths;
 			} else {
-				const {canceled, filePaths} = await dialog.showOpenDialog({
+				const { canceled, filePaths } = await dialog.showOpenDialog({
 					title: 'Select Board-Configuration',
 					properties: ['openFile'],
-					filters: [{name: 'Board-configuration', extensions: ['json']}],
+					filters: [{ name: 'Board-Configuration', extensions: ['json'] }],
 				});
 				currentCanceled = canceled;
 				currentFilePaths = filePaths;
@@ -126,29 +127,29 @@ class IPCHelper {
 			if (currentCanceled) {
 				return false;
 			}
-			const config = JSON.parse(fs.readFileSync(currentFilePaths[0], {encoding: 'utf8'})) as BoardConfigInterface;
+			const config = JSON.parse(fs.readFileSync(currentFilePaths[0], { encoding: 'utf8' })) as BoardConfigInterface;
 			return {
 				config,
 				parsedPath: path.parse(currentFilePaths[0]),
 				path: currentFilePaths[0],
 			};
 		}
-		if (type === 'partie') {
+		if (type === 'game') {
 			let currentCanceled;
 			let currentFilePaths;
 			if (window) {
-				const {canceled, filePaths} = await dialog.showOpenDialog(window, {
+				const { canceled, filePaths } = await dialog.showOpenDialog(window, {
 					title: 'Select Game-Configuration',
 					properties: ['openFile'],
-					filters: [{name: 'Game-Configuration', extensions: ['json']}],
+					filters: [{ name: 'Game-Configuration', extensions: ['json'] }],
 				});
 				currentCanceled = canceled;
 				currentFilePaths = filePaths;
 			} else {
-				const {canceled, filePaths} = await dialog.showOpenDialog({
+				const { canceled, filePaths } = await dialog.showOpenDialog({
 					title: 'Select Game-Configuration',
 					properties: ['openFile'],
-					filters: [{name: 'Game-Configuration', extensions: ['json']}],
+					filters: [{ name: 'Game-Configuration', extensions: ['json'] }],
 				});
 				currentCanceled = canceled;
 				currentFilePaths = filePaths;
@@ -156,7 +157,7 @@ class IPCHelper {
 			if (currentCanceled) {
 				return false;
 			}
-			const config = JSON.parse(fs.readFileSync(currentFilePaths[0], {encoding: 'utf8'})) as PartieConfigInterface;
+			const config = JSON.parse(fs.readFileSync(currentFilePaths[0], { encoding: 'utf8' })) as GameConfigInterface;
 			return {
 				config,
 				parsedPath: path.parse(currentFilePaths[0]),
@@ -167,23 +168,23 @@ class IPCHelper {
 			let currentCanceled;
 			let currentFilePaths;
 			if (window) {
-				const {canceled, filePaths} = await dialog.showOpenDialog(window, {
+				const { canceled, filePaths } = await dialog.showOpenDialog(window, {
 					title: 'Select Configuration',
 					properties: ['openFile'],
 					filters: [
-						{name: 'Game-Configuration', extensions: ['json']},
-						{name: 'Board-Configuration', extensions: ['json']},
+						{ name: 'Game-Configuration', extensions: ['json'] },
+						{ name: 'Board-Configuration', extensions: ['json'] },
 					],
 				});
 				currentCanceled = canceled;
 				currentFilePaths = filePaths;
 			} else {
-				const {canceled, filePaths} = await dialog.showOpenDialog({
+				const { canceled, filePaths } = await dialog.showOpenDialog({
 					title: 'Select Configuration',
 					properties: ['openFile'],
 					filters: [
-						{name: 'Game-Configuration', extensions: ['json']},
-						{name: 'Board-Configuration', extensions: ['json']},
+						{ name: 'Game-Configuration', extensions: ['json'] },
+						{ name: 'Board-Configuration', extensions: ['json'] },
 					],
 				});
 				currentCanceled = canceled;
@@ -192,7 +193,7 @@ class IPCHelper {
 			if (currentCanceled) {
 				return false;
 			}
-			const config = JSON.parse(fs.readFileSync(currentFilePaths[0], {encoding: 'utf8'}));
+			const config = JSON.parse(fs.readFileSync(currentFilePaths[0], { encoding: 'utf8' }));
 
 			return {
 				config,
@@ -203,14 +204,14 @@ class IPCHelper {
 		return false;
 	};
 
-	static jsonValidate = (json: object, type: 'board' | 'partie' = 'partie') => {
-		const ajv = new Ajv({allErrors: true});
+	static jsonValidate = (json: object, type: ConfigType = 'game') => {
+		const ajv = new Ajv({ allErrors: true });
 		let validate;
-		let schema: JSONSchemaType<PartieConfigInterface> | JSONSchemaType<BoardConfigInterface>;
-		if (type === 'partie') {
+		let schema: JSONSchemaType<GameConfigInterface> | JSONSchemaType<BoardConfigInterface>;
+		if (type === 'game') {
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-ignore
-			schema = PartieConfigSchema;
+			schema = GameConfigSchema;
 			validate = ajv.compile(schema);
 		} else {
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -224,13 +225,13 @@ class IPCHelper {
 			}
 			return JSON.stringify(validate.errors, null, 4);
 		} catch (e) {
-			return JSON.stringify({error: 'invalid JSON format'}, null, 4);
+			return JSON.stringify({ error: 'invalid JSON format' }, null, 4);
 		}
 	};
 
 	static handleSaveBoardConfig = async (
 		json: string,
-		window: BrowserWindow | null
+		window: BrowserWindow | null,
 	): Promise<
 		| {
 		parsedPath: ParsedPath;
@@ -241,16 +242,16 @@ class IPCHelper {
 		let currentCanceled;
 		let currentFilePath;
 		if (window) {
-			const {canceled, filePath} = await dialog.showSaveDialog(window, {
+			const { canceled, filePath } = await dialog.showSaveDialog(window, {
 				title: 'Board-Konfiguration speichern',
-				filters: [{name: 'Board-Konfig', extensions: ['json']}],
+				filters: [{ name: 'Board-Konfig', extensions: ['json'] }],
 			});
 			currentCanceled = canceled;
 			currentFilePath = filePath;
 		} else {
-			const {canceled, filePath} = await dialog.showSaveDialog({
+			const { canceled, filePath } = await dialog.showSaveDialog({
 				title: 'Board-Konfiguration speichern',
-				filters: [{name: 'Board-Konfig', extensions: ['json']}],
+				filters: [{ name: 'Board-Konfig', extensions: ['json'] }],
 			});
 			currentCanceled = canceled;
 			currentFilePath = filePath;
@@ -299,7 +300,7 @@ class IPCHelper {
 	}
 
 	static openDirectory(file: string) {
-		const {dir} = path.parse(file);
+		const { dir } = path.parse(file);
 		shell.openPath(dir).catch(() => {
 		});
 	}
@@ -311,7 +312,7 @@ class IPCHelper {
 
 	static saveFile(file: string, content: string) {
 		if (fs.existsSync(file)) {
-			fs.writeFileSync(file, content, {encoding: 'utf8', flag: 'w'});
+			fs.writeFileSync(file, content, { encoding: 'utf8', flag: 'w' });
 			return true;
 		}
 		return 'File does not exits';
@@ -321,18 +322,18 @@ class IPCHelper {
 		let currentCanceled;
 		let currentFilePath;
 		if (window) {
-			const {canceled, filePath} = await dialog.showSaveDialog(window, {
+			const { canceled, filePath } = await dialog.showSaveDialog(window, {
 				title: 'Screenshot speichern',
 				defaultPath: file,
-				filters: [{name: 'Images', extensions: ['png']}],
+				filters: [{ name: 'Images', extensions: ['png'] }],
 			});
 			currentCanceled = canceled;
 			currentFilePath = filePath;
 		} else {
-			const {canceled, filePath} = await dialog.showSaveDialog({
+			const { canceled, filePath } = await dialog.showSaveDialog({
 				title: 'Screenshot speichern',
 				defaultPath: file,
-				filters: [{name: 'Images', extensions: ['png']}],
+				filters: [{ name: 'Images', extensions: ['png'] }],
 			});
 			currentCanceled = canceled;
 			currentFilePath = filePath;
@@ -375,13 +376,13 @@ class IPCHelper {
 				encoding: 'utf8',
 			});
 		}
-		return JSON.stringify({lang: '', data: []});
+		return JSON.stringify({ lang: '', data: [] });
 	}
 
 	static getAssetPath(...paths: string[]): string {
 		return path.join(
 			app.isPackaged ? path.join(process.resourcesPath, 'assets') : path.join(__dirname, '../../../assets'),
-			...paths
+			...paths,
 		);
 	}
 
@@ -405,7 +406,7 @@ class IPCHelper {
 			};
 		}
 		const content = fs.readFileSync(settingsPath, 'utf8');
-		const ajv = new Ajv({allErrors: true});
+		const ajv = new Ajv({ allErrors: true });
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
 		const validate = ajv.compile(SettingsSchema);
@@ -434,8 +435,8 @@ class IPCHelper {
 	static updateSettings(settings: SettingsInterface) {
 		const settingsPath = getAppDataPath('/settings.json');
 		if (!fs.existsSync(settingsPath)) {
-			fs.writeFileSync(settingsPath, JSON.stringify({...IPCHelper.defaultSettings, settings}, null, 4));
-			return {...IPCHelper.defaultSettings, settings};
+			fs.writeFileSync(settingsPath, JSON.stringify({ ...IPCHelper.defaultSettings, settings }, null, 4));
+			return { ...IPCHelper.defaultSettings, settings };
 		}
 		fs.writeFileSync(settingsPath, JSON.stringify(settings, null, 4));
 		return settings;
@@ -449,8 +450,8 @@ class IPCHelper {
 		return PresetsLoader.renameRiverPreset(from, to);
 	}
 
-	static getSchemaPartie() {
-		return PartieConfigSchema;
+	static getSchemaGame() {
+		return GameConfigSchema;
 	}
 
 	static getSchemaBoard() {

@@ -270,6 +270,10 @@
 			"Englisch"
 		],
 		[
+			"French",
+			"Französisch"
+		],
+		[
 			"Language",
 			"Sprache"
 		],
@@ -680,6 +684,122 @@
 		[
 			"End Edit",
 			"Editieren beenden"
+		],
+		[
+			"Battle of the Centerländ - Editor",
+			"Battle of the Centerländ - Editor"
+		],
+		[
+			"Background image",
+			"Hintergrundbild"
+		],
+		[
+			"Maximal number of rounds",
+			"Maximale Anzahl an Runden"
+		],
+		[
+			"Unfavorable number of rounds. The game would be over very quickly!",
+			"Ungünstige Anzahl an Runden. Das Spiel wäre sehr schnell vorbei!"
+		],
+		[
+			"Unfavorable number of rounds. The game would take a long time!",
+			"Ungünstige Anzahl an Runden. Das Spiel würde sehr lange dauern!"
+		],
+		[
+			"Unfavorable shot lembas number. Negative numbers are not allowed!",
+			"Ungünstige Schuss Lembas Anzahl. Negative Zahlen sind nicht erlaubt!"
+		],
+		[
+			"Unfavorable shot lembas number. It would be nearly impossible to shoot!",
+			"Ungünstige Schuss Lembas Anzahl. Es wäre fast unmöglich zu schießen!"
+		],
+		[
+			"Your choice is not recommended. The characters would be too strong at the beginning!",
+			"Ihre Wahl wird nicht empfohlen. Die Charaktere wären zu stark am Anfang!"
+		],
+		[
+			"Start Lembas",
+			"Start Lembas"
+		],
+		[
+			"Shot Lembas",
+			"Schuss Lembas"
+		],
+		[
+			"River Move Count",
+			"Fluss Zug Anzahl"
+		],
+		[
+			"Revive Rounds",
+			"Runden bis zur Wiederbelebung"
+		],
+		[
+			"Character Choice Timeout",
+			"Charakterwahl Timeout"
+		],
+		[
+			"Card Selection Timeout",
+			"Kartenwahl Timeout"
+		],
+		[
+			"Server Ingame Delay",
+			"Server Ingame Verzögerung"
+		],
+		[
+			"in milliseconds",
+			"in Millisekunden"
+		],
+		[
+			"The game ends after the specified number of rounds. -1 means no limit.",
+			"Das Spiel endet nach der angegebenen Anzahl an Runden. -1 bedeutet kein Limit."
+		],
+		[
+			"Unsaved Configuration",
+			"Ungespeicherte Konfiguration"
+		],
+		[
+			"Validation Error",
+			"Validierungsfehler"
+		],
+		[
+			"File does not exits",
+			"Datei existiert nicht"
+		],
+		[
+			"Failed to save file!",
+			"Datei konnte nicht gespeichert werden!"
+		],
+		[
+			"Saved successfully",
+			"Erfolgreich gespeichert"
+		],
+		[
+			"Board Configuration Validation Error",
+			"Spielfeld Konfiguration - Validierungsfehler"
+		],
+		[
+			"File is not a valid board configuration",
+			"Datei ist keine gültige Spielfeld Konfiguration"
+		],
+		[
+			"The board configuration you are trying to load is not valid. Please check the error message below and try again.",
+			"Die Spielfeld Konfiguration die Sie laden wollen ist nicht gültig. Bitte überprüfen Sie die Fehlermeldung unten und versuchen Sie es erneut."
+		],
+		[
+			"Failed to load file! Not a valid game configuration file",
+			"Datei konnte nicht geladen werden! Keine gültige Spiel Konfiguration"
+		],
+		[
+			"Failed to load file! Not a valid game configuration file",
+			"Datei konnte nicht geladen werden! Keine gültige Spiel Konfiguration"
+		],
+		[
+			"Code Preview",
+			"Code Vorschau"
+		],
+		[
+			"Position",
+			"Position"
 		]
 	]
 }

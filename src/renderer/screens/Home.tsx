@@ -6,7 +6,7 @@ import { SettingsInterface } from '../../interfaces/SettingsInterface';
 import Mousetrap from 'mousetrap';
 import BoardEditorChoice from '../components/popups/BoardEditorChoice';
 import RandomBoardStartValuesDialogV2 from '../components/popups/RandomBoardStartValuesDialogV2';
-import PartieEditorChoice from '../components/popups/PartieEditorChoice';
+import GameConfiguratorChoice from '../components/popups/GameConfiguratorChoice';
 import SettingsPopup from '../components/popups/SettingsPopup';
 import PopupV2 from '../components/popups/PopupV2';
 import { isBoolean } from 'lodash';
@@ -14,10 +14,11 @@ import BoardGenerator from '../components/generator/BoardGenerator';
 import { AppScreens } from '../App';
 import { AboutPopup } from '../components/popups/AboutPopup';
 import Dragger from '../components/Dragger';
+import { JsonViewer } from '@textea/json-viewer';
 
 type HomePopups =
 	| 'boardEditorChoiceV2'
-	| 'partieEditorChoice'
+	| 'gameEditorChoice'
 	| 'randomBoardV2StartValues'
 	| 'settings'
 	| 'about'
@@ -35,7 +36,7 @@ type HomeState = {
 	openPopup: HomePopups;
 	version: string;
 	surprise: boolean;
-	errorMessage: { title: string; error: string } | null;
+	errorMessage: { title: string; error: string, text: string } | null;
 	windowDimensions: {
 		width: number;
 		height: number;
@@ -66,10 +67,10 @@ export default class Home extends Component<HomeProps, HomeState> {
 			this.setState({ openPopup: 'boardEditorChoiceV2' });
 		});
 		Mousetrap.bind(['command+p', 'ctrl+p'], () => {
-			this.setState({ openPopup: 'partieEditorChoice' });
+			this.setState({ openPopup: 'gameEditorChoice' });
 		});
 		Mousetrap.bind(['command+p', 'ctrl+p'], () => {
-			this.setState({ openPopup: 'partieEditorChoice' });
+			this.setState({ openPopup: 'gameEditorChoice' });
 		});
 		Mousetrap.bind(['esc'], () => {
 			const { openPopup } = this.state;
@@ -103,8 +104,8 @@ export default class Home extends Component<HomeProps, HomeState> {
 		this.setState({ openPopup: 'boardEditorChoiceV2' });
 	};
 
-	handleOpenPartieEditorChoice = () => {
-		this.setState({ openPopup: 'partieEditorChoice' });
+	handleOpenGameEditorChoice = () => {
+		this.setState({ openPopup: 'gameEditorChoice' });
 	};
 
 	handleOpenSettings = () => {
@@ -125,7 +126,16 @@ export default class Home extends Component<HomeProps, HomeState> {
 				os={os}
 				settings={settings}
 			>
-				<pre>{errorMessage?.error}</pre>
+				<div className='flex flex-col gap-4'>
+					{errorMessage && errorMessage.text ? (
+						<p>{errorMessage.text}</p>
+					) : ''}
+					{(errorMessage && errorMessage.error) ? (
+						<JsonViewer value={JSON.parse(errorMessage.error)}
+									theme={settings.darkMode ? 'dark' : 'light'} />
+					) : ''}
+				</div>
+
 			</PopupV2>
 		);
 	};
@@ -144,6 +154,7 @@ export default class Home extends Component<HomeProps, HomeState> {
 					errorMessage: {
 						title: window.t.translate('Board Configuration Validation Error'),
 						error: validation.toString(),
+						text: window.t.translate('The board configuration you are trying to load is not valid. Please check the error message below and try again.'),
 					},
 					openPopup: 'error',
 				});
@@ -206,19 +217,19 @@ export default class Home extends Component<HomeProps, HomeState> {
 					/>
 				);
 				break;
-			case 'partieEditorChoice':
+			case 'gameEditorChoice':
 				popup = (
-					<PartieEditorChoice
+					<GameConfiguratorChoice
 						onClose={() => {
 							this.setState({ openPopup: null });
 						}}
 						onNewConfig={() => {
-							this.props.onOpenScreen('partieConfigNewScreen');
+							this.props.onOpenScreen('gameConfigNewScreen');
 						}}
 						onLoadConfig={async () => {
-							const partieJSON = await window.electron.dialog.openPartieConfig();
-							if (partieJSON) {
-								this.props.onOpenScreen('partieConfigLoadScreen', partieJSON);
+							const gameJSON = await window.electron.dialog.openGameConfiguration();
+							if (gameJSON) {
+								this.props.onOpenScreen('gameConfigLoadScreen', gameJSON);
 							}
 						}}
 					/>
@@ -261,7 +272,8 @@ export default class Home extends Component<HomeProps, HomeState> {
 	};
 
 	handleCloseApp = () => {
-		window.electron.app.close().catch(() => {});
+		window.electron.app.close().catch(() => {
+		});
 	};
 
 	handleOpenValidator = () => {
@@ -286,22 +298,27 @@ export default class Home extends Component<HomeProps, HomeState> {
 		const popup = this.popup(openPopup);
 		const tabIndex = openPopup !== null ? -1 : 0;
 		return (
-			<div className="text-white transition duration-500 dark:bg-gradient-to-br dark:from-slate-900 dark:to-muted-800 bg-with-gradient overflow-hidden relative">
-				<div id="home" className={`${popup ? 'blur' : ''} flex flex-col`}>
+			<div
+				className='text-white transition duration-500 dark:bg-gradient-to-br dark:from-slate-900 dark:to-muted-800 bg-with-gradient overflow-hidden relative'>
+				<div id='home' className={`${popup ? 'blur' : ''} flex flex-col`}>
 					<Dragger os={os}>{window.t.translate('Battle of the Centerländ - Editor')}</Dragger>
-					<div className="grid grid-cols-2 grow">
-						<div className="flex flex-col pb-8" style={{ height: window.innerHeight - (os === 'win32' ? 32 : 0) }}>
-							<div className="flex flex-col pt-8 justify-between grow">
-								<div className="flex xl:flex-col items-center xl:items-start gap-4 xl:gap-0 w-full px-12">
-									<div className="flex gap-4 items-center text-4xl xl:text-6xl 2xl:text-8xl dark:font-with-gradient pt-4 font-flicker">
+					<div className='grid grid-cols-2 grow'>
+						<div className='flex flex-col pb-8'
+							 style={{ height: window.innerHeight - (os === 'win32' ? 32 : 0) }}>
+							<div className='flex flex-col pt-8 justify-between grow'>
+								<div
+									className='flex xl:flex-col items-center xl:items-start gap-4 xl:gap-0 w-full px-12'>
+									<div
+										className='flex gap-4 items-center text-4xl xl:text-6xl 2xl:text-8xl dark:font-with-gradient pt-4 font-flicker'>
 										Battle of the Centerländ
 									</div>
-									<div className="text-2xl xl:text-4xl 2xl:text-6xl tracking-widest dark:font-with-gradient pt-4 xl:pt-0 font-flicker">
+									<div
+										className='text-2xl xl:text-4xl 2xl:text-6xl tracking-widest dark:font-with-gradient pt-4 xl:pt-0 font-flicker'>
 										{window.t.translate('Editor')}
 									</div>
 								</div>
-								<div className="flex flex-col gap-4 w-fit text-left tracking-widest px-12 py-6">
-									<div className="flex flex-col justify-start gap-4 bg-slate-600/25 p-6 rounded">
+								<div className='flex flex-col gap-4 w-fit text-left tracking-widest px-12 py-6'>
+									<div className='flex flex-col justify-start gap-4 bg-slate-600/25 p-6 rounded'>
 										<HomeScreenButton
 											text={window.t.translate('Board-Configurator')}
 											onClick={this.handleOpenBoardEditorChoiceV2}
@@ -309,7 +326,7 @@ export default class Home extends Component<HomeProps, HomeState> {
 										/>
 										<HomeScreenButton
 											text={window.t.translate('Game-Configurator')}
-											onClick={this.handleOpenPartieEditorChoice}
+											onClick={this.handleOpenGameEditorChoice}
 											tabIndex={tabIndex}
 										/>
 										<HomeMenuSeparator />
@@ -335,11 +352,12 @@ export default class Home extends Component<HomeProps, HomeState> {
 								</div>
 							</div>
 						</div>
-						<div className="relative">
-							<div className="w-full absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-								<img className="w-full home-bg" src={bgImage} alt={window.t.translate('Background image')} />
+						<div className='relative'>
+							<div className='w-full absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2'>
+								<img className='w-full home-bg' src={bgImage}
+									 alt={window.t.translate('Background image')} />
 								<img
-									alt="surprise sun"
+									alt='surprise sun'
 									src={sunImage}
 									className={`${
 										surprise ? 'opacity-1 top-1/4' : 'opacity-0 top-1/3'
@@ -348,9 +366,10 @@ export default class Home extends Component<HomeProps, HomeState> {
 							</div>
 						</div>
 					</div>
-					<div className="absolute bottom-0 left-0 z-10 bg-white/50 dark:bg-white/10 p-2 w-[100vw] flex flex-row items-center justify-end gap-2 text-xs dark:text-white text-slate-900">
+					<div
+						className='absolute bottom-0 left-0 z-10 bg-white/50 dark:bg-white/10 p-2 w-[100vw] flex flex-row items-center justify-end gap-2 text-xs dark:text-white text-slate-900'>
 						<span
-							className="cursor-pointer hover:underline"
+							className='cursor-pointer hover:underline'
 							onClick={() => {
 								this.setState({ openPopup: 'about' });
 							}}
@@ -362,7 +381,7 @@ export default class Home extends Component<HomeProps, HomeState> {
 						</span>
 					</div>
 				</div>
-				<div role="dialog" id="popup">
+				<div role='dialog' id='popup'>
 					{popup}
 				</div>
 			</div>

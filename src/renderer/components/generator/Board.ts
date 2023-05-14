@@ -4,7 +4,7 @@ import BoardConfigInterface, {
 	LembasField,
 	Position,
 	PositionDirection,
-} from '../interfaces/BoardConfigInterface';
+} from '../../../interfaces/BoardConfigInterface';
 import DirectionHelper from './helper/DirectionHelper';
 
 /**

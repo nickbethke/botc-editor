@@ -4,13 +4,9 @@ import path, { ParsedPath } from 'path';
 import * as RiverPresetSchema from '../../schema/riverPreset.schema.json';
 import * as BoardPresetSchema from '../../schema/boardPreset.schema.json';
 import { getAppDataPath } from './functions';
-import { Position } from '../../renderer/components/interfaces/BoardConfigInterface';
+import { Direction, DirectionEnum, Position } from '../../interfaces/BoardConfigInterface';
 import IPCHelper from './IPCHelper';
 
-/**
- * River preset directions
- */
-export type RiverPresetDirection = 'NORTH' | 'SOUTH' | 'EAST' | 'WEST';
 /**
  * The river preset scheme
  */
@@ -20,7 +16,7 @@ export type RiverPreset = {
 	height: number;
 	data: {
 		position: Position;
-		direction: RiverPresetDirection;
+		direction: Direction;
 	}[];
 };
 /**
@@ -74,7 +70,7 @@ class PresetsLoader {
 			fs.readdirSync(IPCHelper.getAssetPath('defaultPresets/rivers')).forEach((file) => {
 				fs.copyFileSync(
 					IPCHelper.getAssetPath('defaultPresets/rivers/' + file),
-					getAppDataPath('presets/rivers/' + file)
+					getAppDataPath('presets/rivers/' + file),
 				);
 			});
 		}
@@ -192,7 +188,7 @@ class PresetsLoader {
 	static async renameRiverPreset(from: string, to: string): Promise<ParsedPath> {
 		await fs.renameSync(
 			path.join(PresetsLoader.riverPresetFolder, from),
-			path.join(PresetsLoader.riverPresetFolder, to)
+			path.join(PresetsLoader.riverPresetFolder, to),
 		);
 		return path.parse(path.join(PresetsLoader.riverPresetFolder, to));
 	}

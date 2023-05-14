@@ -6,7 +6,7 @@ import BoardConfigInterface, {
 	LembasField,
 	Position,
 	PositionDirection,
-} from '../interfaces/BoardConfigInterface';
+} from '../../../interfaces/BoardConfigInterface';
 import SauronsEye from './fields/SauronsEye';
 import StartField from './fields/StartField';
 import Checkpoint from './fields/Checkpoint';

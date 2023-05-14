@@ -7,7 +7,7 @@ import FieldWithPositionInterface from '../renderer/components/generator/interfa
 import Grass from '../renderer/components/generator/fields/Grass';
 import SauronsEye from '../renderer/components/generator/fields/SauronsEye';
 import StartField from '../renderer/components/generator/fields/StartField';
-import { DirectionEnum } from '../renderer/components/interfaces/BoardConfigInterface';
+import { DirectionEnum } from '../interfaces/BoardConfigInterface';
 import River from '../renderer/components/generator/fields/River';
 import Checkpoint from '../renderer/components/generator/fields/Checkpoint';
 import AStar from '../renderer/components/generator/helper/AStar';

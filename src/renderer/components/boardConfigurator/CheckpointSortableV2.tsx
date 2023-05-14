@@ -1,7 +1,7 @@
 import React from 'react';
 import SortableList, { SortableItem, SortableKnob } from 'react-easy-sort';
 import { BoardPosition } from '../generator/interfaces/BoardPosition';
-import { Position } from '../interfaces/BoardConfigInterface';
+import { Position } from '../../../interfaces/BoardConfigInterface';
 
 /**
  * the properties of the checkpoint sortable component

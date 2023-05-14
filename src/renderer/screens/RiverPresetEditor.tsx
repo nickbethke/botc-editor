@@ -3,7 +3,7 @@ import Mousetrap from 'mousetrap';
 import _uniqueId from 'lodash/uniqueId';
 import { VscColorMode, VscNewFile } from 'react-icons/vsc';
 import { SettingsInterface } from '../../interfaces/SettingsInterface';
-import { RiverPreset, RiverPresetDirection, RiverPresetWithFile } from '../../main/helper/PresetsLoader';
+import { RiverPreset, RiverPresetWithFile } from '../../main/helper/PresetsLoader';
 import { BoardPosition } from '../components/generator/interfaces/BoardPosition';
 import AStarRiverPreset from '../components/presetEditor/AStar';
 import PresetEditSidebar from '../components/presetEditor/PresetEditSidebar';
@@ -18,6 +18,7 @@ import TopMenuItem, { TopMenuSeparator } from '../components/boardConfigurator/T
 import TopMenuItemCollapsable from '../components/boardConfigurator/TopMenuItemCollapsable';
 import { TopMenuActions } from '../components/boardConfigurator/TopMenu';
 import Dragger from '../components/Dragger';
+import { Direction } from '../../interfaces/BoardConfigInterface';
 
 type PresetEditorPopupType = null | JSX.Element;
 
@@ -34,7 +35,7 @@ type RiverPresetEditorState = {
 	windowDimensions: { width: number; height: number };
 	config: RiverPreset | null;
 	contextMenu: null | JSX.Element;
-	lastSetDirection: RiverPresetDirection;
+	lastSetDirection: Direction;
 	files: RiverPresetWithFile[];
 	currentFile: null | string;
 	fileSep: string;
@@ -96,7 +97,8 @@ class RiverPresetEditor extends React.Component<RiverPresetEditorProps, RiverPre
 			this.setState({ currentTool: currentTool === 'delete' ? null : 'delete' });
 		});
 		Mousetrap.bind(['ctrl+n', 'command+n'], () => {
-			this.newFile().catch(() => {});
+			this.newFile().catch(() => {
+			});
 		});
 		this.onFileUpdate();
 	}
@@ -144,7 +146,8 @@ class RiverPresetEditor extends React.Component<RiverPresetEditorProps, RiverPre
 						this.setState({ editorCache });
 						return this.onFileUpdate();
 					})
-					.catch(() => {});
+					.catch(() => {
+					});
 			}
 		}
 	};
@@ -159,16 +162,16 @@ class RiverPresetEditor extends React.Component<RiverPresetEditorProps, RiverPre
 						this.setState({ contextMenu: null });
 					}
 				},
-				{ once: true }
+				{ once: true },
 			);
 		}
 	};
 
-	addRiver = (neighbor: BoardPosition) => {
+	addRiver = (position: BoardPosition) => {
 		const { config, lastSetDirection } = this.state;
 		if (config) {
 			const { data } = config;
-			data.push({ position: [neighbor.x, neighbor.y], direction: lastSetDirection });
+			data.push({ position: [position.x, position.y], direction: lastSetDirection });
 			this.onPresetUpdate({
 				...config,
 				data,
@@ -229,10 +232,11 @@ class RiverPresetEditor extends React.Component<RiverPresetEditorProps, RiverPre
 							// eslint-disable-next-line promise/no-callback-in-promise
 							callback();
 						}
-					}
+					},
 				);
 			})
-			.catch(() => {});
+			.catch(() => {
+			});
 	};
 
 	openFile = (preset: RiverPresetWithFile, file: string) => {
@@ -266,7 +270,7 @@ class RiverPresetEditor extends React.Component<RiverPresetEditorProps, RiverPre
 						name: next.preset.name,
 					};
 					this.onPresetUpdate(structuredClone(preset), next.edited);
-				}
+				},
 			);
 		}
 	};
@@ -336,7 +340,8 @@ class RiverPresetEditor extends React.Component<RiverPresetEditorProps, RiverPre
 												openTabsOrder.delete(currentFile);
 												return editorCache.deleteFile(currentFile);
 											})
-											.catch(() => {});
+											.catch(() => {
+											});
 									});
 									this.setState({ editorCache, openTabsOrder, popup: null });
 									onClose();
@@ -381,51 +386,51 @@ class RiverPresetEditor extends React.Component<RiverPresetEditorProps, RiverPre
 		} = this.state;
 		const { os, settings, onSettingsUpdate } = this.props;
 		return (
-			<section className="text-white font-lato dark:bg-muted-800 bg-muted-600 h-full">
+			<section className='text-white font-lato dark:bg-muted-800 bg-muted-600 h-full'>
 				<Dragger os={os}>{window.t.translate('River-Preset Editor')}</Dragger>
 				<div
 					className={`text-[14px] flex items-center dark:bg-muted-800 bg-muted-500 dark:border-0 border-t border-muted-400 ${
 						os === 'darwin' ? 'pl-20' : ''
 					}`}
 				>
-					<img className="h-6 ml-2 mr-4" src={destinyMountainImage} alt={window.t.translate('Logo')} />
+					<img className='h-6 ml-2 mr-4' src={destinyMountainImage} alt={window.t.translate('Logo')} />
 					<TopMenuItemCollapsable label={window.t.translate('File')}>
 						<TopMenuItem
-							className="text-left"
+							className='text-left'
 							action={TopMenuActions.NEW}
 							onAction={this.onTopMenuAction}
 							icon={<VscNewFile />}
 							label={window.t.translate('New')}
 							shortCut={`${window.t.translate('Ctrl')}+N`}
-							type="default"
+							type='default'
 						/>
 						<TopMenuSeparator />
 						<TopMenuItem
-							className="text-left"
+							className='text-left'
 							action={TopMenuActions.SAVE}
 							onAction={this.onTopMenuAction}
 							label={`${window.t.translate('Save')}...`}
 							shortCut={`${window.t.translate('Ctrl')}+S`}
-							type="default"
+							type='default'
 						/>
 						<TopMenuSeparator />
 						<TopMenuItem
-							className="text-left"
+							className='text-left'
 							action={TopMenuActions.OPEN_PRESET_FOLDER}
 							onAction={this.onTopMenuAction}
 							label={`${window.t.translate('Open Presets Folder')}...`}
-							type="default"
+							type='default'
 						/>
 						<TopMenuSeparator />
 						<TopMenuItem
-							className="text-left"
+							className='text-left'
 							action={TopMenuActions.CLOSE}
 							onAction={this.onTopMenuAction}
 							label={window.t.translate('Close')}
-							type="default"
+							type='default'
 						/>
 					</TopMenuItemCollapsable>
-					<div className="ml-auto">
+					<div className='ml-auto'>
 						<SidebarMenuItem
 							key={_uniqueId()}
 							label={window.t.translate('Dark Mode')}
@@ -438,7 +443,7 @@ class RiverPresetEditor extends React.Component<RiverPresetEditorProps, RiverPre
 									} transition-transform transform-gpu text-lg`}
 								/>
 							}
-							position="left"
+							position='left'
 							onClick={() => {
 								onSettingsUpdate({ ...settings, darkMode: !settings.darkMode });
 							}}
@@ -446,7 +451,7 @@ class RiverPresetEditor extends React.Component<RiverPresetEditorProps, RiverPre
 					</div>
 				</div>
 				<div className={`${popup !== null ? 'blur' : ''} transition-[filter]`}>
-					<div className="flex w-[100vw] h-full grow">
+					<div className='flex w-[100vw] h-full grow'>
 						<PresetEditSidebar
 							windowDimensions={windowDimensions}
 							isLoadingPresets={isLoadingPresets}
@@ -568,7 +573,7 @@ class RiverPresetEditor extends React.Component<RiverPresetEditorProps, RiverPre
 														if (toClose) {
 															await window.electron.file.savePreset(
 																file,
-																JSON.stringify(editorCache.getPreset(file), null, 4)
+																JSON.stringify(editorCache.getPreset(file), null, 4),
 															);
 															editorCache.deleteFile(file);
 															openTabsOrder.delete(file);
@@ -591,7 +596,7 @@ class RiverPresetEditor extends React.Component<RiverPresetEditorProps, RiverPre
 													settings={settings}
 												>
 													{window.t.translate(
-														'This file has not yet been saved. Do you want to save the current changes before closing?'
+														'This file has not yet been saved. Do you want to save the current changes before closing?',
 													)}
 												</ConfirmPopupV2>
 											),

@@ -1,4 +1,4 @@
-import { DirectionEnum } from '../../interfaces/BoardConfigInterface';
+import { DirectionEnum } from '../../../../interfaces/BoardConfigInterface';
 import FieldWithPositionInterface from './FieldWithPositionInterface';
 
 /**

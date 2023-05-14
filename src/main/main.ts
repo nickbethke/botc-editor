@@ -9,8 +9,8 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 import path from 'path';
-import {app, BrowserWindow, ipcMain, shell} from 'electron';
-import {resolveHtmlPath} from './util';
+import { app, BrowserWindow, ipcMain, shell } from 'electron';
+import { resolveHtmlPath } from './util';
 import IPCHelper from './helper/IPCHelper';
 
 let mainWindow: BrowserWindow | null = null;
@@ -40,7 +40,7 @@ const installExtensions = async () => {
 	return installer
 		.default(
 			extensions.map((name) => installer[name]),
-			forceDownload
+			forceDownload,
 		)
 		.catch(() => {
 		});
@@ -77,7 +77,7 @@ const createWindow = async () => {
 			height: 32,
 		},
 		trafficLightPosition: {
-			x: 10, y: 11
+			x: 10, y: 11,
 		},
 		icon: getAssetPath('icon.png'),
 		webPreferences: {
@@ -119,7 +119,7 @@ const createWindow = async () => {
 	// Open urls in the user's browser
 	mainWindow.webContents.setWindowOpenHandler((details) => {
 		shell.openExternal(details.url);
-		return {action: 'deny'};
+		return { action: 'deny' };
 	});
 
 	// Remove this if your app does not use auto updates
@@ -135,11 +135,11 @@ const registerHandlers = () => {
 	ipcMain.handle('dialog:openBoardConfig', async () => {
 		return IPCHelper.handleFileOpen('board', mainWindow);
 	});
-	ipcMain.handle('dialog:openPartieConfig', async () => {
-		return IPCHelper.handleFileOpen('partie', mainWindow);
+	ipcMain.handle('dialog:openGameConfig', async () => {
+		return IPCHelper.handleFileOpen('game', mainWindow);
 	});
-	ipcMain.handle('dialog:savePartieConfig', async (event, ...args) => {
-		return IPCHelper.handleSavePartieConfig(args[0], mainWindow);
+	ipcMain.handle('dialog:saveGameConfig', async (event, ...args) => {
+		return IPCHelper.handleSaveGameConfig(args[0], mainWindow);
 	});
 	ipcMain.handle('dialog:saveBoardConfig', async (event, ...args) => {
 		return IPCHelper.handleSaveBoardConfig(args[0], mainWindow);
@@ -230,8 +230,8 @@ const registerHandlers = () => {
 	ipcMain.handle('file:renamePreset', (event, ...args) => {
 		return IPCHelper.renamePreset(args[0], args[1]);
 	});
-	ipcMain.handle('schemas:partie', () => {
-		return IPCHelper.getSchemaPartie();
+	ipcMain.handle('schemas:game', () => {
+		return IPCHelper.getSchemaGame();
 	});
 	ipcMain.handle('schemas:board', () => {
 		return IPCHelper.getSchemaBoard();

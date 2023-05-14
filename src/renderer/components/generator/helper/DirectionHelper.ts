@@ -1,4 +1,4 @@
-import { Direction, DirectionEnum } from '../../interfaces/BoardConfigInterface';
+import { Direction, DirectionEnum } from '../../../../interfaces/BoardConfigInterface';
 
 /**
  * The direction helper class.
@@ -47,6 +47,35 @@ class DirectionHelper {
 				return DirectionEnum.WEST;
 			default:
 				return DirectionEnum.NORTH;
+		}
+	}
+
+	static getNextDirection(direction: Direction): Direction {
+		switch (direction) {
+			case 'NORTH':
+			default:
+				return 'EAST';
+			case 'EAST':
+				return 'SOUTH';
+			case 'SOUTH':
+				return 'WEST';
+			case 'WEST':
+				return 'NORTH';
+
+		}
+	}
+
+	static getPreviousDirection(direction: Direction): Direction {
+		switch (direction) {
+			case 'NORTH':
+			default:
+				return 'WEST';
+			case 'EAST':
+				return 'NORTH';
+			case 'SOUTH':
+				return 'EAST';
+			case 'WEST':
+				return 'SOUTH';
 		}
 	}
 }

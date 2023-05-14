@@ -9,12 +9,12 @@
 		},
 		"width": {
 			"type": "number",
-			"minimum": 1,
+			"minimum": 0,
 			"maximum": 20
 		},
 		"height": {
 			"type": "number",
-			"minimum": 1,
+			"minimum": 0,
 			"maximum": 20
 		},
 		"data": {

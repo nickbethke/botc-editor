@@ -1,19 +1,19 @@
 import React from 'react';
 import newBGImage from '../../../../assets/images/new-color.jpg';
 import loadingBGImage from '../../../../assets/images/bg-color-II.jpg';
-import PartieEditorChoiceCard from './components/PartieEditorChoiceCard';
+import GameConfiguratorChoiceCard from './components/GameConfiguratorChoiceCard';
 
-type PartieEditorChoiceProps = {
+type GameConfiguratorChoiceProps = {
 	onClose: () => void;
 	onNewConfig: () => void;
 	onLoadConfig: () => void;
 };
 
-class PartieEditorChoice extends React.Component<PartieEditorChoiceProps, unknown> {
-	constructor(props: PartieEditorChoiceProps) {
+class GameConfiguratorChoice extends React.Component<GameConfiguratorChoiceProps, unknown> {
+	constructor(props: GameConfiguratorChoiceProps) {
 		super(props);
 		this.handlePopupClose = this.handlePopupClose.bind(this);
-		this.openLoadPartieConfig = this.openLoadPartieConfig.bind(this);
+		this.openLoadGameConfig = this.openLoadGameConfig.bind(this);
 	}
 
 	handlePopupClose = () => {
@@ -26,7 +26,7 @@ class PartieEditorChoice extends React.Component<PartieEditorChoiceProps, unknow
 		onNewConfig();
 	};
 
-	openLoadPartieConfig = async () => {
+	openLoadGameConfig = async () => {
 		const { onLoadConfig } = this.props;
 		onLoadConfig();
 	};
@@ -38,18 +38,18 @@ class PartieEditorChoice extends React.Component<PartieEditorChoiceProps, unknow
 				<div>
 					<div className="absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]">
 						<div className="text-center text-3xl mb-8 font-flicker tracking-widest">
-							{window.t.translate('Game-Configuration')}
+							{window.t.translate('Game-Configurator')}
 						</div>
 						<div className="relative flex gap-8 w-[80vw] xl:w-[70vw] 2xl:w-[60vw]  mx-auto">
-							<PartieEditorChoiceCard
+							<GameConfiguratorChoiceCard
 								text={window.t.translate('New Game Configuration')}
 								bgImage={newBGImage}
 								onClickAction={this.openNewConfigScreen}
 							/>
-							<PartieEditorChoiceCard
+							<GameConfiguratorChoiceCard
 								text={window.t.translate('Load')}
 								bgImage={loadingBGImage}
-								onClickAction={this.openLoadPartieConfig}
+								onClickAction={this.openLoadGameConfig}
 							/>
 						</div>
 					</div>
@@ -59,4 +59,4 @@ class PartieEditorChoice extends React.Component<PartieEditorChoiceProps, unknow
 	}
 }
 
-export default PartieEditorChoice;
+export default GameConfiguratorChoice;

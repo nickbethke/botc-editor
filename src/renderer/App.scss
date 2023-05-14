@@ -409,6 +409,14 @@
 		background-repeat: no-repeat;
 	}
 
+	.isRiverMuted {
+		background-image: url('/assets/textures/river.png');
+		background-size: contain;
+		background-position: center;
+		background-repeat: no-repeat;
+		filter: grayscale(100%) brightness(0.75);
+	}
+
 	.isHole {
 		background-image: url('/assets/textures/hole.png');
 		background-size: contain;

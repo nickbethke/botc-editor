@@ -1,15 +1,15 @@
-import PartieConfigInterface from '../components/interfaces/PartieConfigInterface';
+import GameConfigInterface from '../../interfaces/GameConfigInterface';
 
-class PartieConfigValidator {
+class GameConfigValidator {
 	private readonly json: JSON;
 
-	private readonly config: PartieConfigInterface;
+	private readonly config: GameConfigInterface;
 
 	public readonly errors: string[] = [];
 
-	constructor(partieConfig: PartieConfigInterface) {
-		this.config = partieConfig;
-		this.json = JSON.parse(JSON.stringify(partieConfig));
+	constructor(gameConfig: GameConfigInterface) {
+		this.config = gameConfig;
+		this.json = JSON.parse(JSON.stringify(gameConfig));
 
 		if (!('cardSelectionTimeout' in this.config)) {
 			this.errors.push('cardSelectionTimeout is required');
@@ -38,4 +38,4 @@ class PartieConfigValidator {
 	}
 }
 
-export default PartieConfigValidator;
+export default GameConfigValidator;

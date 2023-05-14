@@ -1,4 +1,4 @@
-import { Position } from '../../interfaces/BoardConfigInterface';
+import { Position } from '../../../../interfaces/BoardConfigInterface';
 
 /**
  * The board position type
