@@ -1,4 +1,4 @@
-import {ChevronDownIcon} from '@radix-ui/react-icons';
+import { ChevronDownIcon } from '@radix-ui/react-icons';
 import React from 'react';
 
 /**

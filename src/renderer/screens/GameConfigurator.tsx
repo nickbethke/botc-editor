@@ -9,10 +9,7 @@ import Notification from '../components/Notification';
 import Error from '../components/Error';
 import InputValidator, { InputValidatorType } from '../helper/InputValidator';
 
-import GameConfigInterface, {
-	GameConfigWithPath,
-	PathInterface,
-} from '../../interfaces/GameConfigInterface';
+import GameConfigInterface, { GameConfigWithPath, PathInterface } from '../../interfaces/GameConfigInterface';
 import ConfirmPopupV2 from '../components/popups/ConfirmPopupV2';
 import { SettingsInterface } from '../../interfaces/SettingsInterface';
 import FilePathComponent from '../components/FilePathComponent';

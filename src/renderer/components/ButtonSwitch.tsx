@@ -1,5 +1,5 @@
-import {Component} from "react";
-import Button from "./Button";
+import { Component } from 'react';
+import Button from './Button';
 
 class ButtonSwitchLabel {
 	title: string;

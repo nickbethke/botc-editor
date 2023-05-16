@@ -1,9 +1,9 @@
 import React from 'react';
 import _uniqueId from 'lodash/uniqueId';
-import {BoardPosition} from '../generator/interfaces/BoardPosition';
-import {Position} from '../../../interfaces/BoardConfigInterface';
-import {FieldsEnum} from '../generator/BoardGenerator';
-import {TrashIcon} from "@radix-ui/react-icons";
+import { BoardPosition } from '../generator/interfaces/BoardPosition';
+import { Position } from '../../../interfaces/BoardConfigInterface';
+import { FieldsEnum } from '../generator/BoardGenerator';
+import { TrashIcon } from '@radix-ui/react-icons';
 
 /**
  * The board configurator warnings type

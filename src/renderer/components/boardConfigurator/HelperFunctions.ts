@@ -16,7 +16,6 @@ import BoardConfigInterface, {
 import { FieldsEnum } from '../generator/BoardGenerator';
 import DirectionHelper from '../generator/helper/DirectionHelper';
 import { Rotation } from '../../../interfaces/Types';
-import { SettingsInterface } from '../../../interfaces/SettingsInterface';
 
 /**
  * The getFieldType return value type
@@ -223,14 +222,15 @@ export function addCheckpoint(position: BoardPosition, config: BoardConfigInterf
  * adds a start field to the board config
  * @param position
  * @param config
+ * @param direction
  */
-export function addStartField(position: BoardPosition, config: BoardConfigInterface): BoardConfigInterface {
+export function addStartField(position: BoardPosition, config: BoardConfigInterface, direction: Direction): BoardConfigInterface {
 	const { config: newConfig } = overrideField(position, config);
 
 	const newStartFieldsArray = newConfig.startFields;
 	newStartFieldsArray.push({
 		position: boardPosition2Position(position),
-		direction: 'NORTH',
+		direction,
 	});
 	return { ...newConfig, startFields: newStartFieldsArray };
 }
@@ -254,13 +254,14 @@ export function addLembasField(position: BoardPosition, config: BoardConfigInter
  * adds a river field to the board config
  * @param position
  * @param config
+ * @param direction
  */
-export function addRiver(position: BoardPosition, config: BoardConfigInterface): BoardConfigInterface {
+export function addRiver(position: BoardPosition, config: BoardConfigInterface, direction: Direction): BoardConfigInterface {
 	const { config: newConfig } = overrideField(position, config);
 	const newRiverFieldsArray = newConfig.riverFields;
 	newRiverFieldsArray.push({
 		position: boardPosition2Position(position),
-		direction: 'NORTH',
+		direction,
 	});
 	return { ...newConfig, riverFields: newRiverFieldsArray };
 }
@@ -479,9 +480,7 @@ export function rotateDirection(direction: Direction, rotation: Rotation): Direc
 	}
 }
 
-export function calculateRiverPresetFieldPositionWithRotation(position: [number, number], rotation: '0' | '90' | '180' | '270', settings: SettingsInterface, configuration: BoardConfigInterface, adjustBoardSize: boolean): BoardPosition {
-	const h = adjustBoardSize ? settings.defaultValues.maxBoardSize : configuration.height;
-	const w = adjustBoardSize ? settings.defaultValues.maxBoardSize : configuration.width;
+export function calculateRiverPresetFieldPositionWithRotation(position: [number, number], rotation: '0' | '90' | '180' | '270'): BoardPosition {
 	const [positionX, positionY] = position;
 
 	let x = positionX;
@@ -500,4 +499,21 @@ export function calculateRiverPresetFieldPositionWithRotation(position: [number,
 		x,
 		y,
 	};
+}
+
+/**
+ * calculates the next direction value
+ * @param direction
+ */
+export function getNextDirection(direction: Direction): Direction {
+	switch (direction) {
+		case 'NORTH':
+			return 'EAST';
+		case 'EAST':
+			return 'SOUTH';
+		case 'SOUTH':
+			return 'WEST';
+		case 'WEST':
+			return 'NORTH';
+	}
 }

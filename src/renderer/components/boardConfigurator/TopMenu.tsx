@@ -3,8 +3,8 @@ import TopMenuItem, { TopMenuSeparator } from './TopMenuItem';
 import TopMenuItemCollapsable from './TopMenuItemCollapsable';
 import destinyMountainImage from '../../../../assets/textures/schicksalsberg.png';
 import TopMenuSubItemCollapsable from './TopMenuSubItemCollapsable';
-import { VscColorMode, VscFolder, VscFolderOpened, VscGoToFile, VscNewFile, VscSave, VscSaveAs } from 'react-icons/vsc';
-import { ExitIcon, FilePlusIcon, GearIcon, Half2Icon, ZoomInIcon, ZoomOutIcon } from '@radix-ui/react-icons';
+import { VscColorMode, VscFolder, VscFolderOpened, VscSave } from 'react-icons/vsc';
+import { ExitIcon, FilePlusIcon, GearIcon, ZoomInIcon, ZoomOutIcon } from '@radix-ui/react-icons';
 import { FaRandom } from 'react-icons/fa';
 
 /**

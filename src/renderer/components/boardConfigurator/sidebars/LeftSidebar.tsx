@@ -1,9 +1,9 @@
 import React from 'react';
 import {
-	VscChevronDown,
-	VscChevronLeft,
-	VscChevronRight,
-	VscChevronUp,
+	VscArrowDown,
+	VscArrowLeft,
+	VscArrowRight,
+	VscArrowUp,
 	VscCircleLarge,
 	VscEdit,
 	VscEye,
@@ -19,7 +19,7 @@ import { BiWater } from 'react-icons/bi';
 import { BsCursor } from 'react-icons/bs';
 import { FieldsEnum } from '../../generator/BoardGenerator';
 import SidebarMenuItem, { SidebarMenuItemSeparator } from '../SidebarMenuItem';
-import BoardConfigInterface, { DirectionEnum } from '../../../../interfaces/BoardConfigInterface';
+import BoardConfigInterface, { Direction, DirectionEnum } from '../../../../interfaces/BoardConfigInterface';
 import InputLabel from '../../InputLabel';
 import { EditorToolType } from '../../../screens/BoardConfiguratorV2';
 import { BoardPosition } from '../../generator/interfaces/BoardPosition';
@@ -27,6 +27,7 @@ import {
 	getDirectionFieldConfig,
 	getFieldType,
 	getLembasFieldConfig,
+	getNextDirection,
 	updateLembasFieldAmount,
 	updateRiverFieldDirection,
 	updateStartFieldDirection,
@@ -43,18 +44,21 @@ import Mousetrap from 'mousetrap';
  * The board configurator left sidebar properties
  */
 type LeftSidebarProps = {
-	toolChange: (tool: EditorToolType) => void;
-	tabChange: (tab: LeftSidebarOpenTab) => void;
+	defaultDirection: Direction;
 	currentTool: EditorToolType;
 	openTab: LeftSidebarOpenTab;
 	config: BoardConfigInterface;
-	onConfigUpdate: (config: BoardConfigInterface) => void;
 	configType: LeftSidebarConfigType;
 	fieldInEdit: BoardPosition | null;
 	settings: SettingsInterface;
 	riverPresets: Array<RiverPresetWithFile>;
 	boardPresets: Array<BoardPresetWithFile>;
+
 	onAddRiverPresetToBoard: (newRiverPreset: RiverPresetWithFile) => void;
+	toolChange: (tool: EditorToolType) => void;
+	tabChange: (tab: LeftSidebarOpenTab) => void;
+	onConfigUpdate: (config: BoardConfigInterface) => void;
+	defaultDirectionChange: (direction: Direction) => void;
 };
 /**
  * The board configurator left sidebar open tab type
@@ -93,10 +97,10 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 		const { configType } = this.props;
 
 		if (configType === 'direction') {
-			Mousetrap.bind(['up', 'w'], () => this.onDirectionChange(DirectionEnum.NORTH));
-			Mousetrap.bind(['right', 'd'], () => this.onDirectionChange(DirectionEnum.EAST));
-			Mousetrap.bind(['down', 's'], () => this.onDirectionChange(DirectionEnum.SOUTH));
-			Mousetrap.bind(['left', 'a'], () => this.onDirectionChange(DirectionEnum.WEST));
+			Mousetrap.bind(['ctrl+up', 'ctrl+w'], () => this.onDirectionChange(DirectionEnum.NORTH));
+			Mousetrap.bind(['ctrl+right', 'ctrl+d'], () => this.onDirectionChange(DirectionEnum.EAST));
+			Mousetrap.bind(['ctrl+down', 'ctrl+s'], () => this.onDirectionChange(DirectionEnum.SOUTH));
+			Mousetrap.bind(['ctrl+left', 'ctrl+a'], () => this.onDirectionChange(DirectionEnum.WEST));
 		}
 
 		switch (configType) {
@@ -129,11 +133,12 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 		if (fieldInEdit) {
 			const directionField = getDirectionFieldConfig(fieldInEdit, config);
 			return (
-				<div className="flex flex-col">
-					<div className="p-2 border-y dark:border-muted-700 border-muted-400">{window.t.translate('Direction')}</div>
-					<div className="p-4 flex flex-col gap-4">
+				<div className='flex flex-col'>
+					<div
+						className='p-2 border-y dark:border-muted-700 border-muted-400'>{window.t.translate('Direction')}</div>
+					<div className='p-4 flex flex-col gap-4'>
 						<SelectComponent<DirectionEnum>
-							containerClassName="border-b dark:border-muted-700 border-muted-400"
+							containerClassName='border-b dark:border-muted-700 border-muted-400'
 							value={DirectionHelper.directionToDirEnum(directionField?.direction || 'NORTH')}
 							onChange={(value) => {
 								this.onDirectionChange(value);
@@ -142,27 +147,27 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 								{
 									value: DirectionEnum.NORTH,
 									text: window.t.translate('North'),
-									icon: <VscChevronUp />,
+									icon: <VscArrowUp />,
 								},
 								{
 									value: DirectionEnum.EAST,
 									text: window.t.translate('East'),
-									icon: <VscChevronRight />,
+									icon: <VscArrowRight />,
 								},
 								{
 									value: DirectionEnum.SOUTH,
 									text: window.t.translate('South'),
-									icon: <VscChevronDown />,
+									icon: <VscArrowDown />,
 								},
 								{
 									value: DirectionEnum.WEST,
 									text: window.t.translate('West'),
-									icon: <VscChevronLeft />,
+									icon: <VscArrowLeft />,
 								},
 							]}
 						/>
 						<small>
-							{window.t.translate('You can also use the arrow keys and W, A, S, D to change the direction')}
+							{window.t.translate('You can also use Ctrl + arrow keys and Ctrl+W, Ctrl+A, Ctrl+S, Ctrl+D to change the direction')}
 						</small>
 					</div>
 				</div>
@@ -206,12 +211,13 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 		if (fieldInEdit) {
 			const amountField = getLembasFieldConfig(fieldInEdit, config);
 			return (
-				<div className="flex flex-col">
-					<div className="p-2 border-y dark:border-muted-700 border-muted-400">{window.t.translate('Amount')}</div>
-					<div className="p-4 flex flex-col gap-4">
+				<div className='flex flex-col'>
+					<div
+						className='p-2 border-y dark:border-muted-700 border-muted-400'>{window.t.translate('Amount')}</div>
+					<div className='p-4 flex flex-col gap-4'>
 						<InputLabel
 							label={window.t.translate('Lembas amount')}
-							type="range"
+							type='range'
 							value={amountField ? amountField.amount : 0}
 							min={0}
 							max={20}
@@ -232,13 +238,13 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 	settingsGlobal = () => {
 		const { config, onConfigUpdate, settings } = this.props;
 		return (
-			<div className="flex flex-col">
-				<div className="p-2 border-b dark:border-muted-700 border-muted-400">
+			<div className='flex flex-col'>
+				<div className='p-2 border-b dark:border-muted-700 border-muted-400'>
 					{window.t.translate('Global Settings')}
 				</div>
-				<div className="p-4 flex flex-col gap-4">
+				<div className='p-4 flex flex-col gap-4'>
 					<InputLabel
-						type="text"
+						type='text'
 						label={window.t.translate('Board Name')}
 						value={config.name}
 						onChange={(name) => {
@@ -250,7 +256,7 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 						}}
 					/>
 					<InputLabel
-						type="range"
+						type='range'
 						label={window.t.translate('Board Width')}
 						value={config.width}
 						min={Math.max(config.eye.position[0] + 1, 2)}
@@ -264,7 +270,7 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 						}}
 					/>
 					<InputLabel
-						type="range"
+						type='range'
 						label={window.t.translate('Board Height')}
 						value={config.height}
 						min={Math.max(config.eye.position[1] + 1, 2)}
@@ -290,12 +296,12 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 		const darkModeHeight = settings.darkMode ? 'calc(100vh - 111px)' : 'calc(100vh - 112px)';
 
 		return (
-			<div className="flex flex-col">
-				<div className="p-2 border-b dark:border-muted-700 border-muted-400">
+			<div className='flex flex-col'>
+				<div className='p-2 border-b dark:border-muted-700 border-muted-400'>
 					{window.t.translate('Checkpoint Order')}
 				</div>
 				<div
-					className="p-4 flex flex-col gap-4 overflow-y-auto"
+					className='p-4 flex flex-col gap-4 overflow-y-auto'
 					style={{
 						maxHeight: darkModeHeight,
 					}}
@@ -308,7 +314,8 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 								checkPoints: checkpoints,
 							});
 						}}
-						onSelect={() => {}}
+						onSelect={() => {
+						}}
 					/>
 				</div>
 			</div>
@@ -321,9 +328,10 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 	presets = () => {
 		const { riverPresets, boardPresets, onAddRiverPresetToBoard } = this.props;
 		return (
-			<div className="flex flex-col">
-				<div className="p-2 border-b dark:border-muted-700 border-muted-400">{window.t.translate('Presets')}</div>
-				<div className="overflow-y-auto">
+			<div className='flex flex-col'>
+				<div
+					className='p-2 border-b dark:border-muted-700 border-muted-400'>{window.t.translate('Presets')}</div>
+				<div className='overflow-y-auto'>
 					<PresetView
 						riverPresets={riverPresets}
 						boardPresets={boardPresets}
@@ -355,10 +363,10 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 			tabChange(openTab);
 		}
 		if (openTab !== 'settings') {
-			Mousetrap.unbind(['up', 'w']);
-			Mousetrap.unbind(['right', 'd']);
-			Mousetrap.unbind(['down', 's']);
-			Mousetrap.unbind(['left', 'a']);
+			Mousetrap.unbind(['ctrl+up', 'ctrl+w']);
+			Mousetrap.unbind(['ctrl+right', 'ctrl+d']);
+			Mousetrap.unbind(['ctrl+down', 'ctrl+s']);
+			Mousetrap.unbind(['ctrl+left', 'ctrl+a']);
 		}
 	};
 
@@ -368,7 +376,20 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 	 * @private
 	 */
 	private toolSelection(currentTool: EditorToolType) {
-		const { config } = this.props;
+		const { config, defaultDirection, defaultDirectionChange } = this.props;
+
+		let directionArrow = <VscArrowRight />;
+		if (defaultDirection === 'NORTH') {
+			directionArrow = <VscArrowUp />;
+		}
+		if (defaultDirection === 'WEST') {
+			directionArrow = <VscArrowLeft />;
+		}
+		if (defaultDirection === 'SOUTH') {
+			directionArrow = <VscArrowDown />;
+		}
+
+
 		return (
 			<>
 				<SidebarMenuItem
@@ -399,7 +420,16 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 					shortCut={`${window.t.translate('Ctrl')}+D`}
 				/>
 				<SidebarMenuItemSeparator />
-
+				<SidebarMenuItem
+					label={window.t.translate('Default Direction')}
+					open={false}
+					icon={directionArrow}
+					onClick={() => {
+						defaultDirectionChange(getNextDirection(defaultDirection));
+					}}
+					shortCut={`WASD`}
+				/>
+				<SidebarMenuItemSeparator />
 				<SidebarMenuItem
 					label={window.t.translate('Start')}
 					open={currentTool === FieldsEnum.START}
@@ -465,6 +495,7 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 					}}
 					shortCut={`${window.t.translate('Ctrl')}+7`}
 				/>
+
 			</>
 		);
 	}
@@ -484,7 +515,7 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 					onClick={() => {
 						this.handleOpenTabChange('settings');
 					}}
-					shortCut="Alt+1"
+					shortCut='Alt+1'
 				/>
 				<SidebarMenuItem
 					label={window.t.translate('Checkpoint Order')}
@@ -493,7 +524,7 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 					onClick={() => {
 						this.handleOpenTabChange('checkpointOrder');
 					}}
-					shortCut="Alt+2"
+					shortCut='Alt+2'
 				/>
 				<SidebarMenuItem
 					label={window.t.translate('Presets')}
@@ -502,7 +533,7 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 					onClick={() => {
 						this.handleOpenTabChange('presets');
 					}}
-					shortCut="Alt+3"
+					shortCut='Alt+3'
 				/>
 			</>
 		);
@@ -514,13 +545,13 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 	render() {
 		const { currentTool, openTab } = this.props;
 		return (
-			<div className="flex flex-row h-full">
-				<div className="h-full flex flex-col border-r dark:border-muted-700 border-muted-400 py-1">
+			<div className='flex flex-row h-full'>
+				<div className='h-full flex flex-col border-r dark:border-muted-700 border-muted-400 py-1'>
 					{this.tabSwitch(openTab)}
 					<SidebarMenuItemSeparator />
 					{this.toolSelection(currentTool)}
 				</div>
-				<div className="flex-grow">{this.content()}</div>
+				<div className='flex-grow'>{this.content()}</div>
 			</div>
 		);
 	}

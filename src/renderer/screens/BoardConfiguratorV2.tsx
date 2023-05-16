@@ -4,7 +4,7 @@ import { ParsedPath } from 'path';
 import _uniqueId from 'lodash/uniqueId';
 import { monaco } from 'react-monaco-editor';
 import TopMenu, { TopMenuActions } from '../components/boardConfigurator/TopMenu';
-import BoardConfigInterface, { Position, PositionDirection } from '../../interfaces/BoardConfigInterface';
+import BoardConfigInterface, { Direction, Position, PositionDirection } from '../../interfaces/BoardConfigInterface';
 import LeftSidebar, {
 	LeftSidebarConfigType,
 	LeftSidebarOpenTab,
@@ -27,7 +27,8 @@ import {
 	addHole,
 	addLembasField,
 	addRiver,
-	addStartField, calculateRiverPresetFieldPositionWithRotation,
+	addStartField,
+	calculateRiverPresetFieldPositionWithRotation,
 	getFieldType,
 	moveSauronsEye,
 	removeCheckpoint,
@@ -35,7 +36,8 @@ import {
 	removeLembasField,
 	removeRiver,
 	removeStartField,
-	removeWall, rotateDirection,
+	removeWall,
+	rotateDirection,
 } from '../components/boardConfigurator/HelperFunctions';
 import ConfirmPopupV2 from '../components/popups/ConfirmPopupV2';
 import { SettingsInterface } from '../../interfaces/SettingsInterface';
@@ -109,6 +111,7 @@ type BoardConfiguratorV2State = {
 	riverPresets: Array<RiverPresetWithFile>;
 	boardPresets: Array<BoardPresetWithFile>;
 	newRiverPreset: RiverPresetWithFile | null;
+	defaultDirection: Direction;
 };
 
 class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, BoardConfiguratorV2State> {
@@ -151,6 +154,7 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 			riverPresets: [],
 			boardPresets: [],
 			newRiverPreset: null,
+			defaultDirection: 'NORTH',
 		};
 		this.onTopMenuAction = this.onTopMenuAction.bind(this);
 		this.handleOnFieldOrWallClick = this.handleOnFieldOrWallClick.bind(this);
@@ -252,6 +256,22 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 		});
 		Mousetrap.bind(['command+o', 'ctrl+o'], () => {
 			this.openConfiguration();
+		});
+
+		Mousetrap.bind(['w', 'up'], () => {
+			this.setState({ defaultDirection: 'NORTH' });
+		});
+
+		Mousetrap.bind(['s', 'down'], () => {
+			this.setState({ defaultDirection: 'SOUTH' });
+		});
+
+		Mousetrap.bind(['a', 'left'], () => {
+			this.setState({ defaultDirection: 'WEST' });
+		});
+
+		Mousetrap.bind(['d', 'right'], () => {
+			this.setState({ defaultDirection: 'EAST' });
 		});
 
 		window.addEventListener('resize', this.handleResize);
@@ -417,6 +437,7 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 	}
 
 	private handleFieldPlacing(position: BoardPosition, config: BoardConfigInterface, currentTool: FieldsEnum) {
+		const { defaultDirection } = this.state;
 		switch (currentTool) {
 			case FieldsEnum.EYE:
 				this.updateConfiguration(moveSauronsEye(position, config));
@@ -425,13 +446,13 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 				this.updateConfiguration(addCheckpoint(position, config));
 				break;
 			case FieldsEnum.START:
-				this.updateConfiguration(addStartField(position, config));
+				this.updateConfiguration(addStartField(position, config, defaultDirection));
 				break;
 			case FieldsEnum.LEMBAS:
 				this.updateConfiguration(addLembasField(position, config));
 				break;
 			case FieldsEnum.RIVER:
-				this.updateConfiguration(addRiver(position, config));
+				this.updateConfiguration(addRiver(position, config, defaultDirection));
 				break;
 			case FieldsEnum.HOLE:
 				this.updateConfiguration(addHole(position, config));
@@ -957,10 +978,9 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 		rotation: Rotation,
 	): BoardConfigInterface => {
 
-		const { settings } = this.props;
 		let newConfig = config;
 		let newRivers = newRiverPreset.data.map((river) => {
-			const riverPosition = calculateRiverPresetFieldPositionWithRotation(river.position, rotation, settings, config, adjustBoardSize);
+			const riverPosition = calculateRiverPresetFieldPositionWithRotation(river.position, rotation);
 			return {
 				position: [riverPosition.x + position.x, riverPosition.y + position.y],
 				direction: rotateDirection(river.direction, rotation),
@@ -1097,6 +1117,7 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 			warnings,
 			riverPresets,
 			boardPresets,
+			defaultDirection,
 		} = this.state;
 		const topMenuHeight = this.getTopMenuHeight(settings.darkMode);
 		const mainHeight = windowDimensions.height - (os === 'win32' ? 32 + topMenuHeight : topMenuHeight);
@@ -1159,6 +1180,10 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 								settings={settings}
 								onAddRiverPresetToBoard={(newRiverPreset) => {
 									this.onAddRiverPresetToBoard(newRiverPreset);
+								}}
+								defaultDirection={defaultDirection}
+								defaultDirectionChange={(newDefaultDirection) => {
+									this.setState({ defaultDirection: newDefaultDirection });
 								}}
 							/>
 						</div>

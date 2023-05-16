@@ -16,6 +16,7 @@ import River from './fields/River';
 import Board from './Board';
 import AStar from './helper/AStar';
 import DirectionHelper from './helper/DirectionHelper';
+import { wallBoardPositions2String } from './interfaces/BoardPosition';
 
 /**
  * random boardConfigurator start configuration type
@@ -145,7 +146,7 @@ class BoardGenerator {
 	 * The holes try array, to check where the algorithm is tried to generate holes
 	 * @private
 	 */
-	private holesTrys: Map<string, boolean> | undefined;
+	private holesTrys: Map<string, boolean>;
 
 	/**
 	 * The lembas fields array
@@ -171,6 +172,7 @@ class BoardGenerator {
 		this.startFields = [];
 		this.lembasFields = [];
 		this.wallMapArray = [];
+		this.holesTrys = new Map();
 
 		// check ig generation of boardConfigurator is possible, otherwise throws an error
 		if (this.getFieldCount() < this.getOccupiedFieldsCount()) {
@@ -268,7 +270,7 @@ class BoardGenerator {
 	 * @param position
 	 */
 	public static lembasFieldsArrayToBoardPositionArray(
-		position: LembasField[]
+		position: LembasField[],
 	): { position: BoardPosition; amount: number }[] {
 		const boardPositions: { position: BoardPosition; amount: number }[] = [];
 		for (let i = 0; i < position.length; i += 1) {
@@ -353,7 +355,6 @@ class BoardGenerator {
 	private genHoles() {
 		const maxTrys = this.getFieldCount() * 8;
 		let trys = 0;
-		this.holesTrys = new Map();
 		// generate until all holes to be set are set, or the max trys are reached
 		while (this.holesSet < this.startValues.holes && trys < maxTrys) {
 			this.genHole();
@@ -362,18 +363,19 @@ class BoardGenerator {
 	}
 
 	private genHole() {
-		this.holesTrys = new Map<string, boolean>();
 		// generate random position
 		const position = this.getRandomPosition();
 		// check if position has already been tried
-		if (this.holesTrys.get(BoardGenerator.boardPosition2String(position)) === undefined) {
+		if (!this.holesTrys.has(BoardGenerator.boardPosition2String(position))) {
 			// check pathfinding, so all checkpoints are reachable from all start fields
+			const boardClone = BoardGenerator.cloneBoard(this.board);
+			boardClone[position.x][position.y] = new Hole(position);
 			const { result } = AStar.pathPossible(
 				this.checkpoints,
 				this.startFields,
 				this.lembasFields,
-				this.board,
-				new Map([])
+				boardClone,
+				new Map([]),
 			);
 			// if all paths is possible add the hole field
 			if (result) {
@@ -558,18 +560,9 @@ class BoardGenerator {
 					this.getFieldFromPosition(secondPosition) instanceof River
 				)
 			) {
-				if (
-					!alreadyTried.includes(
-						firstPosition.x.toString() + firstPosition.y.toString() + secondPosition.x.toString() + secondPosition.y
-					) &&
-					!alreadyTried.includes(
-						secondPosition.x.toString() + secondPosition.y.toString() + firstPosition.x.toString() + firstPosition.y
-					)
-				) {
-					const s1 =
-						BoardGenerator.boardPosition2String(firstPosition) + BoardGenerator.boardPosition2String(secondPosition);
-					const s2 =
-						BoardGenerator.boardPosition2String(secondPosition) + BoardGenerator.boardPosition2String(firstPosition);
+				const s1 = wallBoardPositions2String(firstPosition, secondPosition);
+				const s2 = wallBoardPositions2String(secondPosition, firstPosition);
+				if (!alreadyTried.includes(s1) && !alreadyTried.includes(s2)) {
 					const wallsArrayCopy = [...this.wallMapArray];
 					this.wallMapArray.push([s1, true], [s2, true]);
 					const { result } = AStar.pathPossible(
@@ -577,7 +570,7 @@ class BoardGenerator {
 						this.startFields,
 						this.lembasFields,
 						this.board,
-						new Map(this.wallMapArray)
+						new Map(this.wallMapArray),
 					);
 					alreadyTried.push(s1, s2);
 					if (result) {
@@ -646,8 +639,8 @@ class BoardGenerator {
 				!(this.getFieldFromPosition(position) instanceof River && this.getFieldFromPosition(neighbor) instanceof River)
 			) {
 				if (BoardGenerator.probably(this.wallPercentage * 100)) {
-					const s1 = BoardGenerator.boardPosition2String(position) + BoardGenerator.boardPosition2String(neighbor);
-					const s2 = BoardGenerator.boardPosition2String(neighbor) + BoardGenerator.boardPosition2String(position);
+					const s1 = wallBoardPositions2String(position, neighbor);
+					const s2 = wallBoardPositions2String(neighbor, position);
 					const wallsArrayCopy = [...this.wallMapArray];
 					this.wallMapArray.push([s1, true], [s2, true]);
 					const { result: pathPossible } = AStar.pathPossible(
@@ -655,7 +648,7 @@ class BoardGenerator {
 						this.startFields,
 						this.lembasFields,
 						this.board,
-						new Map(this.wallMapArray)
+						new Map(this.wallMapArray),
 					);
 					if (!pathPossible) {
 						this.wallMapArray = wallsArrayCopy;
@@ -696,11 +689,10 @@ class BoardGenerator {
 	}
 
 	private isPositionInBoard(position: BoardPosition): boolean {
+		const width = this.startValues.width;
+		const height = this.startValues.height;
 		const { x, y } = position;
-		if (x > this.startValues.width - 1 || x < 0) {
-			return false;
-		}
-		return !(y > this.startValues.height - 1 || y < 0);
+		return x >= 0 && x < width - 1 && y >= 0 && y < height - 1;
 	}
 
 	private getFieldCount(): number {
@@ -851,7 +843,7 @@ class BoardGenerator {
 
 		board[json.eye.position[1]][json.eye.position[0]] = new SauronsEye(
 			BoardGenerator.positionToBoardPosition(json.eye.position),
-			BoardGenerator.directionToDirectionEnum(json.eye.direction)
+			BoardGenerator.directionToDirectionEnum(json.eye.direction),
 		);
 
 		for (let i = 0; i < json.startFields.length; i += 1) {
@@ -911,6 +903,17 @@ class BoardGenerator {
 			config.riverFields.filter((field) => field.position[0] === position.x && field.position[1] === position.y)
 				.length > 0
 		);
+	}
+
+	private static cloneBoard(board: Array<Array<FieldWithPositionInterface>>) {
+		const newBoard: Array<Array<FieldWithPositionInterface>> = [];
+		for (let i = 0; i < board.length; i += 1) {
+			newBoard[i] = [];
+			for (let j = 0; j < board[i].length; j += 1) {
+				newBoard[i][j] = board[i][j];
+			}
+		}
+		return newBoard;
 	}
 }
 

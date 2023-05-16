@@ -1,5 +1,5 @@
 import React from 'react';
-import {VscChromeClose} from 'react-icons/vsc';
+import { VscChromeClose } from 'react-icons/vsc';
 
 type NotificationProps = {
 	label: string;

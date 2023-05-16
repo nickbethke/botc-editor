@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 export function HomeScreenButton(props: { text: string; onClick: () => void; tabIndex: number; last?: boolean }) {
 	const {onClick, tabIndex, text, last} = props;

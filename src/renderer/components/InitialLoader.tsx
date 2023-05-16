@@ -1,4 +1,4 @@
-import {VscLoading} from "react-icons/vsc";
+import { VscLoading } from 'react-icons/vsc';
 
 export default function InitialLoader() {
 	return (

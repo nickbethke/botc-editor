@@ -1,7 +1,6 @@
 import { Component } from 'react';
 import _uniqueId from 'lodash/uniqueId';
-import { VscChevronDown, VscChevronUp } from 'react-icons/vsc';
-import Button from './Button';
+import { VscChevronUp } from 'react-icons/vsc';
 
 type SelectComponentProps<T> = {
 	value: T;

@@ -1,8 +1,8 @@
 import React from 'react';
-import {createRoot} from 'react-dom/client';
+import { createRoot } from 'react-dom/client';
 import App from './App';
-import TranslationHelper, {AvailableLanguages} from './helper/TranslationHelper';
-import InitialLoader from "./components/InitialLoader";
+import TranslationHelper, { AvailableLanguages } from './helper/TranslationHelper';
+import InitialLoader from './components/InitialLoader';
 
 const container = document.getElementById('root');
 const root = createRoot(container ? container : document.createElement('div'));

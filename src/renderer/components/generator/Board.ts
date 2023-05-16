@@ -1,4 +1,4 @@
-import BoardGenerator, {BoardPosition, RandomBoardStartValues} from './BoardGenerator';
+import BoardGenerator, { BoardPosition, RandomBoardStartValues } from './BoardGenerator';
 import BoardConfigInterface, {
 	DirectionEnum,
 	LembasField,

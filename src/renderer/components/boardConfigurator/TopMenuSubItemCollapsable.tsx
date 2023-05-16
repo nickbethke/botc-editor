@@ -1,5 +1,5 @@
 import React from 'react';
-import {ChevronRightIcon} from "@radix-ui/react-icons";
+import { ChevronRightIcon } from '@radix-ui/react-icons';
 
 /**
  * The board configuration top menu subitem collapsable component properties

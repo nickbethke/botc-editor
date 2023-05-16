@@ -18,12 +18,12 @@ import TopMenuItemCollapsable from '../components/boardConfigurator/TopMenuItemC
 import PopupV2 from '../components/popups/PopupV2';
 import ConfirmPopupV2 from '../components/popups/ConfirmPopupV2';
 import FilePathComponent from '../components/FilePathComponent';
-import KeyCode = monaco.KeyCode;
-import KeyMod = monaco.KeyMod;
 import { JsonViewer } from '@textea/json-viewer';
 import SettingsPopup from '../components/popups/SettingsPopup';
 import Dragger from '../components/Dragger';
 import { ConfigType } from '../../interfaces/Types';
+import KeyCode = monaco.KeyCode;
+import KeyMod = monaco.KeyMod;
 
 type JsonValidatorProps = {
 	onClose: () => void;

@@ -1,6 +1,6 @@
-import BoardConfigInterface, {Position} from '../../interfaces/BoardConfigInterface';
+import BoardConfigInterface, { Position } from '../../interfaces/BoardConfigInterface';
 import BoardGenerator from '../components/generator/BoardGenerator';
-import {wallPosition2String} from '../components/generator/interfaces/BoardPosition';
+import { wallPosition2String } from '../components/generator/interfaces/BoardPosition';
 
 class BoardConfigValidator {
 	private readonly json: JSON;

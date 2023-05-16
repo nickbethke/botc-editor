@@ -1,5 +1,5 @@
-import {BoardPosition} from './BoardPosition';
-import {FieldsEnum} from '../BoardGenerator';
+import { BoardPosition } from './BoardPosition';
+import { FieldsEnum } from '../BoardGenerator';
 
 /**
  * A position interface

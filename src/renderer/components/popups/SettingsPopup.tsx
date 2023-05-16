@@ -2,7 +2,6 @@ import React from 'react';
 import { SettingsInterface } from '../../../interfaces/SettingsInterface';
 import ConfirmPopupV2 from './ConfirmPopupV2';
 import InputLabel from '../InputLabel';
-import TranslationHelper from '../../helper/TranslationHelper';
 import { HomeMenuSeparator } from '../HomeScreenButton';
 import Button from '../Button';
 import ButtonSwitch from '../ButtonSwitch';

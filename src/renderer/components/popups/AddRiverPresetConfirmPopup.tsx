@@ -1,6 +1,6 @@
 import { RiverPresetWithFile } from 'main/helper/PresetsLoader';
 import React, { Component } from 'react';
-import { VscAdd, VscArrowCircleRight } from 'react-icons/vsc';
+import { VscAdd } from 'react-icons/vsc';
 import { SettingsInterface } from '../../../interfaces/SettingsInterface';
 import { BoardPosition } from '../generator/interfaces/BoardPosition';
 import ConfirmPopupV2 from './ConfirmPopupV2';
@@ -73,7 +73,7 @@ export default class AddRiverPresetConfirmPopup extends Component<
 			const row: JSX.Element[] = [];
 			for (let y = 0; y < h; y += 1) {
 				const possibleRiver = preset.data.filter((river) => {
-					const riverPosition = calculateRiverPresetFieldPositionWithRotation(river.position, rotation, settings, configuration, adjustBoardSize);
+					const riverPosition = calculateRiverPresetFieldPositionWithRotation(river.position, rotation);
 					return riverPosition.x + position.x === x && riverPosition.y + position.y === y;
 				});
 

@@ -678,8 +678,8 @@
 			"Zurücksetzen"
 		],
 		[
-			"You can also use the arrow keys and W, A, S, D to change the direction",
-			"Sie können auch die Pfeiltasten und W, A, S, D verwenden um die Richtung zu ändern"
+			"You can also use Ctrl + arrow keys and Ctrl+W, Ctrl+A, Ctrl+S, Ctrl+D to change the direction",
+			"Sie können auch Strg + Pfeiltasten und Strg+W, Strg+A, Strg+S, Strg+D verwenden um die Richtung zu ändern"
 		],
 		[
 			"End Edit",
@@ -800,6 +800,26 @@
 		[
 			"Position",
 			"Position"
+		],
+		[
+			"Copy",
+			"Kopieren"
+		],
+		[
+			"Default",
+			"Standard"
+		],
+		[
+			"The current game board state is not playable because there is a wall set on another wall.",
+			"Der aktuelle Spielbrett Zustand ist nicht spielbar, da eine Wand auf einer anderen Wand gesetzt ist."
+		],
+		[
+			"Remove wall",
+			"Wand entfernen"
+		],
+		[
+			"Default Direction",
+			"Standard Richtung"
 		]
 	]
 }
