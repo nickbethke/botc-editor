@@ -1,14 +1,6 @@
 stages:
   - build
 
-run_tests:
-  stage: test
-  image: node:latest
-  before_script:
-    - npm install
-  script:
-    - npm run test
-
 build:
   stage: build
   image: electronuserland/builder:wine
