@@ -21,7 +21,8 @@
 			"properties": {
 				"defaultBoardName": {
 					"type": "string",
-					"default": "New Board"
+					"default": "New Board",
+					"minLength": 1
 				},
 				"maxBoardSize": {
 					"type": "integer",

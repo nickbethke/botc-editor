@@ -52,8 +52,8 @@ export type WallAlgorithm = 'iterative' | 'random';
  */
 export const defaultStartValues: RandomBoardStartValues = {
 	name: 'THE CENTERLÄND',
-	checkpoints: 1,
-	height: 2,
+	checkpoints: 2,
+	height: 3,
 	width: 2,
 	lembasFields: 0,
 	maxLembasAmountOnField: 0,
@@ -72,7 +72,6 @@ export const defaultStartValues: RandomBoardStartValues = {
  */
 export type BoardPosition = {
 	x: number;
-
 	y: number;
 };
 

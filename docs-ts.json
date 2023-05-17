@@ -1,0 +1,7 @@
+{
+	"srcDir": "./src",
+	"exclude": [
+		"src/__tests__/*"
+	],
+	"enforceVersion": false
+}

@@ -199,8 +199,11 @@ const registerHandlers = () => {
 		return IPCHelper.removeFile(args[0]);
 	});
 
+	/**
+	 * @deprecated
+	 */
 	ipcMain.handle('open:homepage', () => {
-		return IPCHelper.openHomepage();
+		return undefined;
 	});
 
 	ipcMain.handle('file:getTranslation', (event, ...args) => {

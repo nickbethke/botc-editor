@@ -141,7 +141,13 @@ const electronHandler = {
 			return ipcRenderer.invoke('file:renamePreset', from, to);
 		},
 	},
+	/**
+	 * @deprecated since 0.9.85
+	 */
 	open: {
+		/**
+		 * @deprecated since 0.9.85
+		 */
 		homepage() {
 			return ipcRenderer.invoke('open:homepage');
 		},

@@ -1,6 +1,6 @@
 import { app, BrowserWindow, clipboard, dialog, shell } from 'electron';
 import fs from 'fs';
-import Ajv, { JSONSchemaType } from 'ajv';
+import Ajv from 'ajv';
 import * as os from 'os';
 import path, { ParsedPath } from 'path';
 import * as GameConfigSchema from '../../schema/gameConfigSchema.json';
@@ -204,20 +204,13 @@ class IPCHelper {
 		return false;
 	};
 
-	static jsonValidate = (json: object, type: ConfigType = 'game') => {
+	static jsonValidate = (json: object, type: ConfigType = 'game'): boolean | string => {
 		const ajv = new Ajv({ allErrors: true });
 		let validate;
-		let schema: JSONSchemaType<GameConfigInterface> | JSONSchemaType<BoardConfigInterface>;
 		if (type === 'game') {
-			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-			// @ts-ignore
-			schema = GameConfigSchema;
-			validate = ajv.compile(schema);
+			validate = ajv.compile(GameConfigSchema);
 		} else {
-			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-			// @ts-ignore
-			schema = BoardConfigSchema;
-			validate = ajv.compile(schema);
+			validate = ajv.compile(BoardConfigSchema);
 		}
 		try {
 			if (validate(json)) {
@@ -243,15 +236,15 @@ class IPCHelper {
 		let currentFilePath;
 		if (window) {
 			const { canceled, filePath } = await dialog.showSaveDialog(window, {
-				title: 'Board-Konfiguration speichern',
-				filters: [{ name: 'Board-Konfig', extensions: ['json'] }],
+				title: 'Board-Configuration speichern',
+				filters: [{ name: 'Board-Configuration', extensions: ['json'] }],
 			});
 			currentCanceled = canceled;
 			currentFilePath = filePath;
 		} else {
 			const { canceled, filePath } = await dialog.showSaveDialog({
-				title: 'Board-Konfiguration speichern',
-				filters: [{ name: 'Board-Konfig', extensions: ['json'] }],
+				title: 'Board-Configuration speichern',
+				filters: [{ name: 'Board-Configuration', extensions: ['json'] }],
 			});
 			currentCanceled = canceled;
 			currentFilePath = filePath;
@@ -294,23 +287,23 @@ class IPCHelper {
 		return os.platform();
 	};
 
-	static openFile(file: string) {
+	static openFile(file: string): void {
 		shell.openPath(file).catch(() => {
 		});
 	}
 
-	static openDirectory(file: string) {
+	static openDirectory(file: string): void {
 		const { dir } = path.parse(file);
 		shell.openPath(dir).catch(() => {
 		});
 	}
 
-	static openDirectoryDirectly(dir: string) {
+	static openDirectoryDirectly(dir: string): void {
 		shell.openPath(dir).catch(() => {
 		});
 	}
 
-	static saveFile(file: string, content: string) {
+	static saveFile(file: string, content: string): boolean | string {
 		if (fs.existsSync(file)) {
 			fs.writeFileSync(file, content, { encoding: 'utf8', flag: 'w' });
 			return true;
@@ -318,7 +311,7 @@ class IPCHelper {
 		return 'File does not exits';
 	}
 
-	static async saveScreenShotDialog(file: string, content: string, window: BrowserWindow | null) {
+	static async saveScreenShotDialog(file: string, content: string, window: BrowserWindow | null): Promise<boolean> {
 		let currentCanceled;
 		let currentFilePath;
 		if (window) {
@@ -357,7 +350,7 @@ class IPCHelper {
 		return false;
 	}
 
-	static removeFile(file: string) {
+	static removeFile(file: string): boolean | string {
 		if (fs.existsSync(file)) {
 			fs.unlinkSync(file);
 			return true;
@@ -365,11 +358,7 @@ class IPCHelper {
 		return 'File does not exits';
 	}
 
-	static async openHomepage() {
-		await shell.openExternal('https://battle-of-the-centerlaend.web.app');
-	}
-
-	static loadLanguageFile(lang: string) {
+	static loadLanguageFile(lang: string): string {
 		const languagesPath = IPCHelper.getAssetPath('languages/');
 		if (fs.existsSync(path.join(languagesPath, `${lang}.json`))) {
 			return fs.readFileSync(path.join(languagesPath, `${lang}.json`), {
@@ -386,7 +375,7 @@ class IPCHelper {
 		);
 	}
 
-	static clipBoardWrite(text: string) {
+	static clipBoardWrite(text: string): void {
 		clipboard.writeText(text);
 	}
 
@@ -407,8 +396,6 @@ class IPCHelper {
 		}
 		const content = fs.readFileSync(settingsPath, 'utf8');
 		const ajv = new Ajv({ allErrors: true });
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-ignore
 		const validate = ajv.compile(SettingsSchema);
 
 		try {
@@ -432,33 +419,45 @@ class IPCHelper {
 		}
 	}
 
-	static updateSettings(settings: SettingsInterface) {
+	static updateSettings(settings: SettingsInterface): SettingsInterface {
 		const settingsPath = getAppDataPath('/settings.json');
+		if (settings.defaultValues.defaultBoardName === '' || settings.defaultValues.defaultBoardName === ' ') {
+			settings.defaultValues.defaultBoardName = IPCHelper.defaultSettings.defaultValues.defaultBoardName;
+		}
+
+		const ajv = new Ajv({ allErrors: true });
+		const validate = ajv.compile(SettingsSchema);
+
+		if (!validate(settings)) {
+			fs.writeFileSync(settingsPath, JSON.stringify(IPCHelper.defaultSettings, null, 4));
+			return IPCHelper.defaultSettings;
+		}
+
 		if (!fs.existsSync(settingsPath)) {
 			fs.writeFileSync(settingsPath, JSON.stringify({ ...IPCHelper.defaultSettings, settings }, null, 4));
-			return { ...IPCHelper.defaultSettings, settings };
+			return { ...IPCHelper.defaultSettings, ...settings };
 		}
 		fs.writeFileSync(settingsPath, JSON.stringify(settings, null, 4));
 		return settings;
 	}
 
-	static savePreset(file: string, content: string) {
+	static savePreset(file: string, content: string): void {
 		return PresetsLoader.saveRiverPreset(file, content);
 	}
 
-	static renamePreset(from: string, to: string) {
+	static renamePreset(from: string, to: string): Promise<path.ParsedPath> {
 		return PresetsLoader.renameRiverPreset(from, to);
 	}
 
-	static getSchemaGame() {
+	static getSchemaGame(): object {
 		return GameConfigSchema;
 	}
 
-	static getSchemaBoard() {
+	static getSchemaBoard(): object {
 		return BoardConfigSchema;
 	}
 
-	static openPresetDir() {
+	static openPresetDir(): void {
 		IPCHelper.openDirectoryDirectly(path.join(getAppDataPath(), '/presets/'));
 	}
 }

@@ -1,7 +1,10 @@
 const tailwindcss = require('tailwindcss');
 const tailwindcssNesting = require('tailwindcss/nesting');
 const autoprefixer = require('autoprefixer');
-
+/**
+ * Tailwind Settings
+ * @type {{plugins: (*|postcss.PluginCreator<string | Config | {config: string | Config}>|{Config: any, readonly default: postcss.PluginCreator<string | Config | {config: string | Config}>}|autoprefixer|((options?: autoprefixer.Options) => (postcss.Plugin & autoprefixer.ExportedAPI))|((browsers: string[], options?: autoprefixer.Options) => (postcss.Plugin & autoprefixer.ExportedAPI))|(<T extends string[]>(...args: [...T, autoprefixer.Options]) => (postcss.Plugin & autoprefixer.ExportedAPI)))[], theme: {extend: {fontFamily: {mono: string[], lato: string[], flicker: string[], jetbrains: string[]}, transitionProperty: {spacing: string, 'font-size': string, height: string}, colors: {background: {'100': string, '200': string, '300': string, '400': string, '500': string, '600': string, '700': string, '800': string, '900': string, '50': string, DEFAULT: string}, accent: {'100': string, '200': string, '300': string, '400': string, '500': string, '600': string, '700': string, '800': string, '900': string, '50': string, DEFAULT: string}, muted: {'100': string, '200': string, '300': string, '400': string, '500': string, '600': string, '700': string, '800': string, '900': string, '50': string, DEFAULT: string}}}}, darkMode: string, variants: {}, content: string[]}}
+ */
 module.exports = {
 	darkMode: 'class',
 	content: ['./src/**/*.{html,js,tsx,ejs}'],
