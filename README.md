@@ -41,7 +41,12 @@ Siehe [hier](https://electron-react-boilerplate.js.org/docs/installation) für D
 
 ## Installation
 
-....
+### Windows
+
+1. Lade die neuste Version von [hier](https://gitlab.uni-ulm.de/softwaregrundprojekt/2022-2023/gruppenprojekt/group-11/team-11-editor/-/releases) herunter
+2. Entpacke die ZIP-Datei
+3. Starte die `Battle of the Centerländ Editor.exe`
+4. Viel Spaß beim Erstellen von Karten und Konfigurationen
 
 ## Programmierung
 
