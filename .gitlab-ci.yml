@@ -1,5 +1,4 @@
 stages:
-  # - test
   - build
 
 run_tests:
