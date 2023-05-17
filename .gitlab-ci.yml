@@ -1,5 +1,14 @@
 stages:
+  - test
   - build
+
+test:
+  stage: test
+  image: node:latest
+  before_script:
+    - npm install
+  script:
+    - npm run test
 
 build:
   stage: build
@@ -11,4 +20,5 @@ build:
     - npm run package:win
   artifacts:
     paths:
-      - release/build
+      - release/build/*.exe
+      - release/build/*.zip
