@@ -4641,14 +4641,14 @@ dns-packet@^5.2.2:
   dependencies:
     "@leichtgewicht/ip-codec" "^2.0.1"
 
-docs-ts@^0.8.0:
-  version "0.8.0"
-  resolved "https://registry.yarnpkg.com/docs-ts/-/docs-ts-0.8.0.tgz#48e43a9d38ac5ee1c6354e5fb80706175c9db411"
-  integrity sha512-Z++SYRAoJJnWrLZNHKkalIyroJQAppqnfrjoc8pmAr/k3wxZvl7YFd9mocVEAhIZwUEkzUl6luBaAlsJip3sdw==
+docs-ts@^0.7.2:
+  version "0.7.2"
+  resolved "https://registry.yarnpkg.com/docs-ts/-/docs-ts-0.7.2.tgz#ee4f34a1f9d11a91bd37d2cae7a0952b8e6efdfd"
+  integrity sha512-9zydJV84gi0imZWdVPHHqar7yIx6wRpwRHc4aJ3pw9vov/4pAmjfEPPE5gXRtiPFf+3WqOrE4qC6ih1kBJGl9w==
   dependencies:
     chalk "^2.4.2"
     doctrine "^3.0.0"
-    fp-ts "^2.15.0"
+    fp-ts "^2.13.2"
     fs-extra "^7.0.1"
     glob "^7.1.6"
     io-ts "^2.2.20"
@@ -5774,7 +5774,7 @@ forwarded@0.2.0:
   resolved "https://registry.npmjs.org/forwarded/-/forwarded-0.2.0.tgz"
   integrity sha512-buRG0fpBtRHSTCOASe6hD258tEubFoRLb4ZNA6NxMVHNw2gOcwHo9wyablzMzOA5z9xA9L1KNjk/Nt6MT9aYow==
 
-fp-ts@^2.15.0:
+fp-ts@^2.13.2:
   version "2.15.0"
   resolved "https://registry.yarnpkg.com/fp-ts/-/fp-ts-2.15.0.tgz#ed1ff6fc9a072176ec2310e20e814077bb391545"
   integrity sha512-3o6EllAvGuCsDgjM+frscLKDRPR9pqbrg13tJ13z86F4eni913kBV8h85rM6zpu2fEvJ8RWA0ouYlUWwHEmxTg==
