@@ -1,24 +1,11 @@
 stages:
   - test
-  - build
 
 test:
   stage: test
   image: node:latest
   before_script:
     - npm install
+    - npm run build
   script:
     - npm run test
-
-build:
-  stage: build
-  image: electronuserland/builder:wine
-  before_script:
-    - npm i -g ts ts-node typescript
-    - npm install
-  script:
-    - npm run package:win
-  artifacts:
-    paths:
-      - release/build/*.exe
-      - release/build/*.zip
