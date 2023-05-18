@@ -39,14 +39,14 @@ class BoardConfigValidator {
 		const wallDoubleOccupancy = this.wallDoubleOccupancy();
 		if (wallDoubleOccupancy) {
 			this.errors.push(
-				`Double occupancy on a wall position [${wallDoubleOccupancy[0][0]}, ${wallDoubleOccupancy[0][1]}] [${wallDoubleOccupancy[1][0]}, ${wallDoubleOccupancy[1][1]}]`
+				`Double occupancy on a wall position [${wallDoubleOccupancy[0][0]}, ${wallDoubleOccupancy[0][1]}] [${wallDoubleOccupancy[1][0]}, ${wallDoubleOccupancy[1][1]}]`,
 			);
 		}
 		const dimensions = this.checkDimensions();
 		if (dimensions) {
 			this.errors.push(
 				`Board dimensions [${this.config.width}, ${this.config.height}] is smaller then field dimension: `,
-				`\t required dimension: [${dimensions[0] + 1}, ${dimensions[1] + 1}]`
+				`\t required dimension: [${dimensions[0] + 1}, ${dimensions[1] + 1}]`,
 			);
 		}
 	}
@@ -58,8 +58,8 @@ class BoardConfigValidator {
 	private wallDoubleOccupancy(): false | [Position, Position] {
 		const occupiedWallsMap = new Set<string>();
 		if (this.config.walls) {
-			for (let i = 0; i < this.config.walls.length; i += 1) {
-				const wallArray = this.config.walls[i];
+			for (const element of this.config.walls) {
+				const wallArray = element;
 				const string = wallPosition2String([wallArray[0], wallArray[1]]);
 				if (occupiedWallsMap.has(string)) {
 					return [wallArray[0], wallArray[1]];
@@ -80,8 +80,8 @@ class BoardConfigValidator {
 			occupiedMap.add(BoardGenerator.position2String(this.config.eye.position));
 		}
 		if (this.config.startFields) {
-			for (let i = 0; i < this.config.startFields.length; i += 1) {
-				const startField = this.config.startFields[i];
+			for (const element of this.config.startFields) {
+				const startField = element;
 				if (occupiedMap.has(BoardGenerator.position2String(startField.position))) {
 					return startField.position;
 				}
@@ -89,8 +89,8 @@ class BoardConfigValidator {
 			}
 		}
 		if (this.config.checkPoints) {
-			for (let i = 0; i < this.config.checkPoints.length; i += 1) {
-				const checkpoint = this.config.checkPoints[i];
+			for (const element of this.config.checkPoints) {
+				const checkpoint = element;
 				if (occupiedMap.has(BoardGenerator.position2String(checkpoint))) {
 					return checkpoint;
 				}
@@ -98,8 +98,8 @@ class BoardConfigValidator {
 			}
 		}
 		if (this.config.lembasFields) {
-			for (let i = 0; i < this.config.lembasFields.length; i += 1) {
-				const lembasField = this.config.lembasFields[i];
+			for (const element of this.config.lembasFields) {
+				const lembasField = element;
 				if (occupiedMap.has(BoardGenerator.position2String(lembasField.position))) {
 					return lembasField.position;
 				}
@@ -107,8 +107,8 @@ class BoardConfigValidator {
 			}
 		}
 		if (this.config.holes) {
-			for (let i = 0; i < this.config.holes.length; i += 1) {
-				const hole = this.config.holes[i];
+			for (const element of this.config.holes) {
+				const hole = element;
 				if (occupiedMap.has(BoardGenerator.position2String(hole))) {
 					return hole;
 				}
@@ -116,8 +116,8 @@ class BoardConfigValidator {
 			}
 		}
 		if (this.config.riverFields) {
-			for (let i = 0; i < this.config.riverFields.length; i += 1) {
-				const riverField = this.config.riverFields[i];
+			for (const element of this.config.riverFields) {
+				const riverField = element;
 				if (occupiedMap.has(BoardGenerator.position2String(riverField.position))) {
 					return riverField.position;
 				}
@@ -133,37 +133,33 @@ class BoardConfigValidator {
 	 * @private
 	 */
 	private checkDimensions(): false | Position {
-		let maxDimensions = {x: 0, y: 0};
+		let maxDimensions = { x: 0, y: 0 };
 		if (this.config.eye) {
 			maxDimensions = BoardConfigValidator.getMaxDimension(maxDimensions, this.config.eye.position);
 		}
 		if (this.config.startFields) {
-			for (let i = 0; i < this.config.startFields.length; i += 1) {
-				const startField = this.config.startFields[i];
-				maxDimensions = BoardConfigValidator.getMaxDimension(maxDimensions, startField.position);
+			for (const element of this.config.startFields) {
+				maxDimensions = BoardConfigValidator.getMaxDimension(maxDimensions, element.position);
 			}
 		}
 		if (this.config.checkPoints) {
-			for (let i = 0; i < this.config.checkPoints.length; i += 1) {
-				const checkpoint = this.config.checkPoints[i];
-				maxDimensions = BoardConfigValidator.getMaxDimension(maxDimensions, checkpoint);
+			for (const element of this.config.checkPoints) {
+				maxDimensions = BoardConfigValidator.getMaxDimension(maxDimensions, element);
 			}
 		}
 		if (this.config.lembasFields) {
-			for (let i = 0; i < this.config.lembasFields.length; i += 1) {
-				const lembasField = this.config.lembasFields[i];
-				maxDimensions = BoardConfigValidator.getMaxDimension(maxDimensions, lembasField.position);
+			for (const element of this.config.lembasFields) {
+				maxDimensions = BoardConfigValidator.getMaxDimension(maxDimensions, element.position);
 			}
 		}
 		if (this.config.holes) {
-			for (let i = 0; i < this.config.holes.length; i += 1) {
-				const hole = this.config.holes[i];
-				maxDimensions = BoardConfigValidator.getMaxDimension(maxDimensions, hole);
+			for (const element of this.config.holes) {
+				maxDimensions = BoardConfigValidator.getMaxDimension(maxDimensions, element);
 			}
 		}
 		if (this.config.walls) {
-			for (let i = 0; i < this.config.walls.length; i += 1) {
-				const wall = this.config.walls[i];
+			for (const element of this.config.walls) {
+				const wall = element;
 				maxDimensions = BoardConfigValidator.getMaxDimension(maxDimensions, wall[0]);
 				maxDimensions = BoardConfigValidator.getMaxDimension(maxDimensions, wall[1]);
 			}
@@ -183,7 +179,7 @@ class BoardConfigValidator {
 	 */
 	private static getMaxDimension(
 		maxDimensions: { x: number; y: number },
-		position: Position
+		position: Position,
 	): { x: number; y: number } {
 		return {
 			x: Math.max(maxDimensions.x, position[0]),

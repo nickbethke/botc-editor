@@ -21,7 +21,7 @@ type PresetViewProps = {
 type PresetViewState = {
 	open: 'riverPresets' | 'boardPresets';
 	activePreset: string | null;
-	contextMenu: JSX.Element | null;
+	contextMenu: React.JSX.Element | null;
 	windowDimensions: { width: number; height: number };
 };
 /**
@@ -69,9 +69,9 @@ export default class PresetView extends Component<PresetViewProps, PresetViewSta
 	 */
 	previewRiverPreset = (riverPreset: RiverPresetWithFile | undefined) => {
 		if (riverPreset) {
-			const board: JSX.Element[][] = [];
+			const board: React.JSX.Element[][] = [];
 			for (let x = 0; x < riverPreset.width; x += 1) {
-				const row: JSX.Element[] = [];
+				const row: React.JSX.Element[] = [];
 				for (let y = 0; y < riverPreset.height; y += 1) {
 					const river = riverPreset?.data.filter((r) => r.position[0] === x && r.position[1] === y);
 					const isRiver = river.length > 0;
@@ -96,7 +96,7 @@ export default class PresetView extends Component<PresetViewProps, PresetViewSta
 						</div>
 						<div className='flex'>
 							{board.map((row) => (
-								<div className='flex flex-col'>{row.map((cell) => cell)}</div>
+								<div key={_uniqueId()} className='flex flex-col'>{row.map((cell) => cell)}</div>
 							))}
 						</div>
 						<div className='flex flex-col items-center justify-center text-[12px]'>
@@ -124,6 +124,21 @@ export default class PresetView extends Component<PresetViewProps, PresetViewSta
 		return null;
 	};
 
+	onContextMenu = (e: React.MouseEvent<HTMLDivElement, MouseEvent>, preset: RiverPresetWithFile) => {
+		this.setState({
+			contextMenu: (
+				<ContextMenuV2 position={{ x: e.clientX, y: e.clientY }}>
+					<ContextMenuItemV2
+						text={`${window.t.translate('Open preset')}...`}
+						onClick={async () => {
+							await window.electron.file.openExternal(`${preset.file.dir}/${preset.file.base}`);
+						}}
+					/>
+				</ContextMenuV2>
+			),
+		});
+	};
+
 	/**
 	 * Renders the preset view component
 	 */
@@ -148,18 +163,6 @@ export default class PresetView extends Component<PresetViewProps, PresetViewSta
 					>
 						{window.t.translate('River Presets')}
 					</button>
-					{/*<button
-						type="button"
-						onClick={() => {
-							const { open } = this.state;
-							if (open === 'riverPresets') {
-								this.setState({ open: 'boardPresets', activePreset: null });
-							}
-						}}
-						className={`w-full p-2 ${open === 'boardPresets' ? 'active' : ''}`}
-					>
-						{window.t.translate('Board Presets')}
-					</button>*/}
 				</div>
 				<div
 					className={`flex justify-center dark:bg-muted-700 bg-muted-500 transition-all overflow-hidden ${
@@ -196,19 +199,8 @@ export default class PresetView extends Component<PresetViewProps, PresetViewSta
 											this.setState({ activePreset: preset.file.base });
 										}
 									}}
-									onContextMenu={(event) => {
-										this.setState({
-											contextMenu: (
-												<ContextMenuV2 position={{ x: event.clientX, y: event.clientY }}>
-													<ContextMenuItemV2
-														text={`${window.t.translate('Open preset')}...`}
-														onClick={async () => {
-															await window.electron.file.openExternal(`${preset.file.dir}/${preset.file.base}`);
-														}}
-													/>
-												</ContextMenuV2>
-											),
-										});
+									onContextMenu={(e) => {
+										this.onContextMenu(e, preset);
 									}}
 								>
 									<p className={activePreset === preset.file.base ? 'text-accent-300' : ''}>{preset.name}</p>
@@ -236,6 +228,7 @@ export default class PresetView extends Component<PresetViewProps, PresetViewSta
 				</div>
 				{contextMenu}
 			</div>
-		);
+		)
+			;
 	}
 }

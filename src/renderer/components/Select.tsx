@@ -5,12 +5,12 @@ import { VscChevronUp } from 'react-icons/vsc';
 type SelectComponentProps<T> = {
 	value: T;
 	onChange: (value: T) => void;
-	options: Array<{ value: T; text: string; icon?: JSX.Element }>;
+	options: Array<{ value: T; text: string; icon?: React.JSX.Element }>;
 	containerClassName?: string;
 };
 type SelectComponentState<T> = {
 	value: T;
-	options: Array<{ value: T; text: string; icon?: JSX.Element }>;
+	options: Array<{ value: T; text: string; icon?: React.JSX.Element }>;
 	isOpen: boolean;
 	id: string;
 };

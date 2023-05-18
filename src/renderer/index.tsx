@@ -9,11 +9,11 @@ const root = createRoot(container ? container : document.createElement('div'));
 
 const run = async () => {
 	window.t = new TranslationHelper(AvailableLanguages.de);
-	const prefetch = await window.electron.app.prefetch()
-	root.render(<App os={prefetch.os} settings={prefetch.settings}/>);
+	const prefetch = await window.electron.app.prefetch();
+	root.render(<App os={prefetch.os} settings={prefetch.settings} />);
 	return Promise.resolve();
-}
-root.render(<InitialLoader/>);
+};
+root.render(<InitialLoader />);
 setTimeout(() => {
 	run().catch(console.error);
 }, 1000);

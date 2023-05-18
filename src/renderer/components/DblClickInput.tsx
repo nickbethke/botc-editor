@@ -26,10 +26,10 @@ class DblClickInput extends React.Component<DblClickInputProps, DblClickInputSta
 		if (open) {
 			return (
 				<input
-					type="number"
+					type='number'
 					min={min}
 					max={max}
-					className="bg-transparent border-b-2 pl-4 focus:outline-none w-16"
+					className='bg-transparent border-b-2 pl-4 focus:outline-none w-16'
 					onBlur={() => {
 						this.setState({ open: false });
 						onChange(value);
@@ -56,7 +56,7 @@ class DblClickInput extends React.Component<DblClickInputProps, DblClickInputSta
 		}
 		return (
 			<div
-				className="cursor-pointer"
+				className='cursor-pointer'
 				onDoubleClick={() => {
 					this.setState({ open: true });
 				}}

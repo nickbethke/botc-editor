@@ -4,7 +4,7 @@ import { BoardPosition } from '../BoardGenerator';
 import Hole from '../fields/Hole';
 import River from '../fields/River';
 import BoardConfigInterface from '../../../../interfaces/BoardConfigInterface';
-import { position2BoardPosition, wallBoardPositions2String, wallConfig2Map } from '../interfaces/BoardPosition';
+import { position2BoardPosition, wallBoardPositions2StringArray, wallConfig2Map } from '../interfaces/BoardPosition';
 import directionHelper from './DirectionHelper';
 import StartField from '../fields/StartField';
 import Checkpoint from '../fields/Checkpoint';
@@ -16,6 +16,9 @@ export type AStarElement = {
 	cost: number;
 	estimate: number;
 };
+
+type AStarElementWithoutEstimate = { state: BoardPosition, cost: number };
+
 
 /**
  * A-Star PathFinding Class for the board generator
@@ -49,7 +52,7 @@ class AStar {
 		start: BoardPosition,
 		goal: BoardPosition,
 		board: Array<Array<FieldWithPositionInterface>>,
-		walls: Map<string, boolean>
+		walls: Map<string, boolean>,
 	) {
 		this.start = start;
 		this.goal = goal;
@@ -87,37 +90,39 @@ class AStar {
 				}
 				// Generate the possible next steps from this node's state
 				const next = this.generateNextSteps(node.state);
-				// consoleOutput.log("GOTO", node.state, "NEIGHBORS", next);
 
 				// For each possible next step
-				for (let i = 0; i < next.length; i += 1) {
-					// Calculate the cost of the next step by adding the step's cost to the node's cost
-					const step = next[i];
-					const cost = step.cost + node.cost;
-
-					// Check if this step has already been explored
-					const isExplored = explored.find((e) => {
-						return e.state.x === step.state.x && e.state.y === step.state.y;
-					});
-
-					// avoid repeated nodes during the calculation of neighbors
-					const isFrontier = frontier.find((e) => {
-						return e.state.x === step.state.x && e.state.y === step.state.y;
-					});
-
-					// If this step has not been explored
-					if (!isExplored && !isFrontier) {
-						// Add the step to the frontier, using the cost and the heuristic function to estimate the total cost to reach the goal
-						frontier.push({
-							state: step.state,
-							cost,
-							estimate: cost + this.heuristic(step.state),
-						});
-					}
-				}
+				this.forEachNextStep(next, node, explored, frontier);
 			}
 		}
 		return [];
+	}
+
+	private forEachNextStep(next: AStarElementWithoutEstimate[], node: AStarElement, explored: AStarElement[], frontier: AStarElement[]) {
+		for (const step of next) {
+			// Calculate the cost of the next step by adding the step's cost to the node's cost
+			const cost = step.cost + node.cost;
+
+			// Check if this step has already been explored
+			const isExplored = explored.find((e) => {
+				return e.state.x === step.state.x && e.state.y === step.state.y;
+			});
+
+			// avoid repeated nodes during the calculation of neighbors
+			const isFrontier = frontier.find((e) => {
+				return e.state.x === step.state.x && e.state.y === step.state.y;
+			});
+
+			// If this step has not been explored
+			if (!isExplored && !isFrontier) {
+				// Add the step to the frontier, using the cost and the heuristic function to estimate the total cost to reach the goal
+				frontier.push({
+					state: step.state,
+					cost,
+					estimate: cost + this.heuristic(step.state),
+				});
+			}
+		}
 	}
 
 	heuristic(state: BoardPosition): number {
@@ -129,18 +134,17 @@ class AStar {
 		return Math.sqrt(dx * dx + dy * dy) + penalty;
 	}
 
-	generateNextSteps(state: BoardPosition) {
+	generateNextSteps(state: BoardPosition): AStarElementWithoutEstimate[] {
 		// Define an array to store the next steps
 		const width = this.board.length;
 		const height = this.board[0].length;
 
-		const next = [];
+		const next: AStarElementWithoutEstimate[] = [];
 
 		// Check if the current state has any valid neighbors
 		if (state.x > 0) {
 			// If the current state has a neighbor to the left, add it to the array of next steps
 			const neighbor = { x: state.x - 1, y: state.y };
-			// consoleOutput.log("NEIGHBOR?", state, neighbor);
 			if (!this.isObstacle(state.x - 1, state.y) && !this.isWallBetween(state, neighbor)) {
 				next.push({
 					state: { x: state.x - 1, y: state.y },
@@ -151,7 +155,6 @@ class AStar {
 		if (state.x < width - 1) {
 			// If the current state has a neighbor to the right, add it to the array of next steps
 			const neighbor = { x: state.x + 1, y: state.y };
-			// consoleOutput.log("NEIGHBOR?", state, neighbor);
 			if (!this.isObstacle(state.x + 1, state.y) && !this.isWallBetween(state, neighbor)) {
 				next.push({
 					state: { x: state.x + 1, y: state.y },
@@ -162,7 +165,6 @@ class AStar {
 		if (state.y > 0) {
 			// If the current state has a neighbor above it, add it to the array of next steps
 			const neighbor = { x: state.x, y: state.y - 1 };
-			// consoleOutput.log("NEIGHBOR?", state, neighbor);
 			if (!this.isObstacle(state.x, state.y - 1) && !this.isWallBetween(state, neighbor)) {
 				next.push({
 					state: { x: state.x, y: state.y - 1 },
@@ -173,7 +175,6 @@ class AStar {
 		if (state.y < height - 1) {
 			// If the current state has a neighbor below it, add it to the array of next steps
 			const neighbor = { x: state.x, y: state.y + 1 };
-			// consoleOutput.log("NEIGHBOR?", state, neighbor);
 			if (!this.isObstacle(state.x, state.y + 1) && !this.isWallBetween(state, neighbor)) {
 				next.push({
 					state: { x: state.x, y: state.y + 1 },
@@ -191,8 +192,7 @@ class AStar {
 	}
 
 	isWallBetween(position1: BoardPosition, position2: BoardPosition): boolean {
-		const s1 = wallBoardPositions2String(position1, position2);
-		const s2 = wallBoardPositions2String(position2, position1);
+		const [s1, s2] = wallBoardPositions2StringArray(position1, position2);
 		return this.walls.get(s1) === true || this.walls.get(s2) === true;
 	}
 
@@ -208,8 +208,8 @@ class AStar {
 
 		let interSections = 0;
 
-		for (let i = 0; i < path.length; i += 1) {
-			const point = path[i];
+		for (const element of path) {
+			const point = element;
 			if (!(this.board[point[0]][point[1]] instanceof SauronsEye || this.board[point[0]][point[1]] instanceof River)) {
 				interSections += 1;
 			}
@@ -273,7 +273,7 @@ class AStar {
 		startFields: Array<BoardPosition>,
 		lembasFields: Array<{ position: BoardPosition; amount: number }>,
 		board: Array<Array<FieldWithPositionInterface>>,
-		walls: Map<string, boolean>
+		walls: Map<string, boolean>,
 	): {
 		result: boolean;
 		error: { start: BoardPosition | null; end: BoardPosition | null };
@@ -295,8 +295,8 @@ class AStar {
 			}
 		}
 
-		for (let i = 0; i < lembasFields.length; i += 1) {
-			const lembasField = lembasFields[i];
+		for (const element of lembasFields) {
+			const lembasField = element;
 			const aStar = new AStar(lembasField.position, commonStartField, board, walls);
 			const path = aStar.AStar();
 			if (path.length < 1) {
@@ -310,8 +310,8 @@ class AStar {
 			}
 		}
 
-		for (let i = 0; i < checkpoints.length; i += 1) {
-			const checkpoint = checkpoints[i];
+		for (const element of checkpoints) {
+			const checkpoint = element;
 			const aStar = new AStar(checkpoint, commonStartField, board, walls);
 			const path = aStar.AStar();
 			if (path.length < 1) {
@@ -332,7 +332,7 @@ class AStar {
 		startFields: Array<BoardPosition>,
 		lembasFields: Array<{ position: BoardPosition; amount: number }>,
 		board: Array<Array<FieldWithPositionInterface>>,
-		walls: Map<string, boolean>
+		walls: Map<string, boolean>,
 	): {
 		result: boolean;
 		errors: Array<{
@@ -346,11 +346,9 @@ class AStar {
 			end: BoardPosition | null;
 		}> = [];
 
-		for (let i = 0; i < startFields.length; i += 1) {
-			const currStartField = startFields[i];
-			for (let j = 0; j < checkpoints.length; j += 1) {
-				const checkpoint = checkpoints[j];
-
+		for (const startField of startFields) {
+			const currStartField = startField;
+			for (const checkpoint of checkpoints) {
 				const aStar = new AStar(currStartField, checkpoint, board, walls);
 				const path = aStar.AStar();
 
@@ -369,7 +367,6 @@ class AStar {
 		};
 	}
 
-	// TODO: Methode to check from BoardConfig Type
 	public static checkBoardConfig(config: BoardConfigInterface): {
 		result: boolean;
 		errors: Array<{
@@ -390,14 +387,14 @@ class AStar {
 
 		const eye = new SauronsEye(
 			position2BoardPosition(config.eye.position),
-			directionHelper.directionToDirEnum(config.eye.direction)
+			directionHelper.string2DirEnum(config.eye.direction),
 		);
 		board[eye.position.x][eye.position.y] = eye;
 
 		config.startFields.forEach((startField) => {
 			const start = new StartField(
 				position2BoardPosition(startField.position),
-				directionHelper.directionToDirEnum(startField.direction)
+				directionHelper.string2DirEnum(startField.direction),
 			);
 			board[start.position.x][start.position.y] = start;
 		});
@@ -415,7 +412,7 @@ class AStar {
 		config.riverFields.forEach((riverField) => {
 			const river = new River(
 				position2BoardPosition(riverField.position),
-				directionHelper.directionToDirEnum(riverField.direction)
+				directionHelper.string2DirEnum(riverField.direction),
 			);
 			board[river.position.x][river.position.y] = river;
 		});

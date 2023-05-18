@@ -29,7 +29,7 @@ import {
 	addRiver,
 	addStartField,
 	calculateRiverPresetFieldPositionWithRotation,
-	getFieldType,
+	getFieldType, isBoardConfiguration,
 	moveSauronsEye,
 	removeCheckpoint,
 	removeHole,
@@ -49,6 +49,7 @@ import { BoardPresetWithFile, RiverPresetWithFile } from '../../main/helper/Pres
 import AddRiverPresetConfirmPopup from '../components/popups/AddRiverPresetConfirmPopup';
 import Dragger from '../components/Dragger';
 import { Rotation } from '../../interfaces/Types';
+import PopupV2 from '../components/popups/PopupV2';
 
 window.electron.schemas
 	.board()
@@ -75,6 +76,7 @@ type EditorPopupType =
 	| 'settings'
 	| 'newFromRandom'
 	| 'newRandomFileSaveCurrent'
+	| 'loadingError'
 	| 'addRiverPreset';
 
 type BoardConfiguratorV2Props = {
@@ -385,25 +387,11 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 		} else {
 			const type = getFieldType(position, config);
 			switch (type) {
-				case FieldsEnum.EYE:
-					this.setState({
-						fieldInEdit: position,
-						sideBarTabLeftConfigType: 'direction',
-						sideBarTabLeft: 'settings',
-					});
-					break;
 				case FieldsEnum.CHECKPOINT:
 					this.setState({
 						fieldInEdit: position,
 						sideBarTabLeftConfigType: 'global',
 						sideBarTabLeft: 'checkpointOrder',
-					});
-					break;
-				case FieldsEnum.START:
-					this.setState({
-						fieldInEdit: position,
-						sideBarTabLeftConfigType: 'direction',
-						sideBarTabLeft: 'settings',
 					});
 					break;
 				case FieldsEnum.LEMBAS:
@@ -413,6 +401,8 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 						sideBarTabLeft: 'settings',
 					});
 					break;
+				case FieldsEnum.EYE:
+				case FieldsEnum.START:
 				case FieldsEnum.RIVER:
 					this.setState({
 						fieldInEdit: position,
@@ -421,11 +411,6 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 					});
 					break;
 				case FieldsEnum.HOLE:
-					this.setState({
-						fieldInEdit: position,
-						sideBarTabLeftConfigType: 'global',
-					});
-					break;
 				default:
 					this.setState({
 						fieldInEdit: position,
@@ -502,8 +487,8 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 		// Check if there is a path from start to end
 		const { result, errors } = AStar.checkBoardConfig(handledConfig);
 		if (!result) {
-			for (let i = 0; i < errors.length; i += 1) {
-				const error = errors[i];
+			for (const element of errors) {
+				const error = element;
 				if (error.start && error.end) {
 					newWarnings.set(_uniqueId('warning-'), {
 						type: Warnings.pathImpossible,
@@ -560,8 +545,8 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 		// Check if there are walls on walls
 		const occupiedWallsMap = new Set<string>();
 		if (handledConfig.walls) {
-			for (let i = 0; i < handledConfig.walls.length; i += 1) {
-				const wallArray = handledConfig.walls[i];
+			for (const element of handledConfig.walls) {
+				const wallArray = element;
 				const [x, y] = wallArray[0];
 				const [x1, y1] = wallArray[1];
 				const string = wallPosition2String([wallArray[0], wallArray[1]]);
@@ -579,33 +564,6 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 				occupiedWallsMap.add(string);
 			}
 		}
-
-		// Check if there are walls between two rivers
-		/*
-		handledConfig.walls.forEach((wall) => {
-			const [x, y] = wall[0];
-			const [x1, y1] = wall[1];
-			if (
-				BoardGenerator.isRiver({ x, y }, handledConfig) &&
-				BoardGenerator.isRiver(
-					{
-						x: x1,
-						y: y1,
-					},
-					handledConfig
-				)
-			) {
-				newWarnings.set(_uniqueId('warning-'), {
-					type: Warnings.configurationInvalid,
-					title: window.t.translate('Wall'),
-					content: window.t.translate(
-						'The current game board state is not playable because there is a wall between two rivers.'
-					),
-					helper: [`${x}:${y}`, `${x1}:${y1}`],
-					removeWall: wall,
-				});
-			}
-		});*/
 
 		let occupiedFields = new Set<string>();
 
@@ -767,7 +725,7 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 		return newConfig;
 	};
 
-	onTopMenuAction = async (action: TopMenuActions) => {
+	onTopMenuAction = (action: TopMenuActions) => {
 		const { onClose, settings, onSettingsUpdate } = this.props;
 		const { fileSaved } = this.state;
 		switch (action) {
@@ -793,10 +751,10 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 				this.openConfiguration();
 				break;
 			case TopMenuActions.SAVE:
-				await this.saveConfig();
+				this.saveConfig();
 				break;
 			case TopMenuActions.SAVE_AS:
-				await this.saveConfig(true);
+				this.saveConfig(true);
 				break;
 			case TopMenuActions.SAVE_AS_PRESET:
 				break;
@@ -831,7 +789,7 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 		}
 	};
 
-	popup = (): JSX.Element | null => {
+	popup = (): React.JSX.Element | null => {
 		const { popup, windowDimensions, newRiverPreset, config } = this.state;
 		const { os, settings, onSettingsUpdate } = this.props;
 		if (popup === 'closeSaveCurrent') {
@@ -947,6 +905,26 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 				);
 			}
 			return null;
+		}
+		if (popup === 'loadingError') {
+			return (
+				<PopupV2
+					title={window.t.translate('Error')}
+					closeButtonText={window.t.translate('OK')}
+					onClose={() => {
+						this.setState({ popup: null });
+					}}
+					windowDimensions={windowDimensions}
+					os={os}
+					topOffset
+					settings={settings}
+				>
+					<>
+						<p>{window.t.translate('An error occurred while loading the file.')}</p>
+						<p>{window.t.translate('Please check if the file is a valid game configuration.')}</p>
+					</>
+				</PopupV2>
+			);
 		}
 		return null;
 	};
@@ -1076,7 +1054,7 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 		window.electron.dialog
 			.openBoardConfig()
 			.then((loadedConfig) => {
-				if (loadedConfig) {
+				if (loadedConfig && isBoardConfiguration(loadedConfig.config)) {
 					this.initLoadedConfiguration(loadedConfig.config);
 					this.setState({
 						file: loadedConfig,
@@ -1084,6 +1062,9 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 					});
 					return null;
 				}
+				this.setState({
+					popup: 'loadingError',
+				});
 				return new Error('Config not loadable');
 			})
 			.catch(() => {

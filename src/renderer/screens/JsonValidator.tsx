@@ -32,7 +32,7 @@ type JsonValidatorProps = {
 	onSettingsUpdated: (settings: SettingsInterface) => void;
 };
 type JsonValidatorState = {
-	popup: JSX.Element | null;
+	popup: React.JSX.Element | null;
 	code: string;
 	codeError: string;
 	type: ConfigType;
@@ -247,6 +247,7 @@ class JsonValidator extends React.Component<JsonValidatorProps, JsonValidatorSta
 					codeError: '',
 				});
 			}
+
 		} catch (error) {
 			if (error instanceof Error) this.setState({ consoleOutput: [...consoleOutput, `${error.message}`] });
 		}
@@ -280,7 +281,7 @@ class JsonValidator extends React.Component<JsonValidatorProps, JsonValidatorSta
 		this.setState({ code: newValue });
 	};
 
-	leavePopup = (): JSX.Element => {
+	leavePopup = (): React.JSX.Element => {
 		const { windowDimensions } = this.state;
 		const { settings, os } = this.props;
 		return (
@@ -299,7 +300,7 @@ class JsonValidator extends React.Component<JsonValidatorProps, JsonValidatorSta
 		);
 	};
 
-	newFileSavePreviousPopup = (): JSX.Element => {
+	newFileSavePreviousPopup = (): React.JSX.Element => {
 		const { windowDimensions } = this.state;
 		const { settings, os } = this.props;
 		return (
@@ -338,7 +339,7 @@ class JsonValidator extends React.Component<JsonValidatorProps, JsonValidatorSta
 		);
 	};
 
-	loadingPopup = (label?: string): JSX.Element => {
+	loadingPopup = (label?: string): React.JSX.Element => {
 		const { windowDimensions } = this.state;
 		const { settings, os } = this.props;
 		return (
@@ -451,7 +452,7 @@ class JsonValidator extends React.Component<JsonValidatorProps, JsonValidatorSta
 				case 'game':
 				default:
 					save = await window.electron.dialog.saveGameConfiguration(code);
-					if (save) {
+					if (save && save !== 'canceled') {
 						this.setState({
 							currentFile: {
 								parsed: save.parsedPath,

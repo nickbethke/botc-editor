@@ -139,7 +139,7 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 					<div className='p-4 flex flex-col gap-4'>
 						<SelectComponent<DirectionEnum>
 							containerClassName='border-b dark:border-muted-700 border-muted-400'
-							value={DirectionHelper.directionToDirEnum(directionField?.direction || 'NORTH')}
+							value={DirectionHelper.string2DirEnum(directionField?.direction || 'NORTH')}
 							onChange={(value) => {
 								this.onDirectionChange(value);
 							}}

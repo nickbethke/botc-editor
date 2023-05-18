@@ -6,7 +6,7 @@ import { ChevronRightIcon } from '@radix-ui/react-icons';
  */
 type TopMenuSubItemCollapsableProps = {
 	label: string;
-	children: string | JSX.Element | JSX.Element[];
+	children: string | React.JSX.Element | React.JSX.Element[];
 };
 /**
  * The board configuration top menu subitem collapsable component state properties
@@ -24,26 +24,26 @@ class TopMenuSubItemCollapsable extends React.Component<
 > {
 	constructor(props: TopMenuSubItemCollapsableProps) {
 		super(props);
-		this.state = {open: false};
+		this.state = { open: false };
 	}
 
 	/**
 	 * Renders the component
 	 */
 	render() {
-		const {label, children} = this.props;
-		const {open} = this.state;
+		const { label, children } = this.props;
+		const { open } = this.state;
 		return (
 			<div
-				className="pl-8 pr-2 py-1 dark:bg-muted-800 bg-muted-500 dark:hover:bg-muted-700 hover:bg-muted-400 hover:cursor-pointer transition-colors gap-4 relative flex justify-between items-center"
+				className='pl-8 pr-2 py-1 dark:bg-muted-800 bg-muted-500 dark:hover:bg-muted-700 hover:bg-muted-400 hover:cursor-pointer transition-colors gap-4 relative flex justify-between items-center'
 				onMouseEnter={() => {
-					this.setState({open: true});
+					this.setState({ open: true });
 				}}
 				onMouseLeave={() => {
-					this.setState({open: false});
+					this.setState({ open: false });
 				}}
 			>
-				<span>{label}</span> <ChevronRightIcon/>
+				<span>{label}</span> <ChevronRightIcon />
 				<div
 					className={`${
 						open ? 'block' : 'hidden'

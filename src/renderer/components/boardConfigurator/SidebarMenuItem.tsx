@@ -7,7 +7,7 @@ import React from 'react';
 type SidebarMenuItemProps = {
 	label: string;
 	open: boolean;
-	icon?: JSX.Element | null;
+	icon?: React.JSX.Element | null;
 	onClick: () => void;
 	shortCut?: string;
 	position?: 'top' | 'bottom' | 'left' | 'right';
@@ -35,7 +35,7 @@ class SidebarMenuItem extends React.Component<SidebarMenuItemProps, SidebarMenuI
 
 	constructor(props: SidebarMenuItemProps) {
 		super(props);
-		this.state = {hover: false};
+		this.state = { hover: false };
 		this.handleOnHover = this.handleOnHover.bind(this);
 		this.handleOnHoverEnd = this.handleOnHoverEnd.bind(this);
 	}
@@ -44,15 +44,15 @@ class SidebarMenuItem extends React.Component<SidebarMenuItemProps, SidebarMenuI
 	 * Handle the hover event
 	 */
 	handleOnHover = () => {
-		const {hover} = this.state;
+		const { hover } = this.state;
 		if (!hover) {
-			this.setState({hover: true});
+			this.setState({ hover: true });
 			document.addEventListener(
 				'click',
 				() => {
-					this.setState({hover: false});
+					this.setState({ hover: false });
 				},
-				{once: true}
+				{ once: true },
 			);
 		}
 	};
@@ -61,9 +61,9 @@ class SidebarMenuItem extends React.Component<SidebarMenuItemProps, SidebarMenuI
 	 * Handle the hover end event
 	 */
 	handleOnHoverEnd = () => {
-		const {hover} = this.state;
+		const { hover } = this.state;
 		if (hover) {
-			this.setState({hover: false});
+			this.setState({ hover: false });
 		}
 	};
 
@@ -71,17 +71,17 @@ class SidebarMenuItem extends React.Component<SidebarMenuItemProps, SidebarMenuI
 	 * Generates the position css class
 	 */
 	positionClassName = () => {
-		const {position} = this.props;
+		const { position } = this.props;
 		switch (position) {
-			case 'right':
-			default:
-				return 'translate-x-1 left-full';
 			case 'top':
 				return '-top-4 left-0';
 			case 'bottom':
 				return 'top-full translate-y-1 left-0';
 			case 'left':
 				return '-translate-x-1 right-full';
+			case 'right':
+			default:
+				return 'translate-x-1 left-full';
 		}
 	};
 
@@ -89,8 +89,8 @@ class SidebarMenuItem extends React.Component<SidebarMenuItemProps, SidebarMenuI
 	 * Renders the sidebar menu item
 	 */
 	render() {
-		const {label, open, icon, onClick, shortCut, position, disabled} = this.props;
-		const {hover} = this.state;
+		const { label, open, icon, onClick, shortCut, position, disabled } = this.props;
+		const { hover } = this.state;
 		const key = _uniqueId('sidebar-menu-item-');
 
 		const positionClassName = this.positionClassName();
@@ -98,7 +98,7 @@ class SidebarMenuItem extends React.Component<SidebarMenuItemProps, SidebarMenuI
 		return (
 			<button
 				key={key}
-				type="button"
+				type='button'
 				className={`relative my-1 mx-2 rounded-lg p-2 transition-colors ${icon ? 'text-xl' : ''} ${
 					open ? 'bg-white/20' : 'hover:bg-white/10'
 				} ${disabled ? 'opacity-50 cursor-not-allowed' : ''}}`}
@@ -119,7 +119,7 @@ class SidebarMenuItem extends React.Component<SidebarMenuItemProps, SidebarMenuI
 						{shortCut ? (
 							<div className={`flex gap-2 items-center ${position === 'right' && 'flex-row-reverse'}`}>
 								<span>{label}</span>
-								<span className="dark:text-muted-50/50 text-muted-50 tracking-wider">{shortCut}</span>
+								<span className='dark:text-muted-50/50 text-muted-50 tracking-wider'>{shortCut}</span>
 							</div>
 						) : (
 							label
@@ -139,7 +139,7 @@ export function SidebarMenuItemSeparator() {
 	return (
 		<hr
 			key={_uniqueId('sidebar-menu-item-separator-')}
-			className="border-t dark:border-muted-700 border-muted-400 mx-2 my-1"
+			className='border-t dark:border-muted-700 border-muted-400 mx-2 my-1'
 		/>
 	);
 }

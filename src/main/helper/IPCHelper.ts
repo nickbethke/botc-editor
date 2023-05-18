@@ -85,7 +85,7 @@ class IPCHelper {
 
 	static handleFileOpen = async (
 		type: '' | ConfigType = '',
-		window: BrowserWindow | null,
+		window?: BrowserWindow | null,
 	): Promise<
 		| {
 		parsedPath: ParsedPath;

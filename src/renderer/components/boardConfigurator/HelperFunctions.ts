@@ -517,3 +517,13 @@ export function getNextDirection(direction: Direction): Direction {
 			return 'NORTH';
 	}
 }
+
+/**
+ * determines if a configuration is a board configuration
+ * @param config the configuration to check
+ * @returns true if the configuration is a board configuration
+ * @since 0.9.85
+ */
+export function isBoardConfiguration(config: any): config is BoardConfigInterface {
+	return 'width' in config && 'height' in config && 'name' in config && 'checkPoints' in config && 'eye' in config && 'holes' in config && 'lembasFields' in config && 'riverFields' in config && 'startFields' in config && 'walls' in config;
+}

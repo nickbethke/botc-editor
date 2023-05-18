@@ -81,7 +81,7 @@ class PromptPopupV2 extends React.Component<PromptPopupV2Props, PromptPopupV2Sta
 						setTimeout(() => {
 							this.setState({ visible: true });
 						}, 200);
-					}
+					},
 				);
 			}
 		}, 200);
@@ -97,7 +97,8 @@ class PromptPopupV2 extends React.Component<PromptPopupV2Props, PromptPopupV2Sta
 		const { offClick, position, dimension } = this.state;
 		const { os, windowDimensions } = this.props;
 		if (offClick !== preOffClick && !preOffClick) {
-			window.electron.app.beep().catch(() => {});
+			window.electron.app.beep().catch(() => {
+			});
 			setTimeout(() => {
 				this.setState({ offClick: false });
 			}, 500);
@@ -149,7 +150,7 @@ class PromptPopupV2 extends React.Component<PromptPopupV2Props, PromptPopupV2Sta
 		return (
 			<InputLabel
 				label={false}
-				type="text"
+				type='text'
 				value={value}
 				onChange={(v) => {
 					this.setState({ value: v.replace(/[/\\:*?"<>]/g, '') });
@@ -162,16 +163,82 @@ class PromptPopupV2 extends React.Component<PromptPopupV2Props, PromptPopupV2Sta
 	};
 
 	/**
+	 * Handles the mouse down event
+	 * @param e The mouse event
+	 */
+	onMouseDown = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+		const { position } = this.state;
+		const { isDragged } = this.state;
+		const { settings } = this.props;
+		if (!isDragged && settings.popupsDraggable) {
+			this.setState({
+				isDragged: true,
+				rel: {
+					x: e.pageX - position.x,
+					y: e.pageY - position.y,
+				},
+			});
+		}
+		e.stopPropagation();
+		e.preventDefault();
+	};
+
+	/**
+	 * Handles the mouse move event
+	 * @param e The mouse event
+	 */
+	onMouseMove = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+		const { isDragged, rel } = this.state;
+		const { settings } = this.props;
+		if (!isDragged || !settings.popupsDraggable) return;
+		this.setState({
+			position: {
+				x: e.pageX - rel.x,
+				y: e.pageY - rel.y,
+			},
+		});
+		e.stopPropagation();
+		e.preventDefault();
+	};
+
+	/**
+	 * Handles the mouse up event
+	 * @param e The mouse event
+	 */
+	onMouseUp = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+		const { settings } = this.props;
+		if (settings.popupsDraggable) {
+			this.setState({ isDragged: false });
+		}
+		e.stopPropagation();
+		e.preventDefault();
+	};
+
+	/**
+	 * Handles the mouse leave event
+	 * @param e The mouse event
+	 */
+	onMouseLeave = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+		const { settings } = this.props;
+		if (settings.popupsDraggable) {
+			this.setState({ isDragged: false });
+		}
+		e.stopPropagation();
+		e.preventDefault();
+	};
+
+	/**
 	 * Renders the prompt popup component
+	 * @returns The prompt popup component
 	 */
 	render() {
 		const { confirmButtonText, abortButtonText, onConfirm, onAbort, input, title, os, topOffset } = this.props;
 		const { visible, offClick, position } = this.state;
 		return (
 			<div
-				role="presentation"
-				id="popupV2-container"
-				className="w-[100vw] absolute left-0 bg-black/25 text-white"
+				role='presentation'
+				id='popupV2-container'
+				className='w-[100vw] absolute left-0 bg-black/25 text-white'
 				style={{
 					top: os === 'win32' && topOffset ? 32 : 0,
 					height: window.innerHeight - (os === 'win32' && topOffset ? 32 : 0),
@@ -179,8 +246,8 @@ class PromptPopupV2 extends React.Component<PromptPopupV2Props, PromptPopupV2Sta
 				onClick={this.handleOffClick}
 			>
 				<div
-					role="presentation"
-					id="popupV2"
+					role='presentation'
+					id='popupV2'
 					className={`fixed origin-top-left z-50 max-w-[33.333vw] transition-opacity ${
 						visible ? 'opacity-1' : 'opacity-0'
 					} ${offClick && 'popup-warn'}`}
@@ -189,64 +256,26 @@ class PromptPopupV2 extends React.Component<PromptPopupV2Props, PromptPopupV2Sta
 						left: position.x,
 					}}
 				>
-					<div className="dark:bg-muted-800 bg-muted-600 rounded shadow-xl box-shadow-xl border dark:border-muted-700 border-muted-400">
+					<div
+						className='dark:bg-muted-800 bg-muted-600 rounded shadow-xl box-shadow-xl border dark:border-muted-700 border-muted-400'>
 						<div
-							role="presentation"
-							className="p-2 flex justify-start gap-4 items-center text-lg border-b dark:border-muted-700 border-muted-400"
-							draggable="true"
-							onMouseDown={(e) => {
-								const { isDragged } = this.state;
-								const { settings } = this.props;
-								if (!isDragged && settings.popupsDraggable) {
-									this.setState({
-										isDragged: true,
-										rel: {
-											x: e.pageX - position.x,
-											y: e.pageY - position.y,
-										},
-									});
-								}
-								e.stopPropagation();
-								e.preventDefault();
-							}}
-							onMouseMove={(event) => {
-								const { isDragged, rel } = this.state;
-								const { settings } = this.props;
-								if (!isDragged || !settings.popupsDraggable) return;
-								this.setState({
-									position: {
-										x: event.pageX - rel.x,
-										y: event.pageY - rel.y,
-									},
-								});
-								event.stopPropagation();
-								event.preventDefault();
-							}}
-							onMouseUp={(e) => {
-								const { settings } = this.props;
-								if (settings.popupsDraggable) {
-									this.setState({ isDragged: false });
-								}
-								e.stopPropagation();
-								e.preventDefault();
-							}}
-							onMouseLeave={(e) => {
-								const { settings } = this.props;
-								if (settings.popupsDraggable) {
-									this.setState({ isDragged: false });
-								}
-								e.stopPropagation();
-								e.preventDefault();
-							}}
+							role='presentation'
+							className='p-2 flex justify-start gap-4 items-center text-lg border-b dark:border-muted-700 border-muted-400'
+							draggable='true'
+							onMouseDown={this.onMouseDown}
+							onMouseMove={this.onMouseMove}
+							onMouseUp={this.onMouseUp}
+							onMouseLeave={this.onMouseLeave}
 						>
-							<img className="h-6" src={destinyMountainImage} alt={window.t.translate('Logo')} />
+							<img className='h-6' src={destinyMountainImage} alt={window.t.translate('Logo')} />
 							<span>{title}</span>
 						</div>
-						<div className="py-2 px-4 mb-2">{input.type === 'text' ? this.textInput() : null}</div>
-						<div className="py-2 px-4 flex justify-end gap-4 items-center text-sm border-t dark:border-muted-700 border-muted-400">
+						<div className='py-2 px-4 mb-2'>{input.type === 'text' ? this.textInput() : null}</div>
+						<div
+							className='py-2 px-4 flex justify-end gap-4 items-center text-sm border-t dark:border-muted-700 border-muted-400'>
 							<button
-								className="py-1 px-2 bg-accent-600 rounded hover:bg-accent-500"
-								type="button"
+								className='py-1 px-2 bg-accent-600 rounded hover:bg-accent-500'
+								type='button'
 								onClick={() => {
 									const { value } = this.state;
 									onConfirm(value);
@@ -255,8 +284,8 @@ class PromptPopupV2 extends React.Component<PromptPopupV2Props, PromptPopupV2Sta
 								{confirmButtonText}
 							</button>
 							<button
-								className="py-1 px-2 border dark:border-muted-700 border-muted-400 rounded hover:bg-white/25"
-								type="button"
+								className='py-1 px-2 border dark:border-muted-700 border-muted-400 rounded hover:bg-white/25'
+								type='button'
 								onClick={onAbort}
 							>
 								{abortButtonText}

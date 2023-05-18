@@ -59,9 +59,10 @@ export function wallBoardPosition2String(position: [BoardPosition, BoardPosition
  * Generates a unique string from a wall board position according to a specific format "x0|y0|x1|y1"
  * @param position1
  * @param position2
+ * @returns [string, string] - The first string is the string representation of the wall position from position1 to position2, the second string is the string representation of the wall position from position2 to position1
  */
-export function wallBoardPositions2String(position1: BoardPosition, position2: BoardPosition): string {
-	return `${boardPosition2String(position1)}::${boardPosition2String(position2)}`;
+export function wallBoardPositions2StringArray(position1: BoardPosition, position2: BoardPosition): [string, string] {
+	return [`${boardPosition2String(position1)}::${boardPosition2String(position2)}`, `${boardPosition2String(position2)}::${boardPosition2String(position1)}`];
 }
 
 /**
@@ -79,8 +80,8 @@ export function wallPosition2String(position: [Position, Position]): string {
  */
 export function wallConfig2Map(walls: Array<Array<Position>>): Map<string, true> {
 	const map = new Map<string, true>();
-	for (let i = 0; i < walls.length; i += 1) {
-		const wall = walls[i] as [Position, Position];
+	for (const element of walls) {
+		const wall = element as [Position, Position];
 		map.set(wallPosition2String(wall), true);
 	}
 	return map;

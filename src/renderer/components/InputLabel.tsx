@@ -163,17 +163,17 @@ class InputLabel extends React.Component<InputLabelProps, InputLabelState> {
 	};
 
 	render() {
-		let helper: string | JSX.Element = '';
+		let helper: string | React.JSX.Element = '';
 
-		const { helperText, label, type, placeholder, labelClass, value: propsValue, onChange } = this.props;
+		const { helperText, label, type, placeholder, labelClass, onChange } = this.props;
 		const { value } = this.state;
 
 		if (helperText) {
 			helper = <p className='text-sm pl-2'>{helperText}</p>;
 		}
 		const { isValid, hasWarning, warningText, errorMsg } = this.state;
-		let warningHelper: string | JSX.Element = '';
-		let invalidHelper: string | JSX.Element = '';
+		let warningHelper: string | React.JSX.Element = '';
+		let invalidHelper: string | React.JSX.Element = '';
 		if (hasWarning) {
 			warningHelper = (
 				<div className='text-sm dark:text-orange-300 text-amber-500 flex gap-2 items-center pl-2'>

@@ -27,7 +27,7 @@ type PresetEditorMainProps = {
 	onLastSetDirectionChange: (direction: Direction) => unknown;
 	onToolChange: (tool: RiverPresetEditorTools) => unknown;
 	onAddRiver: (position: BoardPosition, initial: boolean) => unknown;
-	onContextMenu: (contextMenu: JSX.Element | null) => unknown;
+	onContextMenu: (contextMenu: React.JSX.Element | null) => unknown;
 	onPresetUpdate: (config: RiverPreset, doSearch?: boolean) => unknown;
 	onCurrentFileChange: (file: string) => void;
 	onCloseOpenPreset: (file: string) => void;
@@ -92,10 +92,10 @@ class PresetEditorMain extends React.Component<PresetEditorMainProps, PresetEdit
 
 	generateBoard = () => {
 		const { config, currentTool, onAddRiver, onContextMenu, onPresetUpdate } = this.props;
-		const board: Array<Array<JSX.Element | null>> = [];
+		const board: Array<Array<React.JSX.Element | null>> = [];
 
 		for (let x = 0; x < 20; x += 1) {
-			const row: Array<JSX.Element | null> = [];
+			const row: Array<React.JSX.Element | null> = [];
 			for (let y = 0; y < 20; y += 1) {
 				row.push(
 					<div
@@ -113,8 +113,7 @@ class PresetEditorMain extends React.Component<PresetEditorMainProps, PresetEdit
 				const y = value.position[1];
 				const neighbors = this.getNeighbors(x, y);
 				if (currentTool !== 'delete') {
-					for (let i = 0; i < neighbors.length; i += 1) {
-						const neighbor = neighbors[i];
+					for (const neighbor of neighbors) {
 						if (!this.fieldSet([neighbor.x, neighbor.y])) {
 							board[neighbor.x][neighbor.y] = (
 								<button
@@ -166,7 +165,7 @@ class PresetEditorMain extends React.Component<PresetEditorMainProps, PresetEdit
 		return board;
 	};
 
-	buildActiveFiles = (): JSX.Element => {
+	buildActiveFiles = (): React.JSX.Element => {
 		const {
 			editorCache,
 			currentFile,

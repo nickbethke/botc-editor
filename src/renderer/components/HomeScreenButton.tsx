@@ -1,10 +1,10 @@
 import React from 'react';
 
 export function HomeScreenButton(props: { text: string; onClick: () => void; tabIndex: number; last?: boolean }) {
-	const {onClick, tabIndex, text, last} = props;
+	const { onClick, tabIndex, text, last } = props;
 	return (
 		<span
-			role="presentation"
+			role='presentation'
 			tabIndex={tabIndex}
 			className={`text-lg xl:text-xl 2xl:text-2xl cursor-pointer hover font-flicker tracking-widest ${last ? 'last' : ''}`}
 			onClick={onClick}
@@ -19,8 +19,8 @@ export function HomeScreenButton(props: { text: string; onClick: () => void; tab
 	);
 }
 
-HomeScreenButton.defaultProps = {last: false};
+HomeScreenButton.defaultProps = { last: false };
 
 export function HomeMenuSeparator() {
-	return <hr className="dark:border-muted-600 border-white my-1"/>;
+	return <hr className='dark:border-muted-600 border-white my-1' />;
 }

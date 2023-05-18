@@ -47,7 +47,7 @@ type WallHelperProps = {
 	onClick: FieldTypeOnClick;
 	editorTool: EditorToolType;
 	isWall: boolean;
-	onContextMenu: (contextMenu: JSX.Element | null) => void;
+	onContextMenu: (contextMenu: React.JSX.Element | null) => void;
 };
 
 /**
@@ -119,17 +119,17 @@ type FieldHelperProps = {
 	type: FieldsEnum | null;
 	inEdit: boolean;
 	attribute: null | Direction | number;
-	onContextMenu: (contextMenu: JSX.Element | null) => void;
+	onContextMenu: (contextMenu: React.JSX.Element | null) => void;
 	onChangeToEdit: (position: BoardPosition | null) => void;
 };
 /**
  * The direction arrows array
  */
-export const DirectionArrows: JSX.Element[] = [
-	<VscArrowUp strokeWidth={2} />,
-	<VscArrowRight strokeWidth={2} />,
-	<VscArrowDown strokeWidth={2} />,
-	<VscArrowLeft strokeWidth={2} />,
+export const DirectionArrows: React.JSX.Element[] = [
+	<VscArrowUp key={_uniqueId()} strokeWidth={2} />,
+	<VscArrowRight key={_uniqueId()} strokeWidth={2} />,
+	<VscArrowDown key={_uniqueId()} strokeWidth={2} />,
+	<VscArrowLeft key={_uniqueId()} strokeWidth={2} />,
 ];
 
 /**
@@ -172,18 +172,18 @@ function FieldHelper(props: FieldHelperProps) {
 	let text = null;
 	switch (type) {
 		case FieldsEnum.START:
-			text = DirectionArrows[DirectionHelper.directionToDirEnum(attribute as Direction)];
+			text = DirectionArrows[DirectionHelper.string2DirEnum(attribute as Direction)];
 			break;
 		case FieldsEnum.CHECKPOINT:
 		case FieldsEnum.DESTINY_MOUNTAIN:
 			text = ((attribute as number) + 1).toString();
 			break;
 		case FieldsEnum.EYE:
-			text = DirectionArrows[DirectionHelper.directionToDirEnum(attribute as Direction)];
+			text = DirectionArrows[DirectionHelper.string2DirEnum(attribute as Direction)];
 			inactiveClass = 'bg-muted/25 hover:cursor-not-allowed';
 			break;
 		case FieldsEnum.RIVER:
-			text = DirectionArrows[DirectionHelper.directionToDirEnum(attribute as Direction)];
+			text = DirectionArrows[DirectionHelper.string2DirEnum(attribute as Direction)];
 			break;
 		case FieldsEnum.LEMBAS:
 			text = attribute === 0 ? '0' : (attribute as number).toString();
@@ -300,7 +300,7 @@ type MainEditorProps = {
  * The main editor component state properties
  */
 type MainEditorState = {
-	contextMenu: JSX.Element | null;
+	contextMenu: React.JSX.Element | null;
 };
 
 /**
@@ -319,15 +319,13 @@ class MainEditor extends React.Component<MainEditorProps, MainEditorState> {
 	 * Handle the context menu event
 	 * @param contextMenu
 	 */
-	onContextMenu = (contextMenu: JSX.Element | null) => {
+	onContextMenu = (contextMenu: React.JSX.Element | null) => {
 		this.setState({ contextMenu });
 		if (contextMenu) {
 			document.addEventListener(
 				'click',
 				() => {
-					if (contextMenu) {
-						this.setState({ contextMenu: null });
-					}
+					this.setState({ contextMenu: null });
 				},
 				{ once: true },
 			);
@@ -341,8 +339,8 @@ class MainEditor extends React.Component<MainEditorProps, MainEditorState> {
 	buildBoard = (config: BoardConfigInterface) => {
 		const { onFieldOrWallClick, editorTool, fieldInEdit, onChangeToEdit } = this.props;
 		const wallMap = wallConfig2Map(config.walls);
-		const board: JSX.Element[][] = [];
-		const xCordsRow: JSX.Element[] = [];
+		const board: React.JSX.Element[][] = [];
+		const xCordsRow: React.JSX.Element[] = [];
 		xCordsRow.push(<div className='h-4 w-4 flex items-center' />);
 		for (let x = 0; x < config.width; x += 1) {
 			xCordsRow.push(
@@ -359,7 +357,7 @@ class MainEditor extends React.Component<MainEditorProps, MainEditorState> {
 		}
 		board.push(xCordsRow);
 		for (let y = 0; y < config.height; y += 1) {
-			const row: JSX.Element[] = [];
+			const row: React.JSX.Element[] = [];
 			row.push(
 				<div
 					className='h-16 w-4 flex items-center justify-center text-muted-50 bg-muted/20 text-[12px] rounded-full'
@@ -390,7 +388,6 @@ class MainEditor extends React.Component<MainEditorProps, MainEditorState> {
 						attribute = getLembasFieldConfig(fieldPosition, config)?.amount || 0;
 						break;
 					default:
-						attribute = null;
 						break;
 				}
 				row.push(
@@ -427,7 +424,7 @@ class MainEditor extends React.Component<MainEditorProps, MainEditorState> {
 			}
 			board.push(row);
 			if (y < config.height - 1) {
-				const wallRow: JSX.Element[] = [];
+				const wallRow: React.JSX.Element[] = [];
 				wallRow.push(<div key={_uniqueId()} className='w-4 h-4' />);
 				for (let x = 0; x < config.width; x += 1) {
 					const position: [BoardPosition, BoardPosition] = [

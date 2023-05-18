@@ -9,7 +9,7 @@ type RiverPresetFileProps = {
 	onCurrentFileChange: (file: string) => void;
 	onCloseOpenPreset: (file: string) => void;
 	edited: boolean;
-	onContextMenu: (contextMenu: JSX.Element | null) => unknown;
+	onContextMenu: (contextMenu: React.JSX.Element | null) => unknown;
 };
 type RiverPresetFileState = {
 	hover: boolean;

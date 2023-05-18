@@ -9,18 +9,18 @@ type TopMenuItemProps =
 	type: 'default';
 	action: TopMenuActions;
 	onAction: (action: TopMenuActions) => void;
-	label: string | JSX.Element | null;
+	label: string | React.JSX.Element | null;
 	className?: string;
-	icon?: null | JSX.Element;
+	icon?: null | React.JSX.Element;
 	shortCut?: string;
 }
 	| {
 	type: 'none';
 	action?: null;
 	onAction?: () => void;
-	label: string | JSX.Element | null;
+	label: string | React.JSX.Element | null;
 	className?: string;
-	icon?: null | JSX.Element;
+	icon?: null | React.JSX.Element;
 	shortCut?: string;
 };
 

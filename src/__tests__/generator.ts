@@ -5,12 +5,14 @@ import BoardGenerator, {
 } from '../renderer/components/generator/BoardGenerator';
 import Ajv from 'ajv';
 import * as boardConfiguratorSchema from '../schema/boardConfigSchema.json';
+import chalk from 'chalk';
 
 function isGeneratedBoardValid(boardJson: Board): boolean {
 	const validate = (new Ajv()).compile(boardConfiguratorSchema);
 	const valid = validate(boardJson);
 	if (!valid) {
-		console.warn(validate.errors);
+		chalk.red('Board is not valid!');
+		console.log(validate.errors);
 	}
 	return valid;
 }

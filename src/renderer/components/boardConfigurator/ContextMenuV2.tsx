@@ -8,7 +8,7 @@ type ContextMenuV2Props = {
 		y: number;
 		x: number;
 	};
-	children: string | JSX.Element | JSX.Element[] | null;
+	children: string | React.JSX.Element | React.JSX.Element[] | null;
 };
 
 /**

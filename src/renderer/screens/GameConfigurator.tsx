@@ -33,7 +33,7 @@ type GameConfiguratorState = {
 		width: number;
 		height: number;
 	};
-	notification: JSX.Element | null;
+	notification: React.JSX.Element | null;
 	file: PathInterface | null;
 	edited: boolean;
 };
@@ -100,13 +100,12 @@ class GameConfigurator extends React.Component<GameConfiguratorProps, GameConfig
 							notification: <Notification label={window.t.translate('Loaded successfully')} />,
 							file: loadedValues as PathInterface,
 						});
-						return null;
+						return;
 					}
 					this.setState({
 						file: null,
 						notification: <Error label={window.t.translate('Failed to load file!')} />,
 					});
-					return null;
 				})
 				.catch(() => {
 				});

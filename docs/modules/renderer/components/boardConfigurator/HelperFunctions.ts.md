@@ -25,6 +25,7 @@ parent: Modules
   - [getNextDirection](#getnextdirection)
   - [getNextRotation](#getnextrotation)
   - [getPreviousRotation](#getpreviousrotation)
+  - [isBoardConfiguration](#isboardconfiguration)
   - [isDestinyMountain](#isdestinymountain)
   - [moveSauronsEye](#movesauronseye)
   - [predictIfConfigurationIsBoardConfiguration](#predictifconfigurationisboardconfiguration)
@@ -201,6 +202,18 @@ calculates the previous rotation value
 ```ts
 export declare function getPreviousRotation(rotation: Rotation): Rotation
 ```
+
+## isBoardConfiguration
+
+determines if a configuration is a board configuration
+
+**Signature**
+
+```ts
+export declare function isBoardConfiguration(config: any): config is BoardConfigInterface
+```
+
+Added in v0.9.85
 
 ## isDestinyMountain
 

@@ -9,7 +9,7 @@ import EditorCache from './EditorCache';
 type OpenPresetsProps = {
 	editorCache: EditorCache;
 	currentFile: null | string;
-	onContextMenu: (contextMenu: JSX.Element | null) => unknown;
+	onContextMenu: (contextMenu: React.JSX.Element | null) => unknown;
 	onCurrentFileChange: (file: string) => void;
 	onCloseOpenPreset: (file: string) => void;
 	openTabsOrder: Map<string, number>;
@@ -48,8 +48,8 @@ const OpenPresets = (props: OpenPresetsProps) => {
 		}
 		setItems(helperArray);
 		const newMap: Map<string, number> = new Map();
-		for (let i = 0; i < helperArray.length; i += 1) {
-			const item = helperArray[i];
+		for (const element of helperArray) {
+			const item = element;
 			newMap.set(item.file, item.order);
 		}
 		onUpdate(newMap);
@@ -60,20 +60,20 @@ const OpenPresets = (props: OpenPresetsProps) => {
 
 	return (
 		<SortableList
-			lockAxis="x"
+			lockAxis='x'
 			onSortEnd={onSortEnd}
-			className="flex max-w-full overflow-x-auto overflow-y-hidden open-file-list"
+			className='flex max-w-full overflow-x-auto overflow-y-hidden open-file-list'
 			customHolderRef={ref}
-			draggedItemClassName="text-white shadow"
+			draggedItemClassName='text-white shadow'
 		>
 			{items.map((item) => {
 				const preset = editorCache.getFile(item.file);
 				if (preset) {
 					return (
 						<SortableItem key={_uniqueId()}>
-							<div className="relative flex items-center justify-between h-full">
+							<div className='relative flex items-center justify-between h-full'>
 								<SortableKnob>
-									<div className="text-white text-2xl cursor-grabbing">
+									<div className='text-white text-2xl cursor-grabbing'>
 										<VscGripper />
 									</div>
 								</SortableKnob>
@@ -85,7 +85,8 @@ const OpenPresets = (props: OpenPresetsProps) => {
 									edited={preset.edited}
 									onContextMenu={onContextMenu}
 								/>
-								{currentFile === item.file ? <div className="w-full h-1 bg-accent absolute bottom-0 left-0" /> : null}
+								{currentFile === item.file ?
+									<div className='w-full h-1 bg-accent absolute bottom-0 left-0' /> : null}
 							</div>
 						</SortableItem>
 					);

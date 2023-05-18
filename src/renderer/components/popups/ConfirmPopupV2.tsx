@@ -10,9 +10,9 @@ export type ConfirmPopupV2Props = {
 	title: string;
 	abortButtonText: string;
 	onAbort: () => void;
-	confirmButtonText: string | JSX.Element;
+	confirmButtonText: string | React.JSX.Element;
 	onConfirm: () => void;
-	children: string | JSX.Element | JSX.Element[];
+	children: string | React.JSX.Element | React.JSX.Element[];
 	os: NodeJS.Platform;
 	topOffset?: boolean;
 	settings: SettingsInterface;
@@ -83,7 +83,7 @@ class ConfirmPopupV2 extends React.Component<ConfirmPopupV2Props, ConfirmPopupV2
 						setTimeout(() => {
 							this.setState({ visible: true });
 						}, 200);
-					}
+					},
 				);
 			}
 		}, 200);
@@ -93,12 +93,14 @@ class ConfirmPopupV2 extends React.Component<ConfirmPopupV2Props, ConfirmPopupV2
 			if (popup) {
 				popup.addEventListener('resize', () => {
 					const { dimension } = this.state;
-					this.setState({
-						dimension: {
-							width: popup.clientWidth + 4,
-							height: popup.clientHeight + 4,
-						},
-					});
+					if (dimension.width !== popup.clientWidth + 4 || dimension.height !== popup.clientHeight + 4) {
+						this.setState({
+							dimension: {
+								width: popup.clientWidth + 4,
+								height: popup.clientHeight + 4,
+							},
+						});
+					}
 				});
 			}
 		}
@@ -127,7 +129,8 @@ class ConfirmPopupV2 extends React.Component<ConfirmPopupV2Props, ConfirmPopupV2
 			const { offClick, position, dimension } = this.state;
 			const { windowDimensions, os } = this.props;
 			if (offClick !== preOffClick && !preOffClick) {
-				window.electron.app.beep().catch(() => {});
+				window.electron.app.beep().catch(() => {
+				});
 				setTimeout(() => {
 					this.setState({ offClick: false });
 				}, 500);
@@ -175,14 +178,25 @@ class ConfirmPopupV2 extends React.Component<ConfirmPopupV2Props, ConfirmPopupV2
 	 * Renders the component.
 	 */
 	render() {
-		const { confirmButtonText, abortButtonText, onConfirm, onAbort, children, title, os, topOffset, maxWidth, big } =
+		const {
+			confirmButtonText,
+			abortButtonText,
+			onConfirm,
+			onAbort,
+			children,
+			title,
+			os,
+			topOffset,
+			maxWidth,
+			big,
+		} =
 			this.props;
 		const { visible, offClick, position } = this.state;
 		return (
 			<div
-				role="presentation"
-				id="popupV2-container"
-				className="w-[100vw] absolute left-0 bg-black/25 text-white"
+				role='presentation'
+				id='popupV2-container'
+				className='w-[100vw] absolute left-0 bg-black/25 text-white'
 				style={{
 					top: os === 'win32' && topOffset ? 32 : 0,
 					height: window.innerHeight - (os === 'win32' && topOffset ? 32 : 0),
@@ -190,8 +204,8 @@ class ConfirmPopupV2 extends React.Component<ConfirmPopupV2Props, ConfirmPopupV2
 				onClick={this.handleOffClick}
 			>
 				<div
-					role="presentation"
-					id="popupV2"
+					role='presentation'
+					id='popupV2'
 					className={`fixed origin-top-left z-50 transition-opacity ${visible ? 'opacity-1' : 'opacity-0'} ${
 						offClick && 'popup-warn'
 					} ${big ? 'w-[50vw]' : ''}`}
@@ -201,11 +215,12 @@ class ConfirmPopupV2 extends React.Component<ConfirmPopupV2Props, ConfirmPopupV2
 						maxWidth: `${maxWidth}px` || (big ? '50vw' : '33.333vw'),
 					}}
 				>
-					<div className="dark:bg-muted-800 bg-muted-600 rounded shadow-xl box-shadow-xl border dark:border-muted-700 border-muted-400">
+					<div
+						className='dark:bg-muted-800 bg-muted-600 rounded shadow-xl box-shadow-xl border dark:border-muted-700 border-muted-400'>
 						<div
-							role="presentation"
-							className="p-2 flex justify-start gap-4 items-center text-lg border-b dark:border-muted-700 border-muted-400"
-							draggable="true"
+							role='presentation'
+							className='p-2 flex justify-start gap-4 items-center text-lg border-b dark:border-muted-700 border-muted-400'
+							draggable='true'
 							onMouseDown={(e) => {
 								const { isDragged } = this.state;
 								const { settings } = this.props;
@@ -251,15 +266,18 @@ class ConfirmPopupV2 extends React.Component<ConfirmPopupV2Props, ConfirmPopupV2
 								e.preventDefault();
 							}}
 						>
-							<img className="h-6" src={destinyMountainImage} alt={window.t.translate('Logo')} />
-							<span className="font-flicker tracking-widest">{title}</span>
+							<img className='h-6' src={destinyMountainImage} alt={window.t.translate('Logo')} />
+							<span className='font-flicker tracking-widest'>{title}</span>
 						</div>
-						<div className="py-2 px-4 mb-2">{children}</div>
-						<div className="py-2 px-4 flex justify-end gap-4 items-center text-sm border-t dark:border-muted-700 border-muted-400">
-							<Button onClick={onConfirm} buttonType="primary" size="sm">
+						<div
+							className='py-2 px-4 mb-2'>{children instanceof Array ? children.map((child) => child) : children}
+						</div>
+						<div
+							className='py-2 px-4 flex justify-end gap-4 items-center text-sm border-t dark:border-muted-700 border-muted-400'>
+							<Button onClick={onConfirm} buttonType='primary' size='sm'>
 								{confirmButtonText}
 							</Button>
-							<Button onClick={onAbort} size="sm">
+							<Button onClick={onAbort} size='sm'>
 								{abortButtonText}
 							</Button>
 						</div>

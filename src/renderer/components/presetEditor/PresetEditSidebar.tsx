@@ -19,7 +19,7 @@ type PresetEditSidebarProps = {
 	settings: SettingsInterface;
 
 	onOpenFile: (preset: RiverPresetWithFile, file: string) => void;
-	onContextMenu: (contextMenu: JSX.Element | null) => void;
+	onContextMenu: (contextMenu: React.JSX.Element | null) => void;
 	onNewFile: () => void;
 	onDeletePreset: (fullPath: string, file: string) => void;
 	onRenamePreset: (fullPath: ParsedPath) => void;

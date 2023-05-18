@@ -4,7 +4,7 @@ import path, { ParsedPath } from 'path';
 import * as RiverPresetSchema from '../../schema/riverPreset.schema.json';
 import * as BoardPresetSchema from '../../schema/boardPreset.schema.json';
 import { getAppDataPath } from './functions';
-import { Direction, DirectionEnum, Position } from '../../interfaces/BoardConfigInterface';
+import { Direction, Position } from '../../interfaces/BoardConfigInterface';
 import IPCHelper from './IPCHelper';
 
 /**
@@ -186,7 +186,7 @@ class PresetsLoader {
 	 * @return the new preset file path
 	 */
 	static async renameRiverPreset(from: string, to: string): Promise<ParsedPath> {
-		await fs.renameSync(
+		fs.renameSync(
 			path.join(PresetsLoader.riverPresetFolder, from),
 			path.join(PresetsLoader.riverPresetFolder, to),
 		);

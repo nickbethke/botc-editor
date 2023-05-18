@@ -76,25 +76,25 @@ class TranslationHelper {
 
 	static stringToEnum(language: string): AvailableLanguages {
 		switch (language) {
-			case 'de':
-			default:
-				return AvailableLanguages.de;
 			case 'en':
 				return AvailableLanguages.en;
 			case 'fr':
 				return AvailableLanguages.fr;
+			case 'de':
+			default:
+				return AvailableLanguages.de;
 		}
 	}
 
 	static enumToString(value: AvailableLanguages) {
 		switch (value) {
-			case AvailableLanguages.de:
-			default:
-				return 'de';
 			case AvailableLanguages.en:
 				return 'en';
 			case AvailableLanguages.fr:
 				return 'fr';
+			case AvailableLanguages.de:
+			default:
+				return 'de';
 		}
 	}
 }

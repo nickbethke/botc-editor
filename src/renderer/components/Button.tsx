@@ -1,4 +1,5 @@
 import { Component } from 'react';
+import _uniqueId from 'lodash/uniqueId';
 
 type ButtonProps = {
 	type?: 'button' | 'submit' | 'reset';
@@ -8,8 +9,8 @@ type ButtonProps = {
 	buttonType?: 'primary' | 'secondary' | 'default';
 	border?: 'l' | 'r' | 't' | 'b' | 'x' | 'y' | 'tr' | 'tl' | 'br' | 'bl' | 'none';
 	size?: 'sm' | 'md' | 'lg';
-	icon?: JSX.Element;
-	children?: JSX.Element | string | JSX.Element[] | string[];
+	icon?: React.JSX.Element;
+	children?: React.JSX.Element | string | React.JSX.Element[] | string[];
 }
 
 export default class Button extends Component<ButtonProps> {
@@ -88,7 +89,9 @@ export default class Button extends Component<ButtonProps> {
 				className={`${this.getSizeClass()} ${this.getBorderClass()} inline-flex items-center gap-2 font-bold transition-all ${this.props.className} ${this.getButtonTypeClass()}`}
 				onClick={this.props.onClick}>
 				{this.props.icon}
-				{this.props.children}
+				{this.props.children instanceof Array ? this.props.children.map((child, index) => {
+					return <div key={_uniqueId()}>{child}</div>;
+				}) : this.props.children}
 			</button>
 		);
 	}

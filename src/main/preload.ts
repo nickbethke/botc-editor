@@ -26,10 +26,10 @@ const electronHandler = {
 		return ipcRenderer.invoke('validate:json', json, type);
 	},
 	schemas: {
-		game: () => {
+		game: (): Promise<object> => {
 			return ipcRenderer.invoke('schemas:game');
 		},
-		board: () => {
+		board: (): Promise<object> => {
 			return ipcRenderer.invoke('schemas:board');
 		},
 	},

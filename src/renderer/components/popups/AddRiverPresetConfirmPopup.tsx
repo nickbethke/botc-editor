@@ -17,6 +17,7 @@ import {
 	getPreviousRotation,
 	rotateDirection,
 } from '../boardConfigurator/HelperFunctions';
+import _uniqueId from 'lodash/uniqueId';
 
 /**
  * The properties for the river preset component.
@@ -68,9 +69,9 @@ export default class AddRiverPresetConfirmPopup extends Component<
 		const { position, adjustBoardSize, rotation } = this.state;
 		const h = adjustBoardSize ? settings.defaultValues.maxBoardSize : configuration.height;
 		const w = adjustBoardSize ? settings.defaultValues.maxBoardSize : configuration.width;
-		const board: JSX.Element[][] = [];
+		const board: React.JSX.Element[][] = [];
 		for (let x = 0; x < w; x += 1) {
-			const row: JSX.Element[] = [];
+			const row: React.JSX.Element[] = [];
 			for (let y = 0; y < h; y += 1) {
 				const possibleRiver = preset.data.filter((river) => {
 					const riverPosition = calculateRiverPresetFieldPositionWithRotation(river.position, rotation);
@@ -202,7 +203,7 @@ export default class AddRiverPresetConfirmPopup extends Component<
 					<div className='flex items-center justify-center'>
 						<div className='flex'>
 							{board.map((row) => (
-								<div className='flex flex-col'>{row.map((cell) => cell)}</div>
+								<div key={_uniqueId()} className='flex flex-col'>{row.map((cell) => cell)}</div>
 							))}
 						</div>
 					</div>

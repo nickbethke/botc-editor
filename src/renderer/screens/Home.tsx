@@ -165,7 +165,7 @@ export default class Home extends Component<HomeProps, HomeState> {
 	popup = (openPopup: HomePopups) => {
 		const { windowDimensions } = this.state;
 		const { os, settings } = this.props;
-		let popup: JSX.Element | null;
+		let popup: React.JSX.Element | null;
 		switch (openPopup) {
 			case 'error':
 				popup = this.errorPopup();

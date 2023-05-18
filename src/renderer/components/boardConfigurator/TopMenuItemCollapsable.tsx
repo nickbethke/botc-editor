@@ -6,7 +6,7 @@ import React from 'react';
  */
 type TopMenuItemCollapsableProps = {
 	label: string;
-	children: string | JSX.Element | JSX.Element[];
+	children: string | React.JSX.Element | React.JSX.Element[];
 };
 /**
  * The board configuration top menu item collapsable component state properties

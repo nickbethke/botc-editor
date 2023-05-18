@@ -8,7 +8,7 @@ import { BoardPosition } from '../components/generator/interfaces/BoardPosition'
 import AStarRiverPreset from '../components/presetEditor/AStar';
 import PresetEditSidebar from '../components/presetEditor/PresetEditSidebar';
 import { getBoardMaxDimension, removeRiver } from '../components/presetEditor/Helper';
-import EditorCache from '../components/presetEditor/EditorCache';
+import EditorCache, { EditorCacheStorageItem } from '../components/presetEditor/EditorCache';
 import PromptPopupV2 from '../components/popups/PromptPopupV2';
 import PresetEditorMain from '../components/presetEditor/PresetEditorMain';
 import ConfirmPopupV2 from '../components/popups/ConfirmPopupV2';
@@ -19,8 +19,9 @@ import TopMenuItemCollapsable from '../components/boardConfigurator/TopMenuItemC
 import { TopMenuActions } from '../components/boardConfigurator/TopMenu';
 import Dragger from '../components/Dragger';
 import { Direction } from '../../interfaces/BoardConfigInterface';
+import path from 'path';
 
-type PresetEditorPopupType = null | JSX.Element;
+type PresetEditorPopupType = null | React.JSX.Element;
 
 type RiverPresetEditorProps = {
 	os: NodeJS.Platform;
@@ -34,7 +35,7 @@ type RiverPresetEditorState = {
 	popup: PresetEditorPopupType;
 	windowDimensions: { width: number; height: number };
 	config: RiverPreset | null;
-	contextMenu: null | JSX.Element;
+	contextMenu: null | React.JSX.Element;
 	lastSetDirection: Direction;
 	files: RiverPresetWithFile[];
 	currentFile: null | string;
@@ -152,15 +153,13 @@ class RiverPresetEditor extends React.Component<RiverPresetEditorProps, RiverPre
 		}
 	};
 
-	onContextMenu = (contextMenu: JSX.Element | null) => {
+	onContextMenu = (contextMenu: React.JSX.Element | null) => {
 		this.setState({ contextMenu });
 		if (contextMenu) {
 			document.addEventListener(
 				'click',
 				() => {
-					if (contextMenu) {
-						this.setState({ contextMenu: null });
-					}
+					this.setState({ contextMenu: null });
 				},
 				{ once: true },
 			);
@@ -384,72 +383,11 @@ class RiverPresetEditor extends React.Component<RiverPresetEditorProps, RiverPre
 			openTabsOrder,
 			isLoadingPresets,
 		} = this.state;
-		const { os, settings, onSettingsUpdate } = this.props;
+		const { os, settings } = this.props;
 		return (
 			<section className='text-white font-lato dark:bg-muted-800 bg-muted-600 h-full'>
 				<Dragger os={os}>{window.t.translate('River-Preset Editor')}</Dragger>
-				<div
-					className={`text-[14px] flex items-center dark:bg-muted-800 bg-muted-500 dark:border-0 border-t border-muted-400 ${
-						os === 'darwin' ? 'pl-20' : ''
-					}`}
-				>
-					<img className='h-6 ml-2 mr-4' src={destinyMountainImage} alt={window.t.translate('Logo')} />
-					<TopMenuItemCollapsable label={window.t.translate('File')}>
-						<TopMenuItem
-							className='text-left'
-							action={TopMenuActions.NEW}
-							onAction={this.onTopMenuAction}
-							icon={<VscNewFile />}
-							label={window.t.translate('New')}
-							shortCut={`${window.t.translate('Ctrl')}+N`}
-							type='default'
-						/>
-						<TopMenuSeparator />
-						<TopMenuItem
-							className='text-left'
-							action={TopMenuActions.SAVE}
-							onAction={this.onTopMenuAction}
-							label={`${window.t.translate('Save')}...`}
-							shortCut={`${window.t.translate('Ctrl')}+S`}
-							type='default'
-						/>
-						<TopMenuSeparator />
-						<TopMenuItem
-							className='text-left'
-							action={TopMenuActions.OPEN_PRESET_FOLDER}
-							onAction={this.onTopMenuAction}
-							label={`${window.t.translate('Open Presets Folder')}...`}
-							type='default'
-						/>
-						<TopMenuSeparator />
-						<TopMenuItem
-							className='text-left'
-							action={TopMenuActions.CLOSE}
-							onAction={this.onTopMenuAction}
-							label={window.t.translate('Close')}
-							type='default'
-						/>
-					</TopMenuItemCollapsable>
-					<div className='ml-auto'>
-						<SidebarMenuItem
-							key={_uniqueId()}
-							label={window.t.translate('Dark Mode')}
-							open={false}
-							icon={
-								<VscColorMode
-									title={window.t.translate('Dark Mode')}
-									className={`${
-										settings.darkMode ? 'rotate-0' : 'rotate-180'
-									} transition-transform transform-gpu text-lg`}
-								/>
-							}
-							position='left'
-							onClick={() => {
-								onSettingsUpdate({ ...settings, darkMode: !settings.darkMode });
-							}}
-						/>
-					</div>
-				</div>
+				{this.header()}
 				<div className={`${popup !== null ? 'blur' : ''} transition-[filter]`}>
 					<div className='flex w-[100vw] h-full grow'>
 						<PresetEditSidebar
@@ -481,53 +419,7 @@ class RiverPresetEditor extends React.Component<RiverPresetEditorProps, RiverPre
 									});
 								}
 							}}
-							onRenamePreset={(fullPath) => {
-								this.setState({
-									popup: (
-										<PromptPopupV2
-											title={window.t.translate('Rename Preset')}
-											abortButtonText={window.t.translate('Cancel')}
-											onAbort={() => {
-												this.setState({ popup: null });
-											}}
-											confirmButtonText={window.t.translate('Rename')}
-											onConfirm={async (newName) => {
-												const newFileName = `${newName}.json`;
-												if (fullPath.base !== newFileName) {
-													const newFileParsedPath = await window.electron.file.renamePreset(fullPath.base, newFileName);
-													this.onFileUpdate(() => {
-														if (editorCache.fileExists(fullPath.base)) {
-															const oldFile = editorCache.getFile(fullPath.base);
-															if (oldFile) {
-																editorCache.deleteFile(fullPath.base);
-																editorCache.addFile({
-																	...oldFile?.preset,
-																	file: newFileParsedPath,
-																});
-															}
-														}
-														const index = openTabsOrder.get(fullPath.base);
-														if (index) {
-															openTabsOrder.delete(fullPath.base);
-															openTabsOrder.set(newFileName, index);
-														}
-														if (currentFile === fullPath.base) {
-															this.setState({
-																currentFile: newFileName,
-															});
-														}
-														this.setState({ popup: null, openTabsOrder });
-													});
-												}
-											}}
-											input={{ type: 'text', startValue: fullPath.name }}
-											windowDimensions={windowDimensions}
-											os={os}
-											settings={settings}
-										/>
-									),
-								});
-							}}
+							onRenamePreset={this.onRenamePreset}
 							settings={settings}
 						/>
 						<PresetEditorMain
@@ -555,68 +447,7 @@ class RiverPresetEditor extends React.Component<RiverPresetEditorProps, RiverPre
 							onTabsOrderUpdate={(newOpenTabsOrder) => {
 								this.setState({ openTabsOrder: newOpenTabsOrder });
 							}}
-							onCloseOpenPreset={(file) => {
-								const toClose = editorCache.getFile(file);
-								if (toClose) {
-									if (toClose.edited) {
-										this.setState({
-											popup: (
-												<ConfirmPopupV2
-													title={window.t.translate('Close River Preset')}
-													abortButtonText={window.t.translate('Cancel')}
-													onAbort={() => {
-														this.setState({ popup: null });
-													}}
-													confirmButtonText={window.t.translate('Save and close')}
-													onConfirm={async () => {
-														// TODO: Save
-														if (toClose) {
-															await window.electron.file.savePreset(
-																file,
-																JSON.stringify(editorCache.getPreset(file), null, 4),
-															);
-															editorCache.deleteFile(file);
-															openTabsOrder.delete(file);
-															if (file === currentFile) {
-																this.setState({
-																	editorCache,
-																	currentFile: null,
-																	config: null,
-																	openTabsOrder,
-																});
-															} else {
-																this.setState({ editorCache, openTabsOrder });
-															}
-														}
-														this.setState({ popup: null });
-														this.onFileUpdate();
-													}}
-													windowDimensions={windowDimensions}
-													os={os}
-													settings={settings}
-												>
-													{window.t.translate(
-														'This file has not yet been saved. Do you want to save the current changes before closing?',
-													)}
-												</ConfirmPopupV2>
-											),
-										});
-									} else {
-										editorCache.deleteFile(file);
-										openTabsOrder.delete(file);
-										if (file === currentFile) {
-											this.setState({
-												editorCache,
-												currentFile: null,
-												config: null,
-												openTabsOrder,
-											});
-										} else {
-											this.setState({ editorCache, openTabsOrder });
-										}
-									}
-								}
-							}}
+							onCloseOpenPreset={this.onCloseOpenPreset}
 						/>
 					</div>
 				</div>
@@ -624,6 +455,191 @@ class RiverPresetEditor extends React.Component<RiverPresetEditorProps, RiverPre
 				{popup}
 			</section>
 		);
+	}
+
+	onCloseOpenPreset = (file: string) => {
+		const { editorCache, openTabsOrder, currentFile } = this.state;
+		const toClose = editorCache.getFile(file);
+		if (toClose) {
+			if (toClose.edited) {
+				this.closeOpenPreset(toClose, file);
+			} else {
+				editorCache.deleteFile(file);
+				openTabsOrder.delete(file);
+				if (file === currentFile) {
+					this.setState({
+						editorCache,
+						currentFile: null,
+						config: null,
+						openTabsOrder,
+					});
+				} else {
+					this.setState({ editorCache, openTabsOrder });
+				}
+			}
+		}
+	};
+
+	closeOpenPreset = (toClose: EditorCacheStorageItem | null, file: string) => {
+		const { os, settings } = this.props;
+		const { editorCache, openTabsOrder, currentFile, windowDimensions } = this.state;
+		this.setState({
+			popup: (
+				<ConfirmPopupV2
+					title={window.t.translate('Close River Preset')}
+					abortButtonText={window.t.translate('Cancel')}
+					onAbort={() => {
+						this.setState({ popup: null });
+					}}
+					confirmButtonText={window.t.translate('Save and close')}
+					onConfirm={async () => {
+						if (toClose !== null) {
+							await window.electron.file.savePreset(
+								file,
+								JSON.stringify(editorCache.getPreset(file), null, 4),
+							);
+							editorCache.deleteFile(file);
+							openTabsOrder.delete(file);
+							if (file === currentFile) {
+								this.setState({
+									editorCache,
+									currentFile: null,
+									config: null,
+									openTabsOrder,
+								});
+							} else {
+								this.setState({ editorCache, openTabsOrder });
+							}
+						}
+						this.setState({ popup: null });
+						this.onFileUpdate();
+					}}
+					windowDimensions={windowDimensions}
+					os={os}
+					settings={settings}
+				>
+					{window.t.translate(
+						'This file has not yet been saved. Do you want to save the current changes before closing?',
+					)}
+				</ConfirmPopupV2>
+			),
+		});
+	};
+
+	header = () => {
+		const { os, settings, onSettingsUpdate } = this.props;
+		return <div
+			className={`text-[14px] flex items-center dark:bg-muted-800 bg-muted-500 dark:border-0 border-t border-muted-400 ${
+				os === 'darwin' ? 'pl-20' : ''
+			}`}
+		>
+			<img className='h-6 ml-2 mr-4' src={destinyMountainImage} alt={window.t.translate('Logo')} />
+			<TopMenuItemCollapsable label={window.t.translate('File')}>
+				<TopMenuItem
+					className='text-left'
+					action={TopMenuActions.NEW}
+					onAction={this.onTopMenuAction}
+					icon={<VscNewFile />}
+					label={window.t.translate('New')}
+					shortCut={`${window.t.translate('Ctrl')}+N`}
+					type='default'
+				/>
+				<TopMenuSeparator />
+				<TopMenuItem
+					className='text-left'
+					action={TopMenuActions.SAVE}
+					onAction={this.onTopMenuAction}
+					label={`${window.t.translate('Save')}...`}
+					shortCut={`${window.t.translate('Ctrl')}+S`}
+					type='default'
+				/>
+				<TopMenuSeparator />
+				<TopMenuItem
+					className='text-left'
+					action={TopMenuActions.OPEN_PRESET_FOLDER}
+					onAction={this.onTopMenuAction}
+					label={`${window.t.translate('Open Presets Folder')}...`}
+					type='default'
+				/>
+				<TopMenuSeparator />
+				<TopMenuItem
+					className='text-left'
+					action={TopMenuActions.CLOSE}
+					onAction={this.onTopMenuAction}
+					label={window.t.translate('Close')}
+					type='default'
+				/>
+			</TopMenuItemCollapsable>
+			<div className='ml-auto'>
+				<SidebarMenuItem
+					key={_uniqueId()}
+					label={window.t.translate('Dark Mode')}
+					open={false}
+					icon={
+						<VscColorMode
+							title={window.t.translate('Dark Mode')}
+							className={`${
+								settings.darkMode ? 'rotate-0' : 'rotate-180'
+							} transition-transform transform-gpu text-lg`}
+						/>
+					}
+					position='left'
+					onClick={() => {
+						onSettingsUpdate({ ...settings, darkMode: !settings.darkMode });
+					}}
+				/>
+			</div>
+		</div>;
+	};
+
+	private onRenamePreset(fullPath: path.ParsedPath) {
+		const { editorCache, openTabsOrder, currentFile, windowDimensions } = this.state;
+		const { os, settings } = this.props;
+		this.setState({
+			popup: (
+				<PromptPopupV2
+					title={window.t.translate('Rename Preset')}
+					abortButtonText={window.t.translate('Cancel')}
+					onAbort={() => {
+						this.setState({ popup: null });
+					}}
+					confirmButtonText={window.t.translate('Rename')}
+					onConfirm={async (newName) => {
+						const newFileName = `${newName}.json`;
+						if (fullPath.base !== newFileName) {
+							const newFileParsedPath = await window.electron.file.renamePreset(fullPath.base, newFileName);
+							this.onFileUpdate(() => {
+								if (editorCache.fileExists(fullPath.base)) {
+									const oldFile = editorCache.getFile(fullPath.base);
+									if (oldFile) {
+										editorCache.deleteFile(fullPath.base);
+										editorCache.addFile({
+											...oldFile?.preset,
+											file: newFileParsedPath,
+										});
+									}
+								}
+								const index = openTabsOrder.get(fullPath.base);
+								if (index) {
+									openTabsOrder.delete(fullPath.base);
+									openTabsOrder.set(newFileName, index);
+								}
+								if (currentFile === fullPath.base) {
+									this.setState({
+										currentFile: newFileName,
+									});
+								}
+								this.setState({ popup: null, openTabsOrder });
+							});
+						}
+					}}
+					input={{ type: 'text', startValue: fullPath.name }}
+					windowDimensions={windowDimensions}
+					os={os}
+					settings={settings}
+				/>
+			),
+		});
 	}
 }
 
