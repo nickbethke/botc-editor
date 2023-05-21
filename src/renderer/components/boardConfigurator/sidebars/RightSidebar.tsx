@@ -72,9 +72,10 @@ class RightSidebar extends React.Component<RightSidebarProps, unknown> {
 	notifications() {
 		const { warnings, onFieldSelect, onRemoveWall, onRemoveField } = this.props;
 		return (
-			<div className="flex flex-col h-full">
-				<div className="p-2 border-b dark:border-muted-700 border-muted-400">{window.t.translate('Warnings')}</div>
-				<div className="flex bg-muted-900/25 flex-col gap-1 flex-grow max-h-full overflow-y-auto">
+			<div className='flex flex-col h-full'>
+				<div
+					className='p-2 border-b dark:border-muted-700 border-muted-400'>{window.t.translate('Warnings')}</div>
+				<div className='flex bg-muted-900/25 flex-col gap-1 flex-grow max-h-full overflow-y-auto'>
 					{Array.from(warnings).map((value) => (
 						<Warning
 							key={_uniqueId('sidebar-warning-')}
@@ -110,25 +111,27 @@ class RightSidebar extends React.Component<RightSidebarProps, unknown> {
 		const windowsHeight = settings.darkMode ? 119 : 120;
 		const notWindowsHeight = settings.darkMode ? 87 : 88;
 		return (
-			<div className="flex flex-col h-full w-full">
-				<div className="p-2 w-full border-b dark:border-muted-700 border-muted-400 flex justify-between items-center">
+			<div className='flex flex-col h-full w-full'>
+				<div
+					className='p-2 w-full border-b dark:border-muted-700 border-muted-400 flex justify-between items-center'>
 					{window.t.translate('Configuration Preview')}
 					<button
-						className="px-2 py-1 rounded bg-muted-900/25 hover:bg-muted-100/10 flex items-center gap-2"
-						type="button"
+						className='px-2 py-1 rounded bg-muted-900/25 hover:bg-muted-100/10 flex items-center gap-2'
+						type='button'
 						onClick={() => {
-							window.electron.clipboard.write(JSON.stringify(config, null, 4)).catch(() => {});
+							window.electron.clipboard.write(JSON.stringify(config, null, 4)).catch(() => {
+							});
 						}}
 					>
 						<VscCopy />
 						{window.t.translate('Copy')}
 					</button>
 				</div>
-				<div className="flex-grow bg-muted-900/25 relative w-[347px] overflow-y-auto">
+				<div className='flex-grow bg-muted-900/25 relative w-[347px] overflow-y-auto'>
 					<MonacoEditor
 						value={JSON.stringify(config, null, 4)}
-						theme="vs-dark"
-						language="json"
+						theme='vs-dark'
+						language='json'
 						width={347}
 						height={windowDimensions.height - (os === 'win32' ? windowsHeight : notWindowsHeight)}
 					/>
@@ -146,7 +149,7 @@ class RightSidebar extends React.Component<RightSidebarProps, unknown> {
 		return (
 			<>
 				<SidebarMenuItem
-					position="left"
+					position='left'
 					label={window.t.translate('Warnings')}
 					open={openTab === 'warnings'}
 					icon={<VscWarning className={warnings.size ? 'text-orange-400' : 'text-accent'} />}
@@ -156,7 +159,7 @@ class RightSidebar extends React.Component<RightSidebarProps, unknown> {
 					shortCut={`${window.t.translate('Alt')}+-`}
 				/>
 				<SidebarMenuItem
-					position="left"
+					position='left'
 					label={window.t.translate('Configuration Preview')}
 					open={openTab === 'configPreview'}
 					icon={<VscJson />}
@@ -166,7 +169,7 @@ class RightSidebar extends React.Component<RightSidebarProps, unknown> {
 					shortCut={`${window.t.translate('Alt')}++`}
 				/>
 				<SidebarMenuItem
-					position="left"
+					position='left'
 					label={window.t.translate('Save as screenshot')}
 					open={false}
 					icon={<TbScreenShare />}
@@ -191,11 +194,11 @@ class RightSidebar extends React.Component<RightSidebarProps, unknown> {
 	render() {
 		const { openTab } = this.props;
 		return (
-			<div className="flex flex-row h-full">
+			<div className='flex flex-row h-full'>
 				<div className={`flex-grow ${openTab ? 'border-r dark:border-muted-700 border-muted-400' : ''}`}>
 					{this.content()}
 				</div>
-				<div className="h-full flex flex-col py-1">{this.tabSwitch(openTab)}</div>
+				<div className='h-full flex flex-col py-1'>{this.tabSwitch(openTab)}</div>
 			</div>
 		);
 	}

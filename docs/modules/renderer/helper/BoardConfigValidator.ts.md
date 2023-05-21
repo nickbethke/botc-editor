@@ -41,7 +41,7 @@ Calculate the max dimensions of the board and the given position
 ```ts
 private static getMaxDimension(
 		maxDimensions: { x: number; y: number },
-		position: Position
+		position: Position,
 	): { x: number; y: number }
 ```
 

@@ -18,10 +18,12 @@ parent: Modules
   - [addRiver](#addriver)
   - [addStartField](#addstartfield)
   - [calculateRiverPresetFieldPositionWithRotation](#calculateriverpresetfieldpositionwithrotation)
+  - [clearFields](#clearfields)
   - [getCheckpointIndexConfig](#getcheckpointindexconfig)
   - [getDirectionFieldConfig](#getdirectionfieldconfig)
   - [getFieldType](#getfieldtype)
   - [getLembasFieldConfig](#getlembasfieldconfig)
+  - [getMissingBoardConfigurationProperties](#getmissingboardconfigurationproperties)
   - [getNextDirection](#getnextdirection)
   - [getNextRotation](#getnextrotation)
   - [getPreviousRotation](#getpreviousrotation)
@@ -130,6 +132,14 @@ export declare function calculateRiverPresetFieldPositionWithRotation(
 ): BoardPosition
 ```
 
+## clearFields
+
+**Signature**
+
+```ts
+export declare function clearFields(position: BoardPosition, config: BoardConfigInterface): BoardConfigInterface
+```
+
 ## getCheckpointIndexConfig
 
 gets a checkpoint field index by its position from the board config
@@ -173,6 +183,14 @@ gets a lembas field by its position from the board config
 export declare function getLembasFieldConfig(position: BoardPosition, config: BoardConfigInterface): LembasField | null
 ```
 
+## getMissingBoardConfigurationProperties
+
+**Signature**
+
+```ts
+export declare function getMissingBoardConfigurationProperties(config: any): Array<string>
+```
+
 ## getNextDirection
 
 calculates the next direction value
@@ -210,7 +228,7 @@ determines if a configuration is a board configuration
 **Signature**
 
 ```ts
-export declare function isBoardConfiguration(config: any): config is BoardConfigInterface
+export declare function isBoardConfiguration(config: any): { valid: boolean; missing: Array<string> }
 ```
 
 Added in v0.9.85

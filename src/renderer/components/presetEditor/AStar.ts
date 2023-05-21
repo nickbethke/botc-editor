@@ -4,11 +4,34 @@ import { RiverPreset } from '../../../main/helper/PresetsLoader';
 import { BoardPosition } from '../generator/interfaces/BoardPosition';
 import { getBoardMaxDimension } from './Helper';
 
+/**
+ * @class AStarRiverPreset
+ * @description
+ * This class is used to check if a river preset is valid.
+ * It uses the A* algorithm to check if the river is connected between the start and end point.
+ * @since 0.7.5
+ */
 class AStarRiverPreset {
+
+	/**
+	 * The matrix used by the A* algorithm.
+	 * @private
+	 * @readonly
+	 */
 	private readonly matrix: number[][];
 
+	/**
+	 * The A* instance.
+	 * @private
+	 * @readonly
+	 */
 	private readonly aStarInstance: AStarFinder;
 
+	/**
+	 * The positions that should be removed from the preset.
+	 * @readonly
+	 * @public
+	 */
 	readonly toBeRemoved: BoardPosition[];
 
 	constructor(preset: RiverPreset) {

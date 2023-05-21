@@ -4,6 +4,10 @@ import * as boardConfigurationSchema from '../schema/boardConfigSchema.json';
 import * as gameConfigurationSchema from '../schema/gameConfigSchema.json';
 import BoardConfigValidator from '../renderer/helper/BoardConfigValidator';
 import GameConfigInterface from '../interfaces/GameConfigInterface';
+import TranslationHelper, { AvailableLanguages } from '../renderer/helper/TranslationHelper';
+
+window.t = new TranslationHelper(AvailableLanguages.en, true);
+
 
 // is valid board configuration after the schema, but not valid for the game
 const invalidBoardConfig: BoardConfigInterface = {

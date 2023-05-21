@@ -750,8 +750,8 @@
 			"in Millisekunden"
 		],
 		[
-			"The game ends after the specified number of rounds. -1 means no limit.",
-			"Das Spiel endet nach der angegebenen Anzahl an Runden. -1 bedeutet kein Limit."
+			"The game ends after the specified number of rounds. 0 means no limit.",
+			"Das Spiel endet nach der angegebenen Anzahl an Runden. 0 bedeutet kein Limit."
 		],
 		[
 			"Unsaved Configuration",
@@ -820,6 +820,114 @@
 		[
 			"Default Direction",
 			"Standard Richtung"
+		],
+		[
+			"Error",
+			"Fehler"
+		],
+		[
+			"An error occurred while loading the file.",
+			"Ein Fehler ist beim Laden der Datei aufgetreten."
+		],
+		[
+			"Please check if the file is a valid game configuration.",
+			"Bitte überprüfen Sie ob die Datei eine gültige Spiel Konfiguration ist."
+		],
+		[
+			"Properties are missing or invalid.",
+			"Die Eigenschaften fehlen oder sind ungültig."
+		],
+		[
+			"Occupation",
+			"Besetzung"
+		],
+		[
+			"The current game board state is not valid, due to a field has the same position as another field.",
+			"Der aktuelle Spielbrett Zustand ist ungültig, da ein Feld die gleiche Position wie ein anderes Feld hat."
+		],
+		[
+			"Remove {0} field",
+			"{0} Feld entfernen"
+		],
+		[
+			"Remove all wall errors",
+			"Alle Wand Fehler entfernen"
+		],
+		[
+			"Remove all field errors",
+			"Alle Feld Fehler entfernen"
+		],
+		[
+			"No path from ({0}, {1}) to ({2}, {3})",
+			"Kein Pfad von ({0}, {1}) nach ({2}, {3})"
+		],
+		[
+			"No path from ({0}, {1})",
+			"Kein Pfad von ({0}, {1})"
+		],
+		[
+			"No path to ({0}, {1})",
+			"Kein Pfad nach ({0}, {1})"
+		],
+		[
+			"cardSelectionTimeout is required",
+			"cardSelectionTimeout ist erforderlich"
+		],
+		[
+			"characterChoiceTimeout is required",
+			"characterChoiceTimeout ist erforderlich"
+		],
+		[
+			"maxRounds is required",
+			"maxRounds ist erforderlich"
+		],
+		[
+			"reviveRounds is required",
+			"reviveRounds ist erforderlich"
+		],
+		[
+			"riverMoveCount is required",
+			"riverMoveCount ist erforderlich"
+		],
+		[
+			"serverIngameDelay is required",
+			"serverIngameDelay ist erforderlich"
+		],
+		[
+			"shotLembas is required",
+			"shotLembas ist erforderlich"
+		],
+		[
+			"startLembas is required",
+			"startLembas ist erforderlich"
+		],
+		[
+			"Double occupancy on a field position [{0}, {1}]",
+			"Doppelte Besetzung auf einer Feld Position [{0}, {1}]"
+		],
+		[
+			"Board width is not defined",
+			"Spielfeld Breite ist nicht definiert"
+		],
+		[
+			"Board height is not defined",
+			"Spielfeld Höhe ist nicht definiert"
+		],
+		[
+			"Board eye is not defined",
+			"Spielfeld Auge ist nicht definiert"
+		],
+		[
+			"Check points are to less (minimum 2) or not defined",
+			"Check Punkte sind zu wenig (mindestens 2) oder nicht definiert"
+		],
+		[
+			"Start fields are to less (minimum 2) or not defined",
+			"Start Felder sind zu wenig (mindestens 2) oder nicht definiert"
+		],
+		[
+			"Board name is not defined",
+			"Spielfeld Name ist nicht definiert"
 		]
 	]
 }

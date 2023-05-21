@@ -684,6 +684,122 @@
 		[
 			"End Edit",
 			"Fin de l'édition"
+		],
+		[
+			"Failed to load file!",
+			"Impossible de charger le fichier!"
+		],
+		[
+			"Loaded successfully",
+			"Chargé avec succès"
+		],
+		[
+			"The game ends after the specified number of rounds. 0 means no limit.",
+			"Le jeu se termine après le nombre de tours spécifié. 0 signifie aucune limite."
+		],
+		[
+			"The loaded file is not a party configuration.",
+			"Le fichier chargé n'est pas une configuration de partie."
+		],
+		[
+			"Battle of the Centerländ - Editor",
+			"Battle of the Centerländ - Éditeur"
+		],
+		[
+			"Background image",
+			"Image d'arrière-plan"
+		],
+		[
+			"Unsaved Configuration",
+			"Configuration non enregistrée"
+		],
+		[
+			"cardSelectionTimeout is required",
+			"cardSelectionTimeout est requis"
+		],
+		[
+			"characterChoiceTimeout is required",
+			"characterChoiceTimeout est requis"
+		],
+		[
+			"maxRounds is required",
+			"maxRounds est requis"
+		],
+		[
+			"reviveRounds is required",
+			"reviveRounds est requis"
+		],
+		[
+			"riverMoveCount is required",
+			"riverMoveCount est requis"
+		],
+		[
+			"serverIngameDelay is required",
+			"serverIngameDelay est requis"
+		],
+		[
+			"shotLembas is required",
+			"shotLembas est requis"
+		],
+		[
+			"startLembas is required",
+			"startLembas est requis"
+		],
+		[
+			"Validation Error",
+			"Erreur de validation"
+		],
+		[
+			"Battle of the Centerländ - Editor",
+			"Battle of the Centerländ - Éditeur"
+		],
+		[
+			"Editor",
+			"Éditeur"
+		],
+		[
+			"Board-Configurator",
+			"Configurateur de plateau"
+		],
+		[
+			"Game-Configurator",
+			"Configurateur de jeu"
+		],
+		[
+			"Validator",
+			"Validateur"
+		],
+		[
+			"Settings",
+			"Paramètres"
+		],
+		[
+			"Exit",
+			"Sortie"
+		],
+		[
+			"Background image",
+			"Image d'arrière-plan"
+		],
+		[
+			"About",
+			"À propos"
+		],
+		[
+			"Editor Version",
+			"Version de l'éditeur"
+		],
+		[
+			"Occupation",
+			"Occupation"
+		],
+		[
+			"The current game board state is not valid, due to a field has the same position as another field.",
+			"L'état actuel du plateau de jeu n'est pas valide, car un champ a la même position qu'un autre champ."
+		],
+		[
+			"Default Direction",
+			"Direction par défaut"
 		]
 	]
 }

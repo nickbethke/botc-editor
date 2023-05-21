@@ -19,7 +19,6 @@ parent: Modules
     - [translateVars (method)](#translatevars-method)
     - [setLanguageJSON (method)](#setlanguagejson-method)
     - [switchLanguage (method)](#switchlanguage-method)
-    - [missingTranslations (property)](#missingtranslations-property)
 
 ---
 
@@ -42,7 +41,7 @@ export interface LanguageSchema {
 
 ```ts
 export declare class TranslationHelper {
-  constructor(lang: AvailableLanguages)
+  constructor(lang: AvailableLanguages, test?: boolean)
 }
 ```
 
@@ -75,7 +74,7 @@ public translate(str: string): string
 **Signature**
 
 ```ts
-public translateVars(str: string, p: string[]): string
+public translateVars(str: string, p: any[]): string
 ```
 
 ### setLanguageJSON (method)
@@ -92,12 +91,4 @@ private setLanguageJSON()
 
 ```ts
 public switchLanguage(lang: AvailableLanguages)
-```
-
-### missingTranslations (property)
-
-**Signature**
-
-```ts
-missingTranslations: Map<string, boolean>
 ```

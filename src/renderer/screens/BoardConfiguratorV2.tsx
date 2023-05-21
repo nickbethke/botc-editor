@@ -1054,13 +1054,17 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 		window.electron.dialog
 			.openBoardConfig()
 			.then((loadedConfig) => {
-				if (loadedConfig && isBoardConfiguration(loadedConfig.config)) {
-					this.initLoadedConfiguration(loadedConfig.config);
-					this.setState({
-						file: loadedConfig,
-						fileSaved: true,
-					});
-					return null;
+
+				if (loadedConfig) {
+					const { valid } = isBoardConfiguration(loadedConfig.config);
+					if (valid) {
+						this.initLoadedConfiguration(loadedConfig.config);
+						this.setState({
+							file: loadedConfig,
+							fileSaved: true,
+						});
+						return null;
+					}
 				}
 				this.setState({
 					popup: 'loadingError',

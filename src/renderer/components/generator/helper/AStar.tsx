@@ -21,6 +21,7 @@ type AStarElementWithoutEstimate = { state: BoardPosition, cost: number };
 
 
 /**
+ * @since 0.6.5
  * A-Star PathFinding Class for the board generator
  */
 class AStar {

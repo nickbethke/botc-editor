@@ -13,7 +13,7 @@ parent: Modules
 - [utils](#utils)
   - [DirectionHelper (class)](#directionhelper-class)
     - [dirEnumToString (static method)](#direnumtostring-static-method)
-    - [directionToDirEnum (static method)](#directiontodirenum-static-method)
+    - [~~directionToDirEnum~~ (static method)](#directiontodirenum-static-method)
     - [string2DirEnum (static method)](#string2direnum-static-method)
     - [getNextDirection (static method)](#getnextdirection-static-method)
     - [getPreviousDirection (static method)](#getpreviousdirection-static-method)
@@ -42,7 +42,7 @@ Converting a direction enum value to its correlating string
 static dirEnumToString(direction: DirectionEnum): Direction
 ```
 
-### directionToDirEnum (static method)
+### ~~directionToDirEnum~~ (static method)
 
 Converting a direction to its correlating enum value
 

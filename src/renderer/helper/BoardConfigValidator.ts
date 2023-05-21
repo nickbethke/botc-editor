@@ -32,23 +32,25 @@ class BoardConfigValidator {
 			this.errors.push(`Start fields are to less (minimum 2) or not defined`);
 		}
 
-		const doubleOccupancy = this.checkDoubleOccupancy();
-		if (doubleOccupancy) {
-			this.errors.push(`Double occupancy on field [${doubleOccupancy[0]}, ${doubleOccupancy[1]}]`);
+		this.errors.forEach((error, index) => {
+			this.errors[index] = window.t.translate(error);
+		});
+
+		if (this.errors.length == 0) {
+			const doubleOccupancy = this.checkDoubleOccupancy();
+			if (doubleOccupancy) {
+				this.errors.push(window.t.translateVars('Double occupancy on a field position [{0}, {1}]', [doubleOccupancy[0], doubleOccupancy[1]]));
+			}
+			const wallDoubleOccupancy = this.wallDoubleOccupancy();
+			if (wallDoubleOccupancy) {
+				this.errors.push(window.t.translateVars('Double occupancy on a wall position [[{0}, {1}], [{2}, {3}]]', [wallDoubleOccupancy[0][0], wallDoubleOccupancy[0][1], wallDoubleOccupancy[1][0], wallDoubleOccupancy[1][1]]));
+			}
+			const dimensions = this.checkDimensions();
+			if (dimensions) {
+				this.errors.push(window.t.translateVars('Board dimensions [{0}, {1}] is smaller then field dimension: [{2}, {3}]', [this.config.width, this.config.height, dimensions[0] + 1, dimensions[1] + 1]));
+			}
 		}
-		const wallDoubleOccupancy = this.wallDoubleOccupancy();
-		if (wallDoubleOccupancy) {
-			this.errors.push(
-				`Double occupancy on a wall position [${wallDoubleOccupancy[0][0]}, ${wallDoubleOccupancy[0][1]}] [${wallDoubleOccupancy[1][0]}, ${wallDoubleOccupancy[1][1]}]`,
-			);
-		}
-		const dimensions = this.checkDimensions();
-		if (dimensions) {
-			this.errors.push(
-				`Board dimensions [${this.config.width}, ${this.config.height}] is smaller then field dimension: `,
-				`\t required dimension: [${dimensions[0] + 1}, ${dimensions[1] + 1}]`,
-			);
-		}
+
 	}
 
 	/**

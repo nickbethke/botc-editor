@@ -35,6 +35,10 @@ class GameConfigValidator {
 		if (!('startLembas' in this.config)) {
 			this.errors.push('startLembas is required');
 		}
+
+		this.errors.forEach((error, index) => {
+			this.errors[index] = window.t.translate(error);
+		});
 	}
 }
 

@@ -28,7 +28,11 @@ export declare class AStarRiverPreset {
 }
 ```
 
+Added in v0.7.5
+
 ### toBeRemoved (property)
+
+The positions that should be removed from the preset.
 
 **Signature**
 

@@ -91,24 +91,11 @@ class GameConfigurator extends React.Component<GameConfiguratorProps, GameConfig
 			}
 
 			const configuration: GameConfigInterface = { ...this.default, ...loadedValues.config };
-			window.electron
-				.validate(loadedValues.config, 'game')
-				.then((valid) => {
-					if (isBoolean(valid) && valid) {
-						this.setState({
-							configuration,
-							notification: <Notification label={window.t.translate('Loaded successfully')} />,
-							file: loadedValues as PathInterface,
-						});
-						return;
-					}
-					this.setState({
-						file: null,
-						notification: <Error label={window.t.translate('Failed to load file!')} />,
-					});
-				})
-				.catch(() => {
-				});
+			this.setState({
+				configuration,
+				notification: <Notification label={window.t.translate('Loaded successfully')} />,
+				file: loadedValues as PathInterface,
+			});
 		}
 	}
 
@@ -337,8 +324,8 @@ class GameConfigurator extends React.Component<GameConfiguratorProps, GameConfig
 								<InputLabel
 									label={window.t.translate('Maximal number of rounds')}
 									type='number'
-									helperText={window.t.translate('The game ends after the specified number of rounds. -1 means no limit.')}
-									min={-1}
+									helperText={window.t.translate('The game ends after the specified number of rounds. 0 means no limit.')}
+									min={0}
 									max={200}
 									value={configuration.maxRounds}
 									validator={
@@ -348,8 +335,8 @@ class GameConfigurator extends React.Component<GameConfiguratorProps, GameConfig
 												ifSmallerThen: {
 													number: 5,
 													error: window.t.translate('Unfavorable number of rounds. The game would be over very quickly!'),
+													except: 0,
 													isError: true,
-													except: -1,
 												},
 												ifBiggerThen: {
 													number: 50,

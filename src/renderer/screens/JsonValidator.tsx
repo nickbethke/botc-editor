@@ -24,6 +24,7 @@ import Dragger from '../components/Dragger';
 import { ConfigType } from '../../interfaces/Types';
 import KeyCode = monaco.KeyCode;
 import KeyMod = monaco.KeyMod;
+import AStar from '../components/generator/helper/AStar';
 
 type JsonValidatorProps = {
 	onClose: () => void;
@@ -234,8 +235,8 @@ class JsonValidator extends React.Component<JsonValidatorProps, JsonValidatorSta
 	};
 
 	onChange = async (newValue: string) => {
-		const { type, consoleOutput } = this.state;
-		this.setState({ consoleOutput: [] });
+		const { type } = this.state;
+		const consoleOutput: string[] = [];
 		try {
 			const valid = await window.electron.validate(JSON.parse(newValue), type);
 			if (typeof valid === 'string') {
@@ -249,36 +250,53 @@ class JsonValidator extends React.Component<JsonValidatorProps, JsonValidatorSta
 			}
 
 		} catch (error) {
-			if (error instanceof Error) this.setState({ consoleOutput: [...consoleOutput, `${error.message}`] });
+			if (error instanceof Error) consoleOutput.push(error.message);
 		}
 		let validator;
 		if (type === 'board') {
 			try {
 				validator = new BoardConfigValidator(JSON.parse(newValue) as BoardConfigInterface);
-				this.setState({
-					consoleOutput: validator.errors,
-				});
+				consoleOutput.push(...validator.errors);
 			} catch (error) {
 				if (error instanceof Error)
-					this.setState({
-						consoleOutput: [...consoleOutput, `${error.message}`],
-					});
+					consoleOutput.push(error.message);
 			}
+
+			try {
+				const pathFinding = AStar.checkBoardConfig(JSON.parse(newValue) as BoardConfigInterface);
+				if (!pathFinding.result) {
+					pathFinding.errors.forEach((error) => {
+						console.log(error);
+						let message = '';
+						if (error.start && error.end) {
+							message = `No path from ({0}, {1}) to ({2}, {3})`;
+							consoleOutput.push(window.t.translateVars(message, [error.start.x, error.start.y, error.end.x, error.end.y]));
+
+						} else if (error.start) {
+							message = `No path from ({0}, {1})`;
+							consoleOutput.push(window.t.translateVars(message, [error.start.x, error.start.y]));
+						} else if (error.end) {
+							message = `No path to ({0}, {1})`;
+							consoleOutput.push(window.t.translateVars(message, [error.end.x, error.end.y]));
+						}
+					});
+				}
+			} catch (error) {
+				if (error instanceof Error)
+					consoleOutput.push(error.message);
+			}
+
 		} else if (type === 'game') {
 			try {
 				validator = new GameConfigValidator(JSON.parse(newValue) as GameConfigInterface);
-				this.setState({
-					consoleOutput: validator.errors,
-				});
+				consoleOutput.push(...validator.errors);
 			} catch (error) {
 				if (error instanceof Error) {
-					this.setState({
-						consoleOutput: [...consoleOutput, `${error.message}`],
-					});
+					consoleOutput.push(error.message);
 				}
 			}
 		}
-		this.setState({ code: newValue });
+		this.setState({ code: newValue, consoleOutput });
 	};
 
 	leavePopup = (): React.JSX.Element => {

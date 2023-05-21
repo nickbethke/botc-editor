@@ -12,32 +12,24 @@ export interface LanguageSchema {
 class TranslationHelper {
 	private lang: AvailableLanguages;
 
-	public missingTranslations: Map<string, boolean>;
 
 	private loadedLanguage: Map<string, string>;
 
-	constructor(lang: AvailableLanguages) {
+	constructor(lang: AvailableLanguages, test?: boolean) {
 		this.lang = lang;
 		this.loadedLanguage = new Map<string, string>();
-		this.missingTranslations = new Map();
-		this.setLanguageJSON();
+		if (!test)
+			this.setLanguageJSON();
 	}
 
 	public translate(str: string): string {
 		if (this.loadedLanguage.has(str)) {
 			return this.loadedLanguage.get(str) || str;
 		}
-		this.missingTranslations.set(str, true);
-		console.warn(`Missing translation for "${str}"`);
-		let missing = '';
-		this.missingTranslations.forEach((v, k) => {
-			missing += `["${k}", ""],\n`;
-		});
-		console.log(missing);
 		return str;
 	}
 
-	public translateVars(str: string, p: string[]): string {
+	public translateVars(str: string, p: any[]): string {
 		let trStr = this.translate(str);
 		p.forEach((v, i) => {
 			trStr = trStr.replace(new RegExp(`\\{${i}\\}`, 'g'), v);

@@ -9,12 +9,12 @@ import RandomBoardStartValuesDialogV2 from '../components/popups/RandomBoardStar
 import GameConfiguratorChoice from '../components/popups/GameConfiguratorChoice';
 import SettingsPopup from '../components/popups/SettingsPopup';
 import PopupV2 from '../components/popups/PopupV2';
-import { isBoolean } from 'lodash';
 import BoardGenerator from '../components/generator/BoardGenerator';
 import { AppScreens } from '../App';
 import { AboutPopup } from '../components/popups/AboutPopup';
 import Dragger from '../components/Dragger';
 import { JsonViewer } from '@textea/json-viewer';
+import { isBoardConfiguration } from '../components/boardConfigurator/HelperFunctions';
 
 type HomePopups =
 	| 'boardEditorChoiceV2'
@@ -131,8 +131,10 @@ export default class Home extends Component<HomeProps, HomeState> {
 						<p>{errorMessage.text}</p>
 					) : ''}
 					{(errorMessage && errorMessage.error) ? (
-						<JsonViewer value={JSON.parse(errorMessage.error)}
-									theme={settings.darkMode ? 'dark' : 'light'} />
+						<JsonViewer
+							value={JSON.parse(errorMessage.error)}
+							theme={settings.darkMode ? 'dark' : 'light'}
+						/>
 					) : ''}
 				</div>
 
@@ -143,8 +145,8 @@ export default class Home extends Component<HomeProps, HomeState> {
 	onBoardLoadConfig = async () => {
 		const boardJSON = await window.electron.dialog.openBoardConfig();
 		if (boardJSON) {
-			const validation = await window.electron.validate(boardJSON.config, 'board');
-			if (isBoolean(validation) && validation) {
+			const { valid, missing } = isBoardConfiguration(boardJSON.config);
+			if (valid) {
 				this.setState({
 					generator: null,
 				});
@@ -153,7 +155,7 @@ export default class Home extends Component<HomeProps, HomeState> {
 				this.setState({
 					errorMessage: {
 						title: window.t.translate('Board Configuration Validation Error'),
-						error: validation.toString(),
+						error: JSON.stringify({ 'missing': missing, 'valid': valid }),
 						text: window.t.translate('The board configuration you are trying to load is not valid. Please check the error message below and try again.'),
 					},
 					openPopup: 'error',
