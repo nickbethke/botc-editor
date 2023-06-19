@@ -1,5 +1,5 @@
 import fs from 'fs';
-import Ajv, { JSONSchemaType } from 'ajv';
+import Ajv from 'ajv';
 import path, { ParsedPath } from 'path';
 import * as RiverPresetSchema from '../../schema/riverPreset.schema.json';
 import * as BoardPresetSchema from '../../schema/boardPreset.schema.json';
@@ -69,8 +69,8 @@ class PresetsLoader {
 			fs.mkdirSync(getAppDataPath('presets/rivers'));
 			fs.readdirSync(IPCHelper.getAssetPath('defaultPresets/rivers')).forEach((file) => {
 				fs.copyFileSync(
-					IPCHelper.getAssetPath('defaultPresets/rivers/' + file),
-					getAppDataPath('presets/rivers/' + file),
+					IPCHelper.getAssetPath(`defaultPresets/rivers/${file}`),
+					getAppDataPath(`presets/rivers/${file}`)
 				);
 			});
 		}
@@ -144,10 +144,7 @@ class PresetsLoader {
 	static validateFile(type: 'river' | 'board', content: string) {
 		const ajv = new Ajv({ allErrors: true });
 		if (type === 'river') {
-			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-			// @ts-ignore
-			const schema: JSONSchemaType<RiverPreset> = RiverPresetSchema;
-			const validate = ajv.compile(schema);
+			const validate = ajv.compile(RiverPresetSchema);
 			try {
 				return !!validate(JSON.parse(content));
 			} catch (e) {
@@ -155,10 +152,7 @@ class PresetsLoader {
 			}
 		}
 		if (type === 'board') {
-			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-			// @ts-ignore
-			const schema: JSONSchemaType<BoardPreset> = BoardPresetSchema;
-			const validate = ajv.compile(schema);
+			const validate = ajv.compile(BoardPresetSchema);
 			try {
 				return !!validate(JSON.parse(content));
 			} catch (e) {
@@ -186,10 +180,7 @@ class PresetsLoader {
 	 * @return the new preset file path
 	 */
 	static async renameRiverPreset(from: string, to: string): Promise<ParsedPath> {
-		fs.renameSync(
-			path.join(PresetsLoader.riverPresetFolder, from),
-			path.join(PresetsLoader.riverPresetFolder, to),
-		);
+		fs.renameSync(path.join(PresetsLoader.riverPresetFolder, from), path.join(PresetsLoader.riverPresetFolder, to));
 		return path.parse(path.join(PresetsLoader.riverPresetFolder, to));
 	}
 }

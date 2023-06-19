@@ -11,13 +11,8 @@ import Hole from '../renderer/components/generator/fields/Hole';
 
 describe('a-star', () => {
 	test('max walls on 3x3 a-start test', () => {
-
 		const board: Array<Array<FieldWithPositionInterface>> = [
-			[
-				new Grass({ x: 0, y: 0 }),
-				new StartField({ x: 0, y: 1 }, DirectionEnum.NORTH),
-				new Grass({ x: 0, y: 2 }),
-			],
+			[new Grass({ x: 0, y: 0 }), new StartField({ x: 0, y: 1 }, DirectionEnum.NORTH), new Grass({ x: 0, y: 2 })],
 			[
 				new SauronsEye({ x: 1, y: 0 }, DirectionEnum.NORTH),
 				new Checkpoint({ x: 1, y: 1 }, 0),
@@ -31,14 +26,38 @@ describe('a-star', () => {
 		];
 
 		const walls: Array<[[number, number], [number, number]]> = [
-			[[0, 2], [1, 2]],
-			[[2, 2], [1, 2]],
-			[[0, 1], [0, 2]],
-			[[2, 1], [2, 2]],
-			[[0, 0], [1, 0]],
-			[[0, 0], [0, 1]],
-			[[1, 0], [1, 1]],
-			[[1, 0], [2, 0]],
+			[
+				[0, 2],
+				[1, 2],
+			],
+			[
+				[2, 2],
+				[1, 2],
+			],
+			[
+				[0, 1],
+				[0, 2],
+			],
+			[
+				[2, 1],
+				[2, 2],
+			],
+			[
+				[0, 0],
+				[1, 0],
+			],
+			[
+				[0, 0],
+				[0, 1],
+			],
+			[
+				[1, 0],
+				[1, 1],
+			],
+			[
+				[1, 0],
+				[2, 0],
+			],
 		];
 		const checkpoints = [
 			{ x: 1, y: 1 },
@@ -82,22 +101,16 @@ describe('a-star', () => {
 
 	test('a-star algorithm impossible', () => {
 		const board: Array<Array<FieldWithPositionInterface>> = [
-			[
-				new SauronsEye({ x: 0, y: 0 }, DirectionEnum.NORTH),
-				new Checkpoint({ x: 0, y: 1 }, DirectionEnum.NORTH),
-			],
-			[
-				new Hole({ x: 1, y: 0 }),
-				new Hole({ x: 1, y: 1 }),
-			],
-			[
-				new StartField({ x: 2, y: 0 }, DirectionEnum.NORTH),
-				new StartField({ x: 2, y: 1 }, DirectionEnum.NORTH),
-			],
+			[new SauronsEye({ x: 0, y: 0 }, DirectionEnum.NORTH), new Checkpoint({ x: 0, y: 1 }, DirectionEnum.NORTH)],
+			[new Hole({ x: 1, y: 0 }), new Hole({ x: 1, y: 1 })],
+			[new StartField({ x: 2, y: 0 }, DirectionEnum.NORTH), new StartField({ x: 2, y: 1 }, DirectionEnum.NORTH)],
 		];
 
 		const checkpoints = [{ x: 0, y: 1 }];
-		const startFields = [{ x: 2, y: 0 }, { x: 2, y: 1 }];
+		const startFields = [
+			{ x: 2, y: 0 },
+			{ x: 2, y: 1 },
+		];
 		const { result } = AStar.pathPossible(checkpoints, startFields, [], board, new Map([]));
 		expect(result).toBe(false);
 	});

@@ -1,6 +1,8 @@
 import { RiverPresetWithFile } from 'main/helper/PresetsLoader';
 import React, { Component } from 'react';
 import { VscAdd } from 'react-icons/vsc';
+import { GrRotateLeft, GrRotateRight } from 'react-icons/gr';
+import _uniqueId from 'lodash/uniqueId';
 import { SettingsInterface } from '../../../interfaces/SettingsInterface';
 import { BoardPosition } from '../generator/interfaces/BoardPosition';
 import ConfirmPopupV2 from './ConfirmPopupV2';
@@ -9,7 +11,6 @@ import InputLabel from '../InputLabel';
 import { getDirectionArrow } from '../presetEditor/RiverFieldPreset';
 import { HomeMenuSeparator } from '../HomeScreenButton';
 import Button from '../Button';
-import { GrRotateLeft, GrRotateRight } from 'react-icons/gr';
 import { Rotation } from '../../../interfaces/Types';
 import {
 	calculateRiverPresetFieldPositionWithRotation,
@@ -17,7 +18,6 @@ import {
 	getPreviousRotation,
 	rotateDirection,
 } from '../boardConfigurator/HelperFunctions';
-import _uniqueId from 'lodash/uniqueId';
 
 /**
  * The properties for the river preset component.
@@ -52,9 +52,9 @@ export default class AddRiverPresetConfirmPopup extends Component<
 			position:
 				props.configuration.eye.position[0] === 0 && props.configuration.eye.position[1] === 0
 					? {
-						x: 1,
-						y: 1,
-					}
+							x: 1,
+							y: 1,
+					  }
 					: { x: 0, y: 0 },
 			adjustBoardSize: false,
 			rotation: '0',
@@ -93,12 +93,22 @@ export default class AddRiverPresetConfirmPopup extends Component<
 				const isHoleClass = isHole ? 'isHole' : '';
 				const isEyeClass = isEye ? 'isEye' : '';
 				const isRiverClass = isRiver ? 'isRiverMuted' : '';
-				const className = isEyeClass || newRiverClass || isRiverClass || isCheckpointClass || isStartClass || isLembasClass || isHoleClass;
+				const className =
+					isEyeClass ||
+					newRiverClass ||
+					isRiverClass ||
+					isCheckpointClass ||
+					isStartClass ||
+					isLembasClass ||
+					isHoleClass;
 
 				row.push(
-					<div className={`w-8 h-8 relative border dark:border-muted-700 border-muted-400 ${className}`}>
+					<div
+						className={`min-w-5 w-5 min-h-5 h-5 relative border dark:border-muted-700 border-muted-400 ${className}`}
+					>
 						<div
-							className={`w-full h-full hover:opacity-100 opacity-0 flex items-center justify-center ${
+							role="presentation"
+							className={`w-5 h-5 hover:opacity-100 opacity-0 flex items-center justify-center ${
 								isEye ? 'hover:cursor-not-allowed' : 'hover:cursor-pointer'
 							}`}
 							onClick={() => {
@@ -109,14 +119,12 @@ export default class AddRiverPresetConfirmPopup extends Component<
 								}
 							}}
 						>
-							{!isEye ? (
-								<VscAdd />
-							) : null}
+							{!isEye ? <VscAdd /> : null}
 						</div>
 						{isNewRiver ? (
 							<div
-								role='presentation'
-								className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 hover:cursor-pointer'
+								role="presentation"
+								className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 hover:cursor-pointer"
 								onClick={() => {
 									if (!isEye) {
 										this.setState({
@@ -130,13 +138,16 @@ export default class AddRiverPresetConfirmPopup extends Component<
 						) : null}
 						{isRiver ? (
 							<div
-								role='presentation'
-								className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 hover:cursor-pointer'
+								role="presentation"
+								className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 hover:cursor-pointer"
 							>
-								{getDirectionArrow(configuration.riverFields.find((value) => value.position[0] === x && value.position[1] === y)!.direction)}
+								{getDirectionArrow(
+									configuration.riverFields.find((value) => value.position[0] === x && value.position[1] === y)!
+										.direction
+								)}
 							</div>
 						) : null}
-					</div>,
+					</div>
 				);
 			}
 			board.push(row);
@@ -161,15 +172,16 @@ export default class AddRiverPresetConfirmPopup extends Component<
 				settings={settings}
 				windowDimensions={windowDimensions}
 			>
-				<div className='flex flex-col gap-4'>
-					<div className='flex justify-center flex-col gap-2 items-center'>
+				<div className="flex flex-col gap-4">
+					<div className="flex justify-center flex-col gap-2 items-center">
 						<p>{window.t.translateVars('Add {0} river preset.', [`"${preset.name}"`])}</p>
 						<small>{window.t.translate('Click on the board to place the river.')}</small>
 						<small>{window.t.translate('Already occupied fields will be overridden, except for the eye.')}</small>
 					</div>
 					<HomeMenuSeparator />
-					<div className='flex justify-center items-center gap-2'>
+					<div className="flex justify-center items-center gap-2">
 						<Button
+							size="sm"
 							onClick={() => {
 								this.setState({
 									rotation: getNextRotation(rotation),
@@ -177,9 +189,9 @@ export default class AddRiverPresetConfirmPopup extends Component<
 							}}
 						>
 							<GrRotateRight />
-
 						</Button>
 						<Button
+							size="sm"
 							onClick={() => {
 								this.setState({
 									rotation: getPreviousRotation(rotation),
@@ -188,11 +200,13 @@ export default class AddRiverPresetConfirmPopup extends Component<
 						>
 							<GrRotateLeft />
 						</Button>
-						<span>{window.t.translate('Rotation')}: {this.state.rotation}°</span>
+						<span>
+							{window.t.translate('Rotation')}: {rotation}°
+						</span>
 					</div>
-					<div className='flex gap-2 justify-center items-center'>
+					<div className="flex gap-2 justify-center items-center">
 						<InputLabel
-							type='switch'
+							type="switch"
 							label={window.t.translate('Adjust board size')}
 							value={adjustBoardSize}
 							onChange={() => {
@@ -200,10 +214,12 @@ export default class AddRiverPresetConfirmPopup extends Component<
 							}}
 						/>
 					</div>
-					<div className='flex items-center justify-center'>
-						<div className='flex'>
+					<div className="flex max-h-[400px] overflow-y-auto">
+						<div className="flex">
 							{board.map((row) => (
-								<div key={_uniqueId()} className='flex flex-col'>{row.map((cell) => cell)}</div>
+								<div key={_uniqueId()} className="flex flex-col">
+									{row.map((cell) => cell)}
+								</div>
 							))}
 						</div>
 					</div>
@@ -211,6 +227,4 @@ export default class AddRiverPresetConfirmPopup extends Component<
 			</ConfirmPopupV2>
 		);
 	}
-
-
 }

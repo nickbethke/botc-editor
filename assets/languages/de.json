@@ -928,6 +928,10 @@
 		[
 			"Board name is not defined",
 			"Spielfeld Name ist nicht definiert"
+		],
+		[
+			"Board sizes over 32 could cause performance issues or the app to crash",
+			"Spielfeld Größen über 32 könnten zu Performance Problemen oder zum Absturz der App führen"
 		]
 	]
 }

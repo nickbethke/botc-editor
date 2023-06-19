@@ -1,5 +1,5 @@
-import BoardConfigInterface from '../interfaces/BoardConfigInterface';
 import Ajv from 'ajv';
+import BoardConfigInterface from '../interfaces/BoardConfigInterface';
 import * as boardConfigurationSchema from '../schema/boardConfigSchema.json';
 import * as gameConfigurationSchema from '../schema/gameConfigSchema.json';
 import BoardConfigValidator from '../renderer/helper/BoardConfigValidator';
@@ -7,7 +7,6 @@ import GameConfigInterface from '../interfaces/GameConfigInterface';
 import TranslationHelper, { AvailableLanguages } from '../renderer/helper/TranslationHelper';
 
 window.t = new TranslationHelper(AvailableLanguages.en, true);
-
 
 // is valid board configuration after the schema, but not valid for the game
 const invalidBoardConfig: BoardConfigInterface = {
@@ -78,38 +77,36 @@ const validGameConfig: GameConfigInterface = {
 	startLembas: 10,
 };
 
-
 describe('validation', () => {
 	describe('board configuration', () => {
 		test('valid board configuration', () => {
-			const validate = (new Ajv()).compile(boardConfigurationSchema);
+			const validate = new Ajv().compile(boardConfigurationSchema);
 			expect(validate(validBoardConfig)).toBeTruthy();
 
 			expect(new BoardConfigValidator(validBoardConfig).errors).toHaveLength(0);
 		});
 
 		test('invalid board configuration for game', () => {
-			const validate = (new Ajv()).compile(boardConfigurationSchema);
+			const validate = new Ajv().compile(boardConfigurationSchema);
 			expect(validate(invalidBoardConfig)).toBeTruthy();
 
 			expect(new BoardConfigValidator(invalidBoardConfig).errors.length).toBeGreaterThanOrEqual(1);
 		});
 
 		test('invalid board configuration against schema', () => {
-			const validate = (new Ajv()).compile(boardConfigurationSchema);
+			const validate = new Ajv().compile(boardConfigurationSchema);
 			expect(validate({})).toBeFalsy();
 		});
 	});
 
 	describe('game configuration', () => {
-
 		test('valid game configuration', () => {
-			const validate = (new Ajv()).compile(gameConfigurationSchema);
+			const validate = new Ajv().compile(gameConfigurationSchema);
 			expect(validate(validGameConfig)).toBeTruthy();
 		});
 
 		test('invalid game configuration', () => {
-			const validate = (new Ajv()).compile(gameConfigurationSchema);
+			const validate = new Ajv().compile(gameConfigurationSchema);
 			expect(validate(invalidGameConfig)).toBeFalsy();
 		});
 	});

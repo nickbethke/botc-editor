@@ -33,10 +33,7 @@
 			"maxItems": 6,
 			"items": {
 				"type": "object",
-				"required": [
-					"position",
-					"direction"
-				],
+				"required": ["position", "direction"],
 				"properties": {
 					"position": {
 						"type": "array",
@@ -48,12 +45,7 @@
 					},
 					"direction": {
 						"type": "string",
-						"enum": [
-							"NORTH",
-							"SOUTH",
-							"WEST",
-							"EAST"
-						]
+						"enum": ["NORTH", "SOUTH", "WEST", "EAST"]
 					}
 				},
 				"additionalProperties": false
@@ -73,10 +65,7 @@
 		},
 		"eye": {
 			"type": "object",
-			"required": [
-				"position",
-				"direction"
-			],
+			"required": ["position", "direction"],
 			"properties": {
 				"position": {
 					"type": "array",
@@ -88,12 +77,7 @@
 				},
 				"direction": {
 					"type": "string",
-					"enum": [
-						"NORTH",
-						"SOUTH",
-						"WEST",
-						"EAST"
-					]
+					"enum": ["NORTH", "SOUTH", "WEST", "EAST"]
 				}
 			},
 			"additionalProperties": false
@@ -113,10 +97,7 @@
 			"type": "array",
 			"items": {
 				"type": "object",
-				"required": [
-					"position",
-					"direction"
-				],
+				"required": ["position", "direction"],
 				"properties": {
 					"position": {
 						"type": "array",
@@ -128,12 +109,7 @@
 					},
 					"direction": {
 						"type": "string",
-						"enum": [
-							"NORTH",
-							"SOUTH",
-							"WEST",
-							"EAST"
-						]
+						"enum": ["NORTH", "SOUTH", "WEST", "EAST"]
 					}
 				},
 				"additionalProperties": false
@@ -157,10 +133,7 @@
 			"type": "array",
 			"items": {
 				"type": "object",
-				"required": [
-					"position",
-					"amount"
-				],
+				"required": ["position", "amount"],
 				"properties": {
 					"position": {
 						"type": "array",

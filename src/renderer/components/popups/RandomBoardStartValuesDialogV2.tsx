@@ -1,25 +1,25 @@
 import React from 'react';
 import { TailSpin } from 'react-loader-spinner';
 import InputLabel from '../InputLabel';
-import BoardGenerator from '../generator/BoardGenerator';
+import BoardGenerator, { RiverAlgorithm, WallAlgorithm } from '../generator/BoardGenerator';
 import { SettingsInterface } from '../../../interfaces/SettingsInterface';
 import ConfirmPopupV2 from './ConfirmPopupV2';
 
 export type RandomBoardStartValuesDialogV2Stats = {
-	name: string;
-	width: number;
-	height: number;
-	startFields: number;
 	checkpoints: number;
+	generating: boolean;
+	height: number;
+	holes: number;
+	lembasAmountExactMaximum: boolean;
 	lembasFields: number;
 	maxLembasAmountOnField: number;
-	lembasAmountExactMaximum: boolean;
-	rivers: boolean;
-	holes: number;
-	walls: boolean;
+	name: string;
 	riverAlgorithm: RiverAlgorithm;
+	rivers: boolean;
+	startFields: number;
+	walls: boolean;
 	wallsAlgorithm: WallAlgorithm;
-	generating: boolean;
+	width: number;
 };
 
 export type RandomBoardStartValuesV2 = {
@@ -47,21 +47,11 @@ type RandomBoardStartValuesDialogV2Props = {
 	settings: SettingsInterface;
 };
 
-/**
- * river algorithm type
- */
-export type RiverAlgorithm = 'default' | 'complex';
-
-/**
- * river algorithm type
- */
-export type WallAlgorithm = 'iterative' | 'random';
-
 class RandomBoardStartValuesDialogV2 extends React.Component<
 	RandomBoardStartValuesDialogV2Props,
 	RandomBoardStartValuesDialogV2Stats
 > {
-	private dimensionMax: number = 20;
+	private readonly dimensionMax: number = 20;
 
 	constructor(props: RandomBoardStartValuesDialogV2Props) {
 		super(props);
@@ -215,7 +205,7 @@ class RandomBoardStartValuesDialogV2 extends React.Component<
 				topOffset={topOffset}
 				settings={settings}
 				maxWidth={1000}
-				big={true}
+				big
 			>
 				<div className="px-16">
 					<div className="grid grid-cols-2 gap-8">

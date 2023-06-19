@@ -4,11 +4,11 @@ import React from 'react';
  * The context menu component properties
  */
 type ContextMenuV2Props = {
+	children: string | React.JSX.Element | React.JSX.Element[] | null;
 	position: {
 		y: number;
 		x: number;
 	};
-	children: string | React.JSX.Element | React.JSX.Element[] | null;
 };
 
 /**
@@ -23,7 +23,7 @@ function ContextMenuV2(props: ContextMenuV2Props) {
 			className="fixed dark:bg-muted-700 bg-muted-600 flex flex-col p-1 rounded z-50"
 			style={{ top: `${position.y}px`, left: `${position.x}px` }}
 		>
-			{children}
+			{children instanceof Array ? children.map((child) => child) : children}
 		</div>
 	);
 }

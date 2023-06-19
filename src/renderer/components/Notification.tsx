@@ -26,12 +26,12 @@ class Notification extends React.Component<NotificationProps, NotificationState>
 				className={`dark:bg-muted-100/25 bg-muted-100/10 border border-green-400 px-4 py-2 rounded flex items-center relative${
 					!visible ? ' hidden' : ''
 				}`}
-				role='alert'
+				role="alert"
 			>
-				<span className='block sm:inline'>{label}</span>
+				<span className="block sm:inline">{label}</span>
 				<button
-					type='button'
-					className='ml-auto'
+					type="button"
+					className="ml-auto"
 					onClick={() => {
 						this.setState({ visible: false });
 					}}

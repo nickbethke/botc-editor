@@ -1,5 +1,5 @@
-import * as settingsSchema from '../schema/settings.schema.json';
 import Ajv from 'ajv';
+import * as settingsSchema from '../schema/settings.schema.json';
 import { SettingsInterface } from '../interfaces/SettingsInterface';
 
 describe('defaults', () => {
@@ -16,12 +16,11 @@ describe('defaults', () => {
 				maxLembasCount: 10,
 				maxHoles: 16,
 			},
-
 		};
-		const validate = (new Ajv()).compile(settingsSchema);
+		const validate = new Ajv().compile(settingsSchema);
 		const valid = validate(defaultSettings);
 		if (!valid) {
-			console.warn(validate.errors);
+			process.stdout.write(JSON.stringify(validate.errors, null, 2));
 		}
 		expect(valid).toBe(true);
 	});

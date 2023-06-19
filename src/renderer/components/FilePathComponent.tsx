@@ -14,8 +14,8 @@ function FilePathComponent(props: FilePathComponentProps) {
 	const fileSep = os === 'win32' ? '\\' : '/';
 	return (
 		<button
-			className='flex items-center italic'
-			type='button'
+			className="flex items-center italic"
+			type="button"
 			onClick={() => {
 				setDirOpen(!dirOpen);
 			}}

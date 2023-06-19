@@ -27,8 +27,8 @@ import FilePathComponent from '../FilePathComponent';
  * The field type onClick arguments
  */
 interface FieldTypeOnClickArgs {
-	wall: [BoardPosition, BoardPosition];
 	field: BoardPosition;
+	wall: [BoardPosition, BoardPosition];
 }
 
 /**
@@ -36,18 +36,18 @@ interface FieldTypeOnClickArgs {
  */
 export type FieldTypeOnClick = <K extends keyof FieldTypeOnClickArgs>(
 	type: K,
-	position: FieldTypeOnClickArgs[K],
+	position: FieldTypeOnClickArgs[K]
 ) => void;
 /**
  * The wall helper component properties
  */
 type WallHelperProps = {
-	position: [BoardPosition, BoardPosition];
-	direction: 'horizontal' | 'vertical';
-	onClick: FieldTypeOnClick;
+	direction?: 'horizontal' | 'vertical';
 	editorTool: EditorToolType;
-	isWall: boolean;
+	isWall?: boolean;
+	onClick: FieldTypeOnClick;
 	onContextMenu: (contextMenu: React.JSX.Element | null) => void;
+	position: [BoardPosition, BoardPosition];
 };
 
 /**
@@ -70,7 +70,7 @@ function WallHelper(props: WallHelperProps) {
 			<ContextMenuV2 position={{ x: event.clientX, y: event.clientY }}>
 				<ContextMenuItemV2
 					text={
-						<div className='flex gap-2'>
+						<div className="flex gap-2">
 							<span>{window.t.translate('Position')}:</span>
 							<span>
 								[{position[0].x}, {position[0].y}]
@@ -81,14 +81,14 @@ function WallHelper(props: WallHelperProps) {
 						</div>
 					}
 				/>
-			</ContextMenuV2>,
+			</ContextMenuV2>
 		);
 	};
 	return (
 		<div
 			key={_uniqueId('wall-helper-')}
 			tabIndex={-1}
-			role='presentation'
+			role="presentation"
 			className={`${
 				direction === 'horizontal' ? 'w-16 h-4' : 'w-4 h-16'
 			} transition transition-color hover:cursor-pointer rounded ${active ? activeClass : inactiveClass} ${
@@ -195,13 +195,13 @@ function FieldHelper(props: FieldHelperProps) {
 	 * @param event
 	 */
 	const getContextMenu = (event: React.MouseEvent<HTMLDivElement>) => {
-		const { onChangeToEdit, inEdit } = props;
+		const { onChangeToEdit } = props;
 		if (editable) {
 			return (
 				<ContextMenuV2 position={{ x: event.clientX, y: event.clientY }}>
 					<ContextMenuItemV2
 						text={
-							<div className='flex gap-2'>
+							<div className="flex gap-2">
 								<span>{window.t.translate('Position')}:</span>
 								<span>
 									[{position.x}, {position.y}]
@@ -213,7 +213,7 @@ function FieldHelper(props: FieldHelperProps) {
 					{inEdit ? (
 						<ContextMenuItemV2
 							text={
-								<div className='flex gap-2 items-center'>
+								<div className="flex gap-2 items-center">
 									<VscEdit />
 									{window.t.translate('End Edit')}
 								</div>
@@ -225,7 +225,7 @@ function FieldHelper(props: FieldHelperProps) {
 					) : (
 						<ContextMenuItemV2
 							text={
-								<div className='flex gap-2 items-center'>
+								<div className="flex gap-2 items-center">
 									<VscEdit />
 									{window.t.translate('Edit')}
 								</div>
@@ -242,7 +242,7 @@ function FieldHelper(props: FieldHelperProps) {
 			<ContextMenuV2 position={{ x: event.clientX, y: event.clientY }}>
 				<ContextMenuItemV2
 					text={
-						<div className='flex gap-2'>
+						<div className="flex gap-2">
 							<span>{window.t.translate('Position')}:</span>
 							<span>
 								[{position.x}, {position.y}]
@@ -257,7 +257,7 @@ function FieldHelper(props: FieldHelperProps) {
 		<div
 			key={_uniqueId('field-helper-')}
 			tabIndex={-1}
-			role='presentation'
+			role="presentation"
 			className={`relative w-16 h-16 transition transition-color rounded border ${
 				active ? activeClass : inactiveClass
 			} ${inEdit ? inEditClass : 'border-transparent'} ${getClassFromFieldEnum()}`}
@@ -269,8 +269,7 @@ function FieldHelper(props: FieldHelperProps) {
 			}}
 		>
 			{attribute !== null ? (
-				<div
-					className='absolute bottom-0 right-0 w-5 h-5 font-mono font-black flex items-center justify-center text-white bg-gray-900/75'>
+				<div className="absolute bottom-0 right-0 w-5 h-5 font-mono font-black flex items-center justify-center text-white bg-gray-900/75">
 					{text}
 				</div>
 			) : null}
@@ -327,7 +326,7 @@ class MainEditor extends React.Component<MainEditorProps, MainEditorState> {
 				() => {
 					this.setState({ contextMenu: null });
 				},
-				{ once: true },
+				{ once: true }
 			);
 		}
 	};
@@ -341,18 +340,18 @@ class MainEditor extends React.Component<MainEditorProps, MainEditorState> {
 		const wallMap = wallConfig2Map(config.walls);
 		const board: React.JSX.Element[][] = [];
 		const xCordsRow: React.JSX.Element[] = [];
-		xCordsRow.push(<div className='h-4 w-4 flex items-center' />);
+		xCordsRow.push(<div className="h-4 w-4 flex items-center" />);
 		for (let x = 0; x < config.width; x += 1) {
 			xCordsRow.push(
 				<>
 					<div
-						className='h-4 w-16 flex items-center justify-center text-muted-50 bg-muted/20 text-[12px] rounded-full'
+						className="h-4 w-16 flex items-center justify-center text-muted-50 bg-muted/20 text-[12px] rounded-full"
 						key={_uniqueId('y-coordinates-')}
 					>
 						{x}
 					</div>
-					<div key={_uniqueId()} className='h-4 w-4 flex items-center' />
-				</>,
+					<div key={_uniqueId()} className="h-4 w-4 flex items-center" />
+				</>
 			);
 		}
 		board.push(xCordsRow);
@@ -360,11 +359,11 @@ class MainEditor extends React.Component<MainEditorProps, MainEditorState> {
 			const row: React.JSX.Element[] = [];
 			row.push(
 				<div
-					className='h-16 w-4 flex items-center justify-center text-muted-50 bg-muted/20 text-[12px] rounded-full'
+					className="h-16 w-4 flex items-center justify-center text-muted-50 bg-muted/20 text-[12px] rounded-full"
 					key={_uniqueId('y-coordinates-')}
 				>
 					{y}
-				</div>,
+				</div>
 			);
 			for (let x = 0; x < config.width; x += 1) {
 				const fieldPosition = { x, y };
@@ -400,7 +399,7 @@ class MainEditor extends React.Component<MainEditorProps, MainEditorState> {
 						attribute={attribute}
 						onContextMenu={this.onContextMenu}
 						onChangeToEdit={onChangeToEdit}
-					/>,
+					/>
 				);
 				if (x < config.width - 1) {
 					const position: [BoardPosition, BoardPosition] = [
@@ -412,20 +411,20 @@ class MainEditor extends React.Component<MainEditorProps, MainEditorState> {
 
 					row.push(
 						<WallHelper
-							direction='vertical'
+							direction="vertical"
 							position={position}
 							onClick={onFieldOrWallClick}
 							editorTool={editorTool}
 							isWall={wallMap.has(positionString1) || wallMap.has(positionString2)}
 							onContextMenu={this.onContextMenu}
-						/>,
+						/>
 					);
 				}
 			}
 			board.push(row);
 			if (y < config.height - 1) {
 				const wallRow: React.JSX.Element[] = [];
-				wallRow.push(<div key={_uniqueId()} className='w-4 h-4' />);
+				wallRow.push(<div key={_uniqueId()} className="w-4 h-4" />);
 				for (let x = 0; x < config.width; x += 1) {
 					const position: [BoardPosition, BoardPosition] = [
 						{ x, y },
@@ -435,27 +434,27 @@ class MainEditor extends React.Component<MainEditorProps, MainEditorState> {
 					const positionString2 = wallBoardPosition2String([position[1], position[0]]);
 					wallRow.push(
 						<WallHelper
-							direction='horizontal'
+							direction="horizontal"
 							position={position}
 							onClick={onFieldOrWallClick}
 							editorTool={editorTool}
 							isWall={wallMap.has(positionString1) || wallMap.has(positionString2)}
 							onContextMenu={this.onContextMenu}
-						/>,
+						/>
 					);
 					if (x < config.width - 1) {
-						wallRow.push(<div key={_uniqueId('wall-divider-')} className='w-4 h-4' />);
+						wallRow.push(<div key={_uniqueId('wall-divider-')} className="w-4 h-4" />);
 					}
 				}
 				board.push(wallRow);
 			}
 			row.push(
 				<div
-					className='h-16 w-4 flex items-center justify-center text-muted-50 bg-muted/20 text-[12px] rounded-full'
+					className="h-16 w-4 flex items-center justify-center text-muted-50 bg-muted/20 text-[12px] rounded-full"
 					key={_uniqueId('y-coordinates-')}
 				>
 					{y}
-				</div>,
+				</div>
 			);
 		}
 		board.push(xCordsRow);
@@ -504,16 +503,15 @@ class MainEditor extends React.Component<MainEditorProps, MainEditorState> {
 		const { contextMenu } = this.state;
 		const board = this.buildBoard(config);
 		return (
-			<div className='max-h-full h-full'>
-				<div
-					className='px-2 dark:bg-muted-800 bg-muted-600 text-sm dark:text-muted-200 text-muted-50 h-fit overflow-x-hidden'>
+			<div className="max-h-full h-full">
+				<div className="px-2 dark:bg-muted-800 bg-muted-600 text-sm dark:text-muted-200 text-muted-50 h-fit overflow-x-hidden">
 					{file ? (
-						<div className='flex items-center gap-0 h-full py-[10px]'>
+						<div className="flex items-center gap-0 h-full py-[10px]">
 							<FilePathComponent file={file.parsedPath} edited={!fileSaved} os={os} />
 						</div>
 					) : (
-						<div className='flex items-center gap-0 h-full'>
-							<span className='py-[10px]'>
+						<div className="flex items-center gap-0 h-full">
+							<span className="py-[10px]">
 								{window.t.translate('Unsaved File')}
 								{fileSaved ? '' : ` *`}
 							</span>
@@ -521,15 +519,15 @@ class MainEditor extends React.Component<MainEditorProps, MainEditorState> {
 					)}
 				</div>
 				<div
-					id='main-editor'
-					className='relative h-full max-w-full flex overflow-auto p-4 z-0 border-t dark:border-muted-700 border-muted-400'
+					id="main-editor"
+					className="relative h-full max-w-full flex overflow-auto p-4 z-0 border-t dark:border-muted-700 border-muted-400"
 					style={{ maxHeight: 'calc(100% - 43px)' }}
 					onWheel={this.handleZoom}
 				>
-					<div id='main-editor-board' className='h-fit'>
+					<div id="main-editor-board" className="h-fit">
 						<div
-							id='main-editor-board-board'
-							className='flex flex-col rounded gap-2 p-2'
+							id="main-editor-board-board"
+							className="flex flex-col rounded gap-2 p-2"
 							style={{
 								transform: `scale(${zoom})`,
 								transformOrigin: 'top left',
@@ -537,7 +535,7 @@ class MainEditor extends React.Component<MainEditorProps, MainEditorState> {
 						>
 							{board.map((row) => {
 								return (
-									<div key={_uniqueId('editor-row-')} className='flex gap-2'>
+									<div key={_uniqueId('editor-row-')} className="flex gap-2">
 										{row.map((field) => field)}
 									</div>
 								);

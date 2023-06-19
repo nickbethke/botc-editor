@@ -32,7 +32,6 @@ class IPCHelper {
 			maxLembasCount: 10,
 			maxHoles: 16,
 		},
-
 	};
 
 	/**
@@ -42,13 +41,14 @@ class IPCHelper {
 	 */
 	static handleSaveGameConfig = async (
 		json: string,
-		window: BrowserWindow | null,
+		window: BrowserWindow | null
 	): Promise<
 		| {
-		parsedPath: ParsedPath;
-		path: string;
-	}
-		| false | 'canceled'
+				parsedPath: ParsedPath;
+				path: string;
+		  }
+		| false
+		| 'canceled'
 	> => {
 		let currentCanceled;
 		let currentFilePath;
@@ -84,24 +84,16 @@ class IPCHelper {
 	};
 
 	static handleFileOpen = async (
-		type: '' | ConfigType = '',
-		window?: BrowserWindow | null,
+		window: BrowserWindow | null,
+		type: '' | ConfigType = ''
 	): Promise<
+		| { parsedPath: ParsedPath; path: string; config: GameConfigInterface }
 		| {
-		parsedPath: ParsedPath;
-		path: string;
-		config: GameConfigInterface;
-	}
-		| {
-		parsedPath: ParsedPath;
-		path: string;
-		config: BoardConfigInterface;
-	}
-		| {
-		parsedPath: ParsedPath;
-		path: string;
-		config: never;
-	}
+				parsedPath: ParsedPath;
+				path: string;
+				config: BoardConfigInterface;
+		  }
+		| { parsedPath: ParsedPath; path: string; config: never }
 		| false
 	> => {
 		if (type === 'board') {
@@ -224,12 +216,12 @@ class IPCHelper {
 
 	static handleSaveBoardConfig = async (
 		json: string,
-		window: BrowserWindow | null,
+		window: BrowserWindow | null
 	): Promise<
 		| {
-		parsedPath: ParsedPath;
-		path: string;
-	}
+				parsedPath: ParsedPath;
+				path: string;
+		  }
 		| false
 	> => {
 		let currentCanceled;
@@ -288,19 +280,16 @@ class IPCHelper {
 	};
 
 	static openFile(file: string): void {
-		shell.openPath(file).catch(() => {
-		});
+		shell.openPath(file).catch(() => {});
 	}
 
 	static openDirectory(file: string): void {
 		const { dir } = path.parse(file);
-		shell.openPath(dir).catch(() => {
-		});
+		shell.openPath(dir).catch(() => {});
 	}
 
 	static openDirectoryDirectly(dir: string): void {
-		shell.openPath(dir).catch(() => {
-		});
+		shell.openPath(dir).catch(() => {});
 	}
 
 	static saveFile(file: string, content: string): boolean | string {
@@ -371,7 +360,7 @@ class IPCHelper {
 	static getAssetPath(...paths: string[]): string {
 		return path.join(
 			app.isPackaged ? path.join(process.resourcesPath, 'assets') : path.join(__dirname, '../../../assets'),
-			...paths,
+			...paths
 		);
 	}
 

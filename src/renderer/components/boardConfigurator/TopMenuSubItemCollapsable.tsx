@@ -35,7 +35,7 @@ class TopMenuSubItemCollapsable extends React.Component<
 		const { open } = this.state;
 		return (
 			<div
-				className='pl-8 pr-2 py-1 dark:bg-muted-800 bg-muted-500 dark:hover:bg-muted-700 hover:bg-muted-400 hover:cursor-pointer transition-colors gap-4 relative flex justify-between items-center'
+				className="pl-8 pr-2 py-1 dark:bg-muted-800 bg-muted-500 dark:hover:bg-muted-700 hover:bg-muted-400 hover:cursor-pointer transition-colors gap-4 relative flex justify-between items-center"
 				onMouseEnter={() => {
 					this.setState({ open: true });
 				}}
@@ -49,9 +49,10 @@ class TopMenuSubItemCollapsable extends React.Component<
 						open ? 'block' : 'hidden'
 					} flex flex-col justify-start absolute -top-[0.57rem] left-full dark:bg-muted-800 bg-muted-500 w-fit whitespace-nowrap rounded-b py-2 border dark:border-muted-700 border-muted-200 hover:cursor-pointer dark:border z-50`}
 				>
-					{children ? children : null}
+					{children || null}
 				</div>
-			</div>);
+			</div>
+		);
 	}
 }
 

@@ -41,3 +41,5 @@ appData/settings.json
 /docs/botc-editor-documentation/
 /docs/main/
 /docs/renderer/
+
+/coverage

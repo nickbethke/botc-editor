@@ -6,11 +6,11 @@ export interface SettingsInterface {
 	language: string;
 	popupsDraggable: boolean;
 	defaultValues: {
-		defaultBoardName: string
-		maxBoardSize: number
-		maxCheckpoints: number
-		maxLembasFields: number
-		maxLembasCount: number
-		maxHoles: number
+		defaultBoardName: string;
+		maxBoardSize: number;
+		maxCheckpoints: number;
+		maxLembasFields: number;
+		maxLembasCount: number;
+		maxHoles: number;
 	};
 }

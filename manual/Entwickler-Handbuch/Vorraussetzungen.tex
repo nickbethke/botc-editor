@@ -1,0 +1,40 @@
+\section{Voraussetzungen}\label{sec:voraussetzungen}
+
+\subsection{Node.js}\label{subsec:node.js2}
+
+Um den Editor zu installieren, muss \emph{Node.js} auf dem System installiert sein.
+Für die Installation von \emph{Node.js} gibt es unterschiedliche Installationsanweisungen, abhängig von dem Betriebssystem, auf dem \emph{Node.js} installiert werden soll.
+Zu finden sind diese unter \url{https://nodejs.org/en/download/}.
+
+\subsection{NPM / Yarn}\label{subsec:npm-/-yarn}
+
+\includegraphics[scale=0.1]{assets/npm}
+\includegraphics[scale=0.1]{assets/yarn}
+
+Um den Editor zu installieren, muss \emph{NPM} oder \emph{Yarn} installiert sein.
+\emph{NPM} wird mit \emph{Node.js} installiert.//
+
+\emph{Yarn} kann unter \url{https://yarnpkg.com/en/docs/install} installiert werden, oder mit \emph{NPM} installiert werden, indem der Befehl \cmd{npm install -g yarn} ausgeführt wird.
+
+NPM und Yarn werden für die Installation der Abhängigkeiten des Editors benötigt.
+Sie sind beide Paketmanager für \emph{Node.js}.
+
+\subsection{Vorbereitung}\label{subsec:vorbereitung}
+
+\begin{enumerate}
+	\item Lade den Quellcode des Editors herunter.
+	\item Entpacke den Quellcode des Editors.
+	\item Öffne ein Terminal.
+	\item Navigiere in das Verzeichnis, in dem der Quellcode des Editors entpackt wurde.
+	\item Führe den Befehl \cmd{npm install} oder \cmd{yarn install} aus.
+	\item Warte, bis die Abhängigkeiten installiert wurden.
+	Das kann einige Minuten dauern.
+	Es kann sein, dass bei der Installation der Abhängigkeiten Warnungen oder Fehler auftreten.
+	Diese können ignoriert werden.
+	\item Führe den Befehl \cmd{npm i -g ts ts-node} oder \cmd{yarn global add ts ts-node} aus.
+	Dieser Befehl installiert die \emph{TypeScript}-Compiler, welche für die Entwicklung des Editors benötigt werden.
+	\item Führe den Befehl \cmd{npm run start} oder \cmd{yarn start} aus.
+	\item Nun, sollte der, Editor gestartet werden und als ein Fenster angezeigt werden.
+\end{enumerate}
+
+Dies ist auch alles auch noch einmal in der \emph{README}-Datei des Editors beschrieben.

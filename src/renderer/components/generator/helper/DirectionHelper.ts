@@ -40,6 +40,10 @@ class DirectionHelper {
 		}
 	}
 
+	/**
+	 * Returns the next direction in the clockwise direction
+	 * @param direction
+	 */
 	static getNextDirection(direction: Direction): Direction {
 		switch (direction) {
 			case 'EAST':
@@ -51,10 +55,13 @@ class DirectionHelper {
 			case 'NORTH':
 			default:
 				return 'EAST';
-
 		}
 	}
 
+	/**
+	 * Returns the next direction in the counterclockwise direction
+	 * @param direction
+	 */
 	static getPreviousDirection(direction: Direction): Direction {
 		switch (direction) {
 			case 'EAST':

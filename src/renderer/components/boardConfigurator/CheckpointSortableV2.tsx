@@ -8,8 +8,8 @@ import { Position } from '../../../interfaces/BoardConfigInterface';
  */
 type CheckpointSortableV2Props = {
 	checkpoints: Array<Position>;
-	onUpdate: (checkpoints: Array<Position>) => void;
 	onSelect: (position: BoardPosition) => void;
+	onUpdate: (checkpoints: Array<Position>) => void;
 };
 type CheckpointSortableV2State = {
 	items: Position[];

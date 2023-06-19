@@ -11,7 +11,10 @@ type GameConfiguratorChoiceCardState = {
 	hover: boolean;
 };
 
-class GameConfiguratorChoiceCard extends React.Component<GameConfiguratorChoiceCardProps, GameConfiguratorChoiceCardState> {
+class GameConfiguratorChoiceCard extends React.Component<
+	GameConfiguratorChoiceCardProps,
+	GameConfiguratorChoiceCardState
+> {
 	constructor(props: GameConfiguratorChoiceCardProps) {
 		super(props);
 		this.state = { hover: false };

@@ -1,9 +1,9 @@
 import React from 'react';
 import _uniqueId from 'lodash/uniqueId';
+import { TrashIcon } from '@radix-ui/react-icons';
 import { BoardPosition } from '../generator/interfaces/BoardPosition';
 import { Position } from '../../../interfaces/BoardConfigInterface';
 import { FieldsEnum } from '../generator/BoardGenerator';
-import { TrashIcon } from '@radix-ui/react-icons';
 import Button from '../Button';
 
 /**
@@ -50,17 +50,7 @@ export type WarningProps = {
  * @constructor
  */
 function Warning(props: WarningProps) {
-	const {
-		title,
-		content,
-		helper,
-		fields,
-		onFieldSelect,
-		removeWall,
-		onRemoveWall,
-		removeField,
-		onRemoveField,
-	} = props;
+	const { title, content, helper, fields, onFieldSelect, removeWall, onRemoveWall, removeField, onRemoveField } = props;
 
 	const fieldEnumToString = (fieldEnum: FieldsEnum) => {
 		switch (fieldEnum) {
@@ -83,33 +73,34 @@ function Warning(props: WarningProps) {
 	};
 
 	return (
-		<div
-			className='m-2 text-sm border dark:border-muted-700 border-muted-400 rounded flex flex-col dark:bg-muted-800 bg-muted-600'>
-			<div className='border-b dark:border-muted-700 border-muted-400 px-2 py-1'>{title}</div>
-			<div className='px-2 py-1'>{content}</div>
+		<div className="m-2 text-sm border dark:border-muted-700 border-muted-400 rounded flex flex-col dark:bg-muted-800 bg-muted-600">
+			<div className="border-b dark:border-muted-700 border-muted-400 px-2 py-1">{title}</div>
+			<div className="px-2 py-1">{content}</div>
 			{fields ? (
-				<div className='flex gap-2 px-2 py-1 mb-2'>
+				<div className="flex gap-2 px-2 py-1 mb-2">
 					{fields.map((field) => (
 						<Button
-							buttonType='secondary'
+							buttonType="secondary"
 							key={_uniqueId('warning-helper-')}
-							className='px-2 py-1'
+							className="px-2 py-1"
 							onClick={() => {
 								onFieldSelect(field);
 							}}
-							size='sm'
+							size="sm"
 						>
-							<p>{window.t.translate('Field')}: [{field.x}, {field.y}]</p>
+							<p>
+								{window.t.translate('Field')}: [{field.x}, {field.y}]
+							</p>
 						</Button>
 					))}
 				</div>
 			) : null}
 			{helper ? (
-				<div className='flex gap-2 px-2 py-1 mb-2'>
+				<div className="flex gap-2 px-2 py-1 mb-2">
 					{helper.map((help) => (
 						<div
 							key={_uniqueId('warning-helper-')}
-							className='px-2 py-1 rounded dark:bg-muted-700 bg-muted-400 text-[12px]'
+							className="px-2 py-1 rounded dark:bg-muted-700 bg-muted-400 text-[12px]"
 						>
 							{help}
 						</div>
@@ -117,15 +108,15 @@ function Warning(props: WarningProps) {
 				</div>
 			) : null}
 			{removeWall ? (
-				<div className='flex gap-2 px-2 py-1 mb-2'>
+				<div className="flex gap-2 px-2 py-1 mb-2">
 					<Button
 						key={_uniqueId('warning-remove-wall-')}
 						onClick={() => {
 							onRemoveWall(removeWall);
 						}}
-						className='px-2 py-1'
-						buttonType='secondary'
-						size='sm'
+						className="px-2 py-1"
+						buttonType="secondary"
+						size="sm"
 						icon={<TrashIcon />}
 					>
 						{window.t.translate('Remove wall')}
@@ -133,15 +124,15 @@ function Warning(props: WarningProps) {
 				</div>
 			) : null}
 			{removeField ? (
-				<div className='flex gap-2 px-2 py-1 mb-2'>
+				<div className="flex gap-2 px-2 py-1 mb-2">
 					<Button
 						key={_uniqueId('warning-remove-field-')}
 						onClick={() => {
 							onRemoveField(removeField);
 						}}
-						className='px-2 py-1'
-						buttonType='secondary'
-						size='sm'
+						className="px-2 py-1"
+						buttonType="secondary"
+						size="sm"
 						icon={<TrashIcon />}
 					>
 						{window.t.translateVars('Remove {0} field', [fieldEnumToString(removeField.type)])}{' '}

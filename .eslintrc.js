@@ -1,4 +1,7 @@
 module.exports = {
+	globals: {
+		NodeJS: true,
+	},
 	extends: 'erb',
 	rules: {
 		// A temporary hack related to IDE not resolving correct package.json
@@ -8,6 +11,13 @@ module.exports = {
 		// Since React 17 and typescript 4.1 you can safely disable the rule
 		'react/react-in-jsx-scope': 'off',
 		'react/static-property-placement': ['error', 'static getter'],
+		'import/extensions': 'off',
+		'react/jsx-filename-extension': 'off',
+		'no-unused-vars': 'off',
+		'no-restricted-syntax': 'off',
+		'react/button-has-type': 'off',
+		'import/prefer-default-export': 'off',
+		'import/no-shadow': 'off',
 	},
 	parserOptions: {
 		ecmaVersion: 2020,

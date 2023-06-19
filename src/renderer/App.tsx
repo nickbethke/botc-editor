@@ -6,7 +6,7 @@ import GameConfigurator from './screens/GameConfigurator';
 import JsonValidator from './screens/JsonValidator';
 import { GameConfigWithPath } from '../interfaces/GameConfigInterface';
 import BoardConfigInterface from '../interfaces/BoardConfigInterface';
-import TranslationHelper, { AvailableLanguages } from './helper/TranslationHelper';
+import TranslationHelper from './helper/TranslationHelper';
 import BoardConfiguratorV2 from './screens/BoardConfiguratorV2';
 import { SettingsInterface } from '../interfaces/SettingsInterface';
 import RiverPresetEditor from './screens/RiverPresetEditor';
@@ -30,12 +30,6 @@ type AppStates = {
 	openScreen: AppScreens;
 	toLoad: object | null;
 	settings: SettingsInterface;
-	errorMessage: { title: string; error: string } | null;
-	fullScreen: boolean;
-	windowDimensions: {
-		width: number;
-		height: number;
-	};
 };
 
 /**
@@ -48,12 +42,6 @@ class App extends React.Component<AppProps, AppStates> {
 			openScreen: 'home',
 			toLoad: null,
 			settings: props.settings,
-			errorMessage: null,
-			fullScreen: false,
-			windowDimensions: {
-				width: window.innerWidth,
-				height: window.innerHeight,
-			},
 		};
 	}
 
@@ -63,15 +51,6 @@ class App extends React.Component<AppProps, AppStates> {
 			document.documentElement.classList.add('dark');
 		}
 		document.documentElement.setAttribute('lang', settings.language);
-		window.addEventListener('resize', () => {
-			this.setState({
-				fullScreen: !window.screenTop && !window.screenY,
-				windowDimensions: {
-					width: window.innerWidth,
-					height: window.innerHeight,
-				},
-			});
-		});
 	}
 
 	componentDidUpdate(prevProps: Readonly<AppProps>, prevState: Readonly<AppStates>) {
@@ -92,46 +71,22 @@ class App extends React.Component<AppProps, AppStates> {
 		this.setState({ openScreen: 'home' });
 	};
 
-	handleSettingsChange = async (settings: SettingsInterface) => {
-		const newSettings = await window.electron.app.updateSettings(settings);
-		const lang = TranslationHelper.stringToEnum(newSettings.language);
-		await this.handleLanguageChange(lang);
-		if (settings.darkMode) {
-			document.documentElement.classList.add('dark');
-		} else {
-			document.documentElement.classList.remove('dark');
-		}
-		this.setState({ settings: newSettings });
-	};
-
-	handleLanguageChange = async (lang: AvailableLanguages) => {
-		await window.t.switchLanguage(lang);
-	};
-
-	render = () => {
-		const { openScreen } = this.state;
-		switch (openScreen) {
-			case 'home':
-				return this.homeScreen();
-			case 'gameConfigNewScreen':
-			case 'gameConfigLoadScreen':
-				return this.gameConfigScreen();
-			case 'boardConfigV2NewScreen':
-			case 'boardConfigV2LoadScreen':
-				return this.boardConfigV2Screen();
-			case 'riverPresetEditor':
-				return this.riverPresetEditor();
-			case 'boardConfigV2FromRandomScreen':
-				return this.boardConfigV2Screen();
-			case 'validator':
-				return this.validatorScreen();
-			default:
-				return this.homeScreen();
-		}
+	handleSettingsChange = (settings: SettingsInterface) => {
+		(async () => {
+			const newSettings = await window.electron.app.updateSettings(settings);
+			const lang = TranslationHelper.stringToEnum(newSettings.language);
+			await window.t.switchLanguage(lang);
+			if (settings.darkMode) {
+				document.documentElement.classList.add('dark');
+			} else {
+				document.documentElement.classList.remove('dark');
+			}
+			this.setState({ settings: newSettings });
+		})().catch(() => {});
 	};
 
 	gameConfigScreen = () => {
-		const { openScreen, settings, fullScreen } = this.state;
+		const { openScreen, settings } = this.state;
 		const { os } = this.props;
 		if (openScreen === 'gameConfigNewScreen') {
 			return (
@@ -141,7 +96,6 @@ class App extends React.Component<AppProps, AppStates> {
 					settings={settings}
 					os={os}
 					onSettingsUpdate={this.handleSettingsChange}
-					fullScreen={fullScreen}
 				/>
 			);
 		}
@@ -155,7 +109,6 @@ class App extends React.Component<AppProps, AppStates> {
 					onClose={this.handleCloseChildScreen}
 					loadedValues={toLoad as GameConfigWithPath}
 					onSettingsUpdate={this.handleSettingsChange}
-					fullScreen={fullScreen}
 				/>
 			);
 		}
@@ -246,6 +199,10 @@ class App extends React.Component<AppProps, AppStates> {
 		return null;
 	};
 
+	handleOpenScreen = (screen: AppScreens, toLoad: any) => {
+		this.setState({ openScreen: screen, toLoad });
+	};
+
 	homeScreen() {
 		const { os } = this.props;
 		const { settings } = this.state;
@@ -259,9 +216,27 @@ class App extends React.Component<AppProps, AppStates> {
 		);
 	}
 
-	handleOpenScreen = (screen: AppScreens, toLoad: any) => {
-		this.setState({ openScreen: screen, toLoad });
-	};
+	render() {
+		const { openScreen } = this.state;
+		switch (openScreen) {
+			case 'home':
+				return this.homeScreen();
+			case 'gameConfigNewScreen':
+			case 'gameConfigLoadScreen':
+				return this.gameConfigScreen();
+			case 'boardConfigV2NewScreen':
+			case 'boardConfigV2LoadScreen':
+				return this.boardConfigV2Screen();
+			case 'riverPresetEditor':
+				return this.riverPresetEditor();
+			case 'boardConfigV2FromRandomScreen':
+				return this.boardConfigV2Screen();
+			case 'validator':
+				return this.validatorScreen();
+			default:
+				return this.homeScreen();
+		}
+	}
 }
 
 export default App;

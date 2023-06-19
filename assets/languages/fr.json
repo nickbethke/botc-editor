@@ -800,6 +800,10 @@
 		[
 			"Default Direction",
 			"Direction par défaut"
+		],
+		[
+			"Board sizes over 32 could cause performance issues or the app to crash",
+			"Les tailles de plateau supérieures à 32 pourraient entraîner des problèmes de performances ou le blocage de l'application"
 		]
 	]
 }

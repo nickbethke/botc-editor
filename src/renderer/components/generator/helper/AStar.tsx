@@ -17,8 +17,7 @@ export type AStarElement = {
 	estimate: number;
 };
 
-type AStarElementWithoutEstimate = { state: BoardPosition, cost: number };
-
+type AStarElementWithoutEstimate = { state: BoardPosition; cost: number };
 
 /**
  * @since 0.6.5
@@ -53,7 +52,7 @@ class AStar {
 		start: BoardPosition,
 		goal: BoardPosition,
 		board: Array<Array<FieldWithPositionInterface>>,
-		walls: Map<string, boolean>,
+		walls: Map<string, boolean>
 	) {
 		this.start = start;
 		this.goal = goal;
@@ -99,7 +98,12 @@ class AStar {
 		return [];
 	}
 
-	private forEachNextStep(next: AStarElementWithoutEstimate[], node: AStarElement, explored: AStarElement[], frontier: AStarElement[]) {
+	private forEachNextStep(
+		next: AStarElementWithoutEstimate[],
+		node: AStarElement,
+		explored: AStarElement[],
+		frontier: AStarElement[]
+	) {
 		for (const step of next) {
 			// Calculate the cost of the next step by adding the step's cost to the node's cost
 			const cost = step.cost + node.cost;
@@ -218,7 +222,7 @@ class AStar {
 		return interSections;
 	}
 
-	getPath = (startX: number, startY: number, endX: number, endY: number) => {
+	getPath = (startX: number, startY: number, endX: number, endY: number): Array<[number, number]> => {
 		// Initialize an empty array to store the coordinates of the points on the path
 		let path: Array<[number, number]> = [];
 
@@ -274,7 +278,7 @@ class AStar {
 		startFields: Array<BoardPosition>,
 		lembasFields: Array<{ position: BoardPosition; amount: number }>,
 		board: Array<Array<FieldWithPositionInterface>>,
-		walls: Map<string, boolean>,
+		walls: Map<string, boolean>
 	): {
 		result: boolean;
 		error: { start: BoardPosition | null; end: BoardPosition | null };
@@ -333,7 +337,7 @@ class AStar {
 		startFields: Array<BoardPosition>,
 		lembasFields: Array<{ position: BoardPosition; amount: number }>,
 		board: Array<Array<FieldWithPositionInterface>>,
-		walls: Map<string, boolean>,
+		walls: Map<string, boolean>
 	): {
 		result: boolean;
 		errors: Array<{
@@ -388,14 +392,14 @@ class AStar {
 
 		const eye = new SauronsEye(
 			position2BoardPosition(config.eye.position),
-			directionHelper.string2DirEnum(config.eye.direction),
+			directionHelper.string2DirEnum(config.eye.direction)
 		);
 		board[eye.position.x][eye.position.y] = eye;
 
 		config.startFields.forEach((startField) => {
 			const start = new StartField(
 				position2BoardPosition(startField.position),
-				directionHelper.string2DirEnum(startField.direction),
+				directionHelper.string2DirEnum(startField.direction)
 			);
 			board[start.position.x][start.position.y] = start;
 		});
@@ -413,7 +417,7 @@ class AStar {
 		config.riverFields.forEach((riverField) => {
 			const river = new River(
 				position2BoardPosition(riverField.position),
-				directionHelper.string2DirEnum(riverField.direction),
+				directionHelper.string2DirEnum(riverField.direction)
 			);
 			board[river.position.x][river.position.y] = river;
 		});

@@ -12,14 +12,12 @@ export interface LanguageSchema {
 class TranslationHelper {
 	private lang: AvailableLanguages;
 
-
 	private loadedLanguage: Map<string, string>;
 
 	constructor(lang: AvailableLanguages, test?: boolean) {
 		this.lang = lang;
 		this.loadedLanguage = new Map<string, string>();
-		if (!test)
-			this.setLanguageJSON();
+		if (!test) this.setLanguageJSON();
 	}
 
 	public translate(str: string): string {
@@ -45,8 +43,7 @@ class TranslationHelper {
 				this.loadedLanguage = new Map<string, string>(json.data);
 				return null;
 			})
-			.catch(() => {
-			});
+			.catch(() => {});
 	}
 
 	public switchLanguage(lang: AvailableLanguages) {

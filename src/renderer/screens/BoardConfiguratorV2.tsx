@@ -29,7 +29,8 @@ import {
 	addRiver,
 	addStartField,
 	calculateRiverPresetFieldPositionWithRotation,
-	getFieldType, isBoardConfiguration,
+	getFieldType,
+	isBoardConfiguration,
 	moveSauronsEye,
 	removeCheckpoint,
 	removeHole,
@@ -65,8 +66,7 @@ window.electron.schemas
 			],
 		});
 	})
-	.catch(() => {
-	});
+	.catch(() => {});
 
 export type EditorToolType = FieldsEnum | 'delete' | 'edit' | 'riverPreset' | null;
 type EditorPopupType =
@@ -130,6 +130,36 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 		walls: [],
 	};
 
+	/**
+	 * Checks if a field is already occupied
+	 * @param position
+	 * @param occupiedFields
+	 * @param warnings
+	 * @param type
+	 */
+	private static checkFieldOccupation(
+		position: Position,
+		occupiedFields: Set<string>,
+		warnings: WarningsMap,
+		type: FieldsEnum
+	): { occupiedFields: Set<string>; warnings: WarningsMap } {
+		const string = position2String(position);
+		if (occupiedFields.has(string)) {
+			warnings.set(_uniqueId('warning-'), {
+				type: Warnings.configurationInvalid,
+				title: window.t.translate('Occupation'),
+				content: window.t.translate(
+					'The current game board state is not valid, due to a field has the same position as another field.'
+				),
+				helper: [`${position[0]}:${position[1]}`],
+				removeField: { position: position2BoardPosition(position), type },
+			});
+		} else {
+			occupiedFields.add(string);
+		}
+		return { occupiedFields, warnings };
+	}
+
 	constructor(props: BoardConfiguratorV2Props) {
 		super(props);
 		const conf = props.config || BoardConfiguratorV2.defaultBoard;
@@ -168,6 +198,29 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 			config: BoardConfiguratorV2.defaultBoard,
 			file: null,
 		};
+	}
+
+	componentDidUpdate(prevProps: Readonly<BoardConfiguratorV2Props>, prevState: Readonly<BoardConfiguratorV2State>) {
+		const { sideBarTabLeft, sidebars, sideBarTabRight, currentTool } = this.state;
+		const { sideBarTabLeft: preSideBarTabLeft, sideBarTabRight: preSideBarTabRight, currentTool: preTool } = prevState;
+		if (sideBarTabLeft === null && sidebars.left > 52) {
+			this.setState({ sidebars: { ...sidebars, left: 52 } });
+		}
+		if (preSideBarTabLeft === null && sideBarTabLeft !== null) {
+			this.setState({ sidebars: { ...sidebars, left: 400 } });
+		}
+		if (sideBarTabRight === null && sidebars.right > 52) {
+			this.setState({ sidebars: { ...sidebars, right: 52 } });
+		}
+		if (preSideBarTabRight === null && sideBarTabRight !== null) {
+			this.setState({ sidebars: { ...sidebars, right: 400 } });
+		}
+		if (preTool === 'edit' && currentTool !== 'edit') {
+			this.setState({
+				sideBarTabLeftConfigType: 'global',
+				fieldInEdit: null,
+			});
+		}
 	}
 
 	componentDidMount() {
@@ -286,8 +339,7 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 				});
 				return null;
 			})
-			.catch(() => {
-			});
+			.catch(() => {});
 	}
 
 	componentWillUnmount() {
@@ -303,33 +355,6 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 			},
 		});
 	};
-
-	componentDidUpdate(prevProps: Readonly<BoardConfiguratorV2Props>, prevState: Readonly<BoardConfiguratorV2State>) {
-		const { sideBarTabLeft, sidebars, sideBarTabRight, currentTool } = this.state;
-		const {
-			sideBarTabLeft: preSideBarTabLeft,
-			sideBarTabRight: preSideBarTabRight,
-			currentTool: preTool,
-		} = prevState;
-		if (sideBarTabLeft === null && sidebars.left > 52) {
-			this.setState({ sidebars: { ...sidebars, left: 52 } });
-		}
-		if (preSideBarTabLeft === null && sideBarTabLeft !== null) {
-			this.setState({ sidebars: { ...sidebars, left: 400 } });
-		}
-		if (sideBarTabRight === null && sidebars.right > 52) {
-			this.setState({ sidebars: { ...sidebars, right: 52 } });
-		}
-		if (preSideBarTabRight === null && sideBarTabRight !== null) {
-			this.setState({ sidebars: { ...sidebars, right: 400 } });
-		}
-		if (preTool === 'edit' && currentTool !== 'edit') {
-			this.setState({
-				sideBarTabLeftConfigType: 'global',
-				fieldInEdit: null,
-			});
-		}
-	}
 
 	handleOnFieldOrWallClick: FieldTypeOnClick = (type, position) => {
 		const { currentTool, config } = this.state;
@@ -450,7 +475,7 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 	private handleWallPlacement(
 		position: [BoardPosition, BoardPosition],
 		config: BoardConfigInterface,
-		currentTool: EditorToolType,
+		currentTool: EditorToolType
 	) {
 		const positionString = wallBoardPosition2String(position);
 		const wallMap = wallConfig2Map(config.walls);
@@ -495,7 +520,7 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 						title: window.t.translate('Pathfinding'),
 						content: window.t.translateVars(
 							'The current board state is not playable, because {0} to {1} has no valid path.',
-							[`[${error.start.x}, ${error.start.y}]`, `[${error.end.x}, ${error.end.y}]`],
+							[`[${error.start.x}, ${error.start.y}]`, `[${error.end.x}, ${error.end.y}]`]
 						),
 						fields: [error.start, error.end],
 					});
@@ -515,7 +540,7 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 				type: Warnings.configurationInvalid,
 				title: window.t.translate('Start fields'),
 				content: window.t.translate(
-					'The current game board state is not playable because there are not enough starting spaces.',
+					'The current game board state is not playable because there are not enough starting spaces.'
 				),
 				helper: [window.t.translateVars('Minimum {0}', ['2'])],
 			});
@@ -524,7 +549,7 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 				type: Warnings.configurationInvalid,
 				title: window.t.translate('Start fields'),
 				content: window.t.translate(
-					'The current game board state is invalid because there are too many starting spaces.',
+					'The current game board state is invalid because there are too many starting spaces.'
 				),
 				helper: [window.t.translateVars('Maximum {0}', ['6'])],
 			});
@@ -536,7 +561,7 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 				type: Warnings.configurationInvalid,
 				title: window.t.translate('Checkpoints'),
 				content: window.t.translate(
-					'The current game board state is not playable because there are not enough checkpoints.',
+					'The current game board state is not playable because there are not enough checkpoints.'
 				),
 				helper: [window.t.translateVars('Minimum {0}', ['2'])],
 			});
@@ -555,7 +580,7 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 						type: Warnings.configurationInvalid,
 						title: window.t.translate('Wall'),
 						content: window.t.translate(
-							'The current game board state is not playable because there is a wall set on another wall.',
+							'The current game board state is not playable because there is a wall set on another wall.'
 						),
 						helper: [`${x}:${y}`, `${x1}:${y1}`],
 						removeWall: wallArray,
@@ -570,98 +595,61 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 		occupiedFields.add(position2String(handledConfig.eye.position));
 
 		handledConfig.startFields.forEach((field) => {
-			const { occupiedFields: oFields, warnings } = this.checkFieldOccupation(
+			const { occupiedFields: oFields, warnings } = BoardConfiguratorV2.checkFieldOccupation(
 				field.position,
-				handledConfig,
 				occupiedFields,
 				newWarnings,
-				FieldsEnum.START,
+				FieldsEnum.START
 			);
 			occupiedFields = oFields;
 			newWarnings = warnings;
 		});
 
 		handledConfig.checkPoints.forEach((field) => {
-			const { occupiedFields: oFields, warnings } = this.checkFieldOccupation(
+			const { occupiedFields: oFields, warnings } = BoardConfiguratorV2.checkFieldOccupation(
 				field,
-				handledConfig,
 				occupiedFields,
 				newWarnings,
-				FieldsEnum.CHECKPOINT,
+				FieldsEnum.CHECKPOINT
 			);
 			occupiedFields = oFields;
 			newWarnings = warnings;
 		});
 
 		handledConfig.lembasFields.forEach((field) => {
-			const { occupiedFields: oFields, warnings } = this.checkFieldOccupation(
+			const { occupiedFields: oFields, warnings } = BoardConfiguratorV2.checkFieldOccupation(
 				field.position,
-				handledConfig,
 				occupiedFields,
 				newWarnings,
-				FieldsEnum.LEMBAS,
+				FieldsEnum.LEMBAS
 			);
 			occupiedFields = oFields;
 			newWarnings = warnings;
 		});
 
 		handledConfig.riverFields.forEach((field) => {
-			const { occupiedFields: oFields, warnings } = this.checkFieldOccupation(
+			const { occupiedFields: oFields, warnings } = BoardConfiguratorV2.checkFieldOccupation(
 				field.position,
-				handledConfig,
 				occupiedFields,
 				newWarnings,
-				FieldsEnum.RIVER,
+				FieldsEnum.RIVER
 			);
 			occupiedFields = oFields;
 			newWarnings = warnings;
 		});
 
 		handledConfig.holes.forEach((field) => {
-			const { occupiedFields: oFields, warnings } = this.checkFieldOccupation(
+			const { occupiedFields: oFields, warnings } = BoardConfiguratorV2.checkFieldOccupation(
 				field,
-				handledConfig,
 				occupiedFields,
 				newWarnings,
-				FieldsEnum.HOLE,
+				FieldsEnum.HOLE
 			);
 			occupiedFields = oFields;
 			newWarnings = warnings;
 		});
 
 		return newWarnings;
-	};
-
-	/**
-	 * Checks if a field is already occupied
-	 * @param position
-	 * @param config
-	 * @param occupiedFields
-	 * @param warnings
-	 * @param type
-	 */
-	checkFieldOccupation = (
-		position: Position,
-		config: BoardConfigInterface,
-		occupiedFields: Set<string>,
-		warnings: WarningsMap,
-		type: FieldsEnum,
-	): { occupiedFields: Set<string>; warnings: WarningsMap } => {
-		const string = position2String(position);
-		if (occupiedFields.has(string)) {
-			warnings.set(_uniqueId('warning-'), {
-				type: Warnings.configurationInvalid,
-				title: window.t.translate('Occupation'),
-				content: window.t.translate(
-					'The current game board state is not valid, due to a field has the same position as another field.',
-				),
-				helper: [`${position[0]}:${position[1]}`],
-				removeField: { position: position2BoardPosition(position), type },
-			});
-		} else {
-			occupiedFields.add(string);
-		}
-		return { occupiedFields, warnings };
 	};
 
 	initLoadedConfiguration = (newConfig: BoardConfigInterface) => {
@@ -706,20 +694,20 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 	updateConfigurationDimensions = (
 		newWidth: number,
 		newHeight: number,
-		newConfig: BoardConfigInterface,
+		newConfig: BoardConfigInterface
 	): BoardConfigInterface => {
 		newConfig.startFields = newConfig.startFields.filter(
-			(field) => field.position[0] < newWidth && field.position[1] < newHeight,
+			(field) => field.position[0] < newWidth && field.position[1] < newHeight
 		);
 		newConfig.checkPoints = newConfig.checkPoints.filter((field) => field[0] < newWidth && field[1] < newHeight);
 		newConfig.walls = newConfig.walls.filter(
-			(field) => field[0][0] < newWidth && field[0][1] < newHeight && field[1][0] < newWidth && field[1][1] < newHeight,
+			(field) => field[0][0] < newWidth && field[0][1] < newHeight && field[1][0] < newWidth && field[1][1] < newHeight
 		);
 		newConfig.lembasFields = newConfig.lembasFields.filter(
-			(field) => field.position[0] < newWidth && field.position[1] < newHeight,
+			(field) => field.position[0] < newWidth && field.position[1] < newHeight
 		);
 		newConfig.riverFields = newConfig.riverFields.filter(
-			(field) => field.position[0] < newWidth && field.position[1] < newHeight,
+			(field) => field.position[0] < newWidth && field.position[1] < newHeight
 		);
 		newConfig.holes = newConfig.holes.filter((field) => field[0] < newWidth && field[1] < newHeight);
 		return newConfig;
@@ -769,8 +757,7 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 				onSettingsUpdate({ ...settings, darkMode: !settings.darkMode });
 				break;
 			case TopMenuActions.OPEN_PRESET_FOLDER:
-				window.electron.file.openPresetDir().catch(() => {
-				});
+				window.electron.file.openPresetDir().catch(() => {});
 				break;
 			case TopMenuActions.SETTINGS:
 				this.setState({ popup: 'settings' });
@@ -891,7 +878,9 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 							this.setState({ popup: null, newRiverPreset: null });
 						}}
 						onConfirm={(position, adjustBoardSize, rotation) => {
-							this.updateConfiguration(this.addRiverPreset(config, newRiverPreset, position, adjustBoardSize, rotation));
+							this.updateConfiguration(
+								this.addRiverPreset(config, newRiverPreset, position, adjustBoardSize, rotation)
+							);
 							this.setState({
 								newRiverPreset: null,
 								popup: null,
@@ -953,9 +942,8 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 		newRiverPreset: RiverPresetWithFile,
 		position: BoardPosition,
 		adjustBoardSize: boolean,
-		rotation: Rotation,
+		rotation: Rotation
 	): BoardConfigInterface => {
-
 		let newConfig = config;
 		let newRivers = newRiverPreset.data.map((river) => {
 			const riverPosition = calculateRiverPresetFieldPositionWithRotation(river.position, rotation);
@@ -989,7 +977,7 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 		newRivers = newRivers.filter((river) => river.position[0] < newWidth && river.position[1] < newHeight);
 		// remove rivers that are on the eye
 		newRivers = newRivers.filter(
-			(river) => !(river.position[0] === config.eye.position[0] && river.position[1] === config.eye.position[1]),
+			(river) => !(river.position[0] === config.eye.position[0] && river.position[1] === config.eye.position[1])
 		);
 		return {
 			...newConfig,
@@ -1015,12 +1003,10 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 					}
 					throw new Error('File not saved');
 				})
-				.catch(() => {
-				});
+				.catch(() => {});
 		} else if (!fileSaved) {
 			if (file) {
-				window.electron.file.save(file.path, JSON.stringify(config, null, 4)).catch(() => {
-				});
+				window.electron.file.save(file.path, JSON.stringify(config, null, 4)).catch(() => {});
 				this.setState({ fileSaved: true });
 			} else {
 				window.electron.dialog
@@ -1035,8 +1021,7 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 						}
 						throw new Error('File not saved');
 					})
-					.catch(() => {
-					});
+					.catch(() => {});
 			}
 		}
 	};
@@ -1054,7 +1039,6 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 		window.electron.dialog
 			.openBoardConfig()
 			.then((loadedConfig) => {
-
 				if (loadedConfig) {
 					const { valid } = isBoardConfiguration(loadedConfig.config);
 					if (valid) {
@@ -1071,8 +1055,7 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 				});
 				return new Error('Config not loadable');
 			})
-			.catch(() => {
-			});
+			.catch(() => {});
 	}
 
 	private zoomIn() {
@@ -1108,7 +1091,7 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 		const mainHeight = windowDimensions.height - (os === 'win32' ? 32 + topMenuHeight : topMenuHeight);
 		const mainWidth = windowDimensions.width - (sidebars.left + sidebars.right);
 		return (
-			<section className='text-white font-lato dark:bg-muted-800 bg-muted-600'>
+			<section className="text-white font-lato dark:bg-muted-800 bg-muted-600">
 				<Dragger os={os}>
 					{window.t.translate('Board-Configurator')}
 					{' - '}
@@ -1125,14 +1108,14 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 						<TopMenu onAction={this.onTopMenuAction} darkMode={settings.darkMode} />
 					</div>
 					<div
-						className='flex flex-row border-t dark:border-muted-700 border-muted-400'
+						className="flex flex-row border-t dark:border-muted-700 border-muted-400"
 						style={{
 							height: `${mainHeight}px`,
 							maxHeight: `${mainHeight}px`,
 						}}
 					>
 						<div
-							className='dark:bg-muted-800 bg-muted-600'
+							className="dark:bg-muted-800 bg-muted-600"
 							style={{
 								width: `${sidebars.left}px`,
 								maxWidth: `${sidebars.left}px`,
@@ -1173,7 +1156,7 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 							/>
 						</div>
 						<div
-							className='dark:bg-black/40 bg-black/20 border-x dark:border-muted-700 border-muted-400'
+							className="dark:bg-black/40 bg-black/20 border-x dark:border-muted-700 border-muted-400"
 							style={{
 								width: `${mainWidth}px`,
 								maxWidth: `${mainWidth}px`,
@@ -1201,7 +1184,7 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 										},
 										() => {
 											this.handleFieldEdit(position, config, true);
-										},
+										}
 									);
 								}}
 								file={file}
@@ -1210,7 +1193,7 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 							/>
 						</div>
 						<div
-							className='dark:bg-muted-800 bg-muted-600'
+							className="dark:bg-muted-800 bg-muted-600"
 							style={{
 								width: `${sidebars.right}px`,
 								maxWidth: `${sidebars.right}px`,
@@ -1239,8 +1222,8 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 												},
 												{ x: wall[1][0], y: wall[1][1] },
 											],
-											config,
-										),
+											config
+										)
 									);
 									if (fileSaved) {
 										this.setState({

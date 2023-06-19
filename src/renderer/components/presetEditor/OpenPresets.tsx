@@ -16,7 +16,7 @@ type OpenPresetsProps = {
 
 	onUpdate: (openTabsOrder: Map<string, number>) => void;
 };
-const OpenPresets = (props: OpenPresetsProps) => {
+function OpenPresets(props: OpenPresetsProps) {
 	const { openTabsOrder, onCloseOpenPreset, editorCache, onCurrentFileChange, currentFile, onContextMenu, onUpdate } =
 		props;
 	const tabsArray = Array.from(openTabsOrder, ([file, order]) => ({ file, order }));
@@ -60,20 +60,20 @@ const OpenPresets = (props: OpenPresetsProps) => {
 
 	return (
 		<SortableList
-			lockAxis='x'
+			lockAxis="x"
 			onSortEnd={onSortEnd}
-			className='flex max-w-full overflow-x-auto overflow-y-hidden open-file-list'
+			className="flex max-w-full overflow-x-auto overflow-y-hidden open-file-list"
 			customHolderRef={ref}
-			draggedItemClassName='text-white shadow'
+			draggedItemClassName="text-white shadow"
 		>
 			{items.map((item) => {
 				const preset = editorCache.getFile(item.file);
 				if (preset) {
 					return (
 						<SortableItem key={_uniqueId()}>
-							<div className='relative flex items-center justify-between h-full'>
+							<div className="relative flex items-center justify-between h-full">
 								<SortableKnob>
-									<div className='text-white text-2xl cursor-grabbing'>
+									<div className="text-white text-2xl cursor-grabbing">
 										<VscGripper />
 									</div>
 								</SortableKnob>
@@ -85,8 +85,7 @@ const OpenPresets = (props: OpenPresetsProps) => {
 									edited={preset.edited}
 									onContextMenu={onContextMenu}
 								/>
-								{currentFile === item.file ?
-									<div className='w-full h-1 bg-accent absolute bottom-0 left-0' /> : null}
+								{currentFile === item.file ? <div className="w-full h-1 bg-accent absolute bottom-0 left-0" /> : null}
 							</div>
 						</SortableItem>
 					);
@@ -95,6 +94,6 @@ const OpenPresets = (props: OpenPresetsProps) => {
 			})}
 		</SortableList>
 	);
-};
+}
 
 export default OpenPresets;

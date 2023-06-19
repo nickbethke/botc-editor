@@ -1,8 +1,8 @@
 import React, { ChangeEvent } from 'react';
 import _uniqueId from 'lodash/uniqueId';
+import { VscError, VscWarning } from 'react-icons/vsc';
 import InputValidator from '../helper/InputValidator';
 import DblClickInput from './DblClickInput';
-import { VscError, VscWarning } from 'react-icons/vsc';
 
 type InputLabelStringProps = {
 	type: 'text';
@@ -88,17 +88,17 @@ class InputLabel extends React.Component<InputLabelProps, InputLabelState> {
 		};
 	}
 
+	componentDidMount() {
+		const { value, validator } = this.props;
+		this.update(value.toString(), validator);
+	}
+
 	// methode if the props change
 	componentDidUpdate(prevProps: InputLabelProps) {
 		const { value, validator } = this.props;
 		if (prevProps.value !== value) {
 			this.update(value.toString(), validator);
 		}
-	}
-
-	componentDidMount() {
-		const { value } = this.props;
-		this.update(value.toString(), this.props.validator);
 	}
 
 	handleOnChange(e: ChangeEvent<HTMLInputElement>) {
@@ -111,22 +111,21 @@ class InputLabel extends React.Component<InputLabelProps, InputLabelState> {
 		if (type === 'number') {
 			const { min, max } = this.props;
 			if (value === '') {
-				if (min != undefined && min > 0) {
+				if (min !== undefined && min > 0) {
 					this.update(min.toString(), validator);
 					onChange(min);
 					return;
-				} else {
-					this.update('0', validator);
-					onChange(0);
-					return;
 				}
+				this.update('0', validator);
+				onChange(0);
+				return;
 			}
-			if (min != undefined && Number.parseInt(value, 10) < min) {
+			if (min !== undefined && Number.parseInt(value, 10) < min) {
 				this.update(min.toString(), validator);
 				onChange(min);
 				return;
 			}
-			if (max != undefined && Number.parseInt(value, 10) > max) {
+			if (max !== undefined && Number.parseInt(value, 10) > max) {
 				this.update(max.toString(), validator);
 				onChange(max);
 				return;
@@ -169,14 +168,14 @@ class InputLabel extends React.Component<InputLabelProps, InputLabelState> {
 		const { value } = this.state;
 
 		if (helperText) {
-			helper = <p className='text-sm pl-2'>{helperText}</p>;
+			helper = <p className="text-sm pl-2">{helperText}</p>;
 		}
 		const { isValid, hasWarning, warningText, errorMsg } = this.state;
 		let warningHelper: string | React.JSX.Element = '';
 		let invalidHelper: string | React.JSX.Element = '';
 		if (hasWarning) {
 			warningHelper = (
-				<div className='text-sm dark:text-orange-300 text-amber-500 flex gap-2 items-center pl-2'>
+				<div className="text-sm dark:text-orange-300 text-amber-500 flex gap-2 items-center pl-2">
 					<VscWarning />
 					{warningText.join(' | ')}
 				</div>
@@ -184,7 +183,7 @@ class InputLabel extends React.Component<InputLabelProps, InputLabelState> {
 		}
 		if (!isValid && errorMsg) {
 			invalidHelper = (
-				<div className='text-sm dark:text-red-300 text-red-400 flex gap-2 items-center pl-2'>
+				<div className="text-sm dark:text-red-300 text-red-400 flex gap-2 items-center pl-2">
 					<VscError />
 					{errorMsg.join(' | ')}
 				</div>
@@ -229,7 +228,7 @@ class InputLabel extends React.Component<InputLabelProps, InputLabelState> {
 		if (type === 'range') {
 			const { max, min } = this.props;
 			return (
-				<div className='flex flex-col'>
+				<div className="flex flex-col">
 					<div>
 						<label htmlFor={this.id} className={`${labelClass} flex flex-row gap-2`}>
 							<span>{label ? `${label}:` : ''}</span>
@@ -247,7 +246,7 @@ class InputLabel extends React.Component<InputLabelProps, InputLabelState> {
 					<div>
 						<input
 							id={this.id}
-							type='range'
+							type="range"
 							value={Number.parseInt(value.toString(), 10)}
 							min={min || 0}
 							max={max || 20}
@@ -266,11 +265,10 @@ class InputLabel extends React.Component<InputLabelProps, InputLabelState> {
 			const checked = value === true || value === 'true';
 			return (
 				<div>
-					<label htmlFor={this.id}
-						   className={`${labelClass} flex flex-row gap-2 justify-center items-center`}>
-						{label ? <span className='min-h-8'>{label}</span> : null}
-						<div className='switch'>
-							<input type='checkbox' id={this.id} checked={checked} onChange={this.handleOnChange} />
+					<label htmlFor={this.id} className={`${labelClass} flex flex-row gap-2 justify-center items-center`}>
+						{label ? <span className="min-h-8">{label}</span> : null}
+						<div className="switch">
+							<input type="checkbox" id={this.id} checked={checked} onChange={this.handleOnChange} />
 							<span className={`${bothSides ? 'slider-both' : ''} slider round`} />
 						</div>
 					</label>

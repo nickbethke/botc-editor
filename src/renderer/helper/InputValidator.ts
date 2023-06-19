@@ -27,40 +27,40 @@ export enum InputValidatorType {
  */
 type InputValidatorArgs =
 	| {
-	type: InputValidatorType.TYPE_STRING;
-	options: {
-		longerThan?: {
-			number: number;
-			error: string;
-		};
-		regex?: {
-			expression: RegExp;
-			error: string;
-		};
-		notEmpty?: {
-			error: string;
-		};
-	};
-}
+			type: InputValidatorType.TYPE_STRING;
+			options: {
+				longerThan?: {
+					number: number;
+					error: string;
+				};
+				regex?: {
+					expression: RegExp;
+					error: string;
+				};
+				notEmpty?: {
+					error: string;
+				};
+			};
+	  }
 	| {
-	type: InputValidatorType.TYPE_NUMBER;
-	options: {
-		ifBiggerThen?: {
-			number: number;
-			error: string;
-		};
-		ifSmallerThen?: {
-			number: number;
-			error: string;
-			except?: number;
-			isError?: boolean;
-		};
-		exact?: {
-			number: number;
-			error: string;
-		};
-	};
-};
+			type: InputValidatorType.TYPE_NUMBER;
+			options: {
+				ifBiggerThen?: {
+					number: number;
+					error: string;
+				};
+				ifSmallerThen?: {
+					number: number;
+					error: string;
+					except?: number;
+					isError?: boolean;
+				};
+				exact?: {
+					number: number;
+					error: string;
+				};
+			};
+	  };
 
 /**
  * InputValidator class
@@ -99,9 +99,9 @@ class InputValidator {
 	 * @param value
 	 */
 	validate(value: string): InputValidatorValidateAnswer {
-		const answer = {
-			valid: { is: true, text: new Array<string>() },
-			warning: { has: false, text: new Array<string>() },
+		const answer: InputValidatorValidateAnswer = {
+			valid: { is: true, text: [] },
+			warning: { has: false, text: [] },
 		};
 		if (this.args.type === InputValidatorType.TYPE_STRING) {
 			if (this.args.options.longerThan && value.length > (this.args.options.longerThan.number || 0)) {
@@ -123,7 +123,12 @@ class InputValidator {
 				answer.warning.text.push(this.args.options.ifBiggerThen.error);
 			}
 			if (this.args.options.ifSmallerThen) {
-				if (!(this.args.options.ifSmallerThen.except !== undefined && toNumber(value) === this.args.options.ifSmallerThen.except)) {
+				if (
+					!(
+						this.args.options.ifSmallerThen.except !== undefined &&
+						toNumber(value) === this.args.options.ifSmallerThen.except
+					)
+				) {
 					if (toNumber(value) < this.args.options.ifSmallerThen.number) {
 						if (this.args.options.ifSmallerThen.isError) {
 							answer.valid.is = false;

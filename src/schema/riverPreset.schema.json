@@ -33,25 +33,12 @@
 					},
 					"direction": {
 						"type": "string",
-						"enum": [
-							"NORTH",
-							"SOUTH",
-							"EAST",
-							"WEST"
-						]
+						"enum": ["NORTH", "SOUTH", "EAST", "WEST"]
 					}
 				},
-				"required": [
-					"position",
-					"direction"
-				]
+				"required": ["position", "direction"]
 			}
 		}
 	},
-	"required": [
-		"data",
-		"name",
-		"width",
-		"height"
-	]
+	"required": ["data", "name", "width", "height"]
 }

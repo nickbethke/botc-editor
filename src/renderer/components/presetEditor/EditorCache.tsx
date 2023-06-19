@@ -54,11 +54,11 @@ class EditorCache {
 			const preset = this.cache.get(fileName);
 			return preset
 				? {
-					width: preset.preset.width,
-					height: preset.preset.height,
-					data: preset.preset.data,
-					name: preset.preset.name,
-				}
+						width: preset.preset.width,
+						height: preset.preset.height,
+						data: preset.preset.data,
+						name: preset.preset.name,
+				  }
 				: null;
 		}
 		return null;

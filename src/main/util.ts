@@ -1,4 +1,3 @@
-/* eslint import/prefer-default-export: off */
 import { URL } from 'url';
 import path from 'path';
 
@@ -11,3 +10,5 @@ export function resolveHtmlPath(htmlFileName: string) {
 	}
 	return `file://${path.resolve(__dirname, '../renderer/', htmlFileName)}`;
 }
+
+export default {};

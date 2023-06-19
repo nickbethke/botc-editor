@@ -1,21 +1,27 @@
-import { Component } from 'react';
+import React, { Component } from 'react';
 import _uniqueId from 'lodash/uniqueId';
 import { VscChevronUp } from 'react-icons/vsc';
 
 type SelectComponentProps<T> = {
-	value: T;
+	containerClassName?: string;
 	onChange: (value: T) => void;
 	options: Array<{ value: T; text: string; icon?: React.JSX.Element }>;
-	containerClassName?: string;
+	value: T;
 };
 type SelectComponentState<T> = {
-	value: T;
-	options: Array<{ value: T; text: string; icon?: React.JSX.Element }>;
-	isOpen: boolean;
 	id: string;
+	isOpen: boolean;
+	options: Array<{ value: T; text: string; icon?: React.JSX.Element }>;
+	value: T;
 };
 
 class SelectComponent<T> extends Component<SelectComponentProps<T>, SelectComponentState<T>> {
+	static get defaultProps() {
+		return {
+			containerClassName: '',
+		};
+	}
+
 	constructor(props: SelectComponentProps<T>) {
 		super(props);
 		this.state = {
@@ -26,15 +32,15 @@ class SelectComponent<T> extends Component<SelectComponentProps<T>, SelectCompon
 		};
 	}
 
+	componentDidMount() {
+		document.addEventListener('click', this.handleOffClick);
+	}
+
 	componentDidUpdate(prevProps: Readonly<SelectComponentProps<T>>) {
 		const { value, options } = this.props;
 		if (prevProps.value !== value || prevProps.options !== options) {
 			this.setState({ value, options });
 		}
-	}
-
-	componentDidMount() {
-		document.addEventListener('click', this.handleOffClick);
 	}
 
 	componentWillUnmount() {
@@ -55,15 +61,13 @@ class SelectComponent<T> extends Component<SelectComponentProps<T>, SelectCompon
 		const { value, options, isOpen, id } = this.state;
 		const currentValue = options.find((option) => option.value === value);
 		return (
-			<div className='relative h-full' id={id}>
+			<div className="relative h-full" id={id}>
 				<div
-					className={
-						'flex gap-1 justify-between px-2 items-center hover:cursor-pointer hover:bg-white/10 h-full ' +
-						containerClassName
-					}
+					role="presentation"
+					className={`flex gap-1 justify-between px-2 items-center hover:cursor-pointer hover:bg-white/10 h-full ${containerClassName}`}
 					onClick={() => this.setState({ isOpen: !isOpen })}
 				>
-					<button type='button' className='px-2 py-1 font-medium flex gap-2 items-center'>
+					<button type="button" className="px-2 py-1 font-medium flex gap-2 items-center">
 						{currentValue?.icon}
 						<span>{currentValue?.text}</span>
 					</button>
@@ -77,7 +81,7 @@ class SelectComponent<T> extends Component<SelectComponentProps<T>, SelectCompon
 					{options.map((option, index) => (
 						<button
 							disabled={option.value === value}
-							type='button'
+							type="button"
 							key={_uniqueId()}
 							className={`px-2 py-1 dark:bg-muted-600 bg-muted-400 text-left flex gap-2 items-center ${
 								index === options.length - 1 ? 'rounded-b' : ''

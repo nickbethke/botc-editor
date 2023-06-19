@@ -65,10 +65,5 @@
 			]
 		}
 	},
-	"required": [
-		"darkMode",
-		"language",
-		"popupsDraggable",
-		"defaultValues"
-	]
+	"required": ["darkMode", "language", "popupsDraggable", "defaultValues"]
 }

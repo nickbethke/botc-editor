@@ -26,7 +26,6 @@
 		"postinstall": "ts-node .erb/scripts/check-native-dep.js && electron-builder install-app-deps && cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.renderer.dev.dll.ts",
 		"lint": "cross-env NODE_ENV=development eslint . --ext .js,.ts,.tsx",
 		"package": "ts-node ./.erb/scripts/clean.js dist && npm run build && electron-builder build --publish never",
-		"postpackage": "",
 		"prepare": "husky install",
 		"rebuild": "electron-rebuild --parallel --types prod,dev,optional --module-dir release/app",
 		"start": "ts-node ./.erb/scripts/check-port-in-use.js && npm run start:renderer",
@@ -34,7 +33,8 @@
 		"start:preload": "cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.preload.dev.ts",
 		"start:renderer": "cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true webpack serve --config ./.erb/configs/webpack.config.renderer.dev.ts",
 		"test": "jest",
-		"docs": "yarn docs-ts"
+		"docs": "yarn docs-ts",
+		"coverage": "jest --coverage"
 	},
 	"lint-staged": {
 		"*.{js,jsx,ts,tsx}": [

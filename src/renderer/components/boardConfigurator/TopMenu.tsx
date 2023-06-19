@@ -1,11 +1,11 @@
 import React from 'react';
+import { VscColorMode, VscFolder, VscFolderOpened, VscSave } from 'react-icons/vsc';
+import { FaRandom } from 'react-icons/fa';
+import { ExitIcon, FilePlusIcon, GearIcon, ZoomInIcon, ZoomOutIcon } from '@radix-ui/react-icons';
 import TopMenuItem, { TopMenuSeparator } from './TopMenuItem';
 import TopMenuItemCollapsable from './TopMenuItemCollapsable';
 import destinyMountainImage from '../../../../assets/textures/schicksalsberg.png';
 import TopMenuSubItemCollapsable from './TopMenuSubItemCollapsable';
-import { VscColorMode, VscFolder, VscFolderOpened, VscSave } from 'react-icons/vsc';
-import { ExitIcon, FilePlusIcon, GearIcon, ZoomInIcon, ZoomOutIcon } from '@radix-ui/react-icons';
-import { FaRandom } from 'react-icons/fa';
 
 /**
  * The board configurator top menu actions
@@ -43,7 +43,7 @@ type TopMenuProps = {
 function TopMenu(props: TopMenuProps) {
 	const { onAction, darkMode } = props;
 	return (
-		<div className="text-[14px] flex items-center">
+		<div className="text-[14px] flex items-center dragger">
 			<img className="h-6 ml-2 mr-4" src={destinyMountainImage} alt={window.t.translate('Logo')} />
 			<TopMenuItemCollapsable label={window.t.translate('File')}>
 				<TopMenuSubItemCollapsable label={window.t.translate('New')}>

@@ -62,7 +62,10 @@ export function wallBoardPosition2String(position: [BoardPosition, BoardPosition
  * @returns [string, string] - The first string is the string representation of the wall position from position1 to position2, the second string is the string representation of the wall position from position2 to position1
  */
 export function wallBoardPositions2StringArray(position1: BoardPosition, position2: BoardPosition): [string, string] {
-	return [`${boardPosition2String(position1)}::${boardPosition2String(position2)}`, `${boardPosition2String(position2)}::${boardPosition2String(position1)}`];
+	return [
+		`${boardPosition2String(position1)}::${boardPosition2String(position2)}`,
+		`${boardPosition2String(position2)}::${boardPosition2String(position1)}`,
+	];
 }
 
 /**

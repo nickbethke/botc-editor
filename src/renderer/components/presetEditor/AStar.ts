@@ -12,7 +12,6 @@ import { getBoardMaxDimension } from './Helper';
  * @since 0.7.5
  */
 class AStarRiverPreset {
-
 	/**
 	 * The matrix used by the A* algorithm.
 	 * @private

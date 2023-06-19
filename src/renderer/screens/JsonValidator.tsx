@@ -6,6 +6,8 @@ import { ParsedPath } from 'path';
 import { VscColorMode, VscFolder, VscNewFile, VscSave, VscVersions } from 'react-icons/vsc';
 import { ProgressBar } from 'react-loader-spinner';
 import _uniqueId from 'lodash/uniqueId';
+import { JsonViewer } from '@textea/json-viewer';
+import { predictIfConfigurationIsPartyConfiguration } from 'renderer/components/Functions';
 import BoardConfigValidator from '../helper/BoardConfigValidator';
 import BoardConfigInterface from '../../interfaces/BoardConfigInterface';
 import GameConfigValidator from '../helper/GameConfigValidator';
@@ -18,7 +20,6 @@ import TopMenuItemCollapsable from '../components/boardConfigurator/TopMenuItemC
 import PopupV2 from '../components/popups/PopupV2';
 import ConfirmPopupV2 from '../components/popups/ConfirmPopupV2';
 import FilePathComponent from '../components/FilePathComponent';
-import { JsonViewer } from '@textea/json-viewer';
 import SettingsPopup from '../components/popups/SettingsPopup';
 import Dragger from '../components/Dragger';
 import { ConfigType } from '../../interfaces/Types';
@@ -75,8 +76,7 @@ class JsonValidator extends React.Component<JsonValidatorProps, JsonValidatorSta
 					],
 				});
 			})
-			.catch(() => {
-			});
+			.catch(() => {});
 
 		this.handleBackButton = this.handleBackButton.bind(this);
 		this.backToHomeScreen = this.backToHomeScreen.bind(this);
@@ -103,8 +103,7 @@ class JsonValidator extends React.Component<JsonValidatorProps, JsonValidatorSta
 
 	componentDidMount() {
 		Mousetrap.bind(['command+s', 'ctrl+s'], () => {
-			this.saveFile().catch(() => {
-			});
+			this.saveFile().catch(() => {});
 		});
 
 		monaco.editor.addEditorAction({
@@ -113,8 +112,7 @@ class JsonValidator extends React.Component<JsonValidatorProps, JsonValidatorSta
 			// eslint-disable-next-line no-bitwise
 			keybindings: [KeyMod.CtrlCmd | KeyCode.KeyS],
 			run: () => {
-				this.saveFile().catch(() => {
-				});
+				this.saveFile().catch(() => {});
 			},
 		});
 
@@ -124,13 +122,55 @@ class JsonValidator extends React.Component<JsonValidatorProps, JsonValidatorSta
 			// eslint-disable-next-line no-bitwise
 			keybindings: [KeyMod.CtrlCmd | KeyCode.KeyO],
 			run: () => {
-				this.openFile().catch(() => {
-				});
+				this.openFile().catch(() => {});
 			},
 		});
 		window.addEventListener('resize', this.handleResize);
-		this.onChange('{}').catch(() => {
-		});
+		this.onChange('{}').catch(() => {});
+	}
+
+	componentDidUpdate(prevProps: Readonly<JsonValidatorProps>, prevState: Readonly<JsonValidatorState>) {
+		const { type } = this.state;
+		const { type: preType } = prevState;
+		if (type !== preType) {
+			if (type === 'board') {
+				window.electron.schemas
+					.board()
+					.then((gameSchema) => {
+						return monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
+							validate: true,
+							schemas: [
+								{
+									uri: '#',
+									fileMatch: ['*'],
+									schema: gameSchema,
+								},
+							],
+						});
+					})
+					.catch(() => {});
+			} else {
+				window.electron.schemas
+					.game()
+					.then((gameSchema) => {
+						return monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
+							validate: true,
+							schemas: [
+								{
+									uri: '#',
+									fileMatch: ['*'],
+									schema: gameSchema,
+								},
+							],
+						});
+					})
+					.catch(() => {});
+			}
+		}
+		const { code } = this.state;
+		if (code === '{' || code === '}' || code === '') {
+			this.setState({ code: '{}' });
+		}
 	}
 
 	componentWillUnmount() {
@@ -157,8 +197,8 @@ class JsonValidator extends React.Component<JsonValidatorProps, JsonValidatorSta
 					onAbort={() => {
 						this.setState({ popup: null });
 					}}
-					onConfirm={(settings: SettingsInterface) => {
-						onSettingsUpdated(settings);
+					onConfirm={(newSettings: SettingsInterface) => {
+						onSettingsUpdated(newSettings);
 						this.setState({ popup: null });
 					}}
 					windowDimensions={windowDimensions}
@@ -167,53 +207,6 @@ class JsonValidator extends React.Component<JsonValidatorProps, JsonValidatorSta
 			),
 		});
 	};
-
-	componentDidUpdate(prevProps: Readonly<JsonValidatorProps>, prevState: Readonly<JsonValidatorState>) {
-		const { type } = this.state;
-		const { type: preType } = prevState;
-		if (type !== preType) {
-			if (type === 'board') {
-				window.electron.schemas
-					.board()
-					.then((gameSchema) => {
-						return monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
-							validate: true,
-							schemas: [
-								{
-									uri: '#',
-									fileMatch: ['*'],
-									schema: gameSchema,
-								},
-							],
-						});
-					})
-					.catch(() => {
-					});
-			} else {
-				window.electron.schemas
-					.game()
-					.then((gameSchema) => {
-						return monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
-							validate: true,
-							schemas: [
-								{
-									uri: '#',
-									fileMatch: ['*'],
-									schema: gameSchema,
-								},
-							],
-						});
-					})
-					.catch(() => {
-					});
-			}
-		}
-		const { code } = this.state;
-		if (code === '{' || code === '}' || code === '') {
-			this.setState({ code: '{}' });
-		}
-
-	}
 
 	handleBackButton = () => {
 		const { fileHasBeenEdited } = this.state;
@@ -248,7 +241,6 @@ class JsonValidator extends React.Component<JsonValidatorProps, JsonValidatorSta
 					codeError: '',
 				});
 			}
-
 		} catch (error) {
 			if (error instanceof Error) consoleOutput.push(error.message);
 		}
@@ -258,20 +250,19 @@ class JsonValidator extends React.Component<JsonValidatorProps, JsonValidatorSta
 				validator = new BoardConfigValidator(JSON.parse(newValue) as BoardConfigInterface);
 				consoleOutput.push(...validator.errors);
 			} catch (error) {
-				if (error instanceof Error)
-					consoleOutput.push(error.message);
+				if (error instanceof Error) consoleOutput.push(error.message);
 			}
 
 			try {
 				const pathFinding = AStar.checkBoardConfig(JSON.parse(newValue) as BoardConfigInterface);
 				if (!pathFinding.result) {
 					pathFinding.errors.forEach((error) => {
-						console.log(error);
 						let message = '';
 						if (error.start && error.end) {
 							message = `No path from ({0}, {1}) to ({2}, {3})`;
-							consoleOutput.push(window.t.translateVars(message, [error.start.x, error.start.y, error.end.x, error.end.y]));
-
+							consoleOutput.push(
+								window.t.translateVars(message, [error.start.x, error.start.y, error.end.x, error.end.y])
+							);
 						} else if (error.start) {
 							message = `No path from ({0}, {1})`;
 							consoleOutput.push(window.t.translateVars(message, [error.start.x, error.start.y]));
@@ -282,10 +273,8 @@ class JsonValidator extends React.Component<JsonValidatorProps, JsonValidatorSta
 					});
 				}
 			} catch (error) {
-				if (error instanceof Error)
-					consoleOutput.push(error.message);
+				if (error instanceof Error) consoleOutput.push(error.message);
 			}
-
 		} else if (type === 'game') {
 			try {
 				validator = new GameConfigValidator(JSON.parse(newValue) as GameConfigInterface);
@@ -335,8 +324,7 @@ class JsonValidator extends React.Component<JsonValidatorProps, JsonValidatorSta
 							});
 							return false;
 						})
-						.catch(() => {
-						});
+						.catch(() => {});
 				}}
 				onAbort={() => {
 					this.setState({
@@ -372,10 +360,10 @@ class JsonValidator extends React.Component<JsonValidatorProps, JsonValidatorSta
 				closeButtonText={window.t.translate('Close')}
 			>
 				<ProgressBar
-					wrapperClass='text-center mx-auto justify-center'
-					borderColor='#ffffff'
-					barColor='#71C294'
-					width='80'
+					wrapperClass="text-center mx-auto justify-center"
+					borderColor="#ffffff"
+					barColor="#71C294"
+					width="80"
 				/>
 			</PopupV2>
 		);
@@ -395,7 +383,7 @@ class JsonValidator extends React.Component<JsonValidatorProps, JsonValidatorSta
 				async () => {
 					const { code } = this.state;
 					await this.onChange(code);
-				},
+				}
 			);
 		}
 	};
@@ -410,38 +398,24 @@ class JsonValidator extends React.Component<JsonValidatorProps, JsonValidatorSta
 					{
 						codeError: '',
 						popup: null,
-						code: code,
+						code,
 						consoleOutput: [],
 						currentFile: {
 							parsed: file.parsedPath,
 							path: file.path,
 						},
 						fileHasBeenEdited: false,
-						type: this.predictIfConfigurationIsPartyConfiguration(file.config) ? 'game' : 'board',
+						type: predictIfConfigurationIsPartyConfiguration(file.config) ? 'game' : 'board',
 					},
 					async () => {
-						const { code } = this.state;
 						await this.onChange(code);
-					},
+					}
 				);
 			} catch (error) {
 				if (error instanceof Error) this.setState({ consoleOutput: [...[error.message]] });
 			}
 		}
 		this.setState({ popup: null });
-	};
-
-	predictIfConfigurationIsPartyConfiguration = (configuration: object) => {
-		return (
-			'maxRounds' in configuration ||
-			'reviveRounds' in configuration ||
-			'serverIngameDelay' in configuration ||
-			'riverMoveCount' in configuration ||
-			'cardSelectionTimeout' in configuration ||
-			'characterChoiceTimeout' in configuration ||
-			'shotLembas' in configuration ||
-			'startLembas' in configuration
-		);
 	};
 
 	saveFile = async () => {
@@ -492,155 +466,6 @@ class JsonValidator extends React.Component<JsonValidatorProps, JsonValidatorSta
 		});
 	};
 
-	render = () => {
-		const { popup, type, code, codeError, windowDimensions, consoleOutput, currentFile, fileHasBeenEdited } =
-			this.state;
-		const { os, settings, onSettingsUpdated } = this.props;
-		const errorMsg = this.genErrorMsg(codeError);
-
-		return (
-			<div className='dark:bg-muted-800 bg-muted-500 text-white h-[100vh] w-[100vw]'>
-				<Dragger os={os}>
-					<>
-						{window.t.translate('Validator')}
-						{` - `}
-						{currentFile ? currentFile.parsed.base : window.t.translate('Unsaved Configuration')}
-						{fileHasBeenEdited ? ' *' : ''}
-					</>
-				</Dragger>
-				<div className='flex flex-col w-full'
-					 style={{ height: windowDimensions.height - (os === 'win32' ? 32 : 0) }}>
-					<div
-						className={`flex text-white items-center  dark:border-0 border-t border-muted-400 ${
-							os === 'darwin' ? 'pl-20' : ''
-						} `}
-					>
-						<img className='h-6 ml-2 mr-4' src={destinyMountainImage} alt={window.t.translate('Logo')} />
-						<TopMenuItemCollapsable label={window.t.translate('Validator')}>
-							<TopMenuItem
-								type='none'
-								onAction={this.openNewFile}
-								label={window.t.translate('New')}
-								icon={<VscNewFile />}
-							/>
-							<TopMenuItem
-								type='none'
-								onAction={this.openFile}
-								label={window.t.translate('Open')}
-								icon={<VscFolder />}
-							/>
-							<TopMenuSeparator />
-							<TopMenuItem
-								type='none'
-								onAction={this.saveFile}
-								label={`${currentFile ? window.t.translate('Save') : window.t.translate('Save as')}...`}
-								icon={<VscSave />}
-							/>
-							<TopMenuSeparator />
-							<TopMenuItem type='none' onAction={this.openSettings}
-										 label={window.t.translate('Settings')} />
-							<TopMenuSeparator />
-							<TopMenuItem type='none' onAction={this.handleBackButton}
-										 label={window.t.translate('Close')} />
-						</TopMenuItemCollapsable>
-						<div className='flex items-center gap-4'>
-							<SelectComponent<ConfigType>
-								value={type}
-								onChange={this.changeType}
-								options={[
-									{
-										value: 'game',
-										text: window.t.translate('Game Configuration'),
-									},
-									{ value: 'board', text: window.t.translate('Board Configuration') },
-								]}
-							/>
-							{currentFile ? (
-								<FilePathComponent os={os} file={currentFile.parsed} edited={fileHasBeenEdited} />
-							) : (
-								<span className='italic'>
-									{window.t.translate('Unsaved Configuration')}
-									{fileHasBeenEdited ? ' *' : ''}
-								</span>
-							)}
-						</div>
-						<div className='ml-auto flex items-center'>
-							<TopMenuItem
-								type='none'
-								onAction={() => {
-									onSettingsUpdated({ ...settings, darkMode: !settings.darkMode });
-								}}
-								label={null}
-								icon={
-									<VscColorMode
-										title={window.t.translate('Dark Mode')}
-										className={`${settings.darkMode ? '' : 'rotate-180'} transition-all transform-gpu text-lg`}
-									/>
-								}
-							/>
-							<TopMenuItem type='none' label={`${window.t.translate('Version')}: 1.2.81`}
-										 icon={<VscVersions />} />
-						</div>
-					</div>
-					<div className='grow relative h-full'>
-						<div>
-							<MonacoEditor
-								value={code}
-								language='json'
-								height={windowDimensions.height - (settings.darkMode ? 372 : 373) + (os === 'win32' ? 0 : 32)}
-								width={windowDimensions.width}
-								theme='vs-dark'
-								onChange={async (value) => {
-									await this.onChange(value);
-									this.setState({ fileHasBeenEdited: true });
-								}}
-							/>
-						</div>
-						<div className='grid 2xl:grid-cols-4 grid-cols-2'>
-							<div className='w-full h-[300px] max-h-[300px] flex flex-col'>
-								<div className='text-white flex flex-col justify-center border-b border-gray-600 p-1'>
-									<div className='pl-4'>{window.t.translate('Errors')}</div>
-								</div>
-								<div className='w-full text-white overflow-auto grow dark:bg-white/10 bg-white'>
-									<div className='h-full max-h-full pl-5 pt-2'>
-										<pre className='user-select'>
-											{consoleOutput.map((error) => (
-												<p key={_uniqueId('console-output-')}
-												   className='dark:text-red-400 text-red-600 text-sm py-1'>
-													{error}
-												</p>
-											))}
-										</pre>
-									</div>
-								</div>
-							</div>
-							<div
-								className='w-full h-[300px] max-h-[300px] flex flex-col border-l border-gray-600 2xl:col-span-3'>
-								<div className='text-white flex flex-col justify-center border-b border-gray-600 p-1'>
-									<div className='pl-4'>{window.t.translate('JSON-Validation')}</div>
-								</div>
-								<div
-									className='w-full dark:bg-white/10 bg-white dark:text-white text-slate-900 overflow-auto grow'>
-									<div className='h-full text-sm'>
-										{errorMsg ? (
-											<div>{errorMsg.map((error) => error)}</div>
-										) : (
-											<div className='flex flex-col justify-center items-center h-full'>
-												<div
-													className='text-2xl text-white'>{window.t.translate('No Errors')}</div>
-											</div>
-										)}
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-				{popup}
-			</div>
-		);
-	};
-
 	private genErrorMsg(codeError: string) {
 		const { settings } = this.props;
 		const errorMsg: ReactElement[] | null[] = [];
@@ -648,9 +473,9 @@ class JsonValidator extends React.Component<JsonValidatorProps, JsonValidatorSta
 			errorMsg[0] = null;
 		} else if (codeError === 'validate') {
 			errorMsg[0] = (
-				<div key={_uniqueId()} className='pt-1'>
-					<span className='text-red-500'>{window.t.translate('ERROR')}</span>
-					<span className='text-white'>: {window.t.translate('Invalid JSON')}</span>
+				<div key={_uniqueId()} className="pt-1">
+					<span className="text-red-500">{window.t.translate('ERROR')}</span>
+					<span className="text-white">: {window.t.translate('Invalid JSON')}</span>
 				</div>
 			);
 		} else {
@@ -665,10 +490,10 @@ class JsonValidator extends React.Component<JsonValidatorProps, JsonValidatorSta
 								i % 2 === 1 ? 'bg-slate-100 dark:bg-gray-900/25' : ''
 							}`}
 						>
-							<div className='border-r py-2 dark:border-white/10 pr-2 h-full my-auto'>
+							<div className="border-r py-2 dark:border-white/10 pr-2 h-full my-auto">
 								{JsonValidator.numberAddZero(i + 1)}
 							</div>
-							<div className='w-full'>
+							<div className="w-full">
 								<JsonViewer
 									key={_uniqueId()}
 									value={e}
@@ -687,6 +512,147 @@ class JsonValidator extends React.Component<JsonValidatorProps, JsonValidatorSta
 			}
 		}
 		return errorMsg;
+	}
+
+	render() {
+		const { popup, type, code, codeError, windowDimensions, consoleOutput, currentFile, fileHasBeenEdited } =
+			this.state;
+		const { os, settings, onSettingsUpdated } = this.props;
+		const errorMsg = this.genErrorMsg(codeError);
+
+		return (
+			<div className="dark:bg-muted-800 bg-muted-500 text-white h-[100vh] w-[100vw]">
+				<Dragger os={os}>
+					<>
+						{window.t.translate('Validator')}
+						{` - `}
+						{currentFile ? currentFile.parsed.base : window.t.translate('Unsaved Configuration')}
+						{fileHasBeenEdited ? ' *' : ''}
+					</>
+				</Dragger>
+				<div className="flex flex-col w-full" style={{ height: windowDimensions.height - (os === 'win32' ? 32 : 0) }}>
+					<div
+						className={`flex text-white items-center  dark:border-0 border-t border-muted-400 ${
+							os === 'darwin' ? 'pl-20' : ''
+						} `}
+					>
+						<img className="h-6 ml-2 mr-4" src={destinyMountainImage} alt={window.t.translate('Logo')} />
+						<TopMenuItemCollapsable label={window.t.translate('Validator')}>
+							<TopMenuItem
+								type="none"
+								onAction={this.openNewFile}
+								label={window.t.translate('New')}
+								icon={<VscNewFile />}
+							/>
+							<TopMenuItem
+								type="none"
+								onAction={this.openFile}
+								label={window.t.translate('Open')}
+								icon={<VscFolder />}
+							/>
+							<TopMenuSeparator />
+							<TopMenuItem
+								type="none"
+								onAction={this.saveFile}
+								label={`${currentFile ? window.t.translate('Save') : window.t.translate('Save as')}...`}
+								icon={<VscSave />}
+							/>
+							<TopMenuSeparator />
+							<TopMenuItem type="none" onAction={this.openSettings} label={window.t.translate('Settings')} />
+							<TopMenuSeparator />
+							<TopMenuItem type="none" onAction={this.handleBackButton} label={window.t.translate('Close')} />
+						</TopMenuItemCollapsable>
+						<div className="flex items-center gap-4">
+							<SelectComponent<ConfigType>
+								value={type}
+								onChange={this.changeType}
+								options={[
+									{
+										value: 'game',
+										text: window.t.translate('Game Configuration'),
+									},
+									{ value: 'board', text: window.t.translate('Board Configuration') },
+								]}
+							/>
+							{currentFile ? (
+								<FilePathComponent os={os} file={currentFile.parsed} edited={fileHasBeenEdited} />
+							) : (
+								<span className="italic">
+									{window.t.translate('Unsaved Configuration')}
+									{fileHasBeenEdited ? ' *' : ''}
+								</span>
+							)}
+						</div>
+						<div className="ml-auto flex items-center">
+							<TopMenuItem
+								type="none"
+								onAction={() => {
+									onSettingsUpdated({ ...settings, darkMode: !settings.darkMode });
+								}}
+								label={null}
+								icon={
+									<VscColorMode
+										title={window.t.translate('Dark Mode')}
+										className={`${settings.darkMode ? '' : 'rotate-180'} transition-all transform-gpu text-lg`}
+									/>
+								}
+							/>
+							<TopMenuItem type="none" label={`${window.t.translate('Version')}: 1.2.81`} icon={<VscVersions />} />
+						</div>
+					</div>
+					<div className="grow relative h-full">
+						<div>
+							<MonacoEditor
+								value={code}
+								language="json"
+								height={windowDimensions.height - (settings.darkMode ? 372 : 373) + (os === 'win32' ? 0 : 32)}
+								width={windowDimensions.width}
+								theme="vs-dark"
+								onChange={async (value) => {
+									await this.onChange(value);
+									this.setState({ fileHasBeenEdited: true });
+								}}
+							/>
+						</div>
+						<div className="grid 2xl:grid-cols-4 grid-cols-2">
+							<div className="w-full h-[300px] max-h-[300px] flex flex-col">
+								<div className="text-white flex flex-col justify-center border-b border-gray-600 p-1">
+									<div className="pl-4">{window.t.translate('Errors')}</div>
+								</div>
+								<div className="w-full text-white overflow-auto grow dark:bg-white/10 bg-white">
+									<div className="h-full max-h-full pl-5 pt-2">
+										<pre className="user-select">
+											{consoleOutput.map((error) => (
+												<p key={_uniqueId('console-output-')} className="dark:text-red-400 text-red-600 text-sm py-1">
+													{error}
+												</p>
+											))}
+										</pre>
+									</div>
+								</div>
+							</div>
+							<div className="w-full h-[300px] max-h-[300px] flex flex-col border-l border-gray-600 2xl:col-span-3">
+								<div className="text-white flex flex-col justify-center border-b border-gray-600 p-1">
+									<div className="pl-4">{window.t.translate('JSON-Validation')}</div>
+								</div>
+								<div className="w-full dark:bg-white/10 bg-white dark:text-white text-slate-900 overflow-auto grow">
+									<div className="h-full text-sm">
+										{errorMsg ? (
+											<div>{errorMsg.map((error) => error)}</div>
+										) : (
+											<div className="flex flex-col justify-center items-center h-full">
+												<div className="text-2xl text-white">{window.t.translate('No Errors')}</div>
+											</div>
+										)}
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				{popup}
+			</div>
+		);
 	}
 }
 

@@ -31,27 +31,27 @@ class BoardEditorChoice extends React.Component<BoardEditorChoiceProps, BoardEdi
 	}
 
 	handlePopupClose = () => {
-		const {onClose} = this.props;
+		const { onClose } = this.props;
 		onClose();
 	};
 
 	openLoadBoardConfig = async () => {
-		const {onLoadConfig} = this.props;
+		const { onLoadConfig } = this.props;
 		onLoadConfig();
 	};
 
 	openNewBoardConfig = () => {
-		const {onNewConfig} = this.props;
+		const { onNewConfig } = this.props;
 		onNewConfig();
 	};
 
 	openRandomBoardConfig = () => {
-		const {onRandomConfig} = this.props;
+		const { onRandomConfig } = this.props;
 		onRandomConfig();
 	};
 
 	openRiverPresetEditor = () => {
-		const {onOpenRiverPresetEditor} = this.props;
+		const { onOpenRiverPresetEditor } = this.props;
 		onOpenRiverPresetEditor();
 	};
 
@@ -91,11 +91,10 @@ class BoardEditorChoice extends React.Component<BoardEditorChoiceProps, BoardEdi
 	}
 
 	render() {
-		const {view} = this.state;
+		const { view } = this.state;
 		return (
 			<div className="absolute w-[100vw] h-[100vh] top-0 left-0">
-				<div role="presentation" className="w-[100vw] h-[100vh] bg-background-800/50"
-					 onClick={this.handlePopupClose}/>
+				<div role="presentation" className="w-[100vw] h-[100vh] bg-background-800/50" onClick={this.handlePopupClose} />
 				<div>
 					<div className="absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]">
 						<div className="flex flex-col gap-8">
@@ -108,26 +107,32 @@ class BoardEditorChoice extends React.Component<BoardEditorChoiceProps, BoardEdi
 							</div>
 							<div className="flex justify-center">
 								<div className="flex gap-4 items-center justify-center">
-									<ButtonSwitch value={view} onChange={
-										(label) => {
-											this.setState({view: label.value as 'default' | 'riverPreset'});
-										}
-									} labels={
-										[
+									<ButtonSwitch
+										value={view}
+										onChange={(label) => {
+											this.setState({ view: label.value as 'default' | 'riverPreset' });
+										}}
+										labels={[
 											new ButtonSwitch.Label(window.t.translate('Configuration'), 'default'),
-											new ButtonSwitch.Label(window.t.translate('River Preset'), "riverPreset")
-										]
-									}/>
+											new ButtonSwitch.Label(window.t.translate('River Preset'), 'riverPreset'),
+										]}
+									/>
 								</div>
 							</div>
-							{/*CSS Carousel with animation between the two elements*/}
+							{/* CSS Carousel with animation between the two elements */}
 							<div className="flex overflow-x-hidden max-w-[100vw]">
 								<div
-									className={`snap-start shrink-0 w-full transition-all ${view == 'default' ? 'opacity-1 translate-x-0' : 'opacity-0 translate-x-full'}`}>
+									className={`snap-start shrink-0 w-full transition-all ${
+										view === 'default' ? 'opacity-1 translate-x-0' : 'opacity-0 translate-x-full'
+									}`}
+								>
 									{this.renderDefault()}
 								</div>
 								<div
-									className={`snap-start shrink-0 w-full transition-all ${view === 'riverPreset' ? 'opacity-1 -translate-x-full' : 'opacity-0 translate-x-0'}`}>
+									className={`snap-start shrink-0 w-full transition-all ${
+										view === 'riverPreset' ? 'opacity-1 -translate-x-full' : 'opacity-0 translate-x-0'
+									}`}
+								>
 									{this.renderPreset()}
 								</div>
 							</div>

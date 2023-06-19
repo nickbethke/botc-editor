@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
+import Mousetrap from 'mousetrap';
+import { JsonViewer } from '@textea/json-viewer';
 import { HomeMenuSeparator, HomeScreenButton } from '../components/HomeScreenButton';
 import bgImage from '../../../assets/images/bg-color-2x-no-bg.png';
 import sunImage from '../../../assets/images/sun.gif';
 import { SettingsInterface } from '../../interfaces/SettingsInterface';
-import Mousetrap from 'mousetrap';
 import BoardEditorChoice from '../components/popups/BoardEditorChoice';
 import RandomBoardStartValuesDialogV2 from '../components/popups/RandomBoardStartValuesDialogV2';
 import GameConfiguratorChoice from '../components/popups/GameConfiguratorChoice';
@@ -11,9 +12,8 @@ import SettingsPopup from '../components/popups/SettingsPopup';
 import PopupV2 from '../components/popups/PopupV2';
 import BoardGenerator from '../components/generator/BoardGenerator';
 import { AppScreens } from '../App';
-import { AboutPopup } from '../components/popups/AboutPopup';
+import AboutPopup from '../components/popups/AboutPopup';
 import Dragger from '../components/Dragger';
-import { JsonViewer } from '@textea/json-viewer';
 import { isBoardConfiguration } from '../components/boardConfigurator/HelperFunctions';
 
 type HomePopups =
@@ -36,12 +36,11 @@ type HomeState = {
 	openPopup: HomePopups;
 	version: string;
 	surprise: boolean;
-	errorMessage: { title: string; error: string, text: string } | null;
+	errorMessage: { title: string; error: string; text: string } | null;
 	windowDimensions: {
 		width: number;
 		height: number;
 	};
-	generator: BoardGenerator | null;
 };
 
 export default class Home extends Component<HomeProps, HomeState> {
@@ -56,7 +55,6 @@ export default class Home extends Component<HomeProps, HomeState> {
 				width: window.innerWidth,
 				height: window.innerHeight,
 			},
-			generator: null,
 		};
 	}
 
@@ -126,37 +124,33 @@ export default class Home extends Component<HomeProps, HomeState> {
 				os={os}
 				settings={settings}
 			>
-				<div className='flex flex-col gap-4'>
-					{errorMessage && errorMessage.text ? (
-						<p>{errorMessage.text}</p>
-					) : ''}
-					{(errorMessage && errorMessage.error) ? (
-						<JsonViewer
-							value={JSON.parse(errorMessage.error)}
-							theme={settings.darkMode ? 'dark' : 'light'}
-						/>
-					) : ''}
+				<div className="flex flex-col gap-4">
+					{errorMessage && errorMessage.text ? <p>{errorMessage.text}</p> : ''}
+					{errorMessage && errorMessage.error ? (
+						<JsonViewer value={JSON.parse(errorMessage.error)} theme={settings.darkMode ? 'dark' : 'light'} />
+					) : (
+						''
+					)}
 				</div>
-
 			</PopupV2>
 		);
 	};
 
 	onBoardLoadConfig = async () => {
 		const boardJSON = await window.electron.dialog.openBoardConfig();
+		const { onOpenScreen } = this.props;
 		if (boardJSON) {
 			const { valid, missing } = isBoardConfiguration(boardJSON.config);
 			if (valid) {
-				this.setState({
-					generator: null,
-				});
-				this.props.onOpenScreen('boardConfigV2LoadScreen', boardJSON);
+				onOpenScreen('boardConfigV2LoadScreen', boardJSON);
 			} else {
 				this.setState({
 					errorMessage: {
 						title: window.t.translate('Board Configuration Validation Error'),
-						error: JSON.stringify({ 'missing': missing, 'valid': valid }),
-						text: window.t.translate('The board configuration you are trying to load is not valid. Please check the error message below and try again.'),
+						error: JSON.stringify({ missing, valid }),
+						text: window.t.translate(
+							'The board configuration you are trying to load is not valid. Please check the error message below and try again.'
+						),
 					},
 					openPopup: 'error',
 				});
@@ -165,8 +159,8 @@ export default class Home extends Component<HomeProps, HomeState> {
 	};
 
 	popup = (openPopup: HomePopups) => {
-		const { windowDimensions } = this.state;
-		const { os, settings } = this.props;
+		const { windowDimensions, version } = this.state;
+		const { os, settings, onOpenScreen, onSettingsUpdate } = this.props;
 		let popup: React.JSX.Element | null;
 		switch (openPopup) {
 			case 'error':
@@ -180,22 +174,16 @@ export default class Home extends Component<HomeProps, HomeState> {
 						}}
 						onLoadConfig={this.onBoardLoadConfig}
 						onNewConfig={() => {
-							this.setState({
-								generator: null,
-							});
-							this.props.onOpenScreen('boardConfigV2NewScreen');
+							onOpenScreen('boardConfigV2NewScreen');
 						}}
 						onRandomConfig={() => {
 							this.setState({
 								openPopup: 'randomBoardV2StartValues',
-								generator: null,
 							});
 						}}
 						onOpenRiverPresetEditor={() => {
-							this.setState({
-								generator: null,
-							});
-							this.props.onOpenScreen('riverPresetEditor');
+							this.setState({});
+							onOpenScreen('riverPresetEditor');
 						}}
 					/>
 				);
@@ -207,11 +195,7 @@ export default class Home extends Component<HomeProps, HomeState> {
 							this.setState({ openPopup: 'boardEditorChoiceV2' });
 						}}
 						onConfirm={(generator) => {
-							this.setState({
-								generator,
-								openPopup: null,
-							});
-							this.props.onOpenScreen('boardConfigV2FromRandomScreen', generator.boardJSON);
+							onOpenScreen('boardConfigV2FromRandomScreen', generator.boardJSON);
 						}}
 						settings={settings}
 						windowDimensions={windowDimensions}
@@ -226,12 +210,12 @@ export default class Home extends Component<HomeProps, HomeState> {
 							this.setState({ openPopup: null });
 						}}
 						onNewConfig={() => {
-							this.props.onOpenScreen('gameConfigNewScreen');
+							onOpenScreen('gameConfigNewScreen');
 						}}
 						onLoadConfig={async () => {
 							const gameJSON = await window.electron.dialog.openGameConfiguration();
 							if (gameJSON) {
-								this.props.onOpenScreen('gameConfigLoadScreen', gameJSON);
+								onOpenScreen('gameConfigLoadScreen', gameJSON);
 							}
 						}}
 					/>
@@ -246,7 +230,7 @@ export default class Home extends Component<HomeProps, HomeState> {
 							this.setState({ openPopup: null });
 						}}
 						onConfirm={(s) => {
-							this.props.onSettingsUpdate(s);
+							onSettingsUpdate(s);
 							this.setState({ openPopup: null });
 						}}
 						windowDimensions={windowDimensions}
@@ -262,7 +246,7 @@ export default class Home extends Component<HomeProps, HomeState> {
 						windowDimensions={windowDimensions}
 						os={os}
 						settings={settings}
-						version={this.state.version}
+						version={version}
 					/>
 				);
 				break;
@@ -273,13 +257,9 @@ export default class Home extends Component<HomeProps, HomeState> {
 		return popup;
 	};
 
-	handleCloseApp = () => {
-		window.electron.app.close().catch(() => {
-		});
-	};
-
 	handleOpenValidator = () => {
-		this.props.onOpenScreen('validator');
+		const { onOpenScreen } = this.props;
+		onOpenScreen('validator');
 	};
 
 	render() {
@@ -300,27 +280,22 @@ export default class Home extends Component<HomeProps, HomeState> {
 		const popup = this.popup(openPopup);
 		const tabIndex = openPopup !== null ? -1 : 0;
 		return (
-			<div
-				className='text-white transition duration-500 dark:bg-gradient-to-br dark:from-slate-900 dark:to-muted-800 bg-with-gradient overflow-hidden relative'>
-				<div id='home' className={`${popup ? 'blur' : ''} flex flex-col`}>
+			<div className="text-white transition duration-500 dark:bg-gradient-to-br dark:from-slate-900 dark:to-muted-800 bg-with-gradient overflow-hidden relative">
+				<div id="home" className={`${popup ? 'blur' : ''} flex flex-col`}>
 					<Dragger os={os}>{window.t.translate('Battle of the Centerländ - Editor')}</Dragger>
-					<div className='grid grid-cols-2 grow'>
-						<div className='flex flex-col pb-8'
-							 style={{ height: window.innerHeight - (os === 'win32' ? 32 : 0) }}>
-							<div className='flex flex-col pt-8 justify-between grow'>
-								<div
-									className='flex xl:flex-col items-center xl:items-start gap-4 xl:gap-0 w-full px-12'>
-									<div
-										className='flex gap-4 items-center text-4xl xl:text-6xl 2xl:text-8xl dark:font-with-gradient pt-4 font-flicker'>
+					<div className="grid grid-cols-2 grow">
+						<div className="flex flex-col pb-8" style={{ height: window.innerHeight - (os === 'win32' ? 32 : 0) }}>
+							<div className="flex flex-col pt-8 justify-between grow">
+								<div className="flex xl:flex-col items-center xl:items-start gap-4 xl:gap-0 w-full px-12">
+									<div className="flex gap-4 items-center text-4xl xl:text-6xl 2xl:text-8xl dark:font-with-gradient pt-4 font-flicker">
 										Battle of the Centerländ
 									</div>
-									<div
-										className='text-2xl xl:text-4xl 2xl:text-6xl tracking-widest dark:font-with-gradient pt-4 xl:pt-0 font-flicker'>
+									<div className="text-2xl xl:text-4xl 2xl:text-6xl tracking-widest dark:font-with-gradient pt-4 xl:pt-0 font-flicker">
 										{window.t.translate('Editor')}
 									</div>
 								</div>
-								<div className='flex flex-col gap-4 w-fit text-left tracking-widest px-12 py-6'>
-									<div className='flex flex-col justify-start gap-4 bg-slate-600/25 p-6 rounded'>
+								<div className="flex flex-col gap-4 w-fit text-left tracking-widest px-12 py-6">
+									<div className="flex flex-col justify-start gap-4 bg-slate-600/25 p-6 rounded">
 										<HomeScreenButton
 											text={window.t.translate('Board-Configurator')}
 											onClick={this.handleOpenBoardEditorChoiceV2}
@@ -346,7 +321,9 @@ export default class Home extends Component<HomeProps, HomeState> {
 										<HomeMenuSeparator />
 										<HomeScreenButton
 											text={window.t.translate('Exit')}
-											onClick={this.handleCloseApp}
+											onClick={() => {
+												window.electron.app.close().catch(() => {});
+											}}
 											tabIndex={tabIndex}
 											last
 										/>
@@ -354,12 +331,11 @@ export default class Home extends Component<HomeProps, HomeState> {
 								</div>
 							</div>
 						</div>
-						<div className='relative'>
-							<div className='w-full absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2'>
-								<img className='w-full home-bg' src={bgImage}
-									 alt={window.t.translate('Background image')} />
+						<div className="relative">
+							<div className="w-full absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+								<img className="w-full home-bg" src={bgImage} alt={window.t.translate('Background image')} />
 								<img
-									alt='surprise sun'
+									alt="surprise sun"
 									src={sunImage}
 									className={`${
 										surprise ? 'opacity-1 top-1/4' : 'opacity-0 top-1/3'
@@ -368,22 +344,22 @@ export default class Home extends Component<HomeProps, HomeState> {
 							</div>
 						</div>
 					</div>
-					<div
-						className='absolute bottom-0 left-0 z-10 bg-white/50 dark:bg-white/10 p-2 w-[100vw] flex flex-row items-center justify-end gap-2 text-xs dark:text-white text-slate-900'>
-						<span
-							className='cursor-pointer hover:underline'
+					<div className="absolute bottom-0 left-0 z-10 bg-white/50 dark:bg-white/10 p-2 w-[100vw] flex flex-row items-center justify-end gap-2 text-xs dark:text-white text-slate-900">
+						<button
+							type="button"
+							className="cursor-pointer hover:underline"
 							onClick={() => {
 								this.setState({ openPopup: 'about' });
 							}}
 						>
 							{window.t.translate('About')}
-						</span>
+						</button>
 						<span>
 							{window.t.translate('Editor Version')}: {version}
 						</span>
 					</div>
 				</div>
-				<div role='dialog' id='popup'>
+				<div role="dialog" id="popup">
 					{popup}
 				</div>
 			</div>

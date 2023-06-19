@@ -136,10 +136,10 @@ export function removeHole(position: BoardPosition, config: BoardConfigInterface
  */
 export function removeWall(
 	position: [BoardPosition, BoardPosition],
-	config: BoardConfigInterface,
+	config: BoardConfigInterface
 ): BoardConfigInterface {
 	const filteredWallArray = config.walls.filter(
-		(e) => wallPosition2String(e as [Position, Position]) !== wallBoardPosition2String(position),
+		(e) => wallPosition2String(e as [Position, Position]) !== wallBoardPosition2String(position)
 	);
 	return {
 		...config,
@@ -154,7 +154,7 @@ export function removeWall(
  */
 function overrideField(
 	position: BoardPosition,
-	config: BoardConfigInterface,
+	config: BoardConfigInterface
 ): { override: boolean; config: BoardConfigInterface } {
 	const type = getFieldType(position, config);
 	switch (type) {
@@ -224,7 +224,11 @@ export function addCheckpoint(position: BoardPosition, config: BoardConfigInterf
  * @param config
  * @param direction
  */
-export function addStartField(position: BoardPosition, config: BoardConfigInterface, direction: Direction): BoardConfigInterface {
+export function addStartField(
+	position: BoardPosition,
+	config: BoardConfigInterface,
+	direction: Direction
+): BoardConfigInterface {
 	const { config: newConfig } = overrideField(position, config);
 
 	const newStartFieldsArray = newConfig.startFields;
@@ -256,7 +260,11 @@ export function addLembasField(position: BoardPosition, config: BoardConfigInter
  * @param config
  * @param direction
  */
-export function addRiver(position: BoardPosition, config: BoardConfigInterface, direction: Direction): BoardConfigInterface {
+export function addRiver(
+	position: BoardPosition,
+	config: BoardConfigInterface,
+	direction: Direction
+): BoardConfigInterface {
 	const { config: newConfig } = overrideField(position, config);
 	const newRiverFieldsArray = newConfig.riverFields;
 	newRiverFieldsArray.push({
@@ -285,7 +293,7 @@ export function addHole(position: BoardPosition, config: BoardConfigInterface): 
  */
 export function getDirectionFieldConfig(
 	position: BoardPosition,
-	config: BoardConfigInterface,
+	config: BoardConfigInterface
 ): PositionDirection | null {
 	const type = getFieldType(position, config);
 	if (type === FieldsEnum.EYE) {
@@ -317,7 +325,7 @@ export function getDirectionFieldConfig(
 export function updateStartFieldDirection(
 	config: BoardConfigInterface,
 	position: BoardPosition,
-	direction: DirectionEnum,
+	direction: DirectionEnum
 ): BoardConfigInterface {
 	if (getFieldType(position, config) !== FieldsEnum.START) {
 		return config;
@@ -342,7 +350,7 @@ export function updateStartFieldDirection(
 export function updateRiverFieldDirection(
 	config: BoardConfigInterface,
 	position: BoardPosition,
-	direction: DirectionEnum,
+	direction: DirectionEnum
 ): BoardConfigInterface {
 	if (getFieldType(position, config) !== FieldsEnum.RIVER) {
 		return config;
@@ -367,7 +375,7 @@ export function updateRiverFieldDirection(
 export function updateLembasFieldAmount(
 	config: BoardConfigInterface,
 	position: BoardPosition,
-	amount: number,
+	amount: number
 ): BoardConfigInterface {
 	if (getFieldType(position, config) !== FieldsEnum.LEMBAS) {
 		return config;
@@ -410,24 +418,15 @@ export function getCheckpointIndexConfig(position: BoardPosition, config: BoardC
  * @param config
  */
 export function predictIfConfigurationIsBoardConfiguration(config: any): config is BoardConfigInterface {
-	if ('width' in config)
-		return true;
-	if ('height' in config)
-		return true;
-	if ('name' in config)
-		return true;
-	if ('checkPoints' in config)
-		return true;
-	if ('eye' in config)
-		return true;
-	if ('holes' in config)
-		return true;
-	if ('lembasFields' in config)
-		return true;
-	if ('riverFields' in config)
-		return true;
-	if ('startFields' in config)
-		return true;
+	if ('width' in config) return true;
+	if ('height' in config) return true;
+	if ('name' in config) return true;
+	if ('checkPoints' in config) return true;
+	if ('eye' in config) return true;
+	if ('holes' in config) return true;
+	if ('lembasFields' in config) return true;
+	if ('riverFields' in config) return true;
+	if ('startFields' in config) return true;
 	return 'walls' in config;
 }
 
@@ -464,6 +463,8 @@ export function getPreviousRotation(rotation: Rotation): Rotation {
 			return '90';
 		case '270':
 			return '180';
+		default:
+			return '0';
 	}
 }
 
@@ -477,10 +478,15 @@ export function rotateDirection(direction: Direction, rotation: Rotation): Direc
 			return DirectionHelper.getNextDirection(DirectionHelper.getNextDirection(direction));
 		case '270':
 			return DirectionHelper.getPreviousDirection(direction);
+		default:
+			return direction;
 	}
 }
 
-export function calculateRiverPresetFieldPositionWithRotation(position: [number, number], rotation: '0' | '90' | '180' | '270'): BoardPosition {
+export function calculateRiverPresetFieldPositionWithRotation(
+	position: [number, number],
+	rotation: '0' | '90' | '180' | '270'
+): BoardPosition {
 	const [positionX, positionY] = position;
 
 	let x = positionX;
@@ -515,7 +521,24 @@ export function getNextDirection(direction: Direction): Direction {
 			return 'WEST';
 		case 'WEST':
 			return 'NORTH';
+		default:
+			return 'NORTH';
 	}
+}
+
+export function getMissingBoardConfigurationProperties(config: any): Array<string> {
+	const missing: Array<string> = [];
+	if (!('width' in config)) missing.push('width');
+	if (!('height' in config)) missing.push('height');
+	if (!('name' in config)) missing.push('name');
+	if (!('checkPoints' in config)) missing.push('checkPoints');
+	if (!('eye' in config)) missing.push('eye');
+	if (!('holes' in config)) missing.push('holes');
+	if (!('lembasFields' in config)) missing.push('lembasFields');
+	if (!('riverFields' in config)) missing.push('riverFields');
+	if (!('startFields' in config)) missing.push('startFields');
+	if (!('walls' in config)) missing.push('walls');
+	return missing;
 }
 
 /**
@@ -524,45 +547,35 @@ export function getNextDirection(direction: Direction): Direction {
  * @returns {{valid: boolean, missing: Array<string>}}
  * @since 0.9.85
  */
-export function isBoardConfiguration(config: any): { valid: boolean, missing: Array<string> } {
-	const valid = 'width' in config && 'height' in config && 'name' in config && 'checkPoints' in config && 'eye' in config && 'holes' in config && 'lembasFields' in config && 'riverFields' in config && 'startFields' in config && 'walls' in config;
+export function isBoardConfiguration(config: any): { valid: boolean; missing: Array<string> } {
+	const valid =
+		'width' in config &&
+		'height' in config &&
+		'name' in config &&
+		'checkPoints' in config &&
+		'eye' in config &&
+		'holes' in config &&
+		'lembasFields' in config &&
+		'riverFields' in config &&
+		'startFields' in config &&
+		'walls' in config;
 	return { valid, missing: getMissingBoardConfigurationProperties(config) };
-}
-
-
-export function getMissingBoardConfigurationProperties(config: any): Array<string> {
-	const missing: Array<string> = [];
-	if (!('width' in config))
-		missing.push('width');
-	if (!('height' in config))
-		missing.push('height');
-	if (!('name' in config))
-		missing.push('name');
-	if (!('checkPoints' in config))
-		missing.push('checkPoints');
-	if (!('eye' in config))
-		missing.push('eye');
-	if (!('holes' in config))
-		missing.push('holes');
-	if (!('lembasFields' in config))
-		missing.push('lembasFields');
-	if (!('riverFields' in config))
-		missing.push('riverFields');
-	if (!('startFields' in config))
-		missing.push('startFields');
-	if (!('walls' in config))
-		missing.push('walls');
-	return missing;
 }
 
 export function clearFields(position: BoardPosition, config: BoardConfigInterface): BoardConfigInterface {
 	const newConfig = config;
 
-	newConfig.lembasFields = config.lembasFields.filter((e) => position2String(e.position) !== boardPosition2String(position));
+	newConfig.lembasFields = config.lembasFields.filter(
+		(e) => position2String(e.position) !== boardPosition2String(position)
+	);
 
-	newConfig.riverFields = config.riverFields.filter((e) => position2String(e.position) !== boardPosition2String(position));
+	newConfig.riverFields = config.riverFields.filter(
+		(e) => position2String(e.position) !== boardPosition2String(position)
+	);
 
-	newConfig.startFields = config.startFields.filter((e) => position2String(e.position) !== boardPosition2String(position));
+	newConfig.startFields = config.startFields.filter(
+		(e) => position2String(e.position) !== boardPosition2String(position)
+	);
 
 	newConfig.holes = config.holes.filter((e) => position2String(e) !== boardPosition2String(position));
 

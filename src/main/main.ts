@@ -40,10 +40,9 @@ const installExtensions = async () => {
 	return installer
 		.default(
 			extensions.map((name) => installer[name]),
-			forceDownload,
+			forceDownload
 		)
-		.catch(() => {
-		});
+		.catch(() => {});
 };
 
 /**
@@ -77,7 +76,8 @@ const createWindow = async () => {
 			height: 32,
 		},
 		trafficLightPosition: {
-			x: 10, y: 11,
+			x: 10,
+			y: 11,
 		},
 		icon: getAssetPath('icon.png'),
 		webPreferences: {
@@ -86,17 +86,22 @@ const createWindow = async () => {
 		},
 	});
 
-	mainWindow.loadURL(resolveHtmlPath('index.html')).then(() => {
-		if (!mainWindow) {
-			throw new Error('"mainWindow" is not defined');
-		}
-		if (process.env.START_MINIMIZED) {
-			mainWindow.minimize();
-		} else {
-			mainWindow.show();
-			mainWindow.focus();
-		}
-	});
+	mainWindow
+		.loadURL(resolveHtmlPath('index.html'))
+		.then(() => {
+			if (!mainWindow) {
+				throw new Error('"mainWindow" is not defined');
+			}
+			if (process.env.START_MINIMIZED) {
+				mainWindow.minimize();
+			} else {
+				mainWindow.show();
+				mainWindow.focus();
+			}
+		})
+		.catch((err) => {
+			process.stdout.write(err);
+		});
 
 	mainWindow.on('ready-to-show', () => {
 		if (!mainWindow) {
@@ -133,10 +138,10 @@ const createWindow = async () => {
 
 const registerHandlers = () => {
 	ipcMain.handle('dialog:openBoardConfig', async () => {
-		return IPCHelper.handleFileOpen('board', mainWindow);
+		return IPCHelper.handleFileOpen(mainWindow, 'board');
 	});
 	ipcMain.handle('dialog:openGameConfig', async () => {
-		return IPCHelper.handleFileOpen('game', mainWindow);
+		return IPCHelper.handleFileOpen(mainWindow, 'game');
 	});
 	ipcMain.handle('dialog:saveGameConfig', async (event, ...args) => {
 		return IPCHelper.handleSaveGameConfig(args[0], mainWindow);
@@ -145,7 +150,7 @@ const registerHandlers = () => {
 		return IPCHelper.handleSaveBoardConfig(args[0], mainWindow);
 	});
 	ipcMain.handle('dialog:openConfig', async () => {
-		return IPCHelper.handleFileOpen('', mainWindow);
+		return IPCHelper.handleFileOpen(mainWindow, '');
 	});
 
 	ipcMain.handle('dialog:saveScreenshot', (event, ...args) => {
@@ -268,9 +273,8 @@ const run = async () => {
 		if (mainWindow === null) createWindow();
 	});
 	registerHandlers();
-
 };
 
 run().catch((e) => {
-	console.error(e);
+	process.stdout.write(e);
 });

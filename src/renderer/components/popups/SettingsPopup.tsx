@@ -54,7 +54,7 @@ class SettingsPopup extends React.Component<SettingsPopupProps, SettingsPopupSta
 
 	render() {
 		const { os, windowDimensions, onAbort, onConfirm, topOffset } = this.props;
-		const { settings } = this.state;
+		const { settings, openView } = this.state;
 		return (
 			<ConfirmPopupV2
 				title={window.t.translate('Settings')}
@@ -74,7 +74,7 @@ class SettingsPopup extends React.Component<SettingsPopupProps, SettingsPopupSta
 						<div className="flex flex-row justify-between items-center p-4 w-full">
 							<div className="flex flex-row items-center w-full justify-center">
 								<ButtonSwitch
-									value={this.state.openView}
+									value={openView}
 									onChange={(checkedLabel) => {
 										this.setState({
 											openView: checkedLabel.value === 'settings' ? 'settings' : 'defaultValues',
@@ -88,7 +88,7 @@ class SettingsPopup extends React.Component<SettingsPopupProps, SettingsPopupSta
 							</div>
 						</div>
 					</div>
-					{this.state.openView === 'settings' ? (
+					{openView === 'settings' ? (
 						<div className="flex flex-col gap-4 p-4">
 							<div className="grid grid-cols-2 items-center gap-8">
 								<p>{window.t.translate('Language')}</p>
@@ -98,7 +98,7 @@ class SettingsPopup extends React.Component<SettingsPopupProps, SettingsPopupSta
 										this.setState({
 											settings: {
 												...settings,
-												language: language,
+												language,
 											},
 										});
 									}}
@@ -107,7 +107,7 @@ class SettingsPopup extends React.Component<SettingsPopupProps, SettingsPopupSta
 										{ value: 'en', text: window.t.translate('English') },
 										{ value: 'fr', text: window.t.translate('French') },
 									]}
-									containerClassName={'border-b border-gray-300'}
+									containerClassName="border-b border-gray-300"
 								/>
 							</div>
 							<div className="grid grid-cols-2 items-center gap-8">
@@ -183,7 +183,7 @@ class SettingsPopup extends React.Component<SettingsPopupProps, SettingsPopupSta
 										});
 									}}
 									max={64}
-									min={1}
+									min={3}
 								/>
 							</div>
 							<div className="grid grid-cols-2 items-center gap-8">

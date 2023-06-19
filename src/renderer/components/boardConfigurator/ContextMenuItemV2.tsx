@@ -4,8 +4,8 @@ import React from 'react';
  * The context menu item properties
  */
 type ContextMenuItemV2Props = {
-	text: string | React.JSX.Element;
 	onClick?: () => void | null | Promise<void>;
+	text: string | React.JSX.Element;
 };
 
 /**

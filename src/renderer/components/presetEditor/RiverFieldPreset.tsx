@@ -43,7 +43,7 @@ class RiverFieldPreset extends React.Component<RiverFieldPresetProps, unknown> {
 			<ContextMenuV2 position={{ x: event.clientX, y: event.clientY }}>
 				<ContextMenuItemV2
 					text={
-						<div className='flex gap-2'>
+						<div className="flex gap-2">
 							<span>{window.t.translate('Position')}:</span>
 							<span>
 								[{field.position[0]}, {field.position[1]}]
@@ -54,7 +54,7 @@ class RiverFieldPreset extends React.Component<RiverFieldPresetProps, unknown> {
 				<ContextMenuDividerV2 />
 				<ContextMenuItemV2
 					text={
-						<button type='button' className='flex gap-4 items-center justify-between'>
+						<button type="button" className="flex gap-4 items-center justify-between">
 							<span>{window.t.translate('North')}</span>
 							{field.direction === 'NORTH' ? <VscCheck /> : null}
 						</button>
@@ -65,7 +65,7 @@ class RiverFieldPreset extends React.Component<RiverFieldPresetProps, unknown> {
 				/>
 				<ContextMenuItemV2
 					text={
-						<button type='button' className='flex gap-4 items-center justify-between'>
+						<button type="button" className="flex gap-4 items-center justify-between">
 							<span>{window.t.translate('East')}</span>
 							{field.direction === 'EAST' ? <VscCheck /> : null}
 						</button>
@@ -76,7 +76,7 @@ class RiverFieldPreset extends React.Component<RiverFieldPresetProps, unknown> {
 				/>
 				<ContextMenuItemV2
 					text={
-						<button type='button' className='flex gap-4 items-center justify-between'>
+						<button type="button" className="flex gap-4 items-center justify-between">
 							<span>{window.t.translate('South')}</span>
 							{field.direction === 'SOUTH' ? <VscCheck /> : null}
 						</button>
@@ -87,7 +87,7 @@ class RiverFieldPreset extends React.Component<RiverFieldPresetProps, unknown> {
 				/>
 				<ContextMenuItemV2
 					text={
-						<button type='button' className='flex gap-4 items-center justify-between'>
+						<button type="button" className="flex gap-4 items-center justify-between">
 							<span>{window.t.translate('West')}</span>
 							{field.direction === 'WEST' ? <VscCheck /> : null}
 						</button>
@@ -96,7 +96,7 @@ class RiverFieldPreset extends React.Component<RiverFieldPresetProps, unknown> {
 						this.changeDirection('WEST');
 					}}
 				/>
-			</ContextMenuV2>,
+			</ContextMenuV2>
 		);
 	};
 
@@ -109,8 +109,8 @@ class RiverFieldPreset extends React.Component<RiverFieldPresetProps, unknown> {
 		const { field, onClick } = this.props;
 		return (
 			<button
-				type='button'
-				className='relative dark:bg-blue-600 bg-blue-400 xl:min-w-8 xl:w-8 xl:h-8 min-w-7 w-7 h-7 flex items-center justify-center outline outline-1 dark:outline-muted-700 outline-muted-500'
+				type="button"
+				className="relative dark:bg-blue-600 bg-blue-400 xl:min-w-8 xl:w-8 xl:h-8 min-w-7 w-7 h-7 flex items-center justify-center outline outline-1 dark:outline-muted-700 outline-muted-500"
 				onContextMenu={this.showContextMenu}
 				onClick={() => {
 					onClick(field.position);

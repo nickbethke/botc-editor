@@ -1,29 +1,31 @@
-import { Component } from 'react';
+import React, { Component } from 'react';
 import _uniqueId from 'lodash/uniqueId';
 
 type ButtonProps = {
-	type?: 'button' | 'submit' | 'reset';
+	type?: Readonly<'button' | 'submit' | 'reset' | undefined>;
 	onClick?: () => void;
 	className?: string;
 	disabled?: boolean;
 	buttonType?: 'primary' | 'secondary' | 'default';
-	border?: 'l' | 'r' | 't' | 'b' | 'x' | 'y' | 'tr' | 'tl' | 'br' | 'bl' | 'none';
+	border?: 'l' | 'r' | 't' | 'b' | 'x' | 'y' | 'tr' | 'tl' | 'br' | 'bl' | 'none' | 'default';
 	size?: 'sm' | 'md' | 'lg';
 	icon?: React.JSX.Element;
 	children?: React.JSX.Element | string | React.JSX.Element[] | string[];
-}
+};
 
 export default class Button extends Component<ButtonProps> {
-
 	static get defaultProps() {
 		return {
 			buttonType: 'default',
 			disabled: false,
+			border: 'default',
+			size: 'md',
+			icon: null,
+			children: null,
+			className: '',
+			onClick: () => {},
+			type: 'button',
 		};
-	}
-
-	constructor(props: ButtonProps) {
-		super(props);
 	}
 
 	getSizeClass = () => {
@@ -64,6 +66,7 @@ export default class Button extends Component<ButtonProps> {
 				return 'rounded-bl';
 			case 'none':
 				return '';
+			case 'default':
 			default:
 				return 'rounded';
 		}
@@ -82,16 +85,20 @@ export default class Button extends Component<ButtonProps> {
 	};
 
 	render() {
+		const { type, onClick, className, disabled, icon, children } = this.props;
 		return (
 			<button
-				disabled={this.props.disabled}
-				type={this.props.type || 'button'}
-				className={`${this.getSizeClass()} ${this.getBorderClass()} inline-flex items-center gap-2 font-bold transition-all ${this.props.className} ${this.getButtonTypeClass()}`}
-				onClick={this.props.onClick}>
-				{this.props.icon}
-				{this.props.children instanceof Array ? this.props.children.map((child, index) => {
-					return <div key={_uniqueId()}>{child}</div>;
-				}) : this.props.children}
+				type={type}
+				disabled={disabled}
+				className={`${this.getSizeClass()} ${this.getBorderClass()} inline-flex items-center gap-2 font-bold transition-all ${className} ${this.getButtonTypeClass()}`}
+				onClick={onClick}
+			>
+				{icon}
+				{children instanceof Array
+					? children.map((child, index) => {
+							return <div key={_uniqueId()}>{child}</div>;
+					  })
+					: children}
 			</button>
 		);
 	}

@@ -19,25 +19,6 @@ import DirectionHelper from './helper/DirectionHelper';
 import { wallBoardPositions2StringArray } from './interfaces/BoardPosition';
 
 /**
- * random boardConfigurator start configuration type
- */
-export type RandomBoardStartValues = {
-	name: string;
-	width: number;
-	height: number;
-	startFields: number;
-	checkpoints: number;
-	lembasFields: number;
-	maxLembasAmountOnField: number;
-	lembasAmountExactMaximum: boolean;
-	rivers: boolean;
-	holes: number;
-	walls: boolean;
-	riverAlgorithm: RiverAlgorithm;
-	wallsAlgorithm: WallAlgorithm;
-};
-
-/**
  * river algorithm type
  */
 export type RiverAlgorithm = 'default' | 'complex';
@@ -46,6 +27,24 @@ export type RiverAlgorithm = 'default' | 'complex';
  * river algorithm type
  */
 export type WallAlgorithm = 'iterative' | 'random';
+/**
+ * random boardConfigurator start configuration type
+ */
+export type RandomBoardStartValues = {
+	checkpoints: number;
+	height: number;
+	holes: number;
+	lembasAmountExactMaximum: boolean;
+	lembasFields: number;
+	maxLembasAmountOnField: number;
+	name: string;
+	riverAlgorithm: RiverAlgorithm;
+	rivers: boolean;
+	startFields: number;
+	walls: boolean;
+	wallsAlgorithm: WallAlgorithm;
+	width: number;
+};
 
 /**
  * default random boardConfigurator start configuration
@@ -217,7 +216,6 @@ class BoardGenerator {
 				this.genWallsRandom();
 			}
 		}
-
 	}
 
 	/**
@@ -249,7 +247,7 @@ class BoardGenerator {
 	 * @param position
 	 */
 	public static lembasFieldsArrayToBoardPositionArray(
-		position: LembasField[],
+		position: LembasField[]
 	): { position: BoardPosition; amount: number }[] {
 		const boardPositions: { position: BoardPosition; amount: number }[] = [];
 		for (const lembasField of position) {
@@ -282,10 +280,10 @@ class BoardGenerator {
 	 * @param width Width of the virtual board
 	 */
 	public static generateBoardArray(height: number, width: number): Array<Array<FieldWithPositionInterface>> {
-		const board = new Array<Array<FieldWithPositionInterface>>();
+		const board: Array<Array<FieldWithPositionInterface>> = [];
 
 		for (let x = 0; x < width; x += 1) {
-			const row: FieldWithPositionInterface[] = new Array<FieldWithPositionInterface>();
+			const row: FieldWithPositionInterface[] = [];
 			for (let y = 0; y < height; y += 1) {
 				row.push(new Grass({ x, y }));
 			}
@@ -352,7 +350,7 @@ class BoardGenerator {
 				this.startFields,
 				this.lembasFields,
 				boardClone,
-				new Map([]),
+				new Map([])
 			);
 			// if all paths is possible add the hole field
 			if (result) {
@@ -479,10 +477,10 @@ class BoardGenerator {
 	public getRiverNeighbors(position: BoardPosition): Array<{ position: BoardPosition; direction: Direction }> {
 		const { x, y } = position;
 
-		const neighbors = new Array<{
+		const neighbors: {
 			position: BoardPosition;
 			direction: Direction;
-		}>();
+		}[] = [];
 		// north
 		let currentPosition = { x, y: y - 1 };
 		if (this.isPositionInBoard(currentPosition) && this.board[y - 1][x] instanceof Grass) {
@@ -545,7 +543,7 @@ class BoardGenerator {
 						this.startFields,
 						this.lembasFields,
 						this.board,
-						new Map(this.wallMapArray),
+						new Map(this.wallMapArray)
 					);
 					alreadyTried.push(s1, s2);
 					if (result) {
@@ -569,7 +567,7 @@ class BoardGenerator {
 	private getNeighbors(position: BoardPosition): Array<BoardPosition> {
 		const { x, y } = position;
 
-		const neighbors = new Array<BoardPosition>();
+		const neighbors: BoardPosition[] = [];
 		// north
 		let currentPosition = { x, y: y - 1 };
 		if (this.isPositionInBoard(currentPosition)) {
@@ -619,7 +617,7 @@ class BoardGenerator {
 						this.startFields,
 						this.lembasFields,
 						this.board,
-						new Map(this.wallMapArray),
+						new Map(this.wallMapArray)
 					);
 					if (!pathPossible) {
 						this.wallMapArray = wallsArrayCopy;
@@ -645,7 +643,7 @@ class BoardGenerator {
 	private getNeighbors_David(position: BoardPosition): Array<BoardPosition> {
 		const { x, y } = position;
 
-		const neighbors = new Array<BoardPosition>();
+		const neighbors: BoardPosition[] = [];
 		// east
 		let currentPosition = { x: x + 1, y };
 		if (this.isPositionInBoard(currentPosition)) {
@@ -660,8 +658,8 @@ class BoardGenerator {
 	}
 
 	private isPositionInBoard(position: BoardPosition): boolean {
-		const width = this.startValues.width;
-		const height = this.startValues.height;
+		const { width } = this.startValues;
+		const { height } = this.startValues;
 		const { x, y } = position;
 		return x >= 0 && x < width - 1 && y >= 0 && y < height - 1;
 	}
@@ -811,7 +809,7 @@ class BoardGenerator {
 
 		board[json.eye.position[1]][json.eye.position[0]] = new SauronsEye(
 			BoardGenerator.positionToBoardPosition(json.eye.position),
-			BoardGenerator.directionToDirectionEnum(json.eye.direction),
+			BoardGenerator.directionToDirectionEnum(json.eye.direction)
 		);
 
 		for (const startField of json.startFields) {
