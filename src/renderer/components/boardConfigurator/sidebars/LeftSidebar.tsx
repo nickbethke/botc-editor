@@ -18,6 +18,7 @@ import { MdBorderStyle, MdOutlineFastfood } from 'react-icons/md';
 import { BiWater } from 'react-icons/bi';
 import { BsCursor } from 'react-icons/bs';
 import Mousetrap from 'mousetrap';
+import { GiEagleHead } from 'react-icons/gi';
 import { FieldsEnum } from '../../generator/BoardGenerator';
 import SidebarMenuItem, { SidebarMenuItemSeparator } from '../SidebarMenuItem';
 import BoardConfigInterface, { Direction, DirectionEnum } from '../../../../interfaces/BoardConfigInterface';
@@ -483,6 +484,15 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 					}}
 					shortCut={`${window.t.translate('Ctrl')}+6`}
 				/>
+				<SidebarMenuItem
+					label={window.t.translate('Eagle Field')}
+					open={currentTool === FieldsEnum.EAGLE}
+					icon={<GiEagleHead />}
+					onClick={() => {
+						this.handleCurrentToolChange(FieldsEnum.EAGLE);
+					}}
+					shortCut={`${window.t.translate('Ctrl')}+7`}
+				/>
 				<SidebarMenuItemSeparator />
 				<SidebarMenuItem
 					label={window.t.translate('Wall Tool')}
@@ -491,7 +501,7 @@ class LeftSidebar extends React.Component<LeftSidebarProps, unknown> {
 					onClick={() => {
 						this.handleCurrentToolChange(FieldsEnum.WALL);
 					}}
-					shortCut={`${window.t.translate('Ctrl')}+7`}
+					shortCut={`${window.t.translate('Ctrl')}+8`}
 				/>
 			</>
 		);

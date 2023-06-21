@@ -12,6 +12,7 @@ interface BoardConfigInterface {
 	startFields: PositionDirection[];
 	walls: Array<Array<Position>>;
 	width: number;
+	eagleFields: Position[];
 }
 
 /**

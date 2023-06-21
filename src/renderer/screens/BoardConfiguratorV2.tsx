@@ -24,6 +24,7 @@ import {
 } from '../components/generator/interfaces/BoardPosition';
 import {
 	addCheckpoint,
+	addEagle,
 	addHole,
 	addLembasField,
 	addRiver,
@@ -33,6 +34,7 @@ import {
 	isBoardConfiguration,
 	moveSauronsEye,
 	removeCheckpoint,
+	removeEagle,
 	removeHole,
 	removeLembasField,
 	removeRiver,
@@ -128,6 +130,7 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 		riverFields: [],
 		holes: [],
 		walls: [],
+		eagleFields: [],
 	};
 
 	/**
@@ -162,7 +165,7 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 
 	constructor(props: BoardConfiguratorV2Props) {
 		super(props);
-		const conf = props.config || BoardConfiguratorV2.defaultBoard;
+		const conf = props.config ?? BoardConfiguratorV2.defaultBoard;
 		this.state = {
 			windowDimensions: {
 				width: window.innerWidth,
@@ -180,7 +183,7 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 			config: conf,
 			mainEditorZoom: 1,
 			fieldInEdit: null,
-			file: props.file || null,
+			file: props.file ?? null,
 			fileSaved: !!props.file,
 			warnings: this.checkWarnings(conf),
 			riverPresets: [],
@@ -263,8 +266,11 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 		Mousetrap.bind('ctrl+6', () => {
 			this.setState({ currentTool: FieldsEnum.HOLE });
 		});
-		Mousetrap.bind('ctrl+7', () => {
+		Mousetrap.bind('ctrl+8', () => {
 			this.setState({ currentTool: FieldsEnum.WALL });
+		});
+		Mousetrap.bind('ctrl+7', () => {
+			this.setState({ currentTool: FieldsEnum.EAGLE });
 		});
 		Mousetrap.bind(['ctrl+e'], () => {
 			this.setState({ currentTool: 'edit' });
@@ -395,6 +401,9 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 			case FieldsEnum.HOLE:
 				this.updateConfiguration(removeHole(position, config));
 				break;
+			case FieldsEnum.EAGLE:
+				this.updateConfiguration(removeEagle(position, config));
+				break;
 			default:
 				break;
 		}
@@ -436,6 +445,7 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 					});
 					break;
 				case FieldsEnum.HOLE:
+				case FieldsEnum.EAGLE:
 				default:
 					this.setState({
 						fieldInEdit: position,
@@ -466,6 +476,9 @@ class BoardConfiguratorV2 extends React.Component<BoardConfiguratorV2Props, Boar
 				break;
 			case FieldsEnum.HOLE:
 				this.updateConfiguration(addHole(position, config));
+				break;
+			case FieldsEnum.EAGLE:
+				this.updateConfiguration(addEagle(position, config));
 				break;
 			default:
 				break;

@@ -27,6 +27,7 @@ export type GetFieldTypeReturnValues =
 	| FieldsEnum.HOLE
 	| FieldsEnum.LEMBAS
 	| FieldsEnum.RIVER
+	| FieldsEnum.EAGLE
 	| null;
 
 /**
@@ -56,6 +57,10 @@ export function getFieldType(position: BoardPosition, config: BoardConfigInterfa
 	}
 	if (config.holes.find((e) => position2String(e) === positionString) !== undefined) {
 		return FieldsEnum.HOLE;
+	}
+
+	if (config.eagleFields.find((e) => position2String(e) === positionString) !== undefined) {
+		return FieldsEnum.EAGLE;
 	}
 
 	return null;
@@ -129,6 +134,11 @@ export function removeHole(position: BoardPosition, config: BoardConfigInterface
 	return { ...config, holes: filteredHolesArray };
 }
 
+export function removeEagle(position: BoardPosition, config: BoardConfigInterface): BoardConfigInterface {
+	const filteredEagleArray = config.eagleFields.filter((e) => position2String(e) !== boardPosition2String(position));
+	return { ...config, eagleFields: filteredEagleArray };
+}
+
 /**
  * remove a wall with the position from the board config
  * @param position
@@ -185,6 +195,12 @@ function overrideField(
 				config: removeHole(position, config),
 				override: true,
 			};
+		case FieldsEnum.EAGLE:
+			return {
+				config: removeEagle(position, config),
+				override: true,
+			};
+
 		default:
 			return { config, override: false };
 	}
@@ -284,6 +300,13 @@ export function addHole(position: BoardPosition, config: BoardConfigInterface): 
 	const newHolesArray = newConfig.holes;
 	newHolesArray.push(boardPosition2Position(position));
 	return { ...newConfig, holes: newHolesArray };
+}
+
+export function addEagle(position: BoardPosition, config: BoardConfigInterface): BoardConfigInterface {
+	const { config: newConfig } = overrideField(position, config);
+	const newEagleFieldsArray = newConfig.eagleFields;
+	newEagleFieldsArray.push(boardPosition2Position(position));
+	return { ...newConfig, eagleFields: newEagleFieldsArray };
 }
 
 /**

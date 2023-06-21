@@ -32,6 +32,14 @@ class BoardConfigValidator {
 			this.errors.push(`Start fields are to less (minimum 2) or not defined`);
 		}
 
+		if (!this.config.eagleFields || !('eagleFields' in this.config)) {
+			this.errors.push(`Eagle fields are not defined`);
+		}
+
+		if (!this.config.lembasFields || !('lembasFields' in this.config)) {
+			this.errors.push(`Lembas fields are not defined`);
+		}
+
 		this.errors.forEach((error, index) => {
 			this.errors[index] = window.t.translate(error);
 		});

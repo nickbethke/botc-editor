@@ -143,7 +143,7 @@ function FieldHelper(props: FieldHelperProps) {
 	let inactiveClass = 'bg-muted-700 hover:bg-muted-600 hover:cursor-pointer';
 	const activeClass = 'bg-accent/40 hover:bg-accent/75 shadow-lg hover:cursor-pointer';
 	const inEditClass = `${activeClass} border-red-400`;
-	const editableFieldTypes = [FieldsEnum.EYE, FieldsEnum.START, FieldsEnum.RIVER, FieldsEnum.LEMBAS];
+	const editableFieldTypes = [FieldsEnum.EYE, FieldsEnum.START, FieldsEnum.RIVER, FieldsEnum.LEMBAS, FieldsEnum.EAGLE];
 	const editable = type !== null ? editableFieldTypes.includes(type) : false;
 	/**
 	 * Return the field type css class
@@ -164,6 +164,8 @@ function FieldHelper(props: FieldHelperProps) {
 				return 'isRiver';
 			case FieldsEnum.HOLE:
 				return 'isHole';
+			case FieldsEnum.EAGLE:
+				return 'isEagleField';
 			default:
 				return '';
 		}

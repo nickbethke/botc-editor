@@ -932,6 +932,14 @@
 		[
 			"Board sizes over 32 could cause performance issues or the app to crash",
 			"Spielfeld Größen über 32 könnten zu Performance Problemen oder zum Absturz der App führen"
+		],
+		[
+			"Lembas fields are not defined",
+			"Lembas Felder sind nicht definiert"
+		],
+		[
+			"Eagle fields are not defined",
+			"Adler Felder sind nicht definiert"
 		]
 	]
 }
