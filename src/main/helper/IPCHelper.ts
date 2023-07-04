@@ -31,6 +31,7 @@ class IPCHelper {
 			maxLembasFields: 16,
 			maxLembasCount: 10,
 			maxHoles: 16,
+			maxEagleFields: 16,
 		},
 	};
 

@@ -12,5 +12,6 @@ export interface SettingsInterface {
 		maxLembasFields: number;
 		maxLembasCount: number;
 		maxHoles: number;
+		maxEagleFields: number;
 	};
 }

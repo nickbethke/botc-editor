@@ -17,6 +17,7 @@ import Board from './Board';
 import AStar from './helper/AStar';
 import DirectionHelper from './helper/DirectionHelper';
 import { wallBoardPositions2StringArray } from './interfaces/BoardPosition';
+import EagleField from './fields/EagleField';
 
 /**
  * river algorithm type
@@ -44,6 +45,7 @@ export type RandomBoardStartValues = {
 	walls: boolean;
 	wallsAlgorithm: WallAlgorithm;
 	width: number;
+	eagleFields: number;
 };
 
 /**
@@ -63,6 +65,7 @@ export const defaultStartValues: RandomBoardStartValues = {
 	walls: false,
 	wallsAlgorithm: 'iterative',
 	riverAlgorithm: 'default',
+	eagleFields: 0,
 };
 
 /**
@@ -216,6 +219,8 @@ class BoardGenerator {
 				this.genWallsRandom();
 			}
 		}
+
+		this.genEagleFields();
 	}
 
 	/**
@@ -875,6 +880,15 @@ class BoardGenerator {
 			}
 		}
 		return newBoard;
+	}
+
+	private genEagleFields() {
+		const todo = this.startValues.eagleFields;
+		for (let i = 0; i < todo; i += 1) {
+			const position = this.getRandomPosition();
+			this.board[position.x][position.y] = new EagleField(position);
+			this.boardJSON.addEagleField(position);
+		}
 	}
 }
 

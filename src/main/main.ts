@@ -66,9 +66,9 @@ const createWindow = async () => {
 		autoHideMenuBar: true,
 		show: false,
 		width: 1195,
-		height: 880,
+		height: 940,
 		minWidth: 1195,
-		minHeight: 880,
+		minHeight: 940,
 		titleBarStyle: 'hidden',
 		titleBarOverlay: {
 			color: 'hsl(204,14%,49%)',

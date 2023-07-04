@@ -31,6 +31,8 @@ class Board implements BoardConfigInterface {
 
 	width: number;
 
+	eagleFields: Position[] = [];
+
 	constructor(name: string, width: number, height: number) {
 		this.width = width;
 		this.height = height;
@@ -110,6 +112,15 @@ class Board implements BoardConfigInterface {
 	 */
 	public addWall(position: [[number, number], [number, number]]) {
 		this.walls.push(position);
+	}
+
+	/**
+	 * Add a position to the eagleFields array
+	 * @param position
+	 */
+	public addEagleField(position: BoardPosition) {
+		const { x, y } = position;
+		this.eagleFields.push([x, y]);
 	}
 
 	/**

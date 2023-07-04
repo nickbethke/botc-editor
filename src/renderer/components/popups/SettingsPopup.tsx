@@ -1,4 +1,5 @@
 import React from 'react';
+import { merge } from 'lodash';
 import { SettingsInterface } from '../../../interfaces/SettingsInterface';
 import ConfirmPopupV2 from './ConfirmPopupV2';
 import InputLabel from '../InputLabel';
@@ -34,6 +35,7 @@ class SettingsPopup extends React.Component<SettingsPopupProps, SettingsPopupSta
 				maxHoles: 10,
 				maxLembasCount: 10,
 				maxLembasFields: 10,
+				maxEagleFields: 10,
 			},
 		};
 	}
@@ -41,7 +43,7 @@ class SettingsPopup extends React.Component<SettingsPopupProps, SettingsPopupSta
 	constructor(props: SettingsPopupProps) {
 		super(props);
 		this.state = {
-			settings: props.settings,
+			settings: merge(SettingsPopup.defaultSettings, props.settings),
 			openView: 'settings',
 		};
 	}
@@ -258,6 +260,26 @@ class SettingsPopup extends React.Component<SettingsPopupProps, SettingsPopupSta
 												defaultValues: {
 													...settings.defaultValues,
 													maxHoles,
+												},
+											},
+										});
+									}}
+									max={64}
+									min={1}
+								/>
+							</div>
+							<div className="grid grid-cols-2 items-center gap-8">
+								<p>{window.t.translate('Maximum Eagle Fields')}</p>
+								<InputLabel
+									type="number"
+									value={settings.defaultValues.maxEagleFields}
+									onChange={(maxEagleFields) => {
+										this.setState({
+											settings: {
+												...settings,
+												defaultValues: {
+													...settings.defaultValues,
+													maxEagleFields,
 												},
 											},
 										});

@@ -22,8 +22,10 @@ class TranslationHelper {
 
 	public translate(str: string): string {
 		if (this.loadedLanguage.has(str)) {
-			return this.loadedLanguage.get(str) || str;
+			return this.loadedLanguage.get(str) ?? str;
 		}
+		console.warn(`Translation for ${str} not found!`);
+		console.log(JSON.stringify([str, '']));
 		return str;
 	}
 

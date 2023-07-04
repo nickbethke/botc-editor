@@ -4,6 +4,7 @@ import InputLabel from '../InputLabel';
 import BoardGenerator, { RiverAlgorithm, WallAlgorithm } from '../generator/BoardGenerator';
 import { SettingsInterface } from '../../../interfaces/SettingsInterface';
 import ConfirmPopupV2 from './ConfirmPopupV2';
+import eagleField from '../generator/fields/EagleField';
 
 export type RandomBoardStartValuesDialogV2Stats = {
 	checkpoints: number;
@@ -20,6 +21,7 @@ export type RandomBoardStartValuesDialogV2Stats = {
 	walls: boolean;
 	wallsAlgorithm: WallAlgorithm;
 	width: number;
+	eagleFields: number;
 };
 
 export type RandomBoardStartValuesV2 = {
@@ -36,6 +38,7 @@ export type RandomBoardStartValuesV2 = {
 	walls: boolean;
 	riverAlgorithm: RiverAlgorithm;
 	wallsAlgorithm: WallAlgorithm;
+	eagleFields: number;
 };
 
 type RandomBoardStartValuesDialogV2Props = {
@@ -70,6 +73,7 @@ class RandomBoardStartValuesDialogV2 extends React.Component<
 			riverAlgorithm: 'default',
 			wallsAlgorithm: 'iterative',
 			generating: false,
+			eagleFields: 0,
 		};
 
 		this.dimensionMax = props.settings.defaultValues.maxBoardSize;
@@ -128,8 +132,8 @@ class RandomBoardStartValuesDialogV2 extends React.Component<
 	}
 
 	getNeededFieldCount = () => {
-		const { startFields, checkpoints, lembasFields, holes } = this.state;
-		return startFields + checkpoints + lembasFields + holes + 1;
+		const { startFields, checkpoints, lembasFields, holes, eagleFields } = this.state;
+		return startFields + checkpoints + lembasFields + holes + 1 + eagleFields;
 	};
 
 	generate = () => {
@@ -149,6 +153,7 @@ class RandomBoardStartValuesDialogV2 extends React.Component<
 					checkpoints,
 					name,
 					width,
+					eagleFields,
 				} = this.state;
 				const { onConfirm } = this.props;
 				const generationValues: RandomBoardStartValuesV2 = {
@@ -165,6 +170,7 @@ class RandomBoardStartValuesDialogV2 extends React.Component<
 					checkpoints,
 					name,
 					width,
+					eagleFields,
 				};
 				const generator = new BoardGenerator(generationValues);
 				this.setState({ generating: false });
@@ -189,6 +195,7 @@ class RandomBoardStartValuesDialogV2 extends React.Component<
 			walls,
 			holes,
 			generating,
+			eagleFields,
 		} = this.state;
 		const { windowDimensions, os, topOffset, onAbort, settings } = this.props;
 		return (
@@ -318,19 +325,35 @@ class RandomBoardStartValuesDialogV2 extends React.Component<
 						</div>
 					</div>
 					<hr className="my-4" />
-					<div className="relative grid gap-8 h-fit mx-auto w-1/2">
-						<InputLabel
-							label={window.t.translate('Holes')}
-							type="range"
-							value={holes}
-							onChange={(value) => {
-								this.setState({
-									holes: Number.parseInt(value.toString(), 10),
-								});
-							}}
-							min={0}
-							max={settings.defaultValues.maxHoles}
-						/>
+					<div className="flex gap-8 w-full">
+						<div className="w-full">
+							<InputLabel
+								label={window.t.translate('Holes')}
+								type="range"
+								value={holes}
+								onChange={(value) => {
+									this.setState({
+										holes: Number.parseInt(value.toString(), 10),
+									});
+								}}
+								min={0}
+								max={settings.defaultValues.maxHoles}
+							/>
+						</div>
+						<div className="w-full">
+							<InputLabel
+								label={window.t.translate('Eagle Fields')}
+								type="range"
+								value={eagleFields}
+								onChange={(value) => {
+									this.setState({
+										eagleFields: Number.parseInt(value.toString(), 10),
+									});
+								}}
+								min={0}
+								max={settings.defaultValues.maxEagleFields}
+							/>
+						</div>
 					</div>
 					<hr className="my-4" />
 					<div className="text-center font-lato flex flex-col">
