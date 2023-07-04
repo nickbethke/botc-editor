@@ -85,6 +85,7 @@ describe('wall generation', () => {
 			wallsAlgorithm: 'iterative',
 			riverAlgorithm: 'default',
 			name: 'Small Board',
+			eagleFields: 0,
 		};
 
 		const generator = Board.generateRandom(startValuesSmall);

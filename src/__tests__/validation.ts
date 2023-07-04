@@ -30,6 +30,7 @@ const invalidBoardConfig: BoardConfigInterface = {
 		[0, 3],
 		[0, 4],
 	],
+	eagleFields: [],
 };
 
 // is valid board configuration after the schema, and valid for the game
@@ -54,6 +55,7 @@ const validBoardConfig: BoardConfigInterface = {
 		[0, 3],
 		[0, 4],
 	],
+	eagleFields: [],
 };
 
 // missing required fields for a valid board configuration
