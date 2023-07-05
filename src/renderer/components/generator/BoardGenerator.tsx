@@ -488,24 +488,24 @@ class BoardGenerator {
 		}[] = [];
 		// north
 		let currentPosition = { x, y: y - 1 };
-		if (this.isPositionInBoard(currentPosition) && this.board[y - 1][x] instanceof Grass) {
+		if (this.isPositionInBoard(currentPosition) && this.board[x][y - 1] instanceof Grass) {
 			neighbors.push({ position: currentPosition, direction: 'NORTH' });
 		}
 
 		// east
 		currentPosition = { x: x + 1, y };
-		if (this.isPositionInBoard(currentPosition) && this.board[y][x + 1] instanceof Grass) {
+		if (this.isPositionInBoard(currentPosition) && this.board[x + 1][y] instanceof Grass) {
 			neighbors.push({ position: currentPosition, direction: 'EAST' });
 		}
 		// south
 		currentPosition = { x, y: y + 1 };
-		if (this.isPositionInBoard(currentPosition) && this.board[y + 1][x] instanceof Grass) {
+		if (this.isPositionInBoard(currentPosition) && this.board[x][y + 1] instanceof Grass) {
 			neighbors.push({ position: currentPosition, direction: 'SOUTH' });
 		}
 
 		// west
 		currentPosition = { x: x - 1, y };
-		if (this.isPositionInBoard(currentPosition) && this.board[y][x - 1] instanceof Grass) {
+		if (this.isPositionInBoard(currentPosition) && this.board[x - 1][y] instanceof Grass) {
 			neighbors.push({ position: currentPosition, direction: 'WEST' });
 		}
 
@@ -566,7 +566,7 @@ class BoardGenerator {
 	}
 
 	private getFieldFromPosition(position: BoardPosition): FieldWithPositionInterface {
-		return this.board[position.y][position.x];
+		return this.board[position.x][position.y];
 	}
 
 	private getNeighbors(position: BoardPosition): Array<BoardPosition> {
