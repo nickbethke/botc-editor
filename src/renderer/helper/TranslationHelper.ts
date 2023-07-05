@@ -12,7 +12,7 @@ export interface LanguageSchema {
 class TranslationHelper {
 	private lang: AvailableLanguages;
 
-	private loadedLanguage: Map<string, string>;
+	public loadedLanguage: Map<string, string>;
 
 	constructor(lang: AvailableLanguages, test?: boolean) {
 		this.lang = lang;
@@ -24,8 +24,6 @@ class TranslationHelper {
 		if (this.loadedLanguage.has(str)) {
 			return this.loadedLanguage.get(str) ?? str;
 		}
-		console.warn(`Translation for ${str} not found!`);
-		console.log(JSON.stringify([str, '']));
 		return str;
 	}
 

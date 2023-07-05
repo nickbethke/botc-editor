@@ -69,6 +69,31 @@ describe('calculations', () => {
 	});
 });
 
+describe('eagle fields', () => {
+	test('eagle fields', () => {
+		const startValuesSmall: RandomBoardStartValues = {
+			checkpoints: 4,
+			height: 16,
+			lembasFields: 8,
+			maxLembasAmountOnField: 3,
+			lembasAmountExactMaximum: false,
+			rivers: true,
+			startFields: 6,
+			width: 16,
+			holes: 8,
+			walls: true,
+			wallsAlgorithm: 'iterative',
+			riverAlgorithm: 'default',
+			name: 'Small Board',
+			eagleFields: 8,
+		};
+
+		const generator = Board.generateRandom(startValuesSmall);
+		expect(generator.boardJSON.eagleFields.length).toBeGreaterThanOrEqual(0);
+		expect(isGeneratedBoardValid(generator.boardJSON)).toBe(true);
+	});
+});
+
 describe('wall generation', () => {
 	test('walls', () => {
 		const startValuesSmall: RandomBoardStartValues = {
