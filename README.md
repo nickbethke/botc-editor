@@ -29,8 +29,8 @@ Nachdem NodeJS installiert ist, kann das Projekt installiert werden. Dazu muss d
 Abhängigkeiten installiert werden:
 
 ```bash
-git clone https://gitlab.uni-ulm.de/softwaregrundprojekt/2022-2023/messe/editor/messe-editor-team-11.git
-cd messe-editor-team-11
+git clone https://github.com/nickbethke/botc-editor.git
+cd botc-editor
 npm i -g ts ts-node
 npm install
 ```
@@ -72,7 +72,7 @@ werden:
 
 > macOS [Download WebStorm](https://www.jetbrains.com/de-de/webstorm/download/#section=mac)
 
-Nachdem die IDE installiert ist, kann das Projekt geöffnet werden. Dazu muss der Ordner `messe-editor-team-11` als
+Nachdem die IDE installiert ist, kann das Projekt geöffnet werden. Dazu muss der Ordner `botc-editor` als
 Projekt geöffnet werden. Nachdem das Projekt geöffnet ist, kann die IDE genutzt werden.
 
 ## Tests ausführen
